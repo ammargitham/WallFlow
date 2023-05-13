@@ -1,0 +1,53 @@
+package com.ammar.havenwalls.ui.wallpaper
+
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import androidx.core.app.TaskStackBuilder
+import androidx.core.net.toUri
+import coil.memory.MemoryCache
+import com.ammar.havenwalls.LOCAL_DEEPLINK_SCHEME
+import com.ammar.havenwalls.model.Wallpaper
+import com.ammar.havenwalls.activities.main.MainActivity
+import kotlin.random.Random
+
+data class WallpaperScreenNavArgs(
+    val cacheKey: MemoryCache.Key? = null,
+    val wallpaperId: String,
+)
+
+const val wallpaperScreenLocalHost = "w"
+const val wallpaperScreenLocalDeepLinkUriPattern =
+    "$LOCAL_DEEPLINK_SCHEME://$wallpaperScreenLocalHost/{wallpaperId}"
+const val wallpaperScreenExternalDeepLinkUriPattern = "https://wallhaven.cc/w/{wallpaperId}"
+const val wallpaperScreenExternalShortDeepLinkUriPattern = "https://whvn.cc/{wallpaperId}"
+
+fun getWallpaperScreenLocalDeepLink(wallpaper: Wallpaper) =
+    getWallpaperScreenLocalDeepLink(wallpaper.id)
+
+fun getWallpaperScreenLocalDeepLink(wallpaperId: String) =
+    "$LOCAL_DEEPLINK_SCHEME://$wallpaperScreenLocalHost/${wallpaperId}"
+
+fun getWallpaperScreenPendingIntent(
+    context: Context,
+    wallpaper: Wallpaper,
+) = getWallpaperScreenPendingIntent(context, wallpaper.id)
+
+fun getWallpaperScreenPendingIntent(
+    context: Context,
+    wallpaperId: String,
+): PendingIntent? {
+    val deepLinkIntent = Intent(
+        Intent.ACTION_VIEW,
+        getWallpaperScreenLocalDeepLink(wallpaperId).toUri(),
+        context,
+        MainActivity::class.java,
+    )
+    return TaskStackBuilder.create(context).run {
+        addNextIntentWithParentStack(deepLinkIntent)
+        getPendingIntent(
+            Random.nextInt(),
+            PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_ONE_SHOT,
+        )
+    }
+}
