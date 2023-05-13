@@ -10,16 +10,16 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.ammar.havenwalls.R
 import com.ammar.havenwalls.data.preferences.AppPreferences
 import com.ammar.havenwalls.data.preferences.ObjectDetectionPreferences
-import com.ammar.havenwalls.extensions.produceState
 import com.ammar.havenwalls.model.ObjectDetectionModel
 import com.ammar.havenwalls.ui.common.TopBar
 import com.ammar.havenwalls.ui.common.bottombar.LocalBottomBarController
@@ -37,11 +37,7 @@ fun SettingsScreen(
     navController: NavController,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
-    val lifecycle = LocalLifecycleOwner.current.lifecycle
-    val uiState = lifecycle.produceState(
-        viewModel = viewModel,
-        initialValue = SettingsUiState(),
-    )
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val searchBarController = LocalMainSearchBarController.current
     val bottomBarController = LocalBottomBarController.current
 
@@ -106,9 +102,9 @@ fun SettingsScreen(
         )
     }
 
-    if (uiState.deleteModel != null) {
+    uiState.deleteModel?.run {
         ObjectDetectionModelDeleteConfirmDialog(
-            model = uiState.deleteModel,
+            model = this,
             onConfirmClick = { viewModel.deleteModel(uiState.deleteModel, true) },
             onDismissRequest = { viewModel.deleteModel(null) },
         )

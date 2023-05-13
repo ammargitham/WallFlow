@@ -2,7 +2,6 @@ package com.ammar.havenwalls.extensions
 
 import android.util.Log
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
@@ -10,9 +9,6 @@ import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.core.graphics.toColorInt
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.repeatOnLifecycle
-import com.ammar.havenwalls.ui.common.UiStateViewModel
 
 fun Color.toHexString() = String.format("#%06X", 0xFFFFFF and this.toArgb())
 
@@ -24,23 +20,6 @@ fun Dp.toPx() = with(LocalDensity.current) { roundToPx() }
 
 @Composable
 fun Dp.toPxF() = with(LocalDensity.current) { toPx() }
-
-@Composable
-fun <T> Lifecycle.produceState(
-    viewModel: UiStateViewModel<T>,
-    initialValue: T,
-): T {
-    val uiState by androidx.compose.runtime.produceState(
-        initialValue = initialValue,
-        key1 = this,
-        key2 = viewModel
-    ) {
-        repeatOnLifecycle(state = Lifecycle.State.STARTED) {
-            viewModel.uiState.collect { value = it }
-        }
-    }
-    return uiState
-}
 
 fun Modifier.ignoreHorizontalParentPadding(horizontal: Dp) =
     this.layout { measurable, constraints ->

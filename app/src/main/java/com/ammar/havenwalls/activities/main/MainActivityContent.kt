@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -19,9 +20,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntSize
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.ammar.havenwalls.data.common.SearchQuery
 import com.ammar.havenwalls.data.repository.GlobalErrorsRepository.GlobalError
+import com.ammar.havenwalls.model.Search
 import com.ammar.havenwalls.model.wallpaper1
 import com.ammar.havenwalls.model.wallpaper2
+import com.ammar.havenwalls.ui.common.SearchBar
+import com.ammar.havenwalls.ui.common.Suggestion
 import com.ammar.havenwalls.ui.common.bottombar.BottomBar
 import com.ammar.havenwalls.ui.common.globalerrors.GlobalErrorsColumn
 import com.ammar.havenwalls.ui.common.mainsearch.MainSearchBar
@@ -38,11 +43,29 @@ fun MainActivityContent(
     currentDestination: TypedDestination<*>? = null,
     showBackButton: Boolean = false,
     globalErrors: List<GlobalError> = emptyList(),
+    searchBarVisible: Boolean = true,
+    searchBarActive: Boolean = false,
+    searchBarSearch: Search = Search(),
+    searchBarQuery: String = "",
+    searchBarSuggestions: List<Suggestion<Search>> = emptyList(),
+    showSearchBarFilters: Boolean = false,
+    searchBarDeleteSuggestion: Search? = null,
+    searchBarOverflowIcon: @Composable (() -> Unit)? = null,
     onBackClick: () -> Unit = {},
     onFixWallHavenApiKeyClick: () -> Unit = {},
     onDismissGlobalError: (error: GlobalError) -> Unit = {},
     onBottomBarSizeChanged: (size: IntSize) -> Unit = {},
     onBottomBarItemClick: (destination: DirectionDestinationSpec) -> Unit = {},
+    onSearchBarActiveChange: (active: Boolean) -> Unit = {},
+    onSearchBarQueryChange: (String) -> Unit = {},
+    onSearchBarSearch: (query: String) -> Unit = {},
+    onSearchBarSuggestionClick: (suggestion: Suggestion<Search>) -> Unit = {},
+    onSearchBarSuggestionInsert: (suggestion: Suggestion<Search>) -> Unit = {},
+    onSearchBarSuggestionDeleteRequest: (suggestion: Suggestion<Search>) -> Unit = {},
+    onSearchBarShowFiltersChange: (show: Boolean) -> Unit = {},
+    onSearchBarFiltersChange: (searchQuery: SearchQuery) -> Unit = {},
+    onDeleteSearchBarSuggestionConfirmClick: () -> Unit = {},
+    onDeleteSearchBarSuggestionDismissRequest: () -> Unit = {},
     content: @Composable (contentPadding: PaddingValues) -> Unit,
 ) {
     Column(
@@ -80,8 +103,25 @@ fun MainActivityContent(
                 content(it)
                 MainSearchBar(
                     modifier = Modifier.windowInsetsPadding(topWindowInsets),
-                    showBackButton = showBackButton,
-                    onBackClick = onBackClick,
+                    visible = searchBarVisible,
+                    active = searchBarActive,
+                    search = searchBarSearch,
+                    query = searchBarQuery,
+                    suggestions = searchBarSuggestions,
+                    showFilters = showSearchBarFilters,
+                    deleteSuggestion = searchBarDeleteSuggestion,
+                    overflowIcon = searchBarOverflowIcon,
+                    onQueryChange = onSearchBarQueryChange,
+                    onBackClick = if (showBackButton) onBackClick else null,
+                    onSearch = onSearchBarSearch,
+                    onSuggestionClick = onSearchBarSuggestionClick,
+                    onSuggestionInsert = onSearchBarSuggestionInsert,
+                    onSuggestionDeleteRequest = onSearchBarSuggestionDeleteRequest,
+                    onActiveChange = onSearchBarActiveChange,
+                    onShowFiltersChange = onSearchBarShowFiltersChange,
+                    onFiltersChange = onSearchBarFiltersChange,
+                    onDeleteSuggestionConfirmClick = onDeleteSearchBarSuggestionConfirmClick,
+                    onDeleteSuggestionDismissRequest = onDeleteSearchBarSuggestionDismissRequest,
                 )
                 BottomBar(
                     modifier = Modifier
@@ -106,7 +146,13 @@ private fun PreviewMainActivityContent() {
             MainActivityContent {
                 val wallpapers = flowOf(PagingData.from(listOf(wallpaper1, wallpaper2)))
                 val pagingItems = wallpapers.collectAsLazyPagingItems()
-                HomeScreenContent(tags = emptyList(), wallpapers = pagingItems)
+                HomeScreenContent(
+                    modifier = Modifier
+                        .windowInsetsPadding(topWindowInsets)
+                        .padding(top = SearchBar.Defaults.height),
+                    tags = emptyList(),
+                    wallpapers = pagingItems
+                )
             }
         }
     }

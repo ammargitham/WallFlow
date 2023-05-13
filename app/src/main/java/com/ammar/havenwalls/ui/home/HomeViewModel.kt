@@ -12,7 +12,6 @@ import com.ammar.havenwalls.data.repository.WallHavenRepository
 import com.ammar.havenwalls.data.repository.utils.Resource
 import com.ammar.havenwalls.data.repository.utils.successOr
 import com.ammar.havenwalls.model.Tag
-import com.ammar.havenwalls.ui.common.UiStateViewModel
 import com.github.materiiapps.partial.Partialize
 import com.github.materiiapps.partial.getOrElse
 import com.github.materiiapps.partial.partial
@@ -36,7 +35,7 @@ import kotlinx.datetime.Clock
 class HomeViewModel @Inject constructor(
     private val wallHavenRepository: WallHavenRepository,
     private val appPreferencesRepository: AppPreferencesRepository,
-) : ViewModel(), UiStateViewModel<HomeUiState> {
+) : ViewModel() {
     private val initialUiState = HomeUiState()
     private val popularTags = wallHavenRepository.popularTags()
     private val localUiState = MutableStateFlow(HomeUiStatePartial())
@@ -52,7 +51,7 @@ class HomeViewModel @Inject constructor(
         .debounce { if (it) 1000 else 0 }
         .distinctUntilChanged()
 
-    override val uiState = combine(
+    val uiState = combine(
         popularTags,
         appPreferencesRepository.appPreferencesFlow,
         localUiState,

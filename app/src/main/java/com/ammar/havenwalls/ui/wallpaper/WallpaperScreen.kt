@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import coil.compose.AsyncImagePainter
@@ -60,7 +61,6 @@ import com.ammar.havenwalls.extensions.isSetWallpaperAllowedCompat
 import com.ammar.havenwalls.extensions.isWallpaperSupportedCompat
 import com.ammar.havenwalls.extensions.openUrl
 import com.ammar.havenwalls.extensions.parseMimeType
-import com.ammar.havenwalls.extensions.produceState
 import com.ammar.havenwalls.extensions.search
 import com.ammar.havenwalls.extensions.share
 import com.ammar.havenwalls.extensions.toDp
@@ -110,10 +110,7 @@ fun WallpaperScreen(
     viewModel: WallpaperViewModel = hiltViewModel(),
 ) {
     val lifecycle = LocalLifecycleOwner.current.lifecycle
-    val uiState = lifecycle.produceState(
-        viewModel = viewModel,
-        initialValue = WallpaperUiState(navArgs.wallpaperId),
-    )
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val navigationBarSemiTransparentColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)
     val searchBarController = LocalMainSearchBarController.current
     val bottomBarController = LocalBottomBarController.current

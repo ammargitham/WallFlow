@@ -7,24 +7,23 @@ import androidx.paging.cachedIn
 import com.ammar.havenwalls.data.repository.WallHavenRepository
 import com.ammar.havenwalls.model.Search
 import com.ammar.havenwalls.model.toSearchQuery
-import com.ammar.havenwalls.ui.common.UiStateViewModel
 import com.ammar.havenwalls.ui.navArgs
 import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.update
-import javax.inject.Inject
 
 @HiltViewModel
 class SearchViewModel @Inject constructor(
     wallHavenRepository: WallHavenRepository,
     savedStateHandle: SavedStateHandle,
-) : ViewModel(), UiStateViewModel<SearchUiState> {
+) : ViewModel() {
     private val navArgs: SearchScreenNavArgs = savedStateHandle.navArgs()
     private val _uiState = MutableStateFlow(SearchUiState())
-    override val uiState: StateFlow<SearchUiState> = _uiState
+    val uiState: StateFlow<SearchUiState> = _uiState
     private val searchFlow = MutableStateFlow(navArgs.search)
 
     @OptIn(ExperimentalCoroutinesApi::class)

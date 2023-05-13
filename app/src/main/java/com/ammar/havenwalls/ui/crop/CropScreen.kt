@@ -29,12 +29,12 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import androidx.core.graphics.times
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.ammar.havenwalls.R
@@ -43,7 +43,6 @@ import com.ammar.havenwalls.data.repository.utils.Resource
 import com.ammar.havenwalls.data.repository.utils.successOr
 import com.ammar.havenwalls.extensions.TAG
 import com.ammar.havenwalls.extensions.getScreenResolution
-import com.ammar.havenwalls.extensions.produceState
 import com.ammar.havenwalls.extensions.toDp
 import com.ammar.havenwalls.extensions.toast
 import com.ammar.havenwalls.ui.common.BlurTransformation
@@ -57,11 +56,7 @@ fun CropScreen(
     modifier: Modifier = Modifier,
     viewModel: CropViewModel,
 ) {
-    val lifecycle = LocalLifecycleOwner.current.lifecycle
-    val uiState = lifecycle.produceState(
-        viewModel = viewModel,
-        initialValue = CropUiState()
-    )
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val systemBarsController = LocalSystemBarsController.current
     val overlayColor = Color.Black.copy(alpha = 0.5f)
     val systemBarColor = Color.Black.copy(alpha = 0.75f)
@@ -138,7 +133,7 @@ fun CropScreen(
 
     LaunchedEffect(uiState.detectedObjects) {
         if (uiState.detectedObjects !is Resource.Error) return@LaunchedEffect
-        val e = uiState.detectedObjects.throwable
+        val e = (uiState.detectedObjects as Resource.Error).throwable
         context.toast(e.localizedMessage ?: e.message ?: "Error detecting objects.")
     }
 

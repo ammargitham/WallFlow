@@ -1,5 +1,6 @@
 package com.ammar.havenwalls.ui.common.mainsearch
 
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.fadeIn
@@ -14,155 +15,105 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.ammar.havenwalls.R
-import com.ammar.havenwalls.extensions.produceState
-import com.ammar.havenwalls.extensions.trimAll
+import com.ammar.havenwalls.data.common.SearchQuery
 import com.ammar.havenwalls.model.Search
 import com.ammar.havenwalls.model.TagSearchMeta
 import com.ammar.havenwalls.model.UploaderSearchMeta
-import com.ammar.havenwalls.ui.common.LocalSystemBarsController
 import com.ammar.havenwalls.ui.common.SearchBar
+import com.ammar.havenwalls.ui.common.Suggestion
 import com.ammar.havenwalls.ui.common.TagChip
 import com.ammar.havenwalls.ui.common.UploaderChip
 import com.ammar.havenwalls.ui.common.WallpaperFiltersDialogContent
-import com.ammar.havenwalls.ui.common.bottombar.BottomBarState
-import com.ammar.havenwalls.ui.common.bottombar.LocalBottomBarController
 import com.ammar.havenwalls.ui.home.SearchBarFiltersToggle
+import com.ammar.havenwalls.ui.theme.HavenWallsTheme
 
 @Composable
 fun MainSearchBar(
     modifier: Modifier = Modifier,
-    showBackButton: Boolean = false,
-    onBackClick: () -> Unit = {},
+    visible: Boolean = true,
+    active: Boolean = false,
+    search: Search = Search(),
+    query: String = "",
+    suggestions: List<Suggestion<Search>> = emptyList(),
+    showFilters: Boolean = false,
+    deleteSuggestion: Search? = null,
+    overflowIcon: @Composable (() -> Unit)? = null,
+    onQueryChange: (String) -> Unit = {},
+    onBackClick: (() -> Unit)? = null,
+    onSearch: (query: String) -> Unit = {},
+    onSuggestionClick: (suggestion: Suggestion<Search>) -> Unit = {},
+    onSuggestionInsert: (suggestion: Suggestion<Search>) -> Unit = {},
+    onSuggestionDeleteRequest: (suggestion: Suggestion<Search>) -> Unit = {},
+    onActiveChange: (active: Boolean) -> Unit = {},
+    onShowFiltersChange: (show: Boolean) -> Unit = {},
+    onFiltersChange: (searchQuery: SearchQuery) -> Unit = {},
+    onDeleteSuggestionConfirmClick: () -> Unit = {},
+    onDeleteSuggestionDismissRequest: () -> Unit = {},
 ) {
-    val viewModel: MainSearchViewModel = hiltViewModel()
-    val lifecycle = LocalLifecycleOwner.current.lifecycle
-    val uiState = lifecycle.produceState(
-        viewModel = viewModel,
-        initialValue = MainSearchUiState()
-    )
-    val controller = LocalMainSearchBarController.current
-    val bottomBarController = LocalBottomBarController.current
-    val systemBarsController = LocalSystemBarsController.current
-
-    val controllerState by controller.state
-    val statusBarSemiTransparentColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)
-    val doSearch = remember {
-        fun(s: Search) {
-            viewModel.onSearch(s)
-            controllerState.onSearch(s)
-        }
-    }
     val placeholder: @Composable () -> Unit = remember { { Text(text = "Search") } }
-
-    LaunchedEffect(controllerState.search) {
-        viewModel.setSearch(controllerState.search)
-    }
-
-    val query = when (uiState.search.meta) {
-        is TagSearchMeta, is UploaderSearchMeta -> {
-            if (uiState.active) uiState.search.query else ""
-        }
-        else -> uiState.search.query
-    }
 
     AnimatedVisibility(
         modifier = modifier,
-        visible = controllerState.visible,
+        visible = visible,
         enter = fadeIn(),
         exit = fadeOut(),
     ) {
         SearchBar(
             placeholder = when {
-                uiState.active -> placeholder
-                else -> when (uiState.search.meta) {
+                active -> placeholder
+                else -> when (search.meta) {
                     is TagSearchMeta, is UploaderSearchMeta -> null
                     else -> placeholder
                 }
             },
             query = query,
-            suggestions = uiState.suggestions,
-            onQueryChange = viewModel::onQueryChange,
-            onBackClick = if (showBackButton) onBackClick else null,
-            onSearch = {
-                if (it.isBlank()) {
-                    return@SearchBar
-                }
-                val search = if (it.trimAll() == query) {
-                    // keep current search data if query hasn't changed
-                    // this allows to keep meta data if only filters were changed
-                    uiState.search.copy(
-                        filters = uiState.search.filters,
-                    )
-                } else {
-                    Search(
-                        query = it,
-                        filters = uiState.search.filters,
-                    )
-                }
-                doSearch(search)
-            },
-            onSuggestionClick = { doSearch(it.value) },
-            onSuggestionInsert = { viewModel.setSearch(it.value) },
-            onSuggestionDeleteRequest = { viewModel.setShowDeleteRequest(it.value) },
-            onActiveChange = { a ->
-                viewModel.setActive(a)
-                viewModel.setShowFilters(false)
-                systemBarsController.update {
-                    it.copy(
-                        statusBarColor = if (a) statusBarSemiTransparentColor else Color.Unspecified,
-                    )
-                }
-                bottomBarController.update {
-                    BottomBarState(
-                        visible = !a,
-                    )
-                }
-                controllerState.onActiveChange(a)
-            },
+            suggestions = suggestions,
             extraLeadingContent = when {
-                uiState.active -> null
-                else -> when (uiState.search.meta) {
+                active -> null
+                else -> when (search.meta) {
                     is TagSearchMeta -> {
-                        { TagChip(tag = uiState.search.meta.tag) }
+                        { TagChip(tag = search.meta.tag) }
                     }
                     is UploaderSearchMeta -> {
-                        { UploaderChip(uploader = uiState.search.meta.uploader) }
+                        { UploaderChip(uploader = search.meta.uploader) }
                     }
                     else -> null
                 }
             },
+            onQueryChange = onQueryChange,
+            onBackClick = onBackClick,
+            onSearch = onSearch,
+            onSuggestionClick = onSuggestionClick,
+            onSuggestionInsert = onSuggestionInsert,
+            onSuggestionDeleteRequest = onSuggestionDeleteRequest,
+            onActiveChange = onActiveChange,
             trailingIcon = {
-                Crossfade(uiState.active) {
+                Crossfade(active) {
                     if (it) {
                         SearchBarFiltersToggle(
-                            checked = uiState.showFilters,
-                            onCheckedChange = viewModel::setShowFilters,
+                            checked = showFilters,
+                            onCheckedChange = onShowFiltersChange,
                         )
                         return@Crossfade
                     }
-                    controllerState.overflowIcon?.invoke()
+                    overflowIcon?.invoke()
                 }
             },
             extraContent = {
                 AnimatedVisibility(
                     modifier = Modifier.clipToBounds(),
-                    visible = uiState.showFilters,
+                    visible = showFilters,
                     enter = slideInVertically(initialOffsetY = { -it }),
                     exit = slideOutVertically(targetOffsetY = { -it }),
                 ) {
@@ -174,39 +125,41 @@ fun MainSearchBar(
                                 .verticalScroll(rememberScrollState())
                                 .windowInsetsPadding(WindowInsets.ime)
                                 .padding(16.dp),
-                            searchQuery = uiState.search.filters,
-                            onChange = {
-                                viewModel.setSearch(
-                                    uiState.search.copy(
-                                        filters = it,
-                                    )
-                                )
-                            },
+                            searchQuery = search.filters,
+                            onChange = onFiltersChange,
                         )
                     }
                 }
             },
         )
     }
-    uiState.showDeleteRequestConfirmation?.run {
+
+    deleteSuggestion?.run {
         AlertDialog(
             title = { Text(text = this.query) },
             text = { Text(text = "Remove from history?") },
             confirmButton = {
-                TextButton(
-                    onClick = { viewModel.deleteSearch(uiState.showDeleteRequestConfirmation) },
-                ) {
+                TextButton(onClick = onDeleteSuggestionConfirmClick) {
                     Text(text = "Confirm")
                 }
             },
             dismissButton = {
-                TextButton(
-                    onClick = { viewModel.setShowDeleteRequest(null) },
-                ) {
+                TextButton(onClick = onDeleteSuggestionDismissRequest) {
                     Text(text = stringResource(R.string.cancel))
                 }
             },
-            onDismissRequest = { viewModel.setShowDeleteRequest(null) },
+            onDismissRequest = onDeleteSuggestionDismissRequest,
         )
+    }
+}
+
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun PreviewMainSearchBar() {
+    HavenWallsTheme {
+        Surface {
+            MainSearchBar()
+        }
     }
 }

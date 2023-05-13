@@ -26,18 +26,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.memory.MemoryCache
 import com.ammar.havenwalls.R
-import com.ammar.havenwalls.extensions.produceState
 import com.ammar.havenwalls.extensions.rememberLazyStaggeredGridState
 import com.ammar.havenwalls.extensions.search
 import com.ammar.havenwalls.extensions.toDp
@@ -75,11 +74,7 @@ fun HomeScreen(
     navigator: DestinationsNavigator,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
-    val lifecycle = LocalLifecycleOwner.current.lifecycle
-    val uiState = lifecycle.produceState(
-        viewModel = viewModel,
-        initialValue = HomeUiState(),
-    )
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val wallpapers = viewModel.wallpapers.collectAsLazyPagingItems()
     val gridState = wallpapers.rememberLazyStaggeredGridState()
     val refreshing = wallpapers.loadState.refresh == LoadState.Loading

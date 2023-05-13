@@ -11,7 +11,6 @@ import com.ammar.havenwalls.extensions.TAG
 import com.ammar.havenwalls.extensions.getFileNameFromUrl
 import com.ammar.havenwalls.extensions.getTempFileIfExists
 import com.ammar.havenwalls.model.Wallpaper
-import com.ammar.havenwalls.ui.common.UiStateViewModel
 import com.ammar.havenwalls.ui.navArgs
 import com.ammar.havenwalls.utils.DownloadManager
 import com.ammar.havenwalls.utils.DownloadManager.Companion.DownloadLocation
@@ -33,10 +32,10 @@ class WallpaperViewModel @Inject constructor(
     wallHavenRepository: WallHavenRepository,
     savedStateHandle: SavedStateHandle,
     private val downloadManager: DownloadManager,
-) : AndroidViewModel(application), UiStateViewModel<WallpaperUiState> {
+) : AndroidViewModel(application) {
     private val navArgs: WallpaperScreenNavArgs = savedStateHandle.navArgs()
     private val _uiState = MutableStateFlow(WallpaperUiState(navArgs.wallpaperId))
-    override val uiState: StateFlow<WallpaperUiState> = _uiState
+    val uiState: StateFlow<WallpaperUiState> = _uiState
 
     init {
         viewModelScope.launch {

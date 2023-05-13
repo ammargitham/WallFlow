@@ -26,7 +26,6 @@ import com.ammar.havenwalls.extensions.getScreenResolution
 import com.ammar.havenwalls.extensions.setWallpaper
 import com.ammar.havenwalls.model.DetectionWithBitmap
 import com.ammar.havenwalls.model.ObjectDetectionModel
-import com.ammar.havenwalls.ui.common.UiStateViewModel
 import com.ammar.havenwalls.utils.DownloadManager
 import com.ammar.havenwalls.utils.DownloadManager.Companion.DownloadLocation
 import com.ammar.havenwalls.utils.DownloadStatus
@@ -39,6 +38,7 @@ import java.io.File
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
@@ -56,11 +56,11 @@ class CropViewModel(
     private val objectDetectionModelRepository: ObjectDetectionModelRepository,
     private val downloadManager: DownloadManager,
     private val ioDispatcher: CoroutineDispatcher,
-) : AndroidViewModel(application), UiStateViewModel<CropUiState> {
+) : AndroidViewModel(application) {
     val imageCropper: ImageCropper by lazy { ImageCropper() }
 
     private val _uiState = MutableStateFlow(CropUiState())
-    override val uiState: StateFlow<CropUiState> = _uiState
+    val uiState: StateFlow<CropUiState> = _uiState.asStateFlow()
     private val modelDownloadStatusFlow = MutableStateFlow<DownloadStatus?>(null)
     private val downloadedModelFlow = MutableStateFlow<File?>(null)
     private val uriFlow = savedStateHandle.getStateFlow<Uri?>(EXTRA_URI, null)

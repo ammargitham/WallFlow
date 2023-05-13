@@ -14,7 +14,6 @@ import com.ammar.havenwalls.data.repository.ObjectDetectionModelRepository
 import com.ammar.havenwalls.extensions.TAG
 import com.ammar.havenwalls.extensions.getMLModelsFileIfExists
 import com.ammar.havenwalls.model.ObjectDetectionModel
-import com.ammar.havenwalls.ui.common.UiStateViewModel
 import com.ammar.havenwalls.utils.DownloadManager
 import com.ammar.havenwalls.utils.DownloadStatus
 import com.ammar.havenwalls.workers.DownloadWorker
@@ -37,10 +36,10 @@ class SettingsViewModel @Inject constructor(
     private val appPreferencesRepository: AppPreferencesRepository,
     private val objectDetectionModelRepository: ObjectDetectionModelRepository,
     private val downloadManager: DownloadManager,
-) : AndroidViewModel(application), UiStateViewModel<SettingsUiState> {
+) : AndroidViewModel(application) {
     private val localUiStateFlow = MutableStateFlow(SettingsUiStatePartial())
 
-    override val uiState = combine(
+    val uiState = combine(
         appPreferencesRepository.appPreferencesFlow,
         objectDetectionModelRepository.getAll(),
         localUiStateFlow,

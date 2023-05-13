@@ -12,16 +12,16 @@ import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridS
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import coil.memory.MemoryCache
-import com.ammar.havenwalls.extensions.produceState
 import com.ammar.havenwalls.model.Wallpaper
 import com.ammar.havenwalls.model.wallpaper1
 import com.ammar.havenwalls.model.wallpaper2
@@ -48,11 +48,7 @@ fun SearchScreen(
     viewModel: SearchViewModel = hiltViewModel(),
 ) {
     val search = navArgs.search
-    val lifecycle = LocalLifecycleOwner.current.lifecycle
-    val uiState = lifecycle.produceState(
-        viewModel = viewModel,
-        initialValue = SearchUiState()
-    )
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val searchBarController = LocalMainSearchBarController.current
     val bottomBarController = LocalBottomBarController.current
     val wallpapers = viewModel.wallpapers.collectAsLazyPagingItems()
