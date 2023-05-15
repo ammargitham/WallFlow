@@ -4,18 +4,22 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.DockedSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,6 +33,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.composed
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.isContainer
@@ -38,13 +43,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.ammar.havenwalls.R
 import com.ammar.havenwalls.extensions.toDp
+import com.ammar.havenwalls.ui.common.bottombar.LocalBottomBarController
 import androidx.compose.material3.SearchBar as MaterialSearchBar
 
 object SearchBar {
-    @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+    @OptIn(ExperimentalFoundationApi::class)
     @Composable
     operator fun <T> invoke(
         modifier: Modifier = Modifier,
+        useDocked: Boolean = false,
         query: String = "",
         placeholder: @Composable (() -> Unit)? = null,
         extraLeadingContent: @Composable (() -> Unit)? = null,
@@ -63,15 +70,63 @@ object SearchBar {
         var active by rememberSaveable { mutableStateOf(false) }
         val density = LocalDensity.current
         val imePadding = WindowInsets.ime.getBottom(density).toDp()
+        val content: @Composable ColumnScope.() -> Unit = {
+            Box {
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(
+                        top = 16.dp,
+                        bottom = imePadding,
+                    ),
+                    // verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    items(suggestions) {
+                        ListItem(
+                            modifier = Modifier.combinedClickable(
+                                onClick = {
+                                    active = false
+                                    onActiveChange(false)
+                                    onSuggestionClick(it)
+                                },
+                                onLongClick = { onSuggestionDeleteRequest(it) },
+                            ),
+                            headlineContent = { Text(it.headline) },
+                            supportingContent = it.supportingText?.let { t ->
+                                {
+                                    Text(
+                                        text = t,
+                                        maxLines = 2,
+                                        overflow = TextOverflow.Ellipsis
+                                    )
+                                }
+                            },
+                            leadingContent = it.icon,
+                            trailingContent = {
+                                IconButton(
+                                    onClick = { onSuggestionInsert(it) },
+                                ) {
+                                    Icon(
+                                        painter = painterResource(R.drawable.baseline_north_west_24),
+                                        contentDescription = null,
+                                    )
+                                }
+                            }
+                        )
+                    }
+                }
+                extraContent?.invoke()
+            }
+        }
 
         Box(
             modifier
                 .semantics { isContainer = true }
                 .zIndex(1f)
-                .fillMaxWidth(),
+                .searchBarContainer(isDocked = useDocked),
         ) {
-            MaterialSearchBar(
-                modifier = Modifier.align(Alignment.TopCenter),
+            SwitchableSearchBar(
+                modifier = Modifier.searchBar(isDocked = useDocked),
+                useDocked = useDocked,
                 query = query,
                 onQueryChange = onQueryChange,
                 onSearch = {
@@ -125,55 +180,56 @@ object SearchBar {
                 },
                 trailingIcon = trailingIcon,
                 enabled = enabled,
-            ) {
-                Box {
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(
-                            top = 16.dp,
-                            bottom = imePadding,
-                        ),
-                        // verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        items(suggestions) {
-                            ListItem(
-                                modifier = Modifier.combinedClickable(
-                                    onClick = {
-                                        active = false
-                                        onActiveChange(false)
-                                        onSuggestionClick(it)
-                                    },
-                                    onLongClick = { onSuggestionDeleteRequest(it) },
-                                ),
-                                headlineContent = { Text(it.headline) },
-                                supportingContent = it.supportingText?.let { t ->
-                                    {
-                                        Text(
-                                            text = t,
-                                            maxLines = 2,
-                                            overflow = TextOverflow.Ellipsis
-                                        )
-                                    }
-                                },
-                                leadingContent = it.icon,
-                                trailingContent = {
-                                    IconButton(
-                                        onClick = { onSuggestionInsert(it) },
-                                    ) {
-                                        Icon(
-                                            painter = painterResource(R.drawable.baseline_north_west_24),
-                                            contentDescription = null,
-                                        )
-                                    }
-                                }
-                            )
-                        }
-                    }
-                    extraContent?.invoke()
-                }
-            }
+                content = content
+            )
         }
+    }
 
+    @Composable
+    @OptIn(ExperimentalMaterial3Api::class)
+    private fun BoxScope.SwitchableSearchBar(
+        modifier: Modifier = Modifier,
+        useDocked: Boolean,
+        query: String,
+        onQueryChange: (String) -> Unit,
+        onSearch: (String) -> Unit,
+        active: Boolean,
+        onActiveChange: (Boolean) -> Unit,
+        placeholder: @Composable (() -> Unit)?,
+        leadingIcon: @Composable () -> Unit,
+        trailingIcon: @Composable (() -> Unit)?,
+        enabled: Boolean,
+        content: @Composable (ColumnScope.() -> Unit),
+    ) {
+        if (useDocked) {
+            DockedSearchBar(
+                modifier = modifier.align(Alignment.TopStart),
+                query = query,
+                onQueryChange = onQueryChange,
+                onSearch = onSearch,
+                active = active,
+                onActiveChange = onActiveChange,
+                placeholder = placeholder,
+                leadingIcon = leadingIcon,
+                trailingIcon = trailingIcon,
+                enabled = enabled,
+                content = content,
+            )
+        } else {
+            MaterialSearchBar(
+                modifier = modifier.align(Alignment.TopCenter),
+                query = query,
+                onQueryChange = onQueryChange,
+                onSearch = onSearch,
+                active = active,
+                onActiveChange = onActiveChange,
+                placeholder = placeholder,
+                leadingIcon = leadingIcon,
+                trailingIcon = trailingIcon,
+                enabled = enabled,
+                content = content,
+            )
+        }
     }
 
     object Defaults {
@@ -193,3 +249,28 @@ data class Suggestion<T>(
         )
     },
 )
+
+
+fun Modifier.searchBarContainer(
+    isDocked: Boolean = false,
+) = composed {
+    if (!isDocked) {
+        return@composed this.fillMaxWidth()
+    }
+    val bottomBarController = LocalBottomBarController.current
+    val state by bottomBarController.state
+    this
+        .fillMaxWidth(0.5f)
+        .padding(
+            start = state.size.width.toDp() + 8.dp,
+            end = 8.dp,
+        )
+}
+
+fun Modifier.searchBar(
+    isDocked: Boolean = false,
+) = if (!isDocked) {
+    this
+} else {
+    this.fillMaxWidth()
+}

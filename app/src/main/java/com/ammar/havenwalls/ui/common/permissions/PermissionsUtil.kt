@@ -2,7 +2,6 @@ package com.ammar.havenwalls.ui.common.permissions
 
 import android.app.Activity
 import android.content.Context
-import android.content.ContextWrapper
 import android.content.pm.PackageManager
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -95,15 +94,6 @@ internal fun PermissionsLifecycleCheckerEffect(
         lifecycle.addObserver(permissionsCheckerObserver)
         onDispose { lifecycle.removeObserver(permissionsCheckerObserver) }
     }
-}
-
-internal fun Context.findActivity(): Activity {
-    var context = this
-    while (context is ContextWrapper) {
-        if (context is Activity) return context
-        context = context.baseContext
-    }
-    throw IllegalStateException("Permissions should be called in the context of an Activity")
 }
 
 internal fun Context.checkPermission(permission: String) =

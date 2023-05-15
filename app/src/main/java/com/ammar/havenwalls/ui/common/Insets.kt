@@ -9,3 +9,7 @@ import androidx.compose.runtime.Composable
 val topWindowInsets: WindowInsets
     @Composable
     get() = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Top)
+
+val bottomWindowInsets: WindowInsets
+    @Composable
+    get() = WindowInsets.systemBars.only(WindowInsetsSides.Horizontal + WindowInsetsSides.Bottom)

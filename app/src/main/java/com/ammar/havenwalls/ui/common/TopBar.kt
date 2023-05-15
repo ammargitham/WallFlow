@@ -29,7 +29,6 @@ import com.ammar.havenwalls.ui.NavGraphs
 import com.ammar.havenwalls.ui.appCurrentDestinationAsState
 import com.ammar.havenwalls.ui.common.bottombar.BottomBarDestination
 import com.ammar.havenwalls.ui.startAppDestination
-import com.ramcosta.composedestinations.utils.startDestination
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,10 +45,10 @@ fun TopBar(
     val currentDestination = navController.appCurrentDestinationAsState().value
         ?: NavGraphs.root.startAppDestination
     val rootDestinations = remember {
-        BottomBarDestination.values().map { it.direction.startDestination }
+        BottomBarDestination.values().map { it.direction.route }
     }
     val showBackButton = remember(currentDestination, rootDestinations) {
-        currentDestination !in rootDestinations
+        currentDestination.route !in rootDestinations
     }
 
     AnimatedVisibility(

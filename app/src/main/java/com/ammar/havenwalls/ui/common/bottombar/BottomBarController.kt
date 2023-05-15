@@ -15,6 +15,7 @@ abstract class BottomBarController {
 data class BottomBarState(
     val visible: Boolean = true,
     val size: IntSize = IntSize.Zero,
+    val isRail: Boolean = false,
 )
 
 class DefaultBottomBarController(initialState: BottomBarState) : BottomBarController() {
@@ -26,6 +27,7 @@ class DefaultBottomBarController(initialState: BottomBarState) : BottomBarContro
         _state.value = _state.value.copy(
             visible = newState.visible,
             size = newState.size,
+            isRail = newState.isRail,
         )
     }
 }

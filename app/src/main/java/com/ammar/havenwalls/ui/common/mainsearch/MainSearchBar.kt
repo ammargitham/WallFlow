@@ -41,6 +41,7 @@ import com.ammar.havenwalls.ui.theme.HavenWallsTheme
 @Composable
 fun MainSearchBar(
     modifier: Modifier = Modifier,
+    useDocked: Boolean = false,
     visible: Boolean = true,
     active: Boolean = false,
     search: Search = Search(),
@@ -70,6 +71,7 @@ fun MainSearchBar(
         exit = fadeOut(),
     ) {
         SearchBar(
+            useDocked = useDocked,
             placeholder = when {
                 active -> placeholder
                 else -> when (search.meta) {

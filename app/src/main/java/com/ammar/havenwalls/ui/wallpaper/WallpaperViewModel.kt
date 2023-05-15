@@ -21,6 +21,7 @@ import java.io.File
 import javax.inject.Inject
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -35,7 +36,7 @@ class WallpaperViewModel @Inject constructor(
 ) : AndroidViewModel(application) {
     private val navArgs: WallpaperScreenNavArgs = savedStateHandle.navArgs()
     private val _uiState = MutableStateFlow(WallpaperUiState(navArgs.wallpaperId))
-    val uiState: StateFlow<WallpaperUiState> = _uiState
+    val uiState: StateFlow<WallpaperUiState> = _uiState.asStateFlow()
 
     init {
         viewModelScope.launch {

@@ -27,7 +27,6 @@ import com.ammar.havenwalls.ui.NavGraphs
 import com.ammar.havenwalls.ui.appCurrentDestinationAsState
 import com.ammar.havenwalls.ui.common.LocalSystemBarsController
 import com.ammar.havenwalls.ui.common.bottombar.BottomBarDestination
-import com.ammar.havenwalls.ui.common.bottombar.BottomBarState
 import com.ammar.havenwalls.ui.common.bottombar.LocalBottomBarController
 import com.ammar.havenwalls.ui.common.mainsearch.LocalMainSearchBarController
 import com.ammar.havenwalls.ui.destinations.WallhavenApiKeyDialogDestination
@@ -35,7 +34,6 @@ import com.ammar.havenwalls.ui.startAppDestination
 import com.ammar.havenwalls.ui.theme.HavenWallsTheme
 import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.ramcosta.composedestinations.navigation.navigate
-import com.ramcosta.composedestinations.utils.startDestination
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -66,10 +64,10 @@ class MainActivity : ComponentActivity() {
             val currentDestination = navController.appCurrentDestinationAsState().value
                 ?: NavGraphs.root.startAppDestination
             val rootDestinations = remember {
-                BottomBarDestination.values().map { it.direction.startDestination }
+                BottomBarDestination.values().map { it.direction.route }
             }
             val showBackButton = remember(currentDestination, rootDestinations) {
-                currentDestination !in rootDestinations
+                currentDestination.route !in rootDestinations
             }
             val systemBarsController = LocalSystemBarsController.current
             val systemBarsState by systemBarsController.state
@@ -79,6 +77,7 @@ class MainActivity : ComponentActivity() {
 
             val windowSizeClass = calculateWindowSizeClass(this)
             val useNavRail = windowSizeClass.widthSizeClass > WindowWidthSizeClass.Compact
+            val isExpanded = windowSizeClass.widthSizeClass >= WindowWidthSizeClass.Expanded
 
             val doSearch = remember {
                 fun(s: Search) {
@@ -102,6 +101,10 @@ class MainActivity : ComponentActivity() {
                 viewModel.setSearchBarSearch(searchBarControllerState.search)
             }
 
+            LaunchedEffect(useNavRail) {
+                bottomBarController.update { it.copy(isRail = useNavRail) }
+            }
+
             HavenWallsTheme(
                 statusBarVisible = systemBarsState.statusBarVisible,
                 statusBarColor = systemBarsState.statusBarColor,
@@ -117,6 +120,8 @@ class MainActivity : ComponentActivity() {
                     MainActivityContent(
                         currentDestination = currentDestination,
                         showBackButton = showBackButton,
+                        useNavRail = useNavRail,
+                        useDockedSearchBar = isExpanded,
                         globalErrors = uiState.globalErrors,
                         searchBarVisible = searchBarControllerState.visible,
                         searchBarActive = uiState.searchBarActive,
@@ -154,12 +159,14 @@ class MainActivity : ComponentActivity() {
                         onSearchBarActiveChange = { active ->
                             viewModel.setSearchBarActive(active)
                             viewModel.setShowSearchBarFilters(false)
-                            systemBarsController.update {
-                                it.copy(
-                                    statusBarColor = if (active) statusBarSemiTransparentColor else Color.Unspecified,
-                                )
+                            if (!isExpanded) {
+                                systemBarsController.update {
+                                    it.copy(
+                                        statusBarColor = if (active) statusBarSemiTransparentColor else Color.Unspecified,
+                                    )
+                                }
+                                bottomBarController.update { it.copy(visible = !active) }
                             }
-                            bottomBarController.update { BottomBarState(visible = !active) }
                             searchBarControllerState.onActiveChange(active)
                         },
                         onSearchBarShowFiltersChange = viewModel::setShowSearchBarFilters,

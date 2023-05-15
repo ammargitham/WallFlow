@@ -27,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import com.ammar.havenwalls.extensions.findActivity
 
 data class MultiplePermissionItem(
     val permission: String,
