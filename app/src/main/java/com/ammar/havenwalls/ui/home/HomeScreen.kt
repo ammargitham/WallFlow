@@ -1,10 +1,7 @@
 package com.ammar.havenwalls.ui.home
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -14,14 +11,11 @@ import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.PullRefreshState
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SheetState
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
@@ -36,8 +30,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -45,7 +39,6 @@ import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import coil.memory.MemoryCache
 import com.ammar.havenwalls.R
 import com.ammar.havenwalls.extensions.findActivity
 import com.ammar.havenwalls.extensions.rememberLazyStaggeredGridState
@@ -57,6 +50,7 @@ import com.ammar.havenwalls.model.TagSearchMeta
 import com.ammar.havenwalls.model.Wallpaper
 import com.ammar.havenwalls.model.wallpaper1
 import com.ammar.havenwalls.model.wallpaper2
+import com.ammar.havenwalls.ui.appCurrentDestinationAsState
 import com.ammar.havenwalls.ui.common.LocalSystemBarsController
 import com.ammar.havenwalls.ui.common.SearchBar
 import com.ammar.havenwalls.ui.common.WallpaperFiltersModalBottomSheet
@@ -65,26 +59,32 @@ import com.ammar.havenwalls.ui.common.bottomWindowInsets
 import com.ammar.havenwalls.ui.common.bottombar.LocalBottomBarController
 import com.ammar.havenwalls.ui.common.mainsearch.LocalMainSearchBarController
 import com.ammar.havenwalls.ui.common.mainsearch.MainSearchBarState
+import com.ammar.havenwalls.ui.common.navigation.TwoPaneNavigation
+import com.ammar.havenwalls.ui.common.navigation.TwoPaneNavigation.Mode
 import com.ammar.havenwalls.ui.common.topWindowInsets
+import com.ammar.havenwalls.ui.destinations.SettingsScreenDestination
 import com.ammar.havenwalls.ui.destinations.WallpaperScreenDestination
 import com.ammar.havenwalls.ui.theme.HavenWallsTheme
+import com.ammar.havenwalls.ui.wallpaper.WallpaperScreenNavArgs
+import com.ammar.havenwalls.ui.wallpaper.WallpaperViewModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.flowOf
 
 @OptIn(
     ExperimentalMaterialApi::class,
-    ExperimentalFoundationApi::class,
     ExperimentalMaterial3Api::class,
     ExperimentalMaterial3WindowSizeClassApi::class,
 )
 @RootNavGraph(start = true)
-@Destination
+@Destination(
+    navArgsDelegate = HomeScreenNavArgs::class,
+)
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    navigator: DestinationsNavigator,
+    twoPaneController: TwoPaneNavigation.Controller,
+    wallpaperViewModel: WallpaperViewModel,
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -114,6 +114,8 @@ fun HomeScreen(
     val context = LocalContext.current
     val windowSizeClass = calculateWindowSizeClass(context.findActivity())
     val isExpanded = windowSizeClass.widthSizeClass >= WindowWidthSizeClass.Expanded
+    val currentPane2Destination by twoPaneController.pane2NavHostController.appCurrentDestinationAsState()
+    val isTwoPaneMode = twoPaneController.paneMode.value == Mode.TWO_PANE
 
     LaunchedEffect(refreshing) {
         viewModel.setWallpapersLoading(refreshing)
@@ -122,73 +124,64 @@ fun HomeScreen(
     LaunchedEffect(Unit) {
         systemBarsController.reset()
         bottomBarController.update { it.copy(visible = true) }
+    }
+
+    LaunchedEffect(uiState.search, uiState.isHome) {
         searchBarController.update {
             MainSearchBarState(
                 visible = true,
-                overflowIcon = { SearchBarOverflowMenu(navigator = navigator) },
-                onSearch = { navigator.search(it) }
+                overflowIcon = if (uiState.isHome) {
+                    {
+                        SearchBarOverflowMenu(
+                            items = listOf(
+                                MenuItem(
+                                    text = stringResource(R.string.settings),
+                                    value = "settings",
+                                )
+                            ),
+                            onItemClick = {
+                                if (it.value == "settings") {
+                                    twoPaneController.navigate(SettingsScreenDestination) {
+                                        launchSingleTop = true
+                                    }
+                                }
+                            }
+                        )
+                    }
+                } else null,
+                search = uiState.search,
+                onSearch = { twoPaneController.pane1NavHostController.search(it) }
             )
         }
     }
 
-    Row(
-        modifier = modifier.fillMaxSize()
-    ) {
-        LeftPane(
-            modifier = Modifier
-                .weight(1f)
-                .fillMaxHeight()
-                .windowInsetsPadding(topWindowInsets)
-                .padding(top = SearchBar.Defaults.height)
-                .pullRefresh(state = refreshState),
-            refreshState = refreshState,
-            gridState = gridState,
-            startPadding = startPadding,
-            bottomPadding = bottomPadding,
-            uiState = uiState,
-            wallpapers = wallpapers,
-            navigator = navigator,
-            viewModel = viewModel,
-            expandedFab = expandedFab,
-            filtersBottomSheetState = filtersBottomSheetState
+    LaunchedEffect(uiState.selectedWallpaper) {
+        val navArgs = WallpaperScreenNavArgs(
+            wallpaperId = uiState.selectedWallpaper?.id,
+            thumbUrl = uiState.selectedWallpaper?.thumbs?.original,
         )
-
-        // if (isExpanded) {
-        //     Spacer(
-        //         modifier = Modifier
-        //             .fillMaxHeight()
-        //             .requiredWidth(8.dp)
-        //     )
-        //     RightPane(
-        //         modifier = Modifier
-        //             .weight(1f)
-        //             .fillMaxHeight()
-        //     )
-        // }
+        if (!isExpanded) {
+            return@LaunchedEffect
+        }
+        twoPaneController.setPaneMode(Mode.TWO_PANE)
+        if (currentPane2Destination is WallpaperScreenDestination) {
+            wallpaperViewModel.setWallpaperId(
+                wallpaperId = navArgs.wallpaperId,
+                thumbUrl = navArgs.thumbUrl,
+            )
+            return@LaunchedEffect
+        }
+        twoPaneController.navigatePane2(
+            WallpaperScreenDestination(navArgs)
+        )
     }
-}
 
-@Composable
-@OptIn(
-    ExperimentalMaterialApi::class,
-    ExperimentalFoundationApi::class,
-    ExperimentalMaterial3Api::class,
-)
-private fun LeftPane(
-    modifier: Modifier = Modifier,
-    refreshState: PullRefreshState,
-    gridState: LazyStaggeredGridState,
-    startPadding: Dp,
-    bottomPadding: Dp,
-    uiState: HomeUiState,
-    wallpapers: LazyPagingItems<Wallpaper>,
-    navigator: DestinationsNavigator,
-    viewModel: HomeViewModel,
-    expandedFab: Boolean,
-    filtersBottomSheetState: SheetState,
-) {
     Box(
-        modifier = modifier,
+        modifier = modifier
+            .fillMaxSize()
+            .windowInsetsPadding(topWindowInsets)
+            .padding(top = SearchBar.Defaults.height)
+            .pullRefresh(state = refreshState),
     ) {
         HomeScreenContent(
             gridState = gridState,
@@ -197,21 +190,28 @@ private fun LeftPane(
                 end = 8.dp,
                 bottom = bottomPadding + 8.dp,
             ),
-            tags = uiState.tags,
+            tags = if (uiState.isHome) uiState.tags else emptyList(),
             isTagsLoading = uiState.areTagsLoading,
             wallpapers = wallpapers,
             blurSketchy = uiState.blurSketchy,
             blurNsfw = uiState.blurNsfw,
-            onWallpaperClick = { cacheKey, wallpaper ->
-                navigator.navigate(
+            selectedWallpaper = uiState.selectedWallpaper,
+            showSelection = isTwoPaneMode,
+            onWallpaperClick = {
+                if (isTwoPaneMode) {
+                    viewModel.setSelectedWallpaper(it)
+                    return@HomeScreenContent
+                }
+                // navigate to wallpaper screen
+                twoPaneController.navigatePane1(
                     WallpaperScreenDestination(
-                        cacheKey = cacheKey,
-                        wallpaperId = wallpaper.id,
+                        wallpaperId = it.id,
+                        thumbUrl = it.thumbs.original,
                     )
                 )
             },
             onTagClick = {
-                navigator.search(
+                twoPaneController.pane1NavHostController.search(
                     Search(
                         query = "id:${it.id}",
                         meta = TagSearchMeta(it),
@@ -227,28 +227,29 @@ private fun LeftPane(
             state = refreshState,
         )
 
-        ExtendedFloatingActionButton(
-            modifier = Modifier
-                .windowInsetsPadding(bottomWindowInsets)
-                .align(Alignment.BottomEnd)
-                .offset(x = (-16).dp, y = (-16).dp - bottomPadding),
-            onClick = {
-                viewModel.showFilters(true)
-            },
-            expanded = expandedFab,
-            icon = {
-                Icon(
-                    painterResource(R.drawable.baseline_filter_alt_24),
-                    contentDescription = "Filters",
-                )
-            },
-            text = { Text(text = "Filters") },
-        )
+        if (uiState.isHome) {
+            ExtendedFloatingActionButton(
+                modifier = Modifier
+                    .windowInsetsPadding(bottomWindowInsets)
+                    .align(Alignment.BottomEnd)
+                    .offset(x = (-16).dp, y = (-16).dp - bottomPadding),
+                onClick = { viewModel.showFilters(true) },
+                expanded = expandedFab,
+                icon = {
+                    Icon(
+                        painter = painterResource(R.drawable.baseline_filter_alt_24),
+                        contentDescription = stringResource(R.string.filters),
+                    )
+                },
+                text = { Text(text = stringResource(R.string.filters)) },
+            )
+        }
 
         if (uiState.showFilters) {
             WallpaperFiltersModalBottomSheet(
+                contentModifier = Modifier.windowInsetsPadding(bottomWindowInsets),
                 bottomSheetState = filtersBottomSheetState,
-                searchQuery = uiState.query,
+                searchQuery = uiState.search.filters,
                 title = "Home Filters",
                 onSave = viewModel::updateQuery,
                 onDismissRequest = { viewModel.showFilters(false) }
@@ -257,22 +258,6 @@ private fun LeftPane(
     }
 }
 
-@Composable
-private fun RightPane(
-    modifier: Modifier = Modifier,
-) {
-    Box(
-        modifier = modifier,
-    ) {
-        Text(
-            modifier = Modifier.align(Alignment.Center),
-            color = MaterialTheme.colorScheme.onSurface,
-            text = "Test"
-        )
-    }
-}
-
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun HomeScreenContent(
     modifier: Modifier = Modifier,
@@ -283,7 +268,9 @@ internal fun HomeScreenContent(
     wallpapers: LazyPagingItems<Wallpaper>,
     blurSketchy: Boolean = false,
     blurNsfw: Boolean = false,
-    onWallpaperClick: (cacheKey: MemoryCache.Key?, wallpaper: Wallpaper) -> Unit = { _, _ -> },
+    selectedWallpaper: Wallpaper? = null,
+    showSelection: Boolean = false,
+    onWallpaperClick: (wallpaper: Wallpaper) -> Unit = {},
     onTagClick: (tag: Tag) -> Unit = {},
 ) {
     WallpaperStaggeredGrid(
@@ -304,11 +291,12 @@ internal fun HomeScreenContent(
                 }
             }
         },
+        selectedWallpaper = selectedWallpaper,
+        showSelection = showSelection,
         onWallpaperClick = onWallpaperClick,
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Preview(showBackground = true)
 @Composable
 private fun DefaultPreview() {
@@ -319,7 +307,6 @@ private fun DefaultPreview() {
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Preview(showBackground = true, widthDp = 480)
 @Composable
 private fun PortraitPreview() {

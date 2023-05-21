@@ -72,6 +72,8 @@
     <string name="notification_permission_rationale">Notification permission is required to show download notifications.</string>
     <string name="write_storage_permission_rationale">Storage write permission is required to save wallpapers to the download folder.</string>
     <string name="ok">OK</string>
+    <string name="filters">Filters</string>
+    <string name="full_screen">Full Screen</string>
     <plurals name="num_detected_objects">
         <item quantity="one">%d object</item>
         <item quantity="other">%d objects</item>

@@ -1,6 +1,5 @@
 package com.ammar.havenwalls.ui.common
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridScope
@@ -15,11 +14,9 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
-import coil.memory.MemoryCache
 import com.ammar.havenwalls.data.common.Purity
 import com.ammar.havenwalls.model.Wallpaper
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WallpaperStaggeredGrid(
     modifier: Modifier = Modifier,
@@ -29,7 +26,9 @@ fun WallpaperStaggeredGrid(
     header: (LazyStaggeredGridScope.() -> Unit)? = null,
     blurSketchy: Boolean = false,
     blurNsfw: Boolean = false,
-    onWallpaperClick: (cacheKey: MemoryCache.Key?, wallpaper: Wallpaper) -> Unit = { _, _ -> },
+    selectedWallpaper: Wallpaper? = null,
+    showSelection: Boolean = false,
+    onWallpaperClick: (wallpaper: Wallpaper) -> Unit = {},
 ) {
     val isRefreshing = wallpapers.loadState.refresh == LoadState.Loading
 
@@ -62,7 +61,8 @@ fun WallpaperStaggeredGrid(
                         Purity.SKETCHY -> blurSketchy
                         Purity.NSFW -> blurNsfw
                     },
-                    onClick = { cacheKey -> onWallpaperClick(cacheKey, it) }
+                    isSelected = showSelection && selectedWallpaper?.id == it.id,
+                    onClick = { onWallpaperClick(it) }
                 )
             } ?: PlaceholderWallpaperCard()
         }

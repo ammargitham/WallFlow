@@ -7,11 +7,11 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.ammar.havenwalls.data.repository.WallHavenRepository
 import com.ammar.havenwalls.data.repository.utils.Resource
+import com.ammar.havenwalls.data.repository.utils.successOr
 import com.ammar.havenwalls.extensions.TAG
 import com.ammar.havenwalls.extensions.getFileNameFromUrl
 import com.ammar.havenwalls.extensions.getTempFileIfExists
 import com.ammar.havenwalls.model.Wallpaper
-import com.ammar.havenwalls.ui.navArgs
 import com.ammar.havenwalls.utils.DownloadManager
 import com.ammar.havenwalls.utils.DownloadManager.Companion.DownloadLocation
 import com.ammar.havenwalls.utils.DownloadStatus
@@ -19,35 +19,62 @@ import com.ammar.havenwalls.workers.DownloadWorker.Companion.NotificationType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.File
 import javax.inject.Inject
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class WallpaperViewModel @Inject constructor(
     private val application: Application,
     wallHavenRepository: WallHavenRepository,
-    savedStateHandle: SavedStateHandle,
+    private val savedStateHandle: SavedStateHandle,
     private val downloadManager: DownloadManager,
 ) : AndroidViewModel(application) {
-    private val navArgs: WallpaperScreenNavArgs = savedStateHandle.navArgs()
-    private val _uiState = MutableStateFlow(WallpaperUiState(navArgs.wallpaperId))
+    private val wallpaperIdKey = "wallpaperId"
+    private val thumbUrlKey = "thumbUrl"
+    private val wallpaperIdFlow: StateFlow<String?> = savedStateHandle.getStateFlow(
+        wallpaperIdKey,
+        null,
+    )
+    private val thumbUrlFlow: StateFlow<String?> = savedStateHandle.getStateFlow(
+        thumbUrlKey,
+        null,
+    )
+    private val _uiState = MutableStateFlow(WallpaperUiState())
     val uiState: StateFlow<WallpaperUiState> = _uiState.asStateFlow()
+    private val wallpaperFlow = wallpaperIdFlow.flatMapLatest {
+        if (it == null) {
+            flowOf(Resource.Success(null))
+        } else {
+            _uiState.update { state ->
+                state.copy(
+                    loading = true,
+                    wallpaper = null,
+                )
+            }
+            wallHavenRepository.wallpaper(it)
+        }
+    }
 
     init {
         viewModelScope.launch {
-            wallHavenRepository.wallpaper(navArgs.wallpaperId).collectLatest { resource ->
+            combine(wallpaperFlow, thumbUrlFlow) { resource, thumbUrl ->
+                Pair(resource, thumbUrl)
+            }.collectLatest { (resource, thumbUrl) ->
                 _uiState.update {
-                    if (resource !is Resource.Success || resource.data == null) {
-                        return@update it.copy(loading = false)
-                    }
                     it.copy(
                         loading = false,
-                        wallpaper = resource.data
+                        wallpaper = resource.successOr(null),
+                        thumbUrl = thumbUrl,
                     )
                 }
             }
@@ -120,11 +147,18 @@ class WallpaperViewModel @Inject constructor(
     fun showNotificationPermissionRationaleDialog(show: Boolean = true) = _uiState.update {
         it.copy(showNotificationPermissionRationaleDialog = show)
     }
+
+    fun setWallpaperId(wallpaperId: String?, thumbUrl: String?) {
+        savedStateHandle.run {
+            set(thumbUrlKey, thumbUrl)
+            set(wallpaperIdKey, wallpaperId)
+        }
+    }
 }
 
 data class WallpaperUiState(
-    val wallpaperId: String,
     val wallpaper: Wallpaper? = null,
+    val thumbUrl: String? = null,
     val systemBarsVisible: Boolean = true,
     val actionsVisible: Boolean = true,
     val showInfo: Boolean = false,

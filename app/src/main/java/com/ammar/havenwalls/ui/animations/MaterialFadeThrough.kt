@@ -15,10 +15,10 @@ const val DefaultMotionDuration: Int = 300
 
 private const val ProgressThreshold = 0.35f
 
-private val Int.ForOutgoing: Int
+internal val Int.ForOutgoing: Int
     get() = (this * ProgressThreshold).toInt()
 
-private val Int.ForIncoming: Int
+internal val Int.ForIncoming: Int
     get() = this - this.ForOutgoing
 
 /**

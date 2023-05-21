@@ -13,13 +13,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.ammar.havenwalls.ui.destinations.TypedDestination
-import com.ramcosta.composedestinations.spec.Direction
 
 @Composable
 fun NavRail(
     modifier: Modifier = Modifier,
     currentDestination: TypedDestination<*>? = null,
-    onItemClick: (destination: Direction) -> Unit = {},
+    onItemClick: (destination: TypedDestination<*>) -> Unit = {},
 ) {
     val bottomBarController = LocalBottomBarController.current
     val state by bottomBarController.state

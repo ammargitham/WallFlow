@@ -6,10 +6,10 @@ import androidx.compose.material.icons.filled.Home
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.ammar.havenwalls.R
 import com.ammar.havenwalls.ui.destinations.HomeScreenDestination
-import com.ramcosta.composedestinations.spec.Direction
+import com.ammar.havenwalls.ui.destinations.TypedDestination
 
 enum class BottomBarDestination(
-    val direction: Direction,
+    val direction: TypedDestination<*>,
     val icon: ImageVector,
     @StringRes val label: Int,
 ) {

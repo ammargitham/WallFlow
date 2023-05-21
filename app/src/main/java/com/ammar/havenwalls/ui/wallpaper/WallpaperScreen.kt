@@ -3,22 +3,27 @@ package com.ammar.havenwalls.ui.wallpaper
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Intent
-import android.content.res.Configuration
 import android.os.Build
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -33,11 +38,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLifecycleOwner
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
@@ -45,13 +51,14 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.NavController
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
-import coil.memory.MemoryCache
 import coil.request.ErrorResult
 import coil.request.ImageRequest
+import coil.request.NullRequestData
 import coil.request.NullRequestDataException
+import coil.size.Scale
+import com.ammar.havenwalls.R
 import com.ammar.havenwalls.activities.main.MainActivityViewModel
 import com.ammar.havenwalls.activities.setwallpaper.SetWallpaperActivity
 import com.ammar.havenwalls.extensions.TAG
@@ -70,19 +77,22 @@ import com.ammar.havenwalls.model.Search
 import com.ammar.havenwalls.model.TagSearchMeta
 import com.ammar.havenwalls.model.UploaderSearchMeta
 import com.ammar.havenwalls.model.Wallpaper
-import com.ammar.havenwalls.model.wallpaper1
 import com.ammar.havenwalls.ui.common.LocalSystemBarsController
 import com.ammar.havenwalls.ui.common.SystemBarsState
 import com.ammar.havenwalls.ui.common.TopBar
+import com.ammar.havenwalls.ui.common.bottomWindowInsets
 import com.ammar.havenwalls.ui.common.bottombar.LocalBottomBarController
 import com.ammar.havenwalls.ui.common.mainsearch.LocalMainSearchBarController
 import com.ammar.havenwalls.ui.common.mainsearch.MainSearchBarState
+import com.ammar.havenwalls.ui.common.navigation.TwoPaneNavigation
+import com.ammar.havenwalls.ui.common.navigation.TwoPaneNavigation.Mode
+import com.ammar.havenwalls.ui.common.navigation.TwoPaneNavigation.PaneSide
 import com.ammar.havenwalls.ui.common.permissions.DownloadPermissionsRationalDialog
 import com.ammar.havenwalls.ui.common.permissions.MultiplePermissionItem
 import com.ammar.havenwalls.ui.common.permissions.isGranted
 import com.ammar.havenwalls.ui.common.permissions.rememberMultiplePermissionsState
 import com.ammar.havenwalls.ui.common.permissions.shouldShowRationale
-import com.ammar.havenwalls.ui.theme.HavenWallsTheme
+import com.ammar.havenwalls.ui.destinations.WallpaperScreenDestination
 import com.ammar.havenwalls.utils.DownloadStatus
 import com.google.modernstorage.permissions.StoragePermissions
 import com.ramcosta.composedestinations.annotation.DeepLink
@@ -104,18 +114,31 @@ import kotlin.math.roundToInt
 )
 @Composable
 fun WallpaperScreen(
-    navController: NavController,
-    navArgs: WallpaperScreenNavArgs,
     mainActivityViewModel: MainActivityViewModel,
-    viewModel: WallpaperViewModel = hiltViewModel(),
+    twoPaneController: TwoPaneNavigation.Controller,
+    paneSide: PaneSide,
+    navViewModel: WallpaperViewModel,
 ) {
+    val isTwoPaneMode = paneSide == PaneSide.Pane2
+    val viewModel = if (isTwoPaneMode) navViewModel else hiltViewModel()
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val navigationBarSemiTransparentColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)
+    val sheetColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
+        BottomSheetDefaults.Elevation
+    )
+    // TODO: Use Color.Transparent for nav bar
+    // fully transparent nav bar will require setting some extra flags,
+    // so setting alpha 0.01 as current workaround
+    val navigationBarColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.01f)
+    // val navigationBarColor = Color.Transparent
     val searchBarController = LocalMainSearchBarController.current
     val bottomBarController = LocalBottomBarController.current
     val systemBarsController = LocalSystemBarsController.current
     val context = LocalContext.current
+    val systemBars = WindowInsets.systemBars
+    val windowInsets = remember {
+        if (isTwoPaneMode) systemBars else WindowInsets(left = 0)
+    }
 
     val storagePerms = remember {
         StoragePermissions.getPermissions(
@@ -146,18 +169,31 @@ fun WallpaperScreen(
         viewModel.download()
     }
 
+    LaunchedEffect(paneSide) {
+        if (paneSide != PaneSide.Pane1) {
+            return@LaunchedEffect
+        }
+        // if screen was launched in pane 1, set the pane mode to SINGLE_PANE
+        twoPaneController.setPaneMode(Mode.SINGLE_PANE)
+    }
+
     LaunchedEffect(Unit) {
+        if (isTwoPaneMode) return@LaunchedEffect
+        // no need for transparent status bar
         lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             systemBarsController.update {
                 SystemBarsState(
                     statusBarColor = Color.Transparent,
                     lightStatusBars = false,
+                    navigationBarColor = navigationBarColor,
                 )
             }
         }
     }
 
     DisposableEffect(Unit) {
+        if (isTwoPaneMode) return@DisposableEffect onDispose {}
+        // for tablets, we do not update the search bar and bottom bar states
         searchBarController.update { MainSearchBarState(visible = false) }
         bottomBarController.update { it.copy(visible = false) }
         mainActivityViewModel.applyScaffoldPadding(false)
@@ -168,24 +204,29 @@ fun WallpaperScreen(
     }
 
     LaunchedEffect(uiState.systemBarsVisible, uiState.showInfo) {
+        // no need for transparent status bar, navigation bar when on tablets
+        if (isTwoPaneMode) return@LaunchedEffect
         systemBarsController.update {
             it.copy(
                 statusBarVisible = uiState.systemBarsVisible,
                 navigationBarVisible = uiState.systemBarsVisible,
-                navigationBarColor = if (uiState.showInfo) Color.Unspecified else navigationBarSemiTransparentColor,
+                navigationBarColor = if (uiState.showInfo) sheetColor else navigationBarColor,
             )
         }
     }
 
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .windowInsetsPadding(windowInsets)
+            .fillMaxSize()
     ) {
         WallpaperScreenContent(
             wallpaper = uiState.wallpaper,
             actionsVisible = uiState.actionsVisible,
             downloadStatus = uiState.downloadStatus,
             loading = uiState.loading,
-            cacheKey = navArgs.cacheKey,
+            thumbUrl = uiState.thumbUrl,
+            showFullScreenAction = isTwoPaneMode,
             onWallpaperTransform = viewModel::onWallpaperTransform,
             onWallpaperTap = viewModel::onWallpaperTap,
             onInfoClick = viewModel::showInfo,
@@ -216,37 +257,59 @@ fun WallpaperScreen(
                         }
                     )
                 }
+            },
+            onFullScreenClick = {
+                twoPaneController.setPaneMode(Mode.SINGLE_PANE)
+                twoPaneController.navigatePane1(
+                    WallpaperScreenDestination(
+                        thumbUrl = uiState.thumbUrl,
+                        wallpaperId = uiState.wallpaper?.id,
+                    )
+                )
             }
         )
 
-        TopBar(
-            navController = navController,
-            visible = uiState.systemBarsVisible,
-            gradientBg = true,
-        )
+        if (!isTwoPaneMode) {
+            // top bar required only for single pane mode
+            TopBar(
+                navController = twoPaneController.pane1NavHostController,
+                visible = uiState.systemBarsVisible,
+                gradientBg = true,
+                showBackButton = true,
+            )
+        }
     }
 
     if (uiState.showInfo) {
         uiState.wallpaper?.run {
             WallpaperInfoBottomSheet(
+                contentModifier = Modifier.windowInsetsPadding(bottomWindowInsets),
                 onDismissRequest = { viewModel.showInfo(false) },
                 wallpaper = this,
                 onTagClick = {
-                    navController.search(
+                    twoPaneController.pane1NavHostController.search(
                         Search(
                             query = "id:${it.id}",
                             meta = TagSearchMeta(tag = it),
                         )
                     )
+                    if (isTwoPaneMode) {
+                        // dismiss the bottom sheet
+                        viewModel.showInfo(false)
+                    }
                 },
                 onUploaderClick = {
                     uploader?.run {
-                        navController.search(
+                        twoPaneController.pane1NavHostController.search(
                             Search(
                                 query = "@${username}",
                                 meta = UploaderSearchMeta(uploader = this),
                             )
                         )
+                        if (isTwoPaneMode) {
+                            // dismiss the bottom sheet
+                            viewModel.showInfo(false)
+                        }
                     }
                 },
                 onSourceClick = { context.openUrl(source) }
@@ -272,7 +335,8 @@ fun WallpaperScreenContent(
     actionsVisible: Boolean = true,
     downloadStatus: DownloadStatus? = null,
     loading: Boolean = false,
-    cacheKey: MemoryCache.Key? = null,
+    thumbUrl: String? = null,
+    showFullScreenAction: Boolean = false,
     onWallpaperTransform: () -> Unit = {},
     onWallpaperTap: () -> Unit = {},
     onInfoClick: () -> Unit = {},
@@ -280,12 +344,13 @@ fun WallpaperScreenContent(
     onShareLinkClick: () -> Unit = {},
     onShareImageClick: () -> Unit = {},
     onApplyWallpaperClick: () -> Unit = {},
+    onFullScreenClick: () -> Unit = {},
 ) {
     var containerIntSize by remember { mutableStateOf(IntSize.Zero) }
 
     val imageSize: IntSize by produceState(
         initialValue = IntSize.Zero,
-        key1 = wallpaper,
+        key1 = wallpaper?.resolution,
         key2 = containerIntSize,
     ) {
         val resolution = wallpaper?.resolution
@@ -293,20 +358,22 @@ fun WallpaperScreenContent(
             value = IntSize.Zero
             return@produceState
         }
-        val containerAspectRatio = containerIntSize.width.toFloat() / containerIntSize.height
+        val containerWidth = containerIntSize.width
+        val containerHeight = containerIntSize.height
+        val containerAspectRatio = containerWidth.toFloat() / containerHeight
         val imageAspectRatio = resolution.aspectRatio
         value = when {
             containerAspectRatio == imageAspectRatio -> IntSize(
-                containerIntSize.width,
-                containerIntSize.height
+                containerWidth,
+                containerHeight
             )
             containerAspectRatio < imageAspectRatio -> IntSize(
-                containerIntSize.width,
-                (containerIntSize.width / imageAspectRatio).roundToInt(),
+                containerWidth,
+                (containerWidth / imageAspectRatio).roundToInt(),
             )
             else -> IntSize(
-                (containerIntSize.height * imageAspectRatio).roundToInt(),
-                containerIntSize.height,
+                (containerHeight * imageAspectRatio).roundToInt(),
+                containerHeight,
             )
         }
     }
@@ -328,19 +395,22 @@ fun WallpaperScreenContent(
     val request by produceState(
         initialValue = null as ImageRequest?,
         key1 = context,
-        key2 = wallpaper,
-        key3 = listOf(cacheKey, imageSize, listener),
+        key2 = wallpaper?.path,
+        key3 = listOf(thumbUrl, imageSize, listener),
     ) {
-        if (wallpaper == null || imageSize == IntSize.Zero) {
+        if (wallpaper?.path == null && thumbUrl == null) {
             return@produceState
         }
         value = ImageRequest.Builder(context).apply {
-            data(wallpaper.path)
-            size(imageSize.width, imageSize.height)
+            data(wallpaper?.path ?: thumbUrl)
+            placeholderMemoryCacheKey(thumbUrl)
+            if (imageSize != IntSize.Zero) {
+                size(imageSize.width, imageSize.height)
+            }
+            scale(Scale.FIT)
             crossfade(true)
             lifecycle(lifecycleOwner)
             listener(listener)
-            cacheKey?.run { placeholderMemoryCacheKey(this) }
         }.build()
     }
     val painter = rememberAsyncImagePainter(model = request)
@@ -365,9 +435,6 @@ fun WallpaperScreenContent(
         },
     )
     val coroutineScope = rememberCoroutineScope()
-    val navigationPadding = WindowInsets.navigationBars
-        .getBottom(LocalDensity.current)
-        .toDp()
     val applyWallpaperEnabled by remember(context) {
         val wallpaperManager = context.wallpaperManager
         derivedStateOf {
@@ -379,42 +446,50 @@ fun WallpaperScreenContent(
             .fillMaxSize()
             .onSizeChanged { containerIntSize = it }
     ) {
-        ZoomableImage(
+        Crossfade(
             modifier = Modifier.fillMaxSize(),
-            coroutineScope = coroutineScope,
-            zoomableState = zoomableState,
-            painter = painter,
-            onTap = {
-                if (painter.state !is AsyncImagePainter.State.Success) return@ZoomableImage
-                onWallpaperTap()
-            },
-            doubleTapBehaviour = zoomableState.DefaultDoubleTapBehaviour(
+            targetState = painter,
+        ) {
+            if (it.request.data is NullRequestData) {
+                NotSelectedPlaceholder(
+                    containerIntSize = containerIntSize,
+                )
+                return@Crossfade
+            }
+            ZoomableImage(
+                modifier = Modifier.fillMaxSize(),
                 coroutineScope = coroutineScope,
-                zoomScale = 5f,
-            ),
-        )
+                zoomableState = zoomableState,
+                painter = it,
+                onTap = {
+                    if (painter.state !is AsyncImagePainter.State.Success) return@ZoomableImage
+                    onWallpaperTap()
+                },
+                doubleTapBehaviour = zoomableState.DefaultDoubleTapBehaviour(
+                    coroutineScope = coroutineScope,
+                    zoomScale = 5f,
+                ),
+            )
+        }
 
         AnimatedVisibility(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(
-                    start = 16.dp,
-                    end = 16.dp,
-                    top = 0.dp,
-                    bottom = navigationPadding + 32.dp,
-                ),
-            visible = painter.state is AsyncImagePainter.State.Success && actionsVisible,
+            modifier = Modifier.align(Alignment.BottomCenter),
+            visible = painter.state is AsyncImagePainter.State.Success
+                    && painter.request.data == wallpaper?.path
+                    && actionsVisible,
             enter = fadeIn(),
             exit = fadeOut(),
         ) {
             WallpaperActions(
                 downloadStatus = downloadStatus,
                 applyWallpaperEnabled = applyWallpaperEnabled,
+                showFullScreenAction = showFullScreenAction,
                 onInfoClick = onInfoClick,
                 onDownloadClick = onDownloadClick,
                 onShareLinkClick = onShareLinkClick,
                 onShareImageClick = onShareImageClick,
                 onApplyWallpaperClick = onApplyWallpaperClick,
+                onFullScreenClick = onFullScreenClick,
             )
         }
 
@@ -433,13 +508,29 @@ fun WallpaperScreenContent(
     }
 }
 
-@Preview
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun PreviewWallpaperScreenContent() {
-    HavenWallsTheme {
-        Surface {
-            WallpaperScreenContent(wallpaper = wallpaper1)
-        }
+private fun NotSelectedPlaceholder(
+    modifier: Modifier = Modifier,
+    containerIntSize: IntSize,
+) {
+    Column(
+        modifier = modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+    ) {
+        Image(
+            modifier = Modifier.size((containerIntSize.width / 2).toDp()),
+            painter = painterResource(R.drawable.outline_image_24),
+            contentDescription = "No wallpaper selected",
+            contentScale = ContentScale.FillWidth,
+            colorFilter = ColorFilter.tint(
+                MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f)
+            )
+        )
+        Text(
+            text = "No wallpaper selected",
+            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
+            style = MaterialTheme.typography.headlineSmall,
+        )
     }
 }

@@ -5,15 +5,14 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.TaskStackBuilder
 import androidx.core.net.toUri
-import coil.memory.MemoryCache
 import com.ammar.havenwalls.LOCAL_DEEPLINK_SCHEME
-import com.ammar.havenwalls.model.Wallpaper
 import com.ammar.havenwalls.activities.main.MainActivity
+import com.ammar.havenwalls.model.Wallpaper
 import kotlin.random.Random
 
 data class WallpaperScreenNavArgs(
-    val cacheKey: MemoryCache.Key? = null,
-    val wallpaperId: String,
+    val thumbUrl: String? = null,
+    val wallpaperId: String? = null,
 )
 
 const val wallpaperScreenLocalHost = "w"

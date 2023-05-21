@@ -1,7 +1,6 @@
 package com.ammar.havenwalls.activities.main
 
 import android.content.res.Configuration
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -39,7 +38,6 @@ import com.ammar.havenwalls.ui.common.topWindowInsets
 import com.ammar.havenwalls.ui.destinations.TypedDestination
 import com.ammar.havenwalls.ui.home.HomeScreenContent
 import com.ammar.havenwalls.ui.theme.HavenWallsTheme
-import com.ramcosta.composedestinations.spec.Direction
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.datetime.Clock
 
@@ -63,7 +61,7 @@ fun MainActivityContent(
     onFixWallHavenApiKeyClick: () -> Unit = {},
     onDismissGlobalError: (error: GlobalError) -> Unit = {},
     onBottomBarSizeChanged: (size: IntSize) -> Unit = {},
-    onBottomBarItemClick: (destination: Direction) -> Unit = {},
+    onBottomBarItemClick: (destination: TypedDestination<*>) -> Unit = {},
     onSearchBarActiveChange: (active: Boolean) -> Unit = {},
     onSearchBarQueryChange: (String) -> Unit = {},
     onSearchBarSearch: (query: String) -> Unit = {},
@@ -85,24 +83,6 @@ fun MainActivityContent(
             onDismiss = onDismissGlobalError,
         )
         Scaffold(
-            // modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-            // topBar = {
-            //     TopBar(
-            //         navController = navController,
-            //         scrollBehavior = scrollBehavior,
-            //         visible = uiState.topAppBarVisible,
-            //         gradientBg = uiState.topAppBarGradientBg,
-            //         titleVisible = uiState.topAppBarTitleVisible,
-            //     )
-            // },
-            // bottomBar = { BottomBar(navController = navController) },
-            // floatingActionButton = {
-            //     FloatingActionButton(
-            //         expanded = fabController.expanded,
-            //
-            //         )
-            // },
-            // contentWindowInsets = WindowInsets.navigationBars,
             contentWindowInsets = WindowInsets(left = 0),
         ) {
             Box(
@@ -234,11 +214,9 @@ private fun PreviewMainActivityContentTable() {
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun PreviewContent(
     useNavRail: Boolean = false,
-    isExpanded: Boolean = false,
 ) {
     val previewWallpaperFlow = flowOf(PagingData.from(listOf(wallpaper1, wallpaper2)))
     val previewTags = List(10) {

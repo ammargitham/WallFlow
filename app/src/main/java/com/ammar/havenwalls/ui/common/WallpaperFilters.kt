@@ -112,6 +112,7 @@ fun WallpaperFiltersDialog(
 @Composable
 fun WallpaperFiltersModalBottomSheet(
     modifier: Modifier = Modifier,
+    contentModifier: Modifier = Modifier,
     bottomSheetState: SheetState = rememberModalBottomSheetState(),
     searchQuery: SearchQuery = SearchQuery(),
     title: String? = null,
@@ -133,7 +134,7 @@ fun WallpaperFiltersModalBottomSheet(
         sheetState = bottomSheetState,
     ) {
         Row(
-            modifier = Modifier
+            modifier = contentModifier
                 .fillMaxWidth()
                 .padding(
                     start = 22.dp,
@@ -166,7 +167,7 @@ fun WallpaperFiltersModalBottomSheet(
         }
         Divider(modifier = Modifier.fillMaxWidth())
         WallpaperFiltersDialogContent(
-            modifier = Modifier
+            modifier = modifier
                 .verticalScroll(scrollState)
                 .padding(
                     top = 22.dp,
@@ -516,7 +517,7 @@ private fun ResolutionsFilter(
             style = MaterialTheme.typography.labelLarge
         )
         FlowRow(
-            verticalAlignment = Alignment.CenterVertically,
+            verticalArrangement = Arrangement.Center,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             if (resolutions.isEmpty()) {
@@ -662,11 +663,8 @@ fun getOrderString(order: Order) = stringResource(
     }
 )
 
-@Preview(showSystemUi = true)
-@Preview(
-    showSystemUi = true,
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-)
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun PreviewFiltersContent() {
     HavenWallsTheme {

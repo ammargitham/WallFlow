@@ -3,7 +3,6 @@ package com.ammar.havenwalls.activities.main
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -19,55 +18,62 @@ import androidx.compose.ui.graphics.Color
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.compose.currentBackStackEntryAsState
 import com.ammar.havenwalls.extensions.trimAll
 import com.ammar.havenwalls.model.Search
 import com.ammar.havenwalls.model.TagSearchMeta
 import com.ammar.havenwalls.model.UploaderSearchMeta
-import com.ammar.havenwalls.ui.NavGraphs
 import com.ammar.havenwalls.ui.appCurrentDestinationAsState
 import com.ammar.havenwalls.ui.common.LocalSystemBarsController
 import com.ammar.havenwalls.ui.common.bottombar.BottomBarDestination
 import com.ammar.havenwalls.ui.common.bottombar.LocalBottomBarController
 import com.ammar.havenwalls.ui.common.mainsearch.LocalMainSearchBarController
+import com.ammar.havenwalls.ui.common.mainsearch.MainSearchBarState
+import com.ammar.havenwalls.ui.common.navigation.TwoPaneNavigation
+import com.ammar.havenwalls.ui.common.navigation.TwoPaneNavigation.Mode
+import com.ammar.havenwalls.ui.common.navigation.rememberTwoPaneNavController
 import com.ammar.havenwalls.ui.destinations.WallhavenApiKeyDialogDestination
-import com.ammar.havenwalls.ui.startAppDestination
+import com.ammar.havenwalls.ui.home.HomeScreenNavArgs
+import com.ammar.havenwalls.ui.navArgs
 import com.ammar.havenwalls.ui.theme.HavenWallsTheme
-import com.google.accompanist.navigation.animation.rememberAnimatedNavController
+import com.ammar.havenwalls.ui.wallpaper.WallpaperViewModel
 import com.ramcosta.composedestinations.navigation.navigate
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    @OptIn(
-        ExperimentalAnimationApi::class,
-        ExperimentalMaterial3WindowSizeClassApi::class,
-    )
+    private lateinit var twoPaneController: TwoPaneNavigation.Controller
+
+    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
         setContent {
-            val navController = rememberAnimatedNavController()
-            // val topAppBarState = rememberTopAppBarState()
-            // val scrollBehavior = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(
-            //     topAppBarState,
-            // )
-            // val fabController = rememberFABController()
-            // val currentBackStackEntry by navController.currentBackStackEntryAsState()
-            // LaunchedEffect(currentBackStackEntry) {
-            //     // reveal TopAppBar on changing screens
-            //     scrollBehavior.state.heightOffset = 0f
-            // }
+            val windowSizeClass = calculateWindowSizeClass(this)
+            val useNavRail = windowSizeClass.widthSizeClass > WindowWidthSizeClass.Compact
+            val isExpanded = windowSizeClass.widthSizeClass >= WindowWidthSizeClass.Expanded
+
+            twoPaneController = rememberTwoPaneNavController(
+                initialPaneMode = if (isExpanded) Mode.TWO_PANE else Mode.SINGLE_PANE
+            )
+            val pane1NavController = twoPaneController.pane1NavHostController
+            val isTwoPaneMode = twoPaneController.paneMode.value == Mode.TWO_PANE
             val viewModel: MainActivityViewModel = hiltViewModel()
+            val wallpaperViewModel: WallpaperViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-            val currentDestination = navController.appCurrentDestinationAsState().value
-                ?: NavGraphs.root.startAppDestination
+            val currentDestination by pane1NavController.appCurrentDestinationAsState()
+            val currentBackStackEntry by pane1NavController.currentBackStackEntryAsState()
             val rootDestinations = remember {
                 BottomBarDestination.values().map { it.direction.route }
             }
-            val showBackButton = remember(currentDestination, rootDestinations) {
-                currentDestination.route !in rootDestinations
+            val showBackButton = remember(currentBackStackEntry, rootDestinations) {
+                if (currentDestination?.baseRoute == "home_screen") {
+                    val navArgs: HomeScreenNavArgs? = currentBackStackEntry?.navArgs()
+                    return@remember navArgs?.search != null
+                }
+                currentDestination?.route !in rootDestinations
             }
             val systemBarsController = LocalSystemBarsController.current
             val systemBarsState by systemBarsController.state
@@ -75,16 +81,6 @@ class MainActivity : ComponentActivity() {
             val searchBarController = LocalMainSearchBarController.current
             val searchBarControllerState by searchBarController.state
 
-            val windowSizeClass = calculateWindowSizeClass(this)
-            val useNavRail = windowSizeClass.widthSizeClass > WindowWidthSizeClass.Compact
-            val isExpanded = windowSizeClass.widthSizeClass >= WindowWidthSizeClass.Expanded
-
-            val doSearch = remember {
-                fun(s: Search) {
-                    viewModel.onSearch(s)
-                    searchBarControllerState.onSearch(s)
-                }
-            }
             val searchBarQuery by remember {
                 derivedStateOf {
                     when (uiState.searchBarSearch.meta) {
@@ -121,7 +117,7 @@ class MainActivity : ComponentActivity() {
                         currentDestination = currentDestination,
                         showBackButton = showBackButton,
                         useNavRail = useNavRail,
-                        useDockedSearchBar = isExpanded,
+                        useDockedSearchBar = isTwoPaneMode,
                         globalErrors = uiState.globalErrors,
                         searchBarVisible = searchBarControllerState.visible,
                         searchBarActive = uiState.searchBarActive,
@@ -132,7 +128,7 @@ class MainActivity : ComponentActivity() {
                         searchBarDeleteSuggestion = uiState.searchBarDeleteSuggestion,
                         searchBarOverflowIcon = searchBarControllerState.overflowIcon,
                         onSearchBarQueryChange = viewModel::onSearchBarQueryChange,
-                        onBackClick = { navController.navigateUp() },
+                        onBackClick = { pane1NavController.navigateUp() },
                         onSearchBarSearch = {
                             if (it.isBlank()) {
                                 return@MainActivityContent
@@ -149,9 +145,11 @@ class MainActivity : ComponentActivity() {
                                     filters = uiState.searchBarSearch.filters,
                                 )
                             }
-                            doSearch(search)
+                            doSearch(viewModel, searchBarControllerState, search)
                         },
-                        onSearchBarSuggestionClick = { doSearch(it.value) },
+                        onSearchBarSuggestionClick = {
+                            doSearch(viewModel, searchBarControllerState, it.value)
+                        },
                         onSearchBarSuggestionInsert = { viewModel.setSearchBarSearch(it.value) },
                         onSearchBarSuggestionDeleteRequest = {
                             viewModel.setShowSearchBarSuggestionDeleteRequest(it.value)
@@ -159,7 +157,7 @@ class MainActivity : ComponentActivity() {
                         onSearchBarActiveChange = { active ->
                             viewModel.setSearchBarActive(active)
                             viewModel.setShowSearchBarFilters(false)
-                            if (!isExpanded) {
+                            if (!isTwoPaneMode) {
                                 systemBarsController.update {
                                     it.copy(
                                         statusBarColor = if (active) statusBarSemiTransparentColor else Color.Unspecified,
@@ -182,27 +180,37 @@ class MainActivity : ComponentActivity() {
                             viewModel.setShowSearchBarSuggestionDeleteRequest(null)
                         },
                         onFixWallHavenApiKeyClick = {
-                            navController.navigate(WallhavenApiKeyDialogDestination)
+                            pane1NavController.navigate(WallhavenApiKeyDialogDestination)
                         },
                         onDismissGlobalError = viewModel::dismissGlobalError,
                         onBottomBarSizeChanged = { size ->
                             bottomBarController.update { it.copy(size = size) }
                         },
                         onBottomBarItemClick = {
-                            navController.navigate(it) {
+                            pane1NavController.navigate(it.route) {
                                 launchSingleTop = true
                             }
                         }
                     ) {
                         MainNavigation(
-                            navController = navController,
+                            twoPaneController = twoPaneController,
                             contentPadding = it,
                             mainActivityViewModel = viewModel,
+                            wallpaperViewModel = wallpaperViewModel,
                             applyContentPadding = uiState.applyScaffoldPadding,
                         )
                     }
                 }
             }
         }
+    }
+
+    private fun doSearch(
+        viewModel: MainActivityViewModel,
+        searchBarControllerState: MainSearchBarState,
+        search: Search,
+    ) {
+        viewModel.onSearch(search)
+        searchBarControllerState.onSearch(search)
     }
 }

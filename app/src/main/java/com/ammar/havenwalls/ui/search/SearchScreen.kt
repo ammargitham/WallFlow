@@ -1,7 +1,6 @@
 package com.ammar.havenwalls.ui.search
 
 import android.content.res.Configuration
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,16 +11,13 @@ import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridS
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import coil.memory.MemoryCache
 import com.ammar.havenwalls.model.Wallpaper
 import com.ammar.havenwalls.model.wallpaper1
 import com.ammar.havenwalls.model.wallpaper2
@@ -37,7 +33,6 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.coroutines.flow.flowOf
 
-@OptIn(ExperimentalFoundationApi::class)
 @Destination(
     navArgsDelegate = SearchScreenNavArgs::class,
 )
@@ -48,7 +43,7 @@ fun SearchScreen(
     viewModel: SearchViewModel = hiltViewModel(),
 ) {
     val search = navArgs.search
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    // val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val searchBarController = LocalMainSearchBarController.current
     val bottomBarController = LocalBottomBarController.current
     val wallpapers = viewModel.wallpapers.collectAsLazyPagingItems()
@@ -81,11 +76,11 @@ fun SearchScreen(
                 end = 8.dp,
                 bottom = 8.dp,
             ),
-            onWallpaperClick = { cacheKey, wallpaper ->
+            onWallpaperClick = { wallpaper ->
                 navigator.navigate(
                     WallpaperScreenDestination(
-                        cacheKey = cacheKey,
                         wallpaperId = wallpaper.id,
+                        thumbUrl = wallpaper.thumbs.original,
                     )
                 )
             },
@@ -93,14 +88,13 @@ fun SearchScreen(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun SearchScreenContent(
     modifier: Modifier = Modifier,
     gridState: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
     wallpapers: LazyPagingItems<Wallpaper>,
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    onWallpaperClick: (cacheKey: MemoryCache.Key?, wallpaper: Wallpaper) -> Unit = { _, _ -> },
+    onWallpaperClick: (wallpaper: Wallpaper) -> Unit = {},
 ) {
     WallpaperStaggeredGrid(
         modifier = modifier,
@@ -111,7 +105,6 @@ private fun SearchScreenContent(
     )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Preview
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable

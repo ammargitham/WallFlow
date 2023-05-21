@@ -16,7 +16,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextDecoration
@@ -34,13 +33,13 @@ import com.ammar.havenwalls.ui.theme.HavenWallsTheme
 @Composable
 fun WallpaperInfoBottomSheet(
     modifier: Modifier = Modifier,
+    contentModifier: Modifier = Modifier,
     wallpaper: Wallpaper,
     onDismissRequest: () -> Unit = {},
     onTagClick: (tag: Tag) -> Unit = {},
     onUploaderClick: () -> Unit = {},
     onSourceClick: () -> Unit = {},
 ) {
-    val coroutineScope = rememberCoroutineScope()
     val bottomSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true,
     )
@@ -51,7 +50,7 @@ fun WallpaperInfoBottomSheet(
         sheetState = bottomSheetState,
     ) {
         WallpaperInfoBottomSheetContent(
-            modifier = Modifier
+            modifier = contentModifier
                 .padding(
                     start = 16.dp,
                     end = 16.dp,
@@ -64,7 +63,6 @@ fun WallpaperInfoBottomSheet(
             onSourceClick = onSourceClick,
         )
     }
-
 }
 
 @Composable

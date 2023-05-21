@@ -1,6 +1,8 @@
 package com.ammar.havenwalls.ui.wallpaper
 
 import android.content.res.Configuration
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -10,7 +12,6 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
@@ -22,17 +23,22 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.PlainTooltipBox
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
+import androidx.compose.material3.rememberPlainTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -65,45 +71,113 @@ import kotlinx.datetime.Clock
 fun WallpaperActions(
     modifier: Modifier = Modifier,
     downloadStatus: DownloadStatus? = null,
-    applyWallpaperEnabled: Boolean = false,
+    applyWallpaperEnabled: Boolean = true,
+    showFullScreenAction: Boolean = false,
     onInfoClick: () -> Unit = {},
     onDownloadClick: () -> Unit = {},
     onShareLinkClick: () -> Unit = {},
     onShareImageClick: () -> Unit = {},
     onApplyWallpaperClick: () -> Unit = {},
+    onFullScreenClick: () -> Unit = {},
 ) {
-    Row(
+    BottomAppBar(
         modifier = modifier,
+        containerColor = BottomAppBarDefaults.containerColor.copy(alpha = 0.9f),
+        actions = {
+            if (showFullScreenAction) {
+                FullScreenButton(onClick = onFullScreenClick)
+            }
+            InfoButton(onClick = onInfoClick)
+            DownloadButton(
+                downloadStatus = downloadStatus,
+                onClick = onDownloadClick,
+            )
+            ShareButton(
+                onLinkClick = onShareLinkClick,
+                onImageClick = onShareImageClick,
+            )
+        },
+        floatingActionButton = if (applyWallpaperEnabled) {
+            {
+                ApplyWallpaperFAB(onClick = onApplyWallpaperClick)
+            }
+        } else null,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ApplyWallpaperFAB(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
+) {
+    val tooltipState = rememberPlainTooltipState()
+
+    PlainTooltipBox(
+        modifier = modifier,
+        tooltip = { Text(text = stringResource(R.string.apply_wallpaper)) },
+        tooltipState = tooltipState,
     ) {
-        FilledTonalIconButton(onClick = onInfoClick) {
+        FloatingActionButton(
+            modifier = Modifier.tooltipTrigger(),
+            onClick = onClick,
+            containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
+            elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.outline_wallpaper_24),
+                contentDescription = stringResource(R.string.apply_wallpaper),
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun FullScreenButton(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
+) {
+    val tooltipState = rememberPlainTooltipState()
+
+    PlainTooltipBox(
+        modifier = modifier,
+        tooltip = { Text(text = stringResource(R.string.full_screen)) },
+        tooltipState = tooltipState,
+    ) {
+        IconButton(
+            modifier = Modifier.tooltipTrigger(),
+            onClick = onClick,
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.baseline_open_in_full_24),
+                contentDescription = stringResource(R.string.full_screen)
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun InfoButton(
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {},
+) {
+    val tooltipState = rememberPlainTooltipState()
+
+    PlainTooltipBox(
+        modifier = modifier,
+        tooltip = { Text(text = stringResource(R.string.info)) },
+        tooltipState = tooltipState,
+    ) {
+        IconButton(
+            modifier = Modifier.tooltipTrigger(),
+            onClick = onClick,
+        ) {
             Icon(
                 imageVector = Icons.Outlined.Info,
                 contentDescription = stringResource(R.string.info)
             )
-        }
-
-        DownloadButton(
-            downloadStatus = downloadStatus,
-            onClick = onDownloadClick,
-        )
-
-        ShareButton(
-            onLinkClick = onShareLinkClick,
-            onImageClick = onShareImageClick,
-        )
-
-        FilledTonalButton(
-            enabled = applyWallpaperEnabled,
-            onClick = onApplyWallpaperClick,
-            contentPadding = ButtonDefaults.ButtonWithIconContentPadding,
-        ) {
-            Icon(
-                modifier = Modifier.size(ButtonDefaults.IconSize),
-                painter = painterResource(R.drawable.outline_wallpaper_24),
-                contentDescription = stringResource(R.string.apply_wallpaper)
-            )
-            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-            Text(text = stringResource(R.string.apply_wallpaper))
         }
     }
 }
@@ -113,21 +187,26 @@ fun WallpaperActions(
 @Composable
 private fun PreviewWallpaperActions() {
     HavenWallsTheme {
-        WallpaperActions(
-            downloadStatus = DownloadStatus.Running(
-                downloadedBytes = 50,
-                totalBytes = 100,
+        Surface {
+            WallpaperActions(
+                downloadStatus = DownloadStatus.Running(
+                    downloadedBytes = 50,
+                    totalBytes = 100,
+                ),
+                showFullScreenAction = true,
             )
-        )
+        }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DownloadButton(
     modifier: Modifier = Modifier,
     downloadStatus: DownloadStatus? = null,
     onClick: () -> Unit = {},
 ) {
+    val tooltipState = rememberPlainTooltipState()
     val progress by animateFloatAsState(
         when (downloadStatus) {
             is DownloadStatus.Running -> downloadStatus.progress
@@ -146,14 +225,14 @@ private fun DownloadButton(
                 || downloadStatus is DownloadStatus.Pending)
     }
 
-    val defaultContainerColor = MaterialTheme.colorScheme.secondaryContainer
+    val defaultContainerColor = Color.Transparent
     val errorContainerColor = MaterialTheme.colorScheme.errorContainer
-    val containerColor = remember(downloadStatus) {
+    val containerColor by animateColorAsState(
         when (downloadStatus) {
-            is DownloadStatus.Failed -> return@remember errorContainerColor
+            is DownloadStatus.Failed -> errorContainerColor
             else -> defaultContainerColor
         }
-    }
+    )
 
     val icon = remember(downloadStatus) {
         when (downloadStatus) {
@@ -164,27 +243,32 @@ private fun DownloadButton(
         }
     }
 
-    Box(
-        modifier = modifier.size(48.dp),
+    PlainTooltipBox(
+        modifier = modifier,
+        tooltip = { Text(text = stringResource(R.string.download)) },
+        tooltipState = tooltipState,
     ) {
-        FilledTonalIconButton(
+        IconButton(
+            modifier = Modifier.tooltipTrigger(),
             onClick = if (clickable) onClick else {
                 {}
             },
-            colors = IconButtonDefaults.filledTonalIconButtonColors(
+            colors = IconButtonDefaults.iconButtonColors(
                 containerColor = containerColor,
                 contentColor = contentColorFor(containerColor)
             ),
         ) {
-            Icon(
-                painter = painterResource(icon),
-                contentDescription = stringResource(R.string.download)
-            )
+            Crossfade(targetState = icon) {
+                Icon(
+                    painter = painterResource(it),
+                    contentDescription = stringResource(R.string.download)
+                )
+            }
         }
         if (showProgress) {
             ProgressIndicator(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .size(48.dp)
                     .padding(4.dp),
                 progress = progress,
             )
@@ -219,18 +303,25 @@ private fun PreviewDownloadButton(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ShareButton(
     modifier: Modifier = Modifier,
     onLinkClick: () -> Unit = {},
     onImageClick: () -> Unit = {},
 ) {
+    val tooltipState = rememberPlainTooltipState()
     var expanded by remember { mutableStateOf(false) }
 
-    Box(
+    PlainTooltipBox(
         modifier = modifier.wrapContentSize(Alignment.TopStart),
+        tooltip = { Text(text = stringResource(R.string.share)) },
+        tooltipState = tooltipState,
     ) {
-        FilledTonalIconButton(onClick = { expanded = true }) {
+        IconButton(
+            modifier = Modifier.tooltipTrigger(),
+            onClick = { expanded = true },
+        ) {
             Icon(
                 imageVector = Icons.Default.Share,
                 contentDescription = stringResource(R.string.share),
@@ -474,27 +565,6 @@ fun UploaderRow(
                 onClick = onClick,
             )
         }
-        // Row(
-        //     modifier = Modifier.weight(3f),
-        //     horizontalArrangement = Arrangement.spacedBy(8.dp),
-        // ) {
-        //     AsyncImage(
-        //         modifier = Modifier
-        //             .size(24.dp)
-        //             .clip(CircleShape),
-        //         placeholder = forwardingPainter(
-        //             painter = painterResource(R.drawable.outline_account_circle_24),
-        //             colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
-        //         ),
-        //         model = uploader.avatar.medium,
-        //         contentScale = ContentScale.Crop,
-        //         contentDescription = "${uploader.username}'s avatar",
-        //     )
-        //     Text(
-        //         modifier = Modifier.align(Alignment.CenterVertically),
-        //         text = uploader.username,
-        //     )
-        // }
     }
 }
 

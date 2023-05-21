@@ -16,7 +16,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import com.ammar.havenwalls.R
 import com.ammar.havenwalls.data.preferences.AppPreferences
 import com.ammar.havenwalls.data.preferences.ObjectDetectionPreferences
@@ -25,16 +24,17 @@ import com.ammar.havenwalls.ui.common.TopBar
 import com.ammar.havenwalls.ui.common.bottombar.LocalBottomBarController
 import com.ammar.havenwalls.ui.common.mainsearch.LocalMainSearchBarController
 import com.ammar.havenwalls.ui.common.mainsearch.MainSearchBarState
+import com.ammar.havenwalls.ui.common.navigation.TwoPaneNavigation
+import com.ammar.havenwalls.ui.common.navigation.TwoPaneNavigation.Mode
 import com.ammar.havenwalls.ui.destinations.WallhavenApiKeyDialogDestination
 import com.ammar.havenwalls.ui.theme.HavenWallsTheme
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.navigation.navigate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination
 @Composable
 fun SettingsScreen(
-    navController: NavController,
+    twoPaneController: TwoPaneNavigation.Controller,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -42,6 +42,7 @@ fun SettingsScreen(
     val bottomBarController = LocalBottomBarController.current
 
     LaunchedEffect(Unit) {
+        twoPaneController.setPaneMode(Mode.SINGLE_PANE) // hide pane 2
         searchBarController.update { MainSearchBarState(visible = false) }
         bottomBarController.update { it.copy(visible = false) }
     }
@@ -50,20 +51,23 @@ fun SettingsScreen(
         modifier = Modifier.fillMaxSize()
     ) {
         TopBar(
-            navController = navController,
+            navController = twoPaneController.pane1NavHostController,
             title = {
                 Text(
                     text = stringResource(R.string.settings),
                     maxLines = 1,
                 )
-            }
+            },
+            showBackButton = true,
         )
         SettingsScreenContent(
             appPreferences = uiState.appPreferences,
             model = uiState.selectedModel,
             onBlurSketchyCheckChange = viewModel::setBlurSketchy,
             onBlurNsfwCheckChange = viewModel::setBlurNsfw,
-            onWallhavenApiKeyItemClick = { navController.navigate(WallhavenApiKeyDialogDestination) },
+            onWallhavenApiKeyItemClick = {
+                twoPaneController.navigate(WallhavenApiKeyDialogDestination)
+            },
             onObjectDetectionPrefsChange = viewModel::updateSubjectDetectionPrefs,
             onObjectDetectionDelegateClick = { viewModel.showObjectDetectionDelegateOptions(true) },
             onObjectDetectionModelClick = { viewModel.showObjectDetectionModelOptions(true) }

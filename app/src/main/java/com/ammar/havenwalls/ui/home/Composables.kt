@@ -21,9 +21,7 @@ import com.ammar.havenwalls.data.common.Purity
 import com.ammar.havenwalls.model.Tag
 import com.ammar.havenwalls.ui.common.OverflowMenu
 import com.ammar.havenwalls.ui.common.TagChip
-import com.ammar.havenwalls.ui.destinations.SettingsScreenDestination
 import com.ammar.havenwalls.ui.theme.HavenWallsTheme
-import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import kotlinx.datetime.Clock
 
 
@@ -98,19 +96,25 @@ fun SearchBarFiltersToggle(
 @Composable
 fun SearchBarOverflowMenu(
     modifier: Modifier = Modifier,
-    navigator: DestinationsNavigator,
+    items: List<MenuItem> = emptyList(),
+    onItemClick: (MenuItem) -> Unit = {},
 ) {
     OverflowMenu(
         modifier = modifier,
     ) { closeMenu ->
-        DropdownMenuItem(
-            text = { Text(stringResource(R.string.settings)) },
-            onClick = {
-                navigator.navigate(SettingsScreenDestination) {
-                    launchSingleTop = true
-                }
-                closeMenu()
-            },
-        )
+        items.forEach {
+            DropdownMenuItem(
+                text = { Text(it.text) },
+                onClick = {
+                    onItemClick(it)
+                    closeMenu()
+                },
+            )
+        }
     }
 }
+
+data class MenuItem(
+    val text: String,
+    val value: String,
+)

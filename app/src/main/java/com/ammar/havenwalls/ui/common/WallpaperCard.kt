@@ -1,6 +1,9 @@
 package com.ammar.havenwalls.ui.common
 
 import android.util.Log
+import androidx.compose.animation.animateColor
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -18,14 +21,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawWithContent
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.drawable.toBitmap
 import coil.compose.AsyncImage
 import coil.memory.MemoryCache
 import coil.request.ImageRequest
@@ -38,6 +47,7 @@ import com.ammar.havenwalls.ui.theme.HavenWallsTheme
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.material.fade
 import com.google.accompanist.placeholder.material.placeholder
+import kotlin.math.roundToInt
 
 private val cardHeight = 300.dp
 
@@ -47,7 +57,8 @@ fun WallpaperCard(
     modifier: Modifier = Modifier,
     wallpaper: Wallpaper,
     blur: Boolean = false,
-    onClick: (cacheKey: MemoryCache.Key?) -> Unit = {},
+    isSelected: Boolean = false,
+    onClick: () -> Unit = {},
 ) {
     var memoryCacheKey: MemoryCache.Key? by remember { mutableStateOf(null) }
     val listener = remember {
@@ -69,16 +80,55 @@ fun WallpaperCard(
             listener(listener)
         }.build()
     }
+    val transition = updateTransition(isSelected, label = "selection state")
+    val selectionColor by transition.animateColor(label = "selection color") {
+        if (it) MaterialTheme.colorScheme.primary.copy(alpha = 0.5f) else Color.Transparent
+    }
+    val selectionCircleColor by transition.animateColor(label = "circle color") {
+        if (it) MaterialTheme.colorScheme.onPrimary else Color.Transparent
+    }
+    val checkImageColor by transition.animateColor(label = "check image color") {
+        if (it) MaterialTheme.colorScheme.primary else Color.Transparent
+    }
+    val checkImageAlpha by transition.animateFloat(label = "check image alpha") {
+        if (it) 1f else 0f
+    }
+    val checkImage = remember(context) {
+        context.resources
+            .getDrawable(R.drawable.baseline_check_24, null)
+            .toBitmap()
+            .asImageBitmap()
+    }
 
     Card(
         modifier = modifier.aspectRatio(wallpaper.resolution.aspectRatio),
-        onClick = { onClick(memoryCacheKey) },
+        onClick = onClick,
     ) {
         AsyncImage(
             modifier = Modifier
                 .blur(if (blur) 16.dp else 0.dp)
                 .clip(RectangleShape)
-                .fillMaxHeight(),
+                .fillMaxHeight()
+                .drawWithContent {
+                    drawContent()
+                    drawRect(selectionColor)
+                    val radius = minOf(size.minDimension / 2f, 20.dp.toPx())
+                    drawCircle(
+                        color = selectionCircleColor,
+                        radius = radius
+                    )
+                    val imageSize = (radius * 1.5).roundToInt()
+                    drawImage(
+                        image = checkImage,
+                        dstOffset = IntOffset(
+                            x = (size.width / 2 - imageSize / 2).roundToInt(),
+                            y = (size.height / 2 - imageSize / 2).roundToInt(),
+                        ),
+                        dstSize = IntSize(imageSize, imageSize),
+                        colorFilter = ColorFilter.tint(checkImageColor),
+                        alpha = checkImageAlpha,
+                    )
+                },
             model = request,
             placeholder = ColorPainter(wallpaper.colors.firstOrNull() ?: Color.White),
             contentDescription = stringResource(R.string.wallpaper_description),
@@ -114,6 +164,18 @@ private fun PreviewWallpaperCard() {
         WallpaperCard(
             modifier = Modifier.width(200.dp),
             wallpaper = wallpaper1,
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewWallpaperCardSelected() {
+    HavenWallsTheme {
+        WallpaperCard(
+            modifier = Modifier.width(200.dp),
+            wallpaper = wallpaper1,
+            isSelected = true,
         )
     }
 }
