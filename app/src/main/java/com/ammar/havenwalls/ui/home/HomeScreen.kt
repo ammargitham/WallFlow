@@ -29,9 +29,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -56,6 +58,7 @@ import com.ammar.havenwalls.ui.common.SearchBar
 import com.ammar.havenwalls.ui.common.WallpaperFiltersModalBottomSheet
 import com.ammar.havenwalls.ui.common.WallpaperStaggeredGrid
 import com.ammar.havenwalls.ui.common.bottomWindowInsets
+import com.ammar.havenwalls.ui.common.bottombar.BottomBarController
 import com.ammar.havenwalls.ui.common.bottombar.LocalBottomBarController
 import com.ammar.havenwalls.ui.common.mainsearch.LocalMainSearchBarController
 import com.ammar.havenwalls.ui.common.mainsearch.MainSearchBarState
@@ -108,9 +111,7 @@ fun HomeScreen(
     val searchBarController = LocalMainSearchBarController.current
     val bottomBarController = LocalBottomBarController.current
     val systemBarsController = LocalSystemBarsController.current
-    val bottomBarState by bottomBarController.state
-    val startPadding = if (bottomBarState.isRail) bottomBarState.size.width.toDp() else 0.dp
-    val bottomPadding = if (bottomBarState.isRail) 0.dp else bottomBarState.size.height.toDp()
+    val (startPadding, bottomPadding) = getStartBottomPadding(bottomBarController)
     val context = LocalContext.current
     val windowSizeClass = calculateWindowSizeClass(context.findActivity())
     val isExpanded = windowSizeClass.widthSizeClass >= WindowWidthSizeClass.Expanded
@@ -230,7 +231,7 @@ fun HomeScreen(
         if (uiState.isHome) {
             ExtendedFloatingActionButton(
                 modifier = Modifier
-                    .windowInsetsPadding(bottomWindowInsets)
+                    // .windowInsetsPadding(bottomWindowInsets)
                     .align(Alignment.BottomEnd)
                     .offset(x = (-16).dp, y = (-16).dp - bottomPadding),
                 onClick = { viewModel.showFilters(true) },
@@ -256,6 +257,20 @@ fun HomeScreen(
             )
         }
     }
+}
+
+@Composable
+private fun getStartBottomPadding(bottomBarController: BottomBarController): Pair<Dp, Dp> {
+    val bottomBarState by bottomBarController.state
+    val startPadding = if (bottomBarState.isRail) bottomBarState.size.width.toDp() else 0.dp
+    val bottomInsetsPadding = if (bottomBarState.isRail) {
+        bottomWindowInsets.getBottom(LocalDensity.current).toDp()
+    } else 0.dp
+    val bottomNavBarPadding = if (bottomBarState.isRail) 0.dp else {
+        bottomBarState.size.height.toDp()
+    }
+    val bottomPadding = bottomInsetsPadding + bottomNavBarPadding
+    return Pair(startPadding, bottomPadding)
 }
 
 @Composable
