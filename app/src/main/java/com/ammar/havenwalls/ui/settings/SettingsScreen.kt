@@ -32,8 +32,8 @@ import com.ammar.havenwalls.ui.common.mainsearch.LocalMainSearchBarController
 import com.ammar.havenwalls.ui.common.mainsearch.MainSearchBarState
 import com.ammar.havenwalls.ui.common.navigation.TwoPaneNavigation
 import com.ammar.havenwalls.ui.common.navigation.TwoPaneNavigation.Mode
-import com.ammar.havenwalls.ui.common.wallpaperfilters.EditSearchModalBottomSheet
-import com.ammar.havenwalls.ui.common.wallpaperfilters.SavedSearchesDialog
+import com.ammar.havenwalls.ui.common.searchedit.EditSearchModalBottomSheet
+import com.ammar.havenwalls.ui.common.searchedit.SavedSearchesDialog
 import com.ammar.havenwalls.ui.destinations.WallhavenApiKeyDialogDestination
 import com.ammar.havenwalls.ui.theme.HavenWallsTheme
 import com.ramcosta.composedestinations.annotation.Destination

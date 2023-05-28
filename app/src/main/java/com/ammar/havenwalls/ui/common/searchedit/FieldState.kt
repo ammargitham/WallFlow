@@ -1,4 +1,4 @@
-package com.ammar.havenwalls.ui.common.wallpaperfilters
+package com.ammar.havenwalls.ui.common.searchedit
 
 import android.content.Context
 import androidx.compose.runtime.State

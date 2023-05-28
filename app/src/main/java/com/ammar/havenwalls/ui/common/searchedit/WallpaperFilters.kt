@@ -1,4 +1,4 @@
-package com.ammar.havenwalls.ui.common.wallpaperfilters
+package com.ammar.havenwalls.ui.common.searchedit
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility

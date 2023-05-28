@@ -70,9 +70,9 @@ import com.ammar.havenwalls.ui.common.mainsearch.MainSearchBarState
 import com.ammar.havenwalls.ui.common.navigation.TwoPaneNavigation
 import com.ammar.havenwalls.ui.common.navigation.TwoPaneNavigation.Mode
 import com.ammar.havenwalls.ui.common.topWindowInsets
-import com.ammar.havenwalls.ui.common.wallpaperfilters.EditSearchModalBottomSheet
-import com.ammar.havenwalls.ui.common.wallpaperfilters.SaveAsDialog
-import com.ammar.havenwalls.ui.common.wallpaperfilters.SavedSearchesDialog
+import com.ammar.havenwalls.ui.common.searchedit.EditSearchModalBottomSheet
+import com.ammar.havenwalls.ui.common.searchedit.SaveAsDialog
+import com.ammar.havenwalls.ui.common.searchedit.SavedSearchesDialog
 import com.ammar.havenwalls.ui.destinations.SettingsScreenDestination
 import com.ammar.havenwalls.ui.destinations.WallpaperScreenDestination
 import com.ammar.havenwalls.ui.theme.HavenWallsTheme

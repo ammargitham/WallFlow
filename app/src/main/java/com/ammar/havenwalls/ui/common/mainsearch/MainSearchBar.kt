@@ -39,7 +39,7 @@ import com.ammar.havenwalls.ui.common.SearchBar
 import com.ammar.havenwalls.ui.common.Suggestion
 import com.ammar.havenwalls.ui.common.TagChip
 import com.ammar.havenwalls.ui.common.UploaderChip
-import com.ammar.havenwalls.ui.common.wallpaperfilters.EditSearchContent
+import com.ammar.havenwalls.ui.common.searchedit.EditSearchContent
 import com.ammar.havenwalls.ui.home.SearchBarFiltersToggle
 import com.ammar.havenwalls.ui.theme.HavenWallsTheme
 
