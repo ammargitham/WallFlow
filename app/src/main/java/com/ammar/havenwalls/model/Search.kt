@@ -1,8 +1,8 @@
 package com.ammar.havenwalls.model
 
 import android.content.Context
+import androidx.compose.runtime.saveable.Saver
 import com.ammar.havenwalls.R
-import com.ammar.havenwalls.data.common.SearchQuery
 import com.ammar.havenwalls.data.db.entity.SearchHistoryEntity
 import com.ammar.havenwalls.extensions.trimAll
 import kotlinx.datetime.Instant
@@ -110,3 +110,13 @@ fun Search.getSupportingText(
         add(context.getString(R.string.wallpaper_id_supp, this))
     }
 }.joinToString(", ").ifBlank { null }
+
+val SearchSaver = Saver<Search, List<String>>(
+    save = { listOf(it.query, it.filters.toQueryString()) },
+    restore = {
+        Search(
+            query = it[0],
+            filters = SearchQuery.fromQueryString(it[1])
+        )
+    }
+)

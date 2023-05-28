@@ -4,7 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.ammar.havenwalls.data.common.Purity
+import com.ammar.havenwalls.model.Purity
 import com.ammar.havenwalls.extensions.trimAll
 import com.ammar.havenwalls.model.Tag
 import kotlinx.datetime.Instant

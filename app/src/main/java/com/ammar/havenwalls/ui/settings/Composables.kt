@@ -22,6 +22,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -51,6 +52,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
@@ -62,6 +64,7 @@ import com.ammar.havenwalls.data.db.entity.ObjectDetectionModelEntity
 import com.ammar.havenwalls.extensions.DELETE
 import com.ammar.havenwalls.extensions.trimAll
 import com.ammar.havenwalls.model.ObjectDetectionModel
+import com.ammar.havenwalls.model.SavedSearch
 import com.ammar.havenwalls.ui.common.ProgressIndicator
 import com.ammar.havenwalls.ui.common.TextFieldState
 import com.ammar.havenwalls.ui.theme.HavenWallsTheme
@@ -117,6 +120,7 @@ internal fun LazyListScope.generalSection(
     blurNsfw: Boolean = false,
     onBlurSketchyCheckChange: (checked: Boolean) -> Unit = {},
     onBlurNsfwCheckChange: (checked: Boolean) -> Unit = {},
+    onManageSavedSearchesClick: () -> Unit = {},
 ) {
     item { HeaderItem(stringResource(R.string.general)) }
     item {
@@ -143,6 +147,12 @@ internal fun LazyListScope.generalSection(
                     onCheckedChange = onBlurNsfwCheckChange,
                 )
             },
+        )
+    }
+    item {
+        ListItem(
+            modifier = Modifier.clickable(onClick = onManageSavedSearchesClick),
+            headlineContent = { Text(text = stringResource(R.string.manager_saved_searches)) }
         )
     }
 }
@@ -726,6 +736,106 @@ private fun PreviewOObjectDetectionModelDeleteConfirmDialog() {
                     name = "model_1",
                     fileName = "file_name_1",
                     url = "url_1",
+                )
+            )
+        }
+    }
+}
+
+@Composable
+fun EditSavedSearchBottomSheetHeader(
+    name: String = "",
+    saveEnabled: Boolean = true,
+    onSaveClick: () -> Unit = {},
+    onNameChange: (String) -> Unit = {},
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                start = 22.dp,
+                end = 22.dp,
+                bottom = 16.dp,
+            ),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            modifier = Modifier.weight(1f),
+            text = stringResource(R.string.edit_saved_search),
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis,
+            style = MaterialTheme.typography.headlineMedium,
+        )
+        Spacer(modifier = Modifier.requiredWidth(8.dp))
+        Button(
+            enabled = saveEnabled,
+            onClick = onSaveClick,
+        ) {
+            Text(stringResource(R.string.save))
+        }
+    }
+    Divider(modifier = Modifier.fillMaxWidth())
+    OutlinedTextField(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                top = 16.dp,
+                start = 22.dp,
+                end = 22.dp,
+            ),
+        label = { Text(text = stringResource(R.string.name)) },
+        value = name,
+        singleLine = true,
+        onValueChange = onNameChange,
+    )
+}
+
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun PreviewEditSearchBottomSheetHeader() {
+    HavenWallsTheme {
+        Surface {
+            Column {
+                EditSavedSearchBottomSheetHeader()
+            }
+        }
+    }
+}
+
+@Composable
+fun DeleteSavedSearchConfirmDialog(
+    modifier: Modifier = Modifier,
+    savedSearch: SavedSearch,
+    onConfirmClick: () -> Unit = {},
+    onDismissRequest: () -> Unit = {},
+) {
+    AlertDialog(
+        modifier = modifier,
+        title = { Text(text = "Delete saved search '${savedSearch.name}'?") },
+        confirmButton = {
+            TextButton(onClick = onConfirmClick) {
+                Text(text = stringResource(R.string.delete))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismissRequest) {
+                Text(text = stringResource(R.string.cancel))
+            }
+        },
+        onDismissRequest = onDismissRequest,
+    )
+}
+
+@Preview(showSystemUi = true)
+@Preview(showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun PreviewDeleteSavedSearchConfirmDialog() {
+    HavenWallsTheme {
+        Surface {
+            DeleteSavedSearchConfirmDialog(
+                savedSearch = SavedSearch(
+                    name = "test",
                 )
             )
         }

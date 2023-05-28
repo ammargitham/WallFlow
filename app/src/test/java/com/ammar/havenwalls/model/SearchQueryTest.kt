@@ -1,4 +1,4 @@
-package com.ammar.havenwalls.data.common
+package com.ammar.havenwalls.model
 
 import org.junit.Test
 import kotlin.test.assertEquals

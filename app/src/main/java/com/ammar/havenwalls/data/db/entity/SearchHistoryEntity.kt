@@ -4,7 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.ammar.havenwalls.data.common.SearchQuery
+import com.ammar.havenwalls.model.SearchQuery
 import com.ammar.havenwalls.model.Search
 import kotlinx.datetime.Instant
 

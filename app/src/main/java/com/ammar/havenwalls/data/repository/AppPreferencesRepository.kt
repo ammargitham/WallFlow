@@ -6,13 +6,14 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import com.ammar.havenwalls.IoDispatcher
-import com.ammar.havenwalls.data.common.SearchQuery
-import com.ammar.havenwalls.data.common.Sorting
-import com.ammar.havenwalls.data.common.TopRange
+import com.ammar.havenwalls.model.SearchQuery
+import com.ammar.havenwalls.model.Sorting
+import com.ammar.havenwalls.model.TopRange
 import com.ammar.havenwalls.data.preferences.AppPreferences
 import com.ammar.havenwalls.data.preferences.ObjectDetectionPreferences
 import com.ammar.havenwalls.data.preferences.PreferencesKeys
 import com.ammar.havenwalls.extensions.TAG
+import com.ammar.havenwalls.model.Search
 import java.io.IOException
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -47,8 +48,11 @@ class AppPreferencesRepository @Inject constructor(
         dataStore.edit { it[PreferencesKeys.WALLHAVEN_API_KEY] = wallhavenApiKey }
     }
 
-    suspend fun updateHomeSearchQuery(searchQuery: SearchQuery) = withContext(ioDispatcher) {
-        dataStore.edit { it[PreferencesKeys.HOME_SEARCH_QUERY] = searchQuery.toQueryString() }
+    suspend fun updateHomeSearch(search: Search) = withContext(ioDispatcher) {
+        dataStore.edit {
+            it[PreferencesKeys.HOME_SEARCH_QUERY] = search.query
+            it[PreferencesKeys.HOME_FILTERS] = search.filters.toQueryString()
+        }
     }
 
     suspend fun updateBlurSketchy(blurSketchy: Boolean) = withContext(ioDispatcher) {
@@ -72,11 +76,14 @@ class AppPreferencesRepository @Inject constructor(
 
     private fun mapAppPreferences(preferences: Preferences) = AppPreferences(
         wallhavenApiKey = preferences[PreferencesKeys.WALLHAVEN_API_KEY] ?: "",
-        homeSearchQuery = preferences[PreferencesKeys.HOME_SEARCH_QUERY]?.let {
-            SearchQuery.fromQueryString(it)
-        } ?: SearchQuery(
-            sorting = Sorting.TOPLIST,
-            topRange = TopRange.ONE_DAY,
+        homeSearch = Search(
+            query = preferences[PreferencesKeys.HOME_SEARCH_QUERY] ?: "",
+            filters = preferences[PreferencesKeys.HOME_FILTERS]?.let {
+                SearchQuery.fromQueryString(it)
+            } ?: SearchQuery(
+                sorting = Sorting.TOPLIST,
+                topRange = TopRange.ONE_DAY,
+            ),
         ),
         blurSketchy = preferences[PreferencesKeys.BLUR_SKETCHY] ?: false,
         blurNsfw = preferences[PreferencesKeys.BLUR_NSFW] ?: false,

@@ -27,6 +27,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -51,6 +52,7 @@ object SearchBar {
     @Composable
     operator fun <T> invoke(
         modifier: Modifier = Modifier,
+        active: Boolean = false,
         useDocked: Boolean = false,
         query: String = "",
         placeholder: @Composable (() -> Unit)? = null,
@@ -67,7 +69,7 @@ object SearchBar {
         onActiveChange: (active: Boolean) -> Unit = {},
         onBackClick: (() -> Unit)? = null,
     ) {
-        var active by rememberSaveable { mutableStateOf(false) }
+        var localActive by rememberSaveable { mutableStateOf(active) }
         val density = LocalDensity.current
         val imePadding = WindowInsets.ime.getBottom(density).toDp()
         val content: @Composable ColumnScope.() -> Unit = {
@@ -84,7 +86,7 @@ object SearchBar {
                         ListItem(
                             modifier = Modifier.combinedClickable(
                                 onClick = {
-                                    active = false
+                                    localActive = false
                                     onActiveChange(false)
                                     onSuggestionClick(it)
                                 },
@@ -118,6 +120,10 @@ object SearchBar {
             }
         }
 
+        LaunchedEffect(active) {
+            localActive = active
+        }
+
         Box(
             modifier
                 .semantics { isContainer = true }
@@ -130,13 +136,13 @@ object SearchBar {
                 query = query,
                 onQueryChange = onQueryChange,
                 onSearch = {
-                    active = false
+                    localActive = false
                     onSearch(it)
                     onActiveChange(false)
                 },
-                active = active,
+                active = localActive,
                 onActiveChange = {
-                    active = it
+                    localActive = it
                     onActiveChange(it)
                 },
                 placeholder = placeholder,
@@ -144,12 +150,12 @@ object SearchBar {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Crossfade(active || onBackClick != null) {
+                        Crossfade(localActive || onBackClick != null) {
                             if (it) {
                                 IconButton(
                                     onClick = {
-                                        if (active) {
-                                            active = false
+                                        if (localActive) {
+                                            localActive = false
                                             onActiveChange(false)
                                             return@IconButton
                                         }

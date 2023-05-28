@@ -2,7 +2,7 @@ package com.ammar.havenwalls.data.network
 
 import com.ammar.havenwalls.data.network.model.NetworkResponse
 import com.ammar.havenwalls.data.network.model.NetworkWallpaper
-import com.ammar.havenwalls.data.common.SearchQuery
+import com.ammar.havenwalls.model.SearchQuery
 import org.jsoup.nodes.Document
 
 interface WallHavenNetworkDataSource {

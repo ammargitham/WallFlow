@@ -56,6 +56,9 @@ class DatabaseModule {
     fun providesObjectDetectionModelDao(appDatabase: AppDatabase) =
         appDatabase.objectDetectionModelDao()
 
+    @Provides
+    fun providesSavedSearchDao(appDatabase: AppDatabase) = appDatabase.savedSearchDao()
+
     lateinit var appDatabase: AppDatabase
 
     @Provides

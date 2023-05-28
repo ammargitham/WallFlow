@@ -7,6 +7,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.ime
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -22,19 +24,22 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ammar.havenwalls.R
-import com.ammar.havenwalls.data.common.SearchQuery
+import com.ammar.havenwalls.model.SearchQuery
+import com.ammar.havenwalls.model.MenuItem
 import com.ammar.havenwalls.model.Search
 import com.ammar.havenwalls.model.TagSearchMeta
 import com.ammar.havenwalls.model.UploaderSearchMeta
+import com.ammar.havenwalls.ui.common.OverflowMenu
 import com.ammar.havenwalls.ui.common.SearchBar
 import com.ammar.havenwalls.ui.common.Suggestion
 import com.ammar.havenwalls.ui.common.TagChip
 import com.ammar.havenwalls.ui.common.UploaderChip
-import com.ammar.havenwalls.ui.common.WallpaperFiltersDialogContent
+import com.ammar.havenwalls.ui.common.wallpaperfilters.EditSearchContent
 import com.ammar.havenwalls.ui.home.SearchBarFiltersToggle
 import com.ammar.havenwalls.ui.theme.HavenWallsTheme
 
@@ -61,6 +66,8 @@ fun MainSearchBar(
     onFiltersChange: (searchQuery: SearchQuery) -> Unit = {},
     onDeleteSuggestionConfirmClick: () -> Unit = {},
     onDeleteSuggestionDismissRequest: () -> Unit = {},
+    onSaveAsClick: () -> Unit = {},
+    onLoadClick: () -> Unit = {},
 ) {
     val placeholder: @Composable () -> Unit = remember { { Text(text = "Search") } }
 
@@ -71,6 +78,7 @@ fun MainSearchBar(
         exit = fadeOut(),
     ) {
         SearchBar(
+            active = active,
             useDocked = useDocked,
             placeholder = when {
                 active -> placeholder
@@ -103,10 +111,17 @@ fun MainSearchBar(
             trailingIcon = {
                 Crossfade(active) {
                     if (it) {
-                        SearchBarFiltersToggle(
-                            checked = showFilters,
-                            onCheckedChange = onShowFiltersChange,
-                        )
+                        Row {
+                            SearchBarFiltersToggle(
+                                checked = showFilters,
+                                onCheckedChange = onShowFiltersChange,
+                            )
+                            ActiveOverflowIcon(
+                                query = query,
+                                onSaveAsClick = onSaveAsClick,
+                                onLoadClick = onLoadClick,
+                            )
+                        }
                         return@Crossfade
                     }
                     overflowIcon?.invoke()
@@ -122,13 +137,14 @@ fun MainSearchBar(
                     Surface(
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        WallpaperFiltersDialogContent(
+                        EditSearchContent(
                             modifier = Modifier
                                 .verticalScroll(rememberScrollState())
                                 .windowInsetsPadding(WindowInsets.ime)
                                 .padding(16.dp),
-                            searchQuery = search.filters,
-                            onChange = onFiltersChange,
+                            showQueryField = false,
+                            search = search,
+                            onChange = { onFiltersChange(it.filters) },
                         )
                     }
                 }
@@ -152,6 +168,46 @@ fun MainSearchBar(
             },
             onDismissRequest = onDeleteSuggestionDismissRequest,
         )
+    }
+}
+
+@Composable
+fun ActiveOverflowIcon(
+    modifier: Modifier = Modifier,
+    query: String = "",
+    onSaveAsClick: () -> Unit = {},
+    onLoadClick: () -> Unit = {},
+) {
+    val context = LocalContext.current
+    val menuItems = remember(context, query.isNotBlank()) {
+        listOf(
+            MenuItem(
+                text = context.getString(R.string.save_as),
+                value = "save_as",
+                onClick = onSaveAsClick,
+                enabled = query.isNotBlank(),
+            ),
+            MenuItem(
+                text = context.getString(R.string.load),
+                value = "load",
+                onClick = onLoadClick,
+            ),
+        )
+    }
+
+    OverflowMenu(
+        modifier = modifier,
+    ) { closeMenu ->
+        menuItems.forEach {
+            DropdownMenuItem(
+                text = { Text(it.text) },
+                enabled = it.enabled,
+                onClick = {
+                    it.onClick?.invoke()
+                    closeMenu()
+                },
+            )
+        }
     }
 }
 

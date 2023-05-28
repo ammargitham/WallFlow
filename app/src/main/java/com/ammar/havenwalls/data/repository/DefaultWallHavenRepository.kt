@@ -6,8 +6,8 @@ import androidx.paging.PagingConfig
 import androidx.paging.map
 import androidx.room.withTransaction
 import com.ammar.havenwalls.IoDispatcher
-import com.ammar.havenwalls.data.common.Purity
-import com.ammar.havenwalls.data.common.SearchQuery
+import com.ammar.havenwalls.model.Purity
+import com.ammar.havenwalls.model.SearchQuery
 import com.ammar.havenwalls.data.db.database.AppDatabase
 import com.ammar.havenwalls.data.db.entity.LastUpdatedCategory
 import com.ammar.havenwalls.data.db.entity.LastUpdatedEntity

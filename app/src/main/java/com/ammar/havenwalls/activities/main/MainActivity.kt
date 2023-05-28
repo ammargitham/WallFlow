@@ -32,6 +32,8 @@ import com.ammar.havenwalls.ui.common.mainsearch.MainSearchBarState
 import com.ammar.havenwalls.ui.common.navigation.TwoPaneNavigation
 import com.ammar.havenwalls.ui.common.navigation.TwoPaneNavigation.Mode
 import com.ammar.havenwalls.ui.common.navigation.rememberTwoPaneNavController
+import com.ammar.havenwalls.ui.common.wallpaperfilters.SaveAsDialog
+import com.ammar.havenwalls.ui.common.wallpaperfilters.SavedSearchesDialog
 import com.ammar.havenwalls.ui.destinations.WallhavenApiKeyDialogDestination
 import com.ammar.havenwalls.ui.home.HomeScreenNavArgs
 import com.ammar.havenwalls.ui.navArgs
@@ -190,7 +192,15 @@ class MainActivity : ComponentActivity() {
                             pane1NavController.navigate(it.route) {
                                 launchSingleTop = true
                             }
-                        }
+                        },
+                        onSearchBarSaveAsClick = {
+                            viewModel.showSaveSearchAsDialog(
+                                uiState.searchBarSearch.copy(
+                                    query = searchBarQuery,
+                                ),
+                            )
+                        },
+                        onSearchBarLoadClick = viewModel::showSavedSearches,
                     ) {
                         MainNavigation(
                             twoPaneController = twoPaneController,
@@ -198,6 +208,28 @@ class MainActivity : ComponentActivity() {
                             mainActivityViewModel = viewModel,
                             wallpaperViewModel = wallpaperViewModel,
                             applyContentPadding = uiState.applyScaffoldPadding,
+                        )
+                    }
+
+                    uiState.saveSearchAsSearch?.run {
+                        SaveAsDialog(
+                            onSave = {
+                                viewModel.saveSearchAs(it, this)
+                                viewModel.showSaveSearchAsDialog(null)
+                            },
+                            onDismissRequest = { viewModel.showSaveSearchAsDialog(null) },
+                        )
+                    }
+
+                    if (uiState.showSavedSearchesDialog) {
+                        SavedSearchesDialog(
+                            savedSearches = uiState.savedSearches,
+                            onSelect = {
+                                doSearch(viewModel, searchBarControllerState, it.search)
+                                viewModel.showSavedSearches(false)
+                                viewModel.setSearchBarActive(false)
+                            },
+                            onDismissRequest = { viewModel.showSavedSearches(false) }
                         )
                     }
                 }

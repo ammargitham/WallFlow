@@ -38,7 +38,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.ammar.havenwalls.R
-import com.ammar.havenwalls.data.common.Resolution
+import com.ammar.havenwalls.model.Resolution
 import com.ammar.havenwalls.data.repository.utils.Resource
 import com.ammar.havenwalls.data.repository.utils.successOr
 import com.ammar.havenwalls.extensions.TAG

@@ -1,6 +1,6 @@
 package com.ammar.havenwalls.data.network.model
 
-import com.ammar.havenwalls.data.common.Purity
+import com.ammar.havenwalls.model.Purity
 import com.ammar.havenwalls.data.db.entity.TagEntity
 import com.ammar.havenwalls.data.network.model.util.InstantSerializer
 import com.ammar.havenwalls.extensions.trimAll

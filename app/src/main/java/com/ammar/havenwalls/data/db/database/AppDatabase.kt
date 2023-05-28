@@ -7,6 +7,7 @@ import com.ammar.havenwalls.data.db.converters.Converters
 import com.ammar.havenwalls.data.db.dao.LastUpdatedDao
 import com.ammar.havenwalls.data.db.dao.ObjectDetectionModelDao
 import com.ammar.havenwalls.data.db.dao.PopularTagsDao
+import com.ammar.havenwalls.data.db.dao.SavedSearchDao
 import com.ammar.havenwalls.data.db.dao.SearchHistoryDao
 import com.ammar.havenwalls.data.db.dao.SearchQueryDao
 import com.ammar.havenwalls.data.db.dao.SearchQueryRemoteKeysDao
@@ -17,6 +18,7 @@ import com.ammar.havenwalls.data.db.dao.WallpapersDao
 import com.ammar.havenwalls.data.db.entity.LastUpdatedEntity
 import com.ammar.havenwalls.data.db.entity.ObjectDetectionModelEntity
 import com.ammar.havenwalls.data.db.entity.PopularTagEntity
+import com.ammar.havenwalls.data.db.entity.SavedSearchEntity
 import com.ammar.havenwalls.data.db.entity.SearchHistoryEntity
 import com.ammar.havenwalls.data.db.entity.SearchQueryEntity
 import com.ammar.havenwalls.data.db.entity.SearchQueryRemoteKeyEntity
@@ -39,6 +41,7 @@ import com.ammar.havenwalls.data.db.entity.WallpaperTagsEntity
         WallpaperTagsEntity::class,
         SearchHistoryEntity::class,
         ObjectDetectionModelEntity::class,
+        SavedSearchEntity::class,
     ],
     version = 1,
 )
@@ -54,4 +57,5 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun uploadersDao(): UploadersDao
     abstract fun searchHistoryDao(): SearchHistoryDao
     abstract fun objectDetectionModelDao(): ObjectDetectionModelDao
+    abstract fun savedSearchDao(): SavedSearchDao
 }

@@ -25,7 +25,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -46,7 +50,9 @@ import com.ammar.havenwalls.extensions.findActivity
 import com.ammar.havenwalls.extensions.rememberLazyStaggeredGridState
 import com.ammar.havenwalls.extensions.search
 import com.ammar.havenwalls.extensions.toDp
+import com.ammar.havenwalls.model.MenuItem
 import com.ammar.havenwalls.model.Search
+import com.ammar.havenwalls.model.SearchSaver
 import com.ammar.havenwalls.model.Tag
 import com.ammar.havenwalls.model.TagSearchMeta
 import com.ammar.havenwalls.model.Wallpaper
@@ -55,7 +61,6 @@ import com.ammar.havenwalls.model.wallpaper2
 import com.ammar.havenwalls.ui.appCurrentDestinationAsState
 import com.ammar.havenwalls.ui.common.LocalSystemBarsController
 import com.ammar.havenwalls.ui.common.SearchBar
-import com.ammar.havenwalls.ui.common.WallpaperFiltersModalBottomSheet
 import com.ammar.havenwalls.ui.common.WallpaperStaggeredGrid
 import com.ammar.havenwalls.ui.common.bottomWindowInsets
 import com.ammar.havenwalls.ui.common.bottombar.BottomBarController
@@ -65,6 +70,9 @@ import com.ammar.havenwalls.ui.common.mainsearch.MainSearchBarState
 import com.ammar.havenwalls.ui.common.navigation.TwoPaneNavigation
 import com.ammar.havenwalls.ui.common.navigation.TwoPaneNavigation.Mode
 import com.ammar.havenwalls.ui.common.topWindowInsets
+import com.ammar.havenwalls.ui.common.wallpaperfilters.EditSearchModalBottomSheet
+import com.ammar.havenwalls.ui.common.wallpaperfilters.SaveAsDialog
+import com.ammar.havenwalls.ui.common.wallpaperfilters.SavedSearchesDialog
 import com.ammar.havenwalls.ui.destinations.SettingsScreenDestination
 import com.ammar.havenwalls.ui.destinations.WallpaperScreenDestination
 import com.ammar.havenwalls.ui.theme.HavenWallsTheme
@@ -73,6 +81,7 @@ import com.ammar.havenwalls.ui.wallpaper.WallpaperViewModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 
 @OptIn(
     ExperimentalMaterialApi::class,
@@ -104,9 +113,6 @@ fun HomeScreen(
             wallpapers.refresh()
             viewModel.refresh()
         },
-    )
-    val filtersBottomSheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true,
     )
     val searchBarController = LocalMainSearchBarController.current
     val bottomBarController = LocalBottomBarController.current
@@ -151,7 +157,10 @@ fun HomeScreen(
                     }
                 } else null,
                 search = uiState.search,
-                onSearch = { twoPaneController.pane1NavHostController.search(it) }
+                onSearch = {
+                    if (uiState.search == it) return@MainSearchBarState
+                    twoPaneController.pane1NavHostController.search(it)
+                }
             )
         }
     }
@@ -247,13 +256,59 @@ fun HomeScreen(
         }
 
         if (uiState.showFilters) {
-            WallpaperFiltersModalBottomSheet(
-                contentModifier = Modifier.windowInsetsPadding(bottomWindowInsets),
-                bottomSheetState = filtersBottomSheetState,
-                searchQuery = uiState.search.filters,
-                title = "Home Filters",
-                onSave = viewModel::updateQuery,
+            val state = rememberModalBottomSheetState()
+            val scope = rememberCoroutineScope()
+            var localSearch by rememberSaveable(
+                uiState.search,
+                stateSaver = SearchSaver,
+            ) { mutableStateOf(uiState.search) }
+
+            EditSearchModalBottomSheet(
+                state = state,
+                search = localSearch,
+                header = {
+                    HomeFiltersBottomSheetHeader(
+                        modifier = Modifier.padding(
+                            start = 22.dp,
+                            end = 22.dp,
+                            bottom = 16.dp,
+                        ),
+                        saveEnabled = localSearch != uiState.search,
+                        onSaveClick = {
+                            viewModel.updateHomeSearch(localSearch)
+                            scope.launch { state.hide() }.invokeOnCompletion {
+                                if (!state.isVisible) {
+                                    viewModel.showFilters(false)
+                                }
+                            }
+                        },
+                        onSaveAsClick = { viewModel.showSaveSearchAsDialog(localSearch) },
+                        onLoadClick = viewModel::showSavedSearches,
+                    )
+                },
+                onChange = { localSearch = it },
                 onDismissRequest = { viewModel.showFilters(false) }
+            )
+        }
+
+        uiState.saveSearchAsSearch?.run {
+            SaveAsDialog(
+                onSave = {
+                    viewModel.saveSearchAs(it, this)
+                    viewModel.showSaveSearchAsDialog(null)
+                },
+                onDismissRequest = { viewModel.showSaveSearchAsDialog(null) },
+            )
+        }
+
+        if (uiState.showSavedSearchesDialog) {
+            SavedSearchesDialog(
+                savedSearches = uiState.savedSearches,
+                onSelect = {
+                    viewModel.updateHomeSearch(it.search)
+                    viewModel.showSavedSearches(false)
+                },
+                onDismissRequest = { viewModel.showSavedSearches(false) }
             )
         }
     }

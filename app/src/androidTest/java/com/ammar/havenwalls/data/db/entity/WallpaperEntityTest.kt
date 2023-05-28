@@ -2,8 +2,8 @@ package com.ammar.havenwalls.data.db.entity
 
 import androidx.compose.ui.graphics.Color
 import androidx.core.graphics.toColorInt
-import com.ammar.havenwalls.data.common.Purity
-import com.ammar.havenwalls.data.common.Resolution
+import com.ammar.havenwalls.model.Purity
+import com.ammar.havenwalls.model.Resolution
 import com.ammar.havenwalls.model.Thumbs
 import com.ammar.havenwalls.model.Wallpaper
 import kotlinx.datetime.Instant

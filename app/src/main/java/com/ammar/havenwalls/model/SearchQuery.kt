@@ -1,6 +1,6 @@
 @file:UseSerializers(ColorSerializer::class)
 
-package com.ammar.havenwalls.data.common
+package com.ammar.havenwalls.model
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf

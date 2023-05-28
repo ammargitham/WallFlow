@@ -1,8 +1,7 @@
 package com.ammar.havenwalls.data.repository
 
 import androidx.paging.PagingData
-import com.ammar.havenwalls.data.common.SearchQuery
-import com.ammar.havenwalls.data.common.TopRange
+import com.ammar.havenwalls.model.SearchQuery
 import com.ammar.havenwalls.data.repository.utils.Resource
 import com.ammar.havenwalls.model.Tag
 import com.ammar.havenwalls.model.Wallpaper

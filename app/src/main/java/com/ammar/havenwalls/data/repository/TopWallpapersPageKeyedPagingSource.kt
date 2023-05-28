@@ -4,9 +4,9 @@ import androidx.paging.PagingSource
 import androidx.paging.PagingSource.LoadParams.Append
 import androidx.paging.PagingSource.LoadResult.Page
 import androidx.paging.PagingState
-import com.ammar.havenwalls.data.common.SearchQuery
-import com.ammar.havenwalls.data.common.Sorting
-import com.ammar.havenwalls.data.common.TopRange
+import com.ammar.havenwalls.model.SearchQuery
+import com.ammar.havenwalls.model.Sorting
+import com.ammar.havenwalls.model.TopRange
 import com.ammar.havenwalls.data.network.WallHavenNetworkDataSource
 import com.ammar.havenwalls.data.network.model.asWallpaper
 import com.ammar.havenwalls.model.Wallpaper

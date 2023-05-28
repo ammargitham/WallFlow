@@ -1,8 +1,8 @@
 package com.ammar.havenwalls.data.network.retrofit
 
-import com.ammar.havenwalls.data.common.SearchQuery
-import com.ammar.havenwalls.data.common.toCategoryInt
-import com.ammar.havenwalls.data.common.toPurityInt
+import com.ammar.havenwalls.model.SearchQuery
+import com.ammar.havenwalls.model.toCategoryInt
+import com.ammar.havenwalls.model.toPurityInt
 import com.ammar.havenwalls.data.network.WallHavenNetworkDataSource
 import com.ammar.havenwalls.data.network.retrofit.api.WallHavenNetworkApi
 import com.ammar.havenwalls.extensions.toHexString

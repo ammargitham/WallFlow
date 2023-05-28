@@ -20,7 +20,7 @@ import androidx.core.content.FileProvider
 import androidx.core.hardware.display.DisplayManagerCompat
 import androidx.core.net.toUri
 import com.ammar.havenwalls.FILE_PROVIDER_AUTHORITY
-import com.ammar.havenwalls.data.common.Resolution
+import com.ammar.havenwalls.model.Resolution
 import com.ammar.havenwalls.model.WallpaperTarget
 import com.ammar.havenwalls.model.toWhichInt
 import com.ammar.havenwalls.utils.isExternalStorageWritable

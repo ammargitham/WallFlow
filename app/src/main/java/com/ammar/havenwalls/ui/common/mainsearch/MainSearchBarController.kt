@@ -6,6 +6,8 @@ import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.staticCompositionLocalOf
+import com.ammar.havenwalls.model.SearchQuery
+import com.ammar.havenwalls.model.Sorting
 import com.ammar.havenwalls.model.Search
 
 abstract class MainSearchBarController {
@@ -15,7 +17,11 @@ abstract class MainSearchBarController {
 
 data class MainSearchBarState(
     val visible: Boolean = true,
-    val search: Search = Search(),
+    val search: Search = Search(
+        filters = SearchQuery(
+            sorting = Sorting.RELEVANCE,
+        )
+    ),
     val overflowIcon: @Composable (() -> Unit)? = null,
     val onActiveChange: (active: Boolean) -> Unit = {},
     val onSearch: (search: Search) -> Unit = {},

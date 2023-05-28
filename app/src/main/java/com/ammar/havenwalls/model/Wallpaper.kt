@@ -4,8 +4,6 @@ package com.ammar.havenwalls.model
 
 import androidx.compose.ui.graphics.Color
 import androidx.core.graphics.toColorInt
-import com.ammar.havenwalls.data.common.Purity
-import com.ammar.havenwalls.data.common.Resolution
 import com.ammar.havenwalls.model.serializers.ColorSerializer
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant

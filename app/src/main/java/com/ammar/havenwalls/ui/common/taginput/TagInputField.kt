@@ -37,6 +37,8 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
 import androidx.compose.ui.unit.dp
 import com.ammar.havenwalls.extensions.trimAll
 import com.ammar.havenwalls.ui.common.ClearableChip
@@ -79,7 +81,9 @@ fun TagInputField(
                     if (it.key != Key.Backspace
                         || fieldValue.isNotEmpty()
                         || tags.isEmpty()
-                        || it.nativeKeyEvent.action != NativeKeyEvent.ACTION_UP
+                        // ACTION_UP not called for physical keyboard
+                        // hence we perform action on DOWN and ignore UP events
+                        || it.nativeKeyEvent.action == NativeKeyEvent.ACTION_UP
                     ) {
                         return@onPreviewKeyEvent false
                     }
@@ -134,6 +138,10 @@ fun TagInputField(
                             }
                             Box(
                                 modifier = Modifier
+                                    .padding(
+                                        top = if (tags.isEmpty()) 0.dp else 12.dp,
+                                        bottom = if (tags.isEmpty()) 0.dp else 12.dp,
+                                    )
                                     .width(IntrinsicSize.Min)
                                     .widthIn(min = 5.dp),
                             ) {
@@ -148,8 +156,8 @@ fun TagInputField(
                     label = label,
                     placeholder = placeholder,
                     contentPadding = OutlinedTextFieldDefaults.contentPadding(
-                        top = if (tags.isEmpty()) 28.dp else 16.dp,
-                        bottom = if (tags.isEmpty()) 28.dp else 16.dp,
+                        top = if (tags.isNotEmpty()) 0.dp else 16.dp,
+                        bottom = if (tags.isNotEmpty()) 0.dp else 16.dp,
                     ),
                     container = {
                         OutlinedTextFieldDefaults.ContainerBox(
@@ -165,11 +173,20 @@ fun TagInputField(
     }
 }
 
+private class TagsParameterProvider : CollectionPreviewParameterProvider<Set<String>>(
+    listOf(
+        emptySet(),
+        setOf("test", "test1"),
+    )
+)
+
 @Preview
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun PreviewTagInputField() {
-    var tags: Set<String> by remember { mutableStateOf(emptySet()) }
+private fun PreviewTagInputField(
+    @PreviewParameter(TagsParameterProvider::class) tags: Set<String>,
+) {
+    var localTags by remember { mutableStateOf(tags) }
 
     HavenWallsTheme {
         Surface {
@@ -179,9 +196,9 @@ private fun PreviewTagInputField() {
                     .fillMaxWidth(),
                 label = { Text(text = "Chip Input") },
                 placeholder = { Text(text = "Placeholder") },
-                tags = tags,
-                onAddTag = { tags = tags + it },
-                onRemoveTag = { tags = tags - it },
+                tags = localTags,
+                onAddTag = { localTags = localTags + it },
+                onRemoveTag = { localTags = localTags - it },
             )
         }
     }

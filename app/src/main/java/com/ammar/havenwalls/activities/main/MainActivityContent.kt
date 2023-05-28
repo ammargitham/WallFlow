@@ -21,8 +21,8 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.ammar.havenwalls.data.common.Purity
-import com.ammar.havenwalls.data.common.SearchQuery
+import com.ammar.havenwalls.model.Purity
+import com.ammar.havenwalls.model.SearchQuery
 import com.ammar.havenwalls.data.repository.GlobalErrorsRepository.GlobalError
 import com.ammar.havenwalls.model.Search
 import com.ammar.havenwalls.model.Tag
@@ -72,6 +72,8 @@ fun MainActivityContent(
     onSearchBarFiltersChange: (searchQuery: SearchQuery) -> Unit = {},
     onDeleteSearchBarSuggestionConfirmClick: () -> Unit = {},
     onDeleteSearchBarSuggestionDismissRequest: () -> Unit = {},
+    onSearchBarSaveAsClick: () -> Unit = {},
+    onSearchBarLoadClick: () -> Unit = {},
     content: @Composable (contentPadding: PaddingValues) -> Unit,
 ) {
     Column(
@@ -111,6 +113,8 @@ fun MainActivityContent(
                     onFiltersChange = onSearchBarFiltersChange,
                     onDeleteSuggestionConfirmClick = onDeleteSearchBarSuggestionConfirmClick,
                     onDeleteSuggestionDismissRequest = onDeleteSearchBarSuggestionDismissRequest,
+                    onSaveAsClick = onSearchBarSaveAsClick,
+                    onLoadClick = onSearchBarLoadClick,
                 )
                 if (useNavRail) {
                     NavRail(

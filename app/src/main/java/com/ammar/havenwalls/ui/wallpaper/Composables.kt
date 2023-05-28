@@ -56,7 +56,7 @@ import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ammar.havenwalls.R
-import com.ammar.havenwalls.data.common.Purity
+import com.ammar.havenwalls.model.Purity
 import com.ammar.havenwalls.model.Avatar
 import com.ammar.havenwalls.model.Tag
 import com.ammar.havenwalls.model.Uploader

@@ -14,7 +14,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
-import com.ammar.havenwalls.data.common.Purity
+import com.ammar.havenwalls.model.Purity
 import com.ammar.havenwalls.model.Wallpaper
 
 @Composable

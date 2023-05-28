@@ -4,19 +4,23 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
-import com.ammar.havenwalls.data.common.Purity
-import com.ammar.havenwalls.data.common.SearchQuery
-import com.ammar.havenwalls.data.common.Sorting
-import com.ammar.havenwalls.data.common.TopRange
+import com.ammar.havenwalls.model.Purity
+import com.ammar.havenwalls.model.SearchQuery
+import com.ammar.havenwalls.model.Sorting
+import com.ammar.havenwalls.model.TopRange
+import com.ammar.havenwalls.data.db.entity.toSavedSearch
 import com.ammar.havenwalls.data.repository.AppPreferencesRepository
+import com.ammar.havenwalls.data.repository.SavedSearchRepository
 import com.ammar.havenwalls.data.repository.WallHavenRepository
 import com.ammar.havenwalls.data.repository.utils.Resource
 import com.ammar.havenwalls.data.repository.utils.successOr
+import com.ammar.havenwalls.model.SavedSearch
 import com.ammar.havenwalls.model.Search
 import com.ammar.havenwalls.model.Tag
 import com.ammar.havenwalls.model.Wallpaper
 import com.ammar.havenwalls.model.toSearchQuery
 import com.ammar.havenwalls.ui.navargs.ktxserializable.DefaultKtxSerializableNavTypeSerializer
+import com.ammar.havenwalls.utils.combine
 import com.github.materiiapps.partial.Partialize
 import com.github.materiiapps.partial.partial
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -46,6 +50,7 @@ import kotlinx.serialization.ExperimentalSerializationApi
 class HomeViewModel @Inject constructor(
     private val wallHavenRepository: WallHavenRepository,
     private val appPreferencesRepository: AppPreferencesRepository,
+    private val savedSearchRepository: SavedSearchRepository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val savedStateSearchFlow: Flow<Search?> = savedStateHandle.getStateFlow<ByteArray?>(
@@ -62,7 +67,7 @@ class HomeViewModel @Inject constructor(
     private val searchFlow = combine(
         appPreferencesRepository.appPreferencesFlow,
         savedStateSearchFlow,
-    ) { preferences, search -> search ?: Search(filters = preferences.homeSearchQuery) }
+    ) { preferences, search -> search ?: preferences.homeSearch }
     private val wallpapersLoadingFlow = MutableStateFlow(false)
     private val debouncedWallpapersLoadingFlow = wallpapersLoadingFlow
         .debounce { if (it) 1000 else 0 }
@@ -78,7 +83,8 @@ class HomeViewModel @Inject constructor(
         appPreferencesRepository.appPreferencesFlow,
         localUiState,
         debouncedWallpapersLoadingFlow,
-    ) { search, tags, appPreferences, local, wallpapersLoading ->
+        savedSearchRepository.getAll(),
+    ) { search, tags, appPreferences, local, wallpapersLoading, savedSearchEntities ->
         local.merge(
             HomeUiState(
                 tags = if (tags is Resource.Loading) List(3) {
@@ -97,7 +103,8 @@ class HomeViewModel @Inject constructor(
                 wallpapersLoading = wallpapersLoading,
                 blurSketchy = appPreferences.blurSketchy,
                 blurNsfw = appPreferences.blurNsfw,
-                isHome = search == Search(filters = appPreferences.homeSearchQuery),
+                isHome = search == appPreferences.homeSearch,
+                savedSearches = savedSearchEntities.map { entity -> entity.toSavedSearch() },
             )
         )
     }.stateIn(
@@ -112,11 +119,10 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun updateQuery(searchQuery: SearchQuery) {
+    fun updateHomeSearch(search: Search) {
         viewModelScope.launch {
-            appPreferencesRepository.updateHomeSearchQuery(searchQuery)
+            appPreferencesRepository.updateHomeSearch(search)
         }
-        localUiState.update { it.copy(showFilters = partial(false)) }
     }
 
     fun showFilters(show: Boolean) = localUiState.update {
@@ -127,6 +133,23 @@ class HomeViewModel @Inject constructor(
 
     fun setSelectedWallpaper(wallpaper: Wallpaper) = localUiState.update {
         it.copy(selectedWallpaper = partial(wallpaper))
+    }
+
+    fun showSaveSearchAsDialog(search: Search? = null) = localUiState.update {
+        it.copy(saveSearchAsSearch = partial(search))
+    }
+
+    fun saveSearchAs(name: String, search: Search) = viewModelScope.launch {
+        savedSearchRepository.addOrUpdateSavedSearch(
+            SavedSearch(
+                name = name,
+                search = search,
+            )
+        )
+    }
+
+    fun showSavedSearches(show: Boolean = true) = localUiState.update {
+        it.copy(showSavedSearchesDialog = partial(show))
     }
 }
 
@@ -146,4 +169,7 @@ data class HomeUiState(
     val blurNsfw: Boolean = false,
     val selectedWallpaper: Wallpaper? = null,
     val isHome: Boolean = false,
+    val saveSearchAsSearch: Search? = null,
+    val showSavedSearchesDialog: Boolean = false,
+    val savedSearches: List<SavedSearch> = emptyList(),
 )

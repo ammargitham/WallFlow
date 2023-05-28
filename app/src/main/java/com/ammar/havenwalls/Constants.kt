@@ -1,6 +1,6 @@
 package com.ammar.havenwalls
 
-import com.ammar.havenwalls.data.common.Resolution
+import com.ammar.havenwalls.model.Resolution
 
 const val WALLHAVEN_BASE_URL = "https://wallhaven.cc/api/v1/"
 

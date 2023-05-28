@@ -8,9 +8,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -20,15 +25,19 @@ import com.ammar.havenwalls.R
 import com.ammar.havenwalls.data.preferences.AppPreferences
 import com.ammar.havenwalls.data.preferences.ObjectDetectionPreferences
 import com.ammar.havenwalls.model.ObjectDetectionModel
+import com.ammar.havenwalls.model.SavedSearchSaver
 import com.ammar.havenwalls.ui.common.TopBar
 import com.ammar.havenwalls.ui.common.bottombar.LocalBottomBarController
 import com.ammar.havenwalls.ui.common.mainsearch.LocalMainSearchBarController
 import com.ammar.havenwalls.ui.common.mainsearch.MainSearchBarState
 import com.ammar.havenwalls.ui.common.navigation.TwoPaneNavigation
 import com.ammar.havenwalls.ui.common.navigation.TwoPaneNavigation.Mode
+import com.ammar.havenwalls.ui.common.wallpaperfilters.EditSearchModalBottomSheet
+import com.ammar.havenwalls.ui.common.wallpaperfilters.SavedSearchesDialog
 import com.ammar.havenwalls.ui.destinations.WallhavenApiKeyDialogDestination
 import com.ammar.havenwalls.ui.theme.HavenWallsTheme
 import com.ramcosta.composedestinations.annotation.Destination
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination
@@ -70,7 +79,8 @@ fun SettingsScreen(
             },
             onObjectDetectionPrefsChange = viewModel::updateSubjectDetectionPrefs,
             onObjectDetectionDelegateClick = { viewModel.showObjectDetectionDelegateOptions(true) },
-            onObjectDetectionModelClick = { viewModel.showObjectDetectionModelOptions(true) }
+            onObjectDetectionModelClick = { viewModel.showObjectDetectionModelOptions(true) },
+            onManageSavedSearchesClick = { viewModel.showSavedSearches(true) }
         )
     }
 
@@ -126,6 +136,57 @@ fun SettingsScreen(
             onDismissRequest = { viewModel.showObjectDetectionDelegateOptions(false) }
         )
     }
+
+    if (uiState.showSavedSearches) {
+        SavedSearchesDialog(
+            savedSearches = uiState.savedSearches,
+            title = stringResource(R.string.saved_searches),
+            showActions = true,
+            selectable = false,
+            onEditClick = { viewModel.editSavedSearch(it) },
+            onDeleteClick = { viewModel.deleteSavedSearch(it) },
+            onDismissRequest = { viewModel.showSavedSearches(false) }
+        )
+    }
+
+    uiState.editSavedSearch?.run {
+        val state = rememberModalBottomSheetState()
+        val scope = rememberCoroutineScope()
+        var localSavedSearch by rememberSaveable(
+            this,
+            stateSaver = SavedSearchSaver,
+        ) { mutableStateOf(this) }
+
+        EditSearchModalBottomSheet(
+            state = state,
+            search = localSavedSearch.search,
+            header = {
+                EditSavedSearchBottomSheetHeader(
+                    name = localSavedSearch.name,
+                    saveEnabled = localSavedSearch != this@run,
+                    onNameChange = { localSavedSearch = localSavedSearch.copy(name = it) },
+                    onSaveClick = {
+                        viewModel.updateSavedSearch(localSavedSearch)
+                        scope.launch { state.hide() }.invokeOnCompletion {
+                            if (!state.isVisible) {
+                                viewModel.editSavedSearch(null)
+                            }
+                        }
+                    },
+                )
+            },
+            onChange = { localSavedSearch = localSavedSearch.copy(search = it) },
+            onDismissRequest = { viewModel.editSavedSearch(null) },
+        )
+    }
+
+    uiState.deleteSavedSearch?.run {
+        DeleteSavedSearchConfirmDialog(
+            savedSearch = this,
+            onConfirmClick = { viewModel.deleteSavedSearch(this, true) },
+            onDismissRequest = { viewModel.deleteSavedSearch(null) }
+        )
+    }
 }
 
 @Composable
@@ -139,6 +200,7 @@ fun SettingsScreenContent(
     onObjectDetectionPrefsChange: (objectDetectionPrefs: ObjectDetectionPreferences) -> Unit = {},
     onObjectDetectionDelegateClick: () -> Unit = {},
     onObjectDetectionModelClick: () -> Unit = {},
+    onManageSavedSearchesClick: () -> Unit = {},
 ) {
     LazyColumn(
         modifier = modifier.fillMaxWidth()
@@ -150,6 +212,7 @@ fun SettingsScreenContent(
             blurNsfw = appPreferences.blurNsfw,
             onBlurSketchyCheckChange = onBlurSketchyCheckChange,
             onBlurNsfwCheckChange = onBlurNsfwCheckChange,
+            onManageSavedSearchesClick = onManageSavedSearchesClick,
         )
         dividerItem()
         objectDetectionSection(

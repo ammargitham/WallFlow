@@ -1,6 +1,6 @@
 package com.ammar.havenwalls.data.network.model
 
-import com.ammar.havenwalls.data.common.Purity
+import com.ammar.havenwalls.model.Purity
 import com.ammar.havenwalls.data.db.entity.ThumbsEntity
 import com.ammar.havenwalls.data.db.entity.WallpaperEntity
 import kotlinx.datetime.Instant

@@ -3,11 +3,16 @@ package com.ammar.havenwalls.activities.main
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.ammar.havenwalls.model.SearchQuery
+import com.ammar.havenwalls.model.Sorting
+import com.ammar.havenwalls.data.db.entity.toSavedSearch
 import com.ammar.havenwalls.data.db.entity.toSearch
 import com.ammar.havenwalls.data.repository.GlobalErrorsRepository
 import com.ammar.havenwalls.data.repository.GlobalErrorsRepository.GlobalError
+import com.ammar.havenwalls.data.repository.SavedSearchRepository
 import com.ammar.havenwalls.data.repository.SearchHistoryRepository
 import com.ammar.havenwalls.extensions.trimAll
+import com.ammar.havenwalls.model.SavedSearch
 import com.ammar.havenwalls.model.Search
 import com.ammar.havenwalls.model.getSupportingText
 import com.ammar.havenwalls.ui.common.Suggestion
@@ -32,6 +37,7 @@ import kotlinx.coroutines.launch
 class MainActivityViewModel @Inject constructor(
     private val globalErrorsRepository: GlobalErrorsRepository,
     private val searchHistoryRepository: SearchHistoryRepository,
+    private val savedSearchRepository: SavedSearchRepository,
     private val application: Application,
 ) : AndroidViewModel(application) {
     private val localUiState = MutableStateFlow(MainUiStatePartial())
@@ -40,7 +46,8 @@ class MainActivityViewModel @Inject constructor(
         localUiState,
         searchHistoryRepository.getAll(),
         globalErrorsRepository.errors,
-    ) { local, searchHistory, errors ->
+        savedSearchRepository.getAll(),
+    ) { local, searchHistory, errors, savedSearchEntities ->
         val localQuery = local.searchBarSearch.getOrNull()?.query?.trimAll()?.lowercase() ?: ""
         local.merge(
             MainUiState(
@@ -58,6 +65,7 @@ class MainActivityViewModel @Inject constructor(
                         )
                     },
                 globalErrors = errors,
+                savedSearches = savedSearchEntities.map { entity -> entity.toSavedSearch() },
             )
         )
     }.stateIn(
@@ -65,22 +73,6 @@ class MainActivityViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = MainUiState(),
     )
-
-    // fun setTopAppBarVisible(visible: Boolean) = _uiState.update {
-    //     it.copy(topAppBarVisible = visible)
-    // }
-    //
-    // fun toggleTopAppBarVisibility() = _uiState.update {
-    //     it.copy(topAppBarVisible = !it.topAppBarVisible)
-    // }
-    //
-    // fun setTopAppBarGradientBg(enabled: Boolean) = _uiState.update {
-    //     it.copy(topAppBarGradientBg = enabled)
-    // }
-    //
-    // fun setTopAppBarTitleVisible(visible: Boolean) = _uiState.update {
-    //     it.copy(topAppBarTitleVisible = visible)
-    // }
 
     fun applyScaffoldPadding(apply: Boolean) = localUiState.update {
         it.copy(applyScaffoldPadding = partial(apply))
@@ -121,18 +113,39 @@ class MainActivityViewModel @Inject constructor(
         searchHistoryRepository.deleteSearch(search)
         localUiState.update { it.copy(searchBarDeleteSuggestion = partial(null)) }
     }
+
+    fun showSaveSearchAsDialog(search: Search? = null) = localUiState.update {
+        it.copy(saveSearchAsSearch = partial(search))
+    }
+
+    fun saveSearchAs(name: String, search: Search) = viewModelScope.launch {
+        savedSearchRepository.addOrUpdateSavedSearch(
+            SavedSearch(
+                name = name,
+                search = search,
+            )
+        )
+    }
+
+    fun showSavedSearches(show: Boolean = true) = localUiState.update {
+        it.copy(showSavedSearchesDialog = partial(show))
+    }
 }
 
 @Partialize
 data class MainUiState(
-    // val topAppBarVisible: Boolean = true,
-    // val topAppBarGradientBg: Boolean = false,
-    // val topAppBarTitleVisible: Boolean = true,
     val applyScaffoldPadding: Boolean = true,
     val globalErrors: List<GlobalError> = emptyList(),
     val searchBarActive: Boolean = false,
-    val searchBarSearch: Search = Search(),
+    val searchBarSearch: Search = Search(
+        filters = SearchQuery(
+            sorting = Sorting.RELEVANCE,
+        )
+    ),
     val searchBarSuggestions: List<Suggestion<Search>> = emptyList(),
     val showSearchBarFilters: Boolean = false,
     val searchBarDeleteSuggestion: Search? = null,
+    val saveSearchAsSearch: Search? = null,
+    val showSavedSearchesDialog: Boolean = false,
+    val savedSearches: List<SavedSearch> = emptyList(),
 )

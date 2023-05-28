@@ -7,13 +7,16 @@ import androidx.lifecycle.viewModelScope
 import com.ammar.havenwalls.EFFICIENT_DET_LITE_0_MODEL_NAME
 import com.ammar.havenwalls.data.db.entity.ObjectDetectionModelEntity
 import com.ammar.havenwalls.data.db.entity.toModel
+import com.ammar.havenwalls.data.db.entity.toSavedSearch
 import com.ammar.havenwalls.data.preferences.AppPreferences
 import com.ammar.havenwalls.data.preferences.ObjectDetectionPreferences
 import com.ammar.havenwalls.data.repository.AppPreferencesRepository
 import com.ammar.havenwalls.data.repository.ObjectDetectionModelRepository
+import com.ammar.havenwalls.data.repository.SavedSearchRepository
 import com.ammar.havenwalls.extensions.TAG
 import com.ammar.havenwalls.extensions.getMLModelsFileIfExists
 import com.ammar.havenwalls.model.ObjectDetectionModel
+import com.ammar.havenwalls.model.SavedSearch
 import com.ammar.havenwalls.utils.DownloadManager
 import com.ammar.havenwalls.utils.DownloadStatus
 import com.ammar.havenwalls.workers.DownloadWorker
@@ -36,6 +39,7 @@ class SettingsViewModel @Inject constructor(
     private val appPreferencesRepository: AppPreferencesRepository,
     private val objectDetectionModelRepository: ObjectDetectionModelRepository,
     private val downloadManager: DownloadManager,
+    private val savedSearchRepository: SavedSearchRepository,
 ) : AndroidViewModel(application) {
     private val localUiStateFlow = MutableStateFlow(SettingsUiStatePartial())
 
@@ -43,7 +47,8 @@ class SettingsViewModel @Inject constructor(
         appPreferencesRepository.appPreferencesFlow,
         objectDetectionModelRepository.getAll(),
         localUiStateFlow,
-    ) { appPreferences, objectDetectionModels, localUiState ->
+        savedSearchRepository.getAll(),
+    ) { appPreferences, objectDetectionModels, localUiState, savedSearches ->
         val selectedModelId = appPreferences.objectDetectionPreferences.modelId
         val selectedModel = if (selectedModelId == 0L) ObjectDetectionModel.DEFAULT else {
             objectDetectionModels
@@ -56,6 +61,7 @@ class SettingsViewModel @Inject constructor(
                 appPreferences = appPreferences,
                 objectDetectionModels = objectDetectionModels,
                 selectedModel = selectedModel,
+                savedSearches = savedSearches.map { entity -> entity.toSavedSearch() },
             )
         )
     }.stateIn(
@@ -222,6 +228,43 @@ class SettingsViewModel @Inject constructor(
         )
         showObjectDetectionModelOptions(false)
     }
+
+    fun showSavedSearches(show: Boolean) = localUiStateFlow.update {
+        it.copy(showSavedSearches = partial(show))
+    }
+
+    fun editSavedSearch(savedSearch: SavedSearch?) = localUiStateFlow.update {
+        it.copy(
+            editSavedSearch = partial(savedSearch),
+            showSavedSearches = partial(false),
+        )
+    }
+
+    fun updateSavedSearch(savedSearch: SavedSearch) {
+        viewModelScope.launch {
+            savedSearchRepository.addOrUpdateSavedSearch(savedSearch)
+        }
+    }
+
+    fun deleteSavedSearch(
+        savedSearch: SavedSearch?,
+        confirmed: Boolean = false,
+    ) {
+        if (savedSearch == null) {
+            localUiStateFlow.update { it.copy(deleteSavedSearch = partial(null)) }
+            return
+        }
+        if (confirmed) {
+            viewModelScope.launch {
+                savedSearchRepository.deleteSavedSearch(savedSearch)
+                // close the dialog
+                localUiStateFlow.update { it.copy(deleteSavedSearch = partial(null)) }
+            }
+            return
+        }
+        // show the dialog
+        localUiStateFlow.update { it.copy(deleteSavedSearch = partial(savedSearch)) }
+    }
 }
 
 @Partialize
@@ -235,4 +278,8 @@ data class SettingsUiState(
     val showEditModelDialog: Boolean = false,
     val modelDownloadStatus: DownloadStatus? = null,
     val deleteModel: ObjectDetectionModelEntity? = null,
+    val showSavedSearches: Boolean = false,
+    val savedSearches: List<SavedSearch> = emptyList(),
+    val editSavedSearch: SavedSearch? = null,
+    val deleteSavedSearch: SavedSearch? = null,
 )

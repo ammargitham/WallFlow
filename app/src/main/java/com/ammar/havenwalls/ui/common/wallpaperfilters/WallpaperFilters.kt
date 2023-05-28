@@ -1,4 +1,4 @@
-package com.ammar.havenwalls.ui.common
+package com.ammar.havenwalls.ui.common.wallpaperfilters
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
@@ -6,6 +6,7 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -24,8 +25,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
@@ -36,17 +35,15 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SheetState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -58,116 +55,42 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ammar.havenwalls.COMMON_RESOLUTIONS
 import com.ammar.havenwalls.R
-import com.ammar.havenwalls.data.common.Category
-import com.ammar.havenwalls.data.common.Order
-import com.ammar.havenwalls.data.common.Purity
-import com.ammar.havenwalls.data.common.Resolution
-import com.ammar.havenwalls.data.common.SearchQuery
-import com.ammar.havenwalls.data.common.SearchQuerySaver
-import com.ammar.havenwalls.data.common.Sorting
-import com.ammar.havenwalls.data.common.TopRange
 import com.ammar.havenwalls.extensions.toDp
 import com.ammar.havenwalls.extensions.toPx
+import com.ammar.havenwalls.model.Category
+import com.ammar.havenwalls.model.Order
+import com.ammar.havenwalls.model.Purity
+import com.ammar.havenwalls.model.Resolution
+import com.ammar.havenwalls.model.Search
+import com.ammar.havenwalls.model.SearchQuery
+import com.ammar.havenwalls.model.Sorting
+import com.ammar.havenwalls.model.TopRange
+import com.ammar.havenwalls.ui.common.ClearableChip
 import com.ammar.havenwalls.ui.common.taginput.TagInputField
 import com.ammar.havenwalls.ui.theme.HavenWallsTheme
-import kotlinx.coroutines.launch
-
-@Composable
-fun WallpaperFiltersDialog(
-    modifier: Modifier = Modifier,
-    searchQuery: SearchQuery = SearchQuery(),
-    title: @Composable (() -> Unit)? = null,
-    onConfirm: (searchQuery: SearchQuery) -> Unit = {},
-    onDismissRequest: () -> Unit = {},
-) {
-    var localSearchQuery by rememberSaveable(
-        searchQuery,
-        stateSaver = SearchQuerySaver,
-    ) { mutableStateOf(searchQuery) }
-
-    AlertDialog(
-        modifier = modifier,
-        title = title,
-        text = {
-            WallpaperFiltersDialogContent(
-                searchQuery = localSearchQuery,
-                onChange = { localSearchQuery = it }
-            )
-        },
-        confirmButton = {
-            TextButton(onClick = { onConfirm(localSearchQuery) }) {
-                Text(text = "Save")
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismissRequest) {
-                Text(text = "Cancel")
-            }
-        },
-        onDismissRequest = onDismissRequest,
-    )
-}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WallpaperFiltersModalBottomSheet(
+fun EditSearchModalBottomSheet(
     modifier: Modifier = Modifier,
     contentModifier: Modifier = Modifier,
-    bottomSheetState: SheetState = rememberModalBottomSheetState(),
-    searchQuery: SearchQuery = SearchQuery(),
-    title: String? = null,
-    onSave: (searchQuery: SearchQuery) -> Unit = {},
+    state: SheetState = rememberModalBottomSheetState(),
+    search: Search = Search(),
+    header: @Composable (ColumnScope.() -> Unit)? = null,
+    onChange: (Search) -> Unit = {},
     onDismissRequest: () -> Unit = {},
 ) {
-    val scope = rememberCoroutineScope()
-    var localSearchQuery by rememberSaveable(
-        searchQuery,
-        stateSaver = SearchQuerySaver,
-    ) { mutableStateOf(searchQuery) }
-
     val imePadding = WindowInsets.ime.getBottom(LocalDensity.current).toDp()
     val scrollState = rememberScrollState()
 
     ModalBottomSheet(
         modifier = modifier,
         onDismissRequest = onDismissRequest,
-        sheetState = bottomSheetState,
+        sheetState = state,
     ) {
-        Row(
+        header?.invoke(this)
+        EditSearchContent(
             modifier = contentModifier
-                .fillMaxWidth()
-                .padding(
-                    start = 22.dp,
-                    end = 22.dp,
-                    bottom = 16.dp,
-                ),
-            verticalAlignment = Alignment.Bottom,
-        ) {
-            title?.let {
-                Text(
-                    modifier = Modifier.weight(1f),
-                    text = it,
-                    style = MaterialTheme.typography.headlineMedium,
-                )
-            } ?: Spacer(modifier = Modifier.weight(1f))
-            Button(
-                onClick = {
-                    onSave(localSearchQuery)
-                    scope
-                        .launch { bottomSheetState.hide() }
-                        .invokeOnCompletion {
-                            if (!bottomSheetState.isVisible) {
-                                onDismissRequest()
-                            }
-                        }
-                }
-            ) {
-                Text("Save")
-            }
-        }
-        Divider(modifier = Modifier.fillMaxWidth())
-        WallpaperFiltersDialogContent(
-            modifier = modifier
                 .verticalScroll(scrollState)
                 .padding(
                     top = 22.dp,
@@ -175,55 +98,64 @@ fun WallpaperFiltersModalBottomSheet(
                     end = 22.dp,
                     bottom = imePadding + 44.dp,
                 ),
-            searchQuery = localSearchQuery,
-            onChange = { localSearchQuery = it }
+            search = search,
+            onChange = onChange,
         )
     }
 }
 
 @Composable
-fun WallpaperFiltersDialogContent(
+fun EditSearchContent(
     modifier: Modifier = Modifier,
-    searchQuery: SearchQuery = SearchQuery(),
-    onChange: (searchQuery: SearchQuery) -> Unit = {},
+    search: Search = Search(),
+    showQueryField: Boolean = true,
+    onChange: (Search) -> Unit = {},
 ) {
     Column(
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(16.dp),
     ) {
+        if (showQueryField) {
+            OutlinedTextField(
+                modifier = Modifier.fillMaxWidth(),
+                label = { Text(text = stringResource(R.string.query)) },
+                value = search.query,
+                onValueChange = { onChange(search.copy(query = it)) },
+            )
+        }
         IncludedTagsFilter(
-            tags = searchQuery.includedTags,
-            onChange = { onChange(searchQuery.copy(includedTags = it)) }
+            tags = search.filters.includedTags,
+            onChange = { onChange(search.copy(filters = search.filters.copy(includedTags = it))) },
         )
         ExcludedTagsFilter(
-            tags = searchQuery.excludedTags,
-            onChange = { onChange(searchQuery.copy(excludedTags = it)) }
+            tags = search.filters.excludedTags,
+            onChange = { onChange(search.copy(filters = search.filters.copy(excludedTags = it))) },
         )
         CategoriesFilter(
-            categories = searchQuery.categories,
-            onChange = { onChange(searchQuery.copy(categories = it)) },
+            categories = search.filters.categories,
+            onChange = { onChange(search.copy(filters = search.filters.copy(categories = it))) },
         )
         PurityFilter(
-            purities = searchQuery.purity,
-            onChange = { onChange(searchQuery.copy(purity = it)) },
+            purities = search.filters.purity,
+            onChange = { onChange(search.copy(filters = search.filters.copy(purity = it))) },
         )
         SortingFilter(
-            sorting = searchQuery.sorting,
-            onChange = { onChange(searchQuery.copy(sorting = it)) },
+            sorting = search.filters.sorting,
+            onChange = { onChange(search.copy(filters = search.filters.copy(sorting = it))) },
         )
-        AnimatedVisibility(searchQuery.sorting == Sorting.TOPLIST) {
+        AnimatedVisibility(search.filters.sorting == Sorting.TOPLIST) {
             TopRangeFilter(
-                topRange = searchQuery.topRange,
-                onChange = { onChange(searchQuery.copy(topRange = it)) },
+                topRange = search.filters.topRange,
+                onChange = { onChange(search.copy(filters = search.filters.copy(topRange = it))) },
             )
         }
         OrderFilter(
-            order = searchQuery.order,
-            onChange = { onChange(searchQuery.copy(order = it)) }
+            order = search.filters.order,
+            onChange = { onChange(search.copy(filters = search.filters.copy(order = it))) },
         )
         ResolutionsFilter(
-            resolutions = searchQuery.resolutions,
-            onChange = { onChange(searchQuery.copy(resolutions = it)) }
+            resolutions = search.filters.resolutions,
+            onChange = { onChange(search.copy(filters = search.filters.copy(resolutions = it))) },
         )
     }
 }
@@ -234,20 +166,13 @@ fun IncludedTagsFilter(
     tags: Set<String> = emptySet(),
     onChange: (tags: Set<String>) -> Unit = {},
 ) {
-    Column(
+    TagInputField(
         modifier = modifier,
-    ) {
-        Text(
-            text = "Included Tags/Keywords",
-            style = MaterialTheme.typography.bodyLarge,
-        )
-        Spacer(modifier = Modifier.requiredHeight(8.dp))
-        TagInputField(
-            tags = tags,
-            onAddTag = { onChange(tags + it) },
-            onRemoveTag = { onChange(tags - it) },
-        )
-    }
+        tags = tags,
+        label = { Text(text = "Included Tags/Keywords") },
+        onAddTag = { onChange(tags + it) },
+        onRemoveTag = { onChange(tags - it) },
+    )
 }
 
 @Composable
@@ -256,20 +181,13 @@ fun ExcludedTagsFilter(
     tags: Set<String> = emptySet(),
     onChange: (tags: Set<String>) -> Unit = {},
 ) {
-    Column(
+    TagInputField(
         modifier = modifier,
-    ) {
-        Text(
-            text = "Excluded Tags/Keywords",
-            style = MaterialTheme.typography.bodyLarge,
-        )
-        Spacer(modifier = Modifier.requiredHeight(8.dp))
-        TagInputField(
-            tags = tags,
-            onAddTag = { onChange(tags + it) },
-            onRemoveTag = { onChange(tags - it) },
-        )
-    }
+        label = { Text(text = "Excluded Tags/Keywords") },
+        tags = tags,
+        onAddTag = { onChange(tags + it) },
+        onRemoveTag = { onChange(tags - it) },
+    )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -281,7 +199,7 @@ private fun CategoriesFilter(
     Column {
         Text(
             text = "Categories",
-            style = MaterialTheme.typography.bodyLarge,
+            style = MaterialTheme.typography.labelLarge,
         )
         Spacer(modifier = Modifier.requiredHeight(8.dp))
         Row(
@@ -318,7 +236,7 @@ private fun PurityFilter(
     Column {
         Text(
             text = "Purity",
-            style = MaterialTheme.typography.bodyLarge
+            style = MaterialTheme.typography.labelLarge
         )
         Spacer(modifier = Modifier.requiredHeight(8.dp))
         Row(
@@ -335,36 +253,10 @@ private fun PurityFilter(
                                 modifier = Modifier.size(16.dp),
                                 imageVector = Icons.Default.Check,
                                 contentDescription = null,
-                                // tint = when (it) {
-                                //     Purity.SFW -> MaterialTheme.colorScheme.onSecondaryContainer
-                                //     Purity.SKETCHY -> Color.Black
-                                //     Purity.NSFW -> Color.White
-                                // },
                             )
                         }
                     },
                     selected = selected,
-                    // colors = FilterChipDefaults.filterChipColors(
-                    //     labelColor = when (it) {
-                    //         Purity.SFW -> MaterialTheme.colorScheme.onSurfaceVariant
-                    //         Purity.SKETCHY -> contentColorFor(Color.Yellow)
-                    //         Purity.NSFW -> MaterialTheme.colorScheme.error
-                    //     },
-                    //     selectedLabelColor = when (it) {
-                    //         Purity.SFW -> MaterialTheme.colorScheme.onSecondaryContainer
-                    //         Purity.SKETCHY -> contentColorFor(Color.Yellow)
-                    //         Purity.NSFW -> Color.White
-                    //     },
-                    //     containerColor = when (it) {
-                    //         Purity.SKETCHY -> Color.Yellow
-                    //         else -> Color.Transparent
-                    //     },
-                    //     selectedContainerColor = when (it) {
-                    //         Purity.SFW -> MaterialTheme.colorScheme.secondaryContainer
-                    //         Purity.SKETCHY -> Color.Yellow
-                    //         Purity.NSFW -> MaterialTheme.colorScheme.errorContainer
-                    //     },
-                    // ),
                     onClick = { onChange(if (selected && purities.size > 1) purities - it else purities + it) }
                 )
             }
@@ -613,7 +505,7 @@ fun AddResolutionButton(
 }
 
 @Composable
-fun getCategoryString(category: Category) = stringResource(
+private fun getCategoryString(category: Category) = stringResource(
     when (category) {
         Category.GENERAL -> R.string.general
         Category.ANIME -> R.string.anime
@@ -622,7 +514,7 @@ fun getCategoryString(category: Category) = stringResource(
 )
 
 @Composable
-fun getPurityString(purity: Purity) = stringResource(
+private fun getPurityString(purity: Purity) = stringResource(
     when (purity) {
         Purity.SFW -> R.string.sfw
         Purity.SKETCHY -> R.string.sketchy
@@ -631,7 +523,7 @@ fun getPurityString(purity: Purity) = stringResource(
 )
 
 @Composable
-fun getSortingString(sorting: Sorting) = stringResource(
+private fun getSortingString(sorting: Sorting) = stringResource(
     when (sorting) {
         Sorting.DATE_ADDED -> R.string.date_added
         Sorting.RELEVANCE -> R.string.relevance
@@ -663,16 +555,21 @@ fun getOrderString(order: Order) = stringResource(
     }
 )
 
-@Preview
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview(device = "spec:width=1080px,height=3000px,dpi=440")
+@Preview(
+    device = "spec:width=1080px,height=3000px,dpi=440",
+    uiMode = Configuration.UI_MODE_NIGHT_YES
+)
 @Composable
 private fun PreviewFiltersContent() {
     HavenWallsTheme {
         Surface {
-            WallpaperFiltersDialogContent(
+            EditSearchContent(
                 modifier = Modifier.padding(16.dp),
-                searchQuery = SearchQuery(
-                    sorting = Sorting.TOPLIST,
+                search = Search(
+                    filters = SearchQuery(
+                        sorting = Sorting.TOPLIST,
+                    )
                 )
             )
         }

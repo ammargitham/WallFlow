@@ -5,7 +5,7 @@ import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
-import com.ammar.havenwalls.data.common.SearchQuery
+import com.ammar.havenwalls.model.SearchQuery
 import com.ammar.havenwalls.data.db.database.AppDatabase
 import com.ammar.havenwalls.data.db.entity.SearchQueryEntity
 import com.ammar.havenwalls.data.db.entity.SearchQueryRemoteKeyEntity
