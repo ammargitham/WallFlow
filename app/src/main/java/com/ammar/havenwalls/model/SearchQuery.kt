@@ -12,12 +12,14 @@ import com.ammar.havenwalls.extensions.quoteIfSpaced
 import com.ammar.havenwalls.extensions.toHexString
 import com.ammar.havenwalls.extensions.toQueryString
 import com.ammar.havenwalls.extensions.urlDecoded
+import com.ammar.havenwalls.model.Ratio.CategoryRatio
 import com.ammar.havenwalls.model.serializers.ColorSerializer
 import com.mr0xf00.easycrop.AspectRatio
 import java.util.regex.Pattern
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 
-@kotlinx.serialization.Serializable
+@Serializable
 data class SearchQuery(
     val includedTags: Set<String> = emptySet(),
     val excludedTags: Set<String> = emptySet(),
@@ -33,6 +35,7 @@ data class SearchQuery(
     val resolutions: Set<Resolution> = emptySet(),
     val colors: Color? = null,
     val seed: String? = null,
+    val ratios: Set<Ratio> = emptySet(),
 ) {
     private fun toStringMap() = mapOf(
         "includedTags" to includedTags
@@ -55,6 +58,7 @@ data class SearchQuery(
         "topRange" to topRange.value,
         "atleast" to (atleast?.toString() ?: ""),
         "resolutions" to resolutions.sortedBy { it.width }.joinToString(","),
+        "ratios" to ratios.map { it.toRatioString() }.sorted().joinToString(","),
         "colors" to (colors?.toHexString() ?: ""),
         "seed" to (seed ?: ""),
     )
@@ -150,6 +154,25 @@ data class SearchQuery(
                     ?.map {
                         val parts = it.split("x")
                         Resolution(parts[0].toInt(), parts[1].toInt())
+                    }
+                    ?.toSet()
+                    ?: emptySet(),
+                ratios = map["ratios"]
+                    ?.split(",")
+                    ?.filter { it.isNotBlank() }
+                    ?.map {
+                        when (it) {
+                            CategoryRatio.Category.LANDSCAPE.categoryName -> {
+                                Ratio.fromCategory(CategoryRatio.Category.LANDSCAPE)
+                            }
+                            CategoryRatio.Category.PORTRAIT.categoryName -> {
+                                Ratio.fromCategory(CategoryRatio.Category.PORTRAIT)
+                            }
+                            else -> {
+                                val parts = it.split("x")
+                                Ratio.fromSize(IntSize(parts[0].toInt(), parts[1].toInt()))
+                            }
+                        }
                     }
                     ?.toSet()
                     ?: emptySet(),
@@ -261,7 +284,7 @@ enum class TopRange(
 }
 
 // TODO Replace Resolution with IntSize
-@kotlinx.serialization.Serializable
+@Serializable
 data class Resolution(
     val width: Int,
     val height: Int,
@@ -286,6 +309,33 @@ private fun gcd(a: Int, b: Int): Int = if (b == 0) a else gcd(b, a % b)
 fun Resolution.getCropAspectRatio(): AspectRatio {
     val (x, y) = reduceFraction(width, height)
     return AspectRatio(x, y)
+}
+
+@Serializable
+sealed class Ratio {
+    abstract fun toRatioString(): String
+
+    data class CategoryRatio(
+        val category: Category,
+    ) : Ratio() {
+        enum class Category(val categoryName: String) {
+            LANDSCAPE("landscape"),
+            PORTRAIT("portrait");
+        }
+
+        override fun toRatioString() = this.category.categoryName
+    }
+
+    data class SizeRatio(
+        val size: IntSize,
+    ) : Ratio() {
+        override fun toRatioString() = this.size.toString()
+    }
+
+    companion object {
+        fun fromSize(size: IntSize): Ratio = SizeRatio(size)
+        fun fromCategory(category: CategoryRatio.Category): Ratio = CategoryRatio(category)
+    }
 }
 
 val SearchQuerySaver = Saver<SearchQuery, String>(

@@ -49,15 +49,20 @@ import com.ammar.havenwalls.ui.theme.HavenWallsTheme
     ExperimentalLayoutApi::class,
 )
 @Composable
-fun TagInputField(
+fun <T> TagInputField(
     modifier: Modifier = Modifier,
     label: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
-    tags: Set<String> = emptySet(),
-    onAddTag: (tag: String) -> Unit = {},
-    onRemoveTag: (tag: String) -> Unit = {},
+    tags: Set<T> = emptySet(),
     colors: TextFieldColors = OutlinedTextFieldDefaults.colors(),
     enabled: Boolean = true,
+    readOnly: Boolean = false,
+    trailingIcon: @Composable (() -> Unit)? = null,
+    showTagClearAction: Boolean = true,
+    tagFromInputString: (String) -> T,
+    getTagString: (tag: T) -> String = { "#${it.toString()}" },
+    onAddTag: (tag: T) -> Unit = {},
+    onRemoveTag: (tag: T) -> Unit = {},
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val localStyle = LocalTextStyle.current
@@ -104,11 +109,12 @@ fun TagInputField(
                     return@BasicTextField
                 }
                 val parts = it.split(regex)
-                val tag = parts[0].trimAll()
-                if (tag.isBlank()) return@BasicTextField
-                onAddTag(tag)
+                val tagString = parts[0].trimAll()
+                if (tagString.isBlank()) return@BasicTextField
+                onAddTag(tagFromInputString(tagString))
                 fieldValue = ""
             },
+            readOnly = readOnly,
             textStyle = mergedStyle,
             cursorBrush = SolidColor(if (selectLastTag) Color.Transparent else MaterialTheme.colorScheme.primary),
             interactionSource = interactionSource,
@@ -126,8 +132,9 @@ fun TagInputField(
                                 val selected = isLast && selectLastTag
 
                                 ClearableChip(
-                                    label = { Text(text = "#$tag") },
+                                    label = { Text(text = getTagString(tag)) },
                                     selected = selected,
+                                    showClearIcon = showTagClearAction,
                                     onClear = {
                                         onRemoveTag(tag)
                                         if (selected) {
@@ -155,6 +162,7 @@ fun TagInputField(
                     interactionSource = interactionSource,
                     label = label,
                     placeholder = placeholder,
+                    trailingIcon = trailingIcon,
                     contentPadding = OutlinedTextFieldDefaults.contentPadding(
                         top = if (tags.isNotEmpty()) 0.dp else 16.dp,
                         bottom = if (tags.isNotEmpty()) 0.dp else 16.dp,
@@ -197,6 +205,7 @@ private fun PreviewTagInputField(
                 label = { Text(text = "Chip Input") },
                 placeholder = { Text(text = "Placeholder") },
                 tags = localTags,
+                tagFromInputString = { it },
                 onAddTag = { localTags = localTags + it },
                 onRemoveTag = { localTags = localTags - it },
             )

@@ -1,5 +1,6 @@
 package com.ammar.havenwalls.ui.common.searchedit
 
+import android.content.Context
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
@@ -30,12 +32,15 @@ import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -54,10 +59,14 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.capitalize
+import androidx.compose.ui.text.intl.Locale
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.ammar.havenwalls.COMMON_RESOLUTIONS
 import com.ammar.havenwalls.R
@@ -65,6 +74,8 @@ import com.ammar.havenwalls.extensions.toPx
 import com.ammar.havenwalls.model.Category
 import com.ammar.havenwalls.model.Order
 import com.ammar.havenwalls.model.Purity
+import com.ammar.havenwalls.model.Ratio
+import com.ammar.havenwalls.model.Ratio.CategoryRatio
 import com.ammar.havenwalls.model.Resolution
 import com.ammar.havenwalls.model.SavedSearch
 import com.ammar.havenwalls.model.Search
@@ -86,6 +97,7 @@ internal fun IncludedTagsFilter(
         label = { Text(text = "Included Tags/Keywords") },
         onAddTag = { onChange(tags + it) },
         onRemoveTag = { onChange(tags - it) },
+        tagFromInputString = { it },
     )
 }
 
@@ -101,6 +113,7 @@ internal fun ExcludedTagsFilter(
         tags = tags,
         onAddTag = { onChange(tags + it) },
         onRemoveTag = { onChange(tags - it) },
+        tagFromInputString = { it },
     )
 }
 
@@ -414,6 +427,243 @@ private fun AddResolutionButton(
                 text = { Text(text = "Custom...") },
                 onClick = onCustomClick,
             )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+internal fun RatioFilter(
+    modifier: Modifier = Modifier,
+    ratios: Set<Ratio> = emptySet(),
+    onChange: (Set<Ratio>) -> Unit = {},
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    ExposedDropdownMenuBox(
+        modifier = modifier.fillMaxWidth(),
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded },
+    ) {
+        TagInputField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor(),
+            readOnly = true,
+            tags = ratios,
+            showTagClearAction = false,
+            onAddTag = {},
+            onRemoveTag = { onChange(ratios - it) },
+            label = { Text(text = stringResource(R.string.ratio)) },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            colors = ExposedDropdownMenuDefaults.textFieldColors(),
+            tagFromInputString = { Ratio.fromSize(IntSize(1, 1)) }, // dummy method
+            getTagString = { it.toRatioString().capitalize(Locale.current) }
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+        ) {
+            RatioMenuContent(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                selectedRatios = ratios,
+                onOptionClick = {
+                    onChange(ratios + it)
+                    expanded = false
+                }
+            )
+        }
+    }
+}
+
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun PreviewRatioFilter() {
+    HavenWallsTheme {
+        Surface {
+            RatioFilter()
+        }
+    }
+}
+
+private data class RatioOption(
+    val ratio: Ratio? = null,
+    val span: Int,
+)
+
+private val ratioOptions = listOf(
+    (16 to 9) to 1,
+    (21 to 9) to 1,
+    (9 to 16) to 1,
+    (1 to 1) to 1,
+    (16 to 10) to 1,
+    (32 to 9) to 1,
+    (10 to 16) to 1,
+    (3 to 2) to 1,
+    null to 1,
+    (48 to 9) to 1,
+    (9 to 18) to 1,
+    (4 to 3) to 1,
+    null to 3,
+    (5 to 4) to 1,
+).map {
+    RatioOption(
+        ratio = it.first?.let { sizePair ->
+            Ratio.fromSize(IntSize(sizePair.first, sizePair.second))
+        },
+        span = it.second,
+    )
+}
+
+
+private fun getRatioGridHeaders(context: Context) = listOf(
+    context.getString(R.string.wide),
+    context.getString(R.string.ultrawide),
+    context.getString(R.string.portrait),
+    context.getString(R.string.square),
+)
+
+@Composable
+private fun RatioMenuContent(
+    modifier: Modifier = Modifier,
+    selectedRatios: Set<Ratio> = emptySet(),
+    onOptionClick: (Ratio) -> Unit = {},
+) {
+    val context = LocalContext.current
+
+    Column(modifier = modifier) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            val landscapeRatio = Ratio.fromCategory(CategoryRatio.Category.LANDSCAPE)
+            val portraitRatio = Ratio.fromCategory(CategoryRatio.Category.PORTRAIT)
+
+            LandscapeChip(
+                selected = landscapeRatio in selectedRatios,
+                onClick = { onOptionClick(landscapeRatio) }
+            )
+            PortraitChip(
+                selected = portraitRatio in selectedRatios,
+                onClick = { onOptionClick(portraitRatio) }
+            )
+        }
+        Spacer(modifier = Modifier.requiredHeight(8.dp))
+        Row(
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            getRatioGridHeaders(context).forEach {
+                GridHeader(
+                    modifier = Modifier.weight(1f),
+                    text = it,
+                )
+            }
+        }
+        Divider(modifier = Modifier.fillMaxWidth())
+        RatioOptionGrid(
+            modifier = Modifier.fillMaxWidth(),
+            selectedRatios = selectedRatios,
+            onOptionClick = onOptionClick,
+        )
+    }
+}
+
+@Composable
+private fun GridHeader(
+    modifier: Modifier = Modifier,
+    text: String,
+) {
+    Text(
+        modifier = modifier,
+        text = text,
+        style = MaterialTheme.typography.labelMedium,
+        textAlign = TextAlign.Center,
+        maxLines = 1,
+    )
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun RatioOptionGrid(
+    modifier: Modifier = Modifier,
+    selectedRatios: Set<Ratio> = emptySet(),
+    onOptionClick: (Ratio) -> Unit = {},
+) {
+    Column(
+        modifier = modifier,
+    ) {
+        ratioOptions.chunked(4).forEach { chunk ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+            ) {
+                chunk.forEach {
+                    Box(
+                        modifier = Modifier.weight(1f * it.span),
+                    ) {
+                        if (it.ratio != null) {
+                            FilterChip(
+                                modifier = Modifier.align(Alignment.Center),
+                                label = { Text(text = it.ratio.toRatioString()) },
+                                selected = it.ratio in selectedRatios,
+                                onClick = { onOptionClick(it.ratio) }
+                            )
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun LandscapeChip(
+    selected: Boolean = false,
+    onClick: () -> Unit = {},
+) {
+    FilterChip(
+        label = { Text(text = stringResource(R.string.landscape)) },
+        leadingIcon = {
+            Icon(
+                modifier = Modifier.size(16.dp),
+                painter = painterResource(R.drawable.baseline_crop_landscape_24),
+                contentDescription = null
+            )
+        },
+        selected = selected,
+        onClick = onClick,
+    )
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun PortraitChip(
+    selected: Boolean = false,
+    onClick: () -> Unit = {},
+) {
+    FilterChip(
+        label = { Text(text = stringResource(R.string.portrait)) },
+        leadingIcon = {
+            Icon(
+                modifier = Modifier.size(16.dp),
+                painter = painterResource(R.drawable.baseline_crop_portrait_24),
+                contentDescription = null
+            )
+        },
+        selected = selected,
+        onClick = onClick,
+    )
+}
+
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun PreviewRatioMenuContent() {
+    HavenWallsTheme {
+        Surface {
+            RatioMenuContent()
         }
     }
 }

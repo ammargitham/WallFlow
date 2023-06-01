@@ -19,6 +19,7 @@ interface WallHavenNetworkApi {
         @Query("atleast") atleast: String? = null,
         @Query("resolutions") resolutions: String? = null,
         @Query("colors") colors: String? = null,
+        @Query("ratios") ratios: String? = null,
         @Query("page") page: Int? = null,
         @Query("seed") seed: String? = null,
     ): NetworkResponse<List<NetworkWallpaper>>

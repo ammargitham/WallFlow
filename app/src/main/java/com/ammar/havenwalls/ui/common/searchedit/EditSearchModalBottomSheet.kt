@@ -119,12 +119,16 @@ fun EditSearchContent(
             resolutions = search.filters.resolutions,
             onChange = { onChange(search.copy(filters = search.filters.copy(resolutions = it))) },
         )
+        RatioFilter(
+            ratios = search.filters.ratios,
+            onChange = { onChange(search.copy(filters = search.filters.copy(ratios = it))) }
+        )
     }
 }
 
-@Preview(device = "spec:width=1080px,height=3000px,dpi=440")
+@Preview(device = "spec:width=1080px,height=3500px,dpi=440")
 @Preview(
-    device = "spec:width=1080px,height=3000px,dpi=440",
+    device = "spec:width=1080px,height=3500px,dpi=440",
     uiMode = Configuration.UI_MODE_NIGHT_YES
 )
 @Composable

@@ -87,6 +87,12 @@
     <string name="home_filters">Home Filters</string>
     <string name="query">Query</string>
     <string name="edit_saved_search">Edit saved search</string>
+    <string name="landscape">Landscape</string>
+    <string name="portrait">Portrait</string>
+    <string name="wide">Wide</string>
+    <string name="ultrawide">Ultrawide</string>
+    <string name="square">Square</string>
+    <string name="ratio">Ratio</string>
     <plurals name="num_detected_objects">
         <item quantity="one">%d object</item>
         <item quantity="other">%d objects</item>
