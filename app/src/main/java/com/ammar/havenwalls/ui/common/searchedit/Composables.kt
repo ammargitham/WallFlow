@@ -76,7 +76,6 @@ import com.ammar.havenwalls.model.Order
 import com.ammar.havenwalls.model.Purity
 import com.ammar.havenwalls.model.Ratio
 import com.ammar.havenwalls.model.Ratio.CategoryRatio
-import com.ammar.havenwalls.model.Resolution
 import com.ammar.havenwalls.model.SavedSearch
 import com.ammar.havenwalls.model.Search
 import com.ammar.havenwalls.model.Sorting
@@ -326,8 +325,8 @@ internal fun OrderFilter(
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun ResolutionsFilter(
-    resolutions: Set<Resolution> = emptySet(),
-    onChange: (resolutions: Set<Resolution>) -> Unit = {},
+    resolutions: Set<IntSize> = emptySet(),
+    onChange: (resolutions: Set<IntSize>) -> Unit = {},
     onAddCustomResolutionClick: () -> Unit = {},
 ) {
     Column {
@@ -364,8 +363,8 @@ internal fun ResolutionsFilter(
 @Composable
 private fun AddResolutionButton(
     modifier: Modifier = Modifier,
-    addedResolutions: Set<Resolution> = emptySet(),
-    onAdd: (resolution: Resolution) -> Unit = {},
+    addedResolutions: Set<IntSize> = emptySet(),
+    onAdd: (resolution: IntSize) -> Unit = {},
     onCustomClick: () -> Unit = {},
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -373,7 +372,7 @@ private fun AddResolutionButton(
     val screenHeight = configuration.screenHeightDp.dp.toPx()
     val screenWidth = configuration.screenWidthDp.dp.toPx()
     val localResolution = remember(screenHeight, screenWidth) {
-        Resolution(screenWidth, screenHeight)
+        IntSize(screenWidth, screenHeight)
     }
     val localInCommon = remember(localResolution) { localResolution in COMMON_RESOLUTIONS.values }
 

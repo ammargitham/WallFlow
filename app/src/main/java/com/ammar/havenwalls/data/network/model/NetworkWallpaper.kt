@@ -1,11 +1,11 @@
 package com.ammar.havenwalls.data.network.model
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.IntSize
 import androidx.core.graphics.toColorInt
-import com.ammar.havenwalls.model.Purity
-import com.ammar.havenwalls.model.Resolution
 import com.ammar.havenwalls.data.db.entity.WallpaperEntity
 import com.ammar.havenwalls.data.network.model.util.InstantSerializer
+import com.ammar.havenwalls.model.Purity
 import com.ammar.havenwalls.model.Wallpaper
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
@@ -45,7 +45,7 @@ fun NetworkWallpaper.asWallpaper() = Wallpaper(
     source = source,
     purity = Purity.fromName(purity),
     category = category,
-    resolution = Resolution(dimension_x, dimension_y),
+    resolution = IntSize(dimension_x, dimension_y),
     fileSize = file_size,
     fileType = file_type,
     createdAt = created_at,

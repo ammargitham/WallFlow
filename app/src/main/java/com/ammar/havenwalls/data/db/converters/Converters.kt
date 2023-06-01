@@ -1,15 +1,15 @@
 package com.ammar.havenwalls.data.db.converters
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.IntSize
 import androidx.core.graphics.toColorInt
 import androidx.room.TypeConverter
+import com.ammar.havenwalls.extensions.toHexString
 import com.ammar.havenwalls.model.Category
 import com.ammar.havenwalls.model.Order
 import com.ammar.havenwalls.model.Purity
-import com.ammar.havenwalls.model.Resolution
 import com.ammar.havenwalls.model.Sorting
 import com.ammar.havenwalls.model.TopRange
-import com.ammar.havenwalls.extensions.toHexString
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
@@ -83,24 +83,24 @@ object Converters {
     fun topRangeToString(topRange: TopRange) = topRange.value
 
     @TypeConverter
-    fun fromResolutionStr(value: String): Resolution {
+    fun fromIntSizeStr(value: String): IntSize {
         val parts = value.split("x")
-        return Resolution(parts[0].toInt(), parts[1].toInt())
+        return IntSize(parts[0].toInt(), parts[1].toInt())
     }
 
     @TypeConverter
-    fun resolutionToString(resolution: Resolution) = resolution.toString()
+    fun intSizeToString(intSize: IntSize) = intSize.toString()
 
     @TypeConverter
-    fun fromResolutionsStr(value: String) = value
+    fun fromIntSizesStr(value: String) = value
         .split(",")
         .filter { it.isNotBlank() }
-        .map { fromResolutionStr(it) }
+        .map { fromIntSizeStr(it) }
         .sortedBy { it.width }
         .toSet()
 
     @TypeConverter
-    fun resolutionsToString(resolutions: Set<Resolution>) = resolutions
+    fun intSizesToString(intSizes: Set<IntSize>) = intSizes
         .sortedBy { it.width }
         .joinToString(",")
 

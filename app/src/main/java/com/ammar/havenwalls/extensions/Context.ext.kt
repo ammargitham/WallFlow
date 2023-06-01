@@ -16,11 +16,11 @@ import android.view.Surface
 import android.view.WindowManager
 import android.webkit.MimeTypeMap
 import android.widget.Toast
+import androidx.compose.ui.unit.IntSize
 import androidx.core.content.FileProvider
 import androidx.core.hardware.display.DisplayManagerCompat
 import androidx.core.net.toUri
 import com.ammar.havenwalls.FILE_PROVIDER_AUTHORITY
-import com.ammar.havenwalls.model.Resolution
 import com.ammar.havenwalls.model.WallpaperTarget
 import com.ammar.havenwalls.model.toWhichInt
 import com.ammar.havenwalls.utils.isExternalStorageWritable
@@ -156,23 +156,23 @@ val Context.windowManager
 
 fun Context.getScreenResolution(
     inDefaultOrientation: Boolean = false,
-): Resolution {
+): IntSize {
     var changeOrientation = false
     if (inDefaultOrientation) {
-        val display = displayManager.getDisplay(Display.DEFAULT_DISPLAY) ?: return Resolution.ZERO
+        val display = displayManager.getDisplay(Display.DEFAULT_DISPLAY) ?: return IntSize.Zero
         val rotation = display.rotation
         // if current rotation is 90 or 270, device is rotated, so we will swap width and height
         changeOrientation = rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270
     }
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
         val bounds = windowManager.currentWindowMetrics.bounds
-        Resolution(
+        IntSize(
             width = if (changeOrientation) bounds.height() else bounds.width(),
             height = if (changeOrientation) bounds.width() else bounds.height(),
         )
     } else {
         val displayMetrics = resources.displayMetrics
-        Resolution(
+        IntSize(
             width = if (changeOrientation) displayMetrics.heightPixels else displayMetrics.widthPixels,
             height = if (changeOrientation) displayMetrics.widthPixels else displayMetrics.heightPixels,
         )

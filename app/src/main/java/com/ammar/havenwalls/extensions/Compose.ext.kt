@@ -8,6 +8,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.IntSize
 import androidx.core.graphics.toColorInt
 
 fun Color.toHexString() = String.format("#%06X", 0xFFFFFF and this.toArgb())
@@ -44,3 +45,6 @@ fun Modifier.ignoreVerticalParentPadding(vertical: Dp, oneSide: Boolean = false)
             placeable.place(0, 0)
         }
     }
+
+val IntSize.aspectRatio
+    get() = if (height != 0) width.toFloat() / height else 0F

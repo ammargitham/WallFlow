@@ -41,6 +41,7 @@ import coil.request.ImageRequest
 import coil.request.SuccessResult
 import com.ammar.havenwalls.R
 import com.ammar.havenwalls.extensions.TAG
+import com.ammar.havenwalls.extensions.aspectRatio
 import com.ammar.havenwalls.model.Wallpaper
 import com.ammar.havenwalls.model.wallpaper1
 import com.ammar.havenwalls.ui.theme.HavenWallsTheme

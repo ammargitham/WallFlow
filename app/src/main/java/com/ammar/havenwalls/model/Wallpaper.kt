@@ -1,10 +1,12 @@
-@file:UseSerializers(ColorSerializer::class)
+@file:UseSerializers(ColorSerializer::class, IntSizeSerializer::class)
 
 package com.ammar.havenwalls.model
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.IntSize
 import androidx.core.graphics.toColorInt
 import com.ammar.havenwalls.model.serializers.ColorSerializer
+import com.ammar.havenwalls.model.serializers.IntSizeSerializer
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.UseSerializers
@@ -20,7 +22,7 @@ data class Wallpaper(
     val source: String,
     val purity: Purity,
     val category: String,
-    val resolution: Resolution,
+    val resolution: IntSize,
     val fileSize: Long,
     val fileType: String,
     val createdAt: Instant,
@@ -57,7 +59,7 @@ val wallpaper1 = Wallpaper(
     source = "https://example.com/source1",
     purity = Purity.SFW,
     category = "landscape",
-    resolution = Resolution(1920, 1080),
+    resolution = IntSize(1920, 1080),
     fileSize = 1000000,
     fileType = "jpg",
     createdAt = Clock.System.now(),
@@ -112,7 +114,7 @@ val wallpaper2 = Wallpaper(
     source = "https://example.com/source2",
     purity = Purity.NSFW,
     category = "portrait",
-    resolution = Resolution(1080, 1920),
+    resolution = IntSize(1080, 1920),
     fileSize = 500000,
     fileType = "png",
     createdAt = Clock.System.now(),

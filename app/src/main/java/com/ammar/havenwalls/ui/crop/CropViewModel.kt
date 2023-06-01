@@ -166,7 +166,7 @@ class CropViewModel(
             val result = imageCropper.crop(
                 uri = uri,
                 context = application,
-                maxResultSize = application.getScreenResolution(true).toIntSize(),
+                maxResultSize = application.getScreenResolution(true),
                 cacheBeforeUse = false,
             )
             if (result is CropResult.Cancelled) {

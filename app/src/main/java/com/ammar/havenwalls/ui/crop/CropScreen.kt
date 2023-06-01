@@ -38,10 +38,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
 import com.ammar.havenwalls.R
-import com.ammar.havenwalls.model.Resolution
 import com.ammar.havenwalls.data.repository.utils.Resource
 import com.ammar.havenwalls.data.repository.utils.successOr
 import com.ammar.havenwalls.extensions.TAG
+import com.ammar.havenwalls.extensions.aspectRatio
 import com.ammar.havenwalls.extensions.getScreenResolution
 import com.ammar.havenwalls.extensions.toDp
 import com.ammar.havenwalls.extensions.toast
@@ -87,7 +87,7 @@ fun CropScreen(
     }
     val backdropPainter = rememberAsyncImagePainter(model = request)
     val resolution by produceState(
-        initialValue = Resolution(0, 0),
+        initialValue = IntSize.Zero,
         key1 = context,
         producer = { value = context.getScreenResolution(true) },
     )

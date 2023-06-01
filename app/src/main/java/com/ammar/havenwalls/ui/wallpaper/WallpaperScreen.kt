@@ -62,6 +62,7 @@ import com.ammar.havenwalls.R
 import com.ammar.havenwalls.activities.main.MainActivityViewModel
 import com.ammar.havenwalls.activities.setwallpaper.SetWallpaperActivity
 import com.ammar.havenwalls.extensions.TAG
+import com.ammar.havenwalls.extensions.aspectRatio
 import com.ammar.havenwalls.extensions.getFileNameFromUrl
 import com.ammar.havenwalls.extensions.getUriForFile
 import com.ammar.havenwalls.extensions.isSetWallpaperAllowedCompat

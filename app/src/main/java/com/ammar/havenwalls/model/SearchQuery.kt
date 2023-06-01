@@ -1,4 +1,4 @@
-@file:UseSerializers(ColorSerializer::class)
+@file:UseSerializers(ColorSerializer::class, IntSizeSerializer::class)
 
 package com.ammar.havenwalls.model
 
@@ -14,7 +14,7 @@ import com.ammar.havenwalls.extensions.toQueryString
 import com.ammar.havenwalls.extensions.urlDecoded
 import com.ammar.havenwalls.model.Ratio.CategoryRatio
 import com.ammar.havenwalls.model.serializers.ColorSerializer
-import com.mr0xf00.easycrop.AspectRatio
+import com.ammar.havenwalls.model.serializers.IntSizeSerializer
 import java.util.regex.Pattern
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
@@ -31,8 +31,8 @@ data class SearchQuery(
     val sorting: Sorting = Sorting.DATE_ADDED,
     val order: Order = Order.DESC,
     val topRange: TopRange = TopRange.ONE_MONTH,
-    val atleast: Resolution? = null,
-    val resolutions: Set<Resolution> = emptySet(),
+    val atleast: IntSize? = null,
+    val resolutions: Set<IntSize> = emptySet(),
     val colors: Color? = null,
     val seed: String? = null,
     val ratios: Set<Ratio> = emptySet(),
@@ -146,14 +146,14 @@ data class SearchQuery(
                             return@let null
                         }
                         val parts = it.split("x")
-                        Resolution(parts[0].toInt(), parts[1].toInt())
+                        IntSize(parts[0].toInt(), parts[1].toInt())
                     },
                 resolutions = map["resolutions"]
                     ?.split(",")
                     ?.filter { it.isNotBlank() }
                     ?.map {
                         val parts = it.split("x")
-                        Resolution(parts[0].toInt(), parts[1].toInt())
+                        IntSize(parts[0].toInt(), parts[1].toInt())
                     }
                     ?.toSet()
                     ?: emptySet(),
@@ -281,34 +281,6 @@ enum class TopRange(
             else -> ONE_YEAR
         }
     }
-}
-
-// TODO Replace Resolution with IntSize
-@Serializable
-data class Resolution(
-    val width: Int,
-    val height: Int,
-) {
-    val aspectRatio by lazy { if (height != 0) width.toFloat() / height else 0F }
-    override fun toString() = "${width}x${height}"
-
-    fun toIntSize() = IntSize(width, height)
-
-    companion object {
-        val ZERO = Resolution(0, 0)
-    }
-}
-
-private fun reduceFraction(x: Int, y: Int): Pair<Int, Int> {
-    val d = gcd(x, y)
-    return Pair(x / d, y / d)
-}
-
-private fun gcd(a: Int, b: Int): Int = if (b == 0) a else gcd(b, a % b)
-
-fun Resolution.getCropAspectRatio(): AspectRatio {
-    val (x, y) = reduceFraction(width, height)
-    return AspectRatio(x, y)
 }
 
 @Serializable

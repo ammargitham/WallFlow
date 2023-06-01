@@ -1,6 +1,7 @@
 package com.ammar.havenwalls.data.db.entity
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.IntSize
 import androidx.core.graphics.toColorInt
 import androidx.room.ColumnInfo
 import androidx.room.Embedded
@@ -10,7 +11,6 @@ import androidx.room.Junction
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 import com.ammar.havenwalls.model.Purity
-import com.ammar.havenwalls.model.Resolution
 import com.ammar.havenwalls.model.Thumbs
 import com.ammar.havenwalls.model.Wallpaper
 import kotlinx.datetime.Instant
@@ -84,7 +84,7 @@ fun WallpaperEntity.asWallpaper(
     purity = purity,
     source = source,
     category = this.category,
-    resolution = Resolution(dimensionX, dimensionY),
+    resolution = IntSize(dimensionX, dimensionY),
     fileSize = fileSize,
     fileType = fileType,
     createdAt = createdAt,

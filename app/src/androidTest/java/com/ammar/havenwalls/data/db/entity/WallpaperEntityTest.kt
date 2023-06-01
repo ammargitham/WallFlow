@@ -1,9 +1,9 @@
 package com.ammar.havenwalls.data.db.entity
 
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.IntSize
 import androidx.core.graphics.toColorInt
 import com.ammar.havenwalls.model.Purity
-import com.ammar.havenwalls.model.Resolution
 import com.ammar.havenwalls.model.Thumbs
 import com.ammar.havenwalls.model.Wallpaper
 import kotlinx.datetime.Instant
@@ -47,7 +47,7 @@ class WallpaperEntityTest {
             source = "",
             purity = Purity.SKETCHY,
             category = "people",
-            resolution = Resolution(1429, 1031),
+            resolution = IntSize(1429, 1031),
             fileSize = 1159446,
             fileType = "image/png",
             createdAt = Instant.parse("2023-04-26T02:41:32Z"),
