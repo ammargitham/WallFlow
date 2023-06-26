@@ -6,15 +6,22 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import com.ammar.havenwalls.IoDispatcher
+import com.ammar.havenwalls.data.preferences.AppPreferences
+import com.ammar.havenwalls.data.preferences.AutoWallpaperPreferences
+import com.ammar.havenwalls.data.preferences.ObjectDetectionPreferences
+import com.ammar.havenwalls.data.preferences.PreferencesKeys
+import com.ammar.havenwalls.data.preferences.defaultAutoWallpaperConstraints
+import com.ammar.havenwalls.data.preferences.defaultAutoWallpaperFreq
+import com.ammar.havenwalls.extensions.TAG
+import com.ammar.havenwalls.extensions.toConstraintTypeMap
+import com.ammar.havenwalls.extensions.toConstraints
+import com.ammar.havenwalls.model.Search
 import com.ammar.havenwalls.model.SearchQuery
 import com.ammar.havenwalls.model.Sorting
 import com.ammar.havenwalls.model.TopRange
-import com.ammar.havenwalls.data.preferences.AppPreferences
-import com.ammar.havenwalls.data.preferences.ObjectDetectionPreferences
-import com.ammar.havenwalls.data.preferences.PreferencesKeys
-import com.ammar.havenwalls.extensions.TAG
-import com.ammar.havenwalls.model.Search
+import com.ammar.havenwalls.model.serializers.constraintTypeMapSerializer
 import java.io.IOException
+import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher
@@ -24,6 +31,8 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.DateTimePeriod
+import kotlinx.serialization.json.Json
 import org.tensorflow.lite.task.core.ComputeSettings.Delegate
 
 @Singleton
@@ -74,6 +83,29 @@ class AppPreferencesRepository @Inject constructor(
             }
         }
 
+    suspend fun updateAutoWallpaperPrefs(autoWallpaperPreferences: AutoWallpaperPreferences) =
+        withContext(ioDispatcher) {
+            dataStore.edit {
+                with(autoWallpaperPreferences) {
+                    it[PreferencesKeys.ENABLE_AUTO_WALLPAPER] = enabled
+                    it[PreferencesKeys.AUTO_WALLPAPER_SAVED_SEARCH_ID] = savedSearchId
+                    it[PreferencesKeys.AUTO_WALLPAPER_USE_OBJECT_DETECTION] = useObjectDetection
+                    it[PreferencesKeys.AUTO_WALLPAPER_FREQUENCY] = frequency.toString()
+                    it[PreferencesKeys.AUTO_WALLPAPER_CONSTRAINTS] = Json.encodeToString(
+                        constraintTypeMapSerializer,
+                        constraints.toConstraintTypeMap(),
+                    )
+                    it[PreferencesKeys.AUTO_WALLPAPER_SHOW_NOTIFICATION] = showNotification
+                }
+            }
+        }
+
+    suspend fun updateAutoWallpaperWorkRequestId(id: UUID?) = withContext(ioDispatcher) {
+        dataStore.edit {
+            it[PreferencesKeys.AUTO_WALLPAPER_WORK_REQUEST_ID] = id?.toString() ?: ""
+        }
+    }
+
     private fun mapAppPreferences(preferences: Preferences) = AppPreferences(
         wallhavenApiKey = preferences[PreferencesKeys.WALLHAVEN_API_KEY] ?: "",
         homeSearch = Search(
@@ -99,8 +131,61 @@ class AppPreferencesRepository @Inject constructor(
                 delegate = delegate,
                 modelId = get(PreferencesKeys.OBJECT_DETECTION_MODEL_ID) ?: 0,
             )
+        },
+        autoWallpaperPreferences = with(preferences) {
+            val savedSearchId = get(PreferencesKeys.AUTO_WALLPAPER_SAVED_SEARCH_ID) ?: 0
+            AutoWallpaperPreferences(
+                enabled = when {
+                    savedSearchId <= 0 -> false
+                    else -> get(PreferencesKeys.ENABLE_AUTO_WALLPAPER) ?: false
+                },
+                savedSearchId = savedSearchId,
+                useObjectDetection = get(PreferencesKeys.AUTO_WALLPAPER_USE_OBJECT_DETECTION)
+                    ?: true,
+                frequency = parseFrequency(get(PreferencesKeys.AUTO_WALLPAPER_FREQUENCY)),
+                constraints = parseConstraints(get(PreferencesKeys.AUTO_WALLPAPER_CONSTRAINTS)),
+                workRequestId = parseWorkRequestId(
+                    get(PreferencesKeys.AUTO_WALLPAPER_WORK_REQUEST_ID)
+                ),
+                showNotification = get(PreferencesKeys.AUTO_WALLPAPER_SHOW_NOTIFICATION) ?: false,
+            )
         }
     )
 
+    private fun parseFrequency(freqStr: String?) = try {
+        if (freqStr != null) {
+            DateTimePeriod.parse(freqStr)
+        } else {
+            null
+        }
+    } catch (e: Exception) {
+        Log.e(TAG, "Error parsing period string: ", e)
+        null
+    } ?: defaultAutoWallpaperFreq
+
+    private fun parseConstraints(constraintsStr: String?) = try {
+        if (constraintsStr != null) {
+            Json.decodeFromString(
+                constraintTypeMapSerializer,
+                constraintsStr,
+            ).toConstraints()
+        } else {
+            null
+        }
+    } catch (e: Exception) {
+        Log.e(TAG, "Error parsing constraints string: ", e)
+        null
+    } ?: defaultAutoWallpaperConstraints
+
+    private fun parseWorkRequestId(uuidStr: String?) = try {
+        UUID.fromString(uuidStr)
+    } catch (e: Exception) {
+        null
+    }
+
     suspend fun getWallHavenApiKey() = mapAppPreferences(dataStore.data.first()).wallhavenApiKey
+
+    suspend fun getAutoWallHavenWorkRequestId() = mapAppPreferences(dataStore.data.first())
+        .autoWallpaperPreferences
+        .workRequestId
 }

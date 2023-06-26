@@ -73,6 +73,8 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            merges += "META-INF/LICENSE.md"
+            merges += "META-INF/LICENSE-notice.md"
         }
     }
 
@@ -103,11 +105,13 @@ dependencies {
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.service)
+    implementation(libs.androidx.lifecycle.process)
     implementation(libs.androidx.activity.compose)
 
     // Hilt Dependency Injection
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
+    kapt(libs.androidx.hilt.compiler)
     // Hilt and instrumented tests.
     androidTestImplementation(libs.hilt.android.testing)
     kaptAndroidTest(libs.hilt.android.compiler)
@@ -171,6 +175,8 @@ dependencies {
 
     // Work
     implementation(libs.androidx.work.ktx)
+    implementation(libs.androidx.hilt.work)
+    androidTestImplementation(libs.androidx.work.testing)
 
     // easycrop
     // implementation(libs.easycrop)
@@ -202,4 +208,7 @@ dependencies {
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.kotlin.test.junit)
     androidTestUtil(libs.androidx.test.services)
+
+    // mockk
+    androidTestImplementation(libs.mockk.android)
 }

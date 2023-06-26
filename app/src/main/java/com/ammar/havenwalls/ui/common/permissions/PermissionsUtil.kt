@@ -9,9 +9,13 @@ import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.core.app.ActivityCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import com.ammar.havenwalls.extensions.isSetWallpaperAllowedCompat
+import com.ammar.havenwalls.extensions.isWallpaperSupportedCompat
+import com.ammar.havenwalls.extensions.wallpaperManager
 
 @Stable
 sealed interface PermissionStatus {
@@ -101,3 +105,9 @@ internal fun Context.checkPermission(permission: String) =
 
 internal fun Activity.shouldShowRationale(permission: String) =
     ActivityCompat.shouldShowRequestPermissionRationale(this, permission)
+
+internal fun Context.checkNotificationPermission() = NotificationManagerCompat.from(this)
+    .areNotificationsEnabled()
+
+internal fun Context.checkSetWallpaperPermission() = wallpaperManager.isWallpaperSupportedCompat
+        && wallpaperManager.isSetWallpaperAllowedCompat

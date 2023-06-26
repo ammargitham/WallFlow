@@ -158,7 +158,7 @@ fun WallpaperScreen(
     ) { permissionStates ->
         val showRationale = permissionStates.map { it.status.shouldShowRationale }.any { it }
         if (showRationale) {
-            viewModel.showNotificationPermissionRationaleDialog(true)
+            viewModel.showPermissionRationaleDialog(true)
             return@rememberMultiplePermissionsState
         }
         // check if storage permissions are granted (notification permission is optional)
@@ -318,11 +318,11 @@ fun WallpaperScreen(
         }
     }
 
-    if (uiState.showNotificationPermissionRationaleDialog) {
+    if (uiState.showPermissionRationaleDialog) {
         DownloadPermissionsRationalDialog(
             permissions = downloadPermissionsState.shouldShowRationale.keys.map { it.permission },
             onConfirmOrDismiss = {
-                viewModel.showNotificationPermissionRationaleDialog(false)
+                viewModel.showPermissionRationaleDialog(false)
                 // notificationPermissionState.launchPermissionRequest()
             }
         )

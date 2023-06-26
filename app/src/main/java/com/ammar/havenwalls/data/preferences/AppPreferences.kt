@@ -1,9 +1,13 @@
 package com.ammar.havenwalls.data.preferences
 
+import androidx.work.Constraints
+import androidx.work.NetworkType
+import com.ammar.havenwalls.model.Search
 import com.ammar.havenwalls.model.SearchQuery
 import com.ammar.havenwalls.model.Sorting
 import com.ammar.havenwalls.model.TopRange
-import com.ammar.havenwalls.model.Search
+import java.util.UUID
+import kotlinx.datetime.DateTimePeriod
 import org.tensorflow.lite.task.core.ComputeSettings.Delegate
 
 data class AppPreferences(
@@ -17,10 +21,26 @@ data class AppPreferences(
     val blurSketchy: Boolean = false,
     val blurNsfw: Boolean = false,
     val objectDetectionPreferences: ObjectDetectionPreferences = ObjectDetectionPreferences(),
+    val autoWallpaperPreferences: AutoWallpaperPreferences = AutoWallpaperPreferences(),
 )
 
 data class ObjectDetectionPreferences(
     val enabled: Boolean = true,
     val delegate: Delegate = Delegate.GPU,
     val modelId: Long = 0,
+)
+
+internal val defaultAutoWallpaperFreq = DateTimePeriod(hours = 4)
+internal val defaultAutoWallpaperConstraints = Constraints.Builder().apply {
+    setRequiredNetworkType(NetworkType.CONNECTED)
+}.build()
+
+data class AutoWallpaperPreferences(
+    val enabled: Boolean = false,
+    val savedSearchId: Long = 0,
+    val useObjectDetection: Boolean = true,
+    val frequency: DateTimePeriod = defaultAutoWallpaperFreq,
+    val constraints: Constraints = defaultAutoWallpaperConstraints,
+    val showNotification: Boolean = false,
+    val workRequestId: UUID? = null,
 )

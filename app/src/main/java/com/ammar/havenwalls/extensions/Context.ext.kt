@@ -17,12 +17,15 @@ import android.view.WindowManager
 import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.compose.ui.unit.IntSize
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.FileProvider
 import androidx.core.hardware.display.DisplayManagerCompat
 import androidx.core.net.toUri
+import androidx.work.WorkManager
 import com.ammar.havenwalls.FILE_PROVIDER_AUTHORITY
 import com.ammar.havenwalls.model.WallpaperTarget
 import com.ammar.havenwalls.model.toWhichInt
+import com.ammar.havenwalls.ui.common.permissions.checkSetWallpaperPermission
 import com.ammar.havenwalls.utils.isExternalStorageWritable
 import com.ammar.havenwalls.utils.withMLModelsDir
 import com.ammar.havenwalls.utils.withTempDir
@@ -61,9 +64,7 @@ fun Context.setWallpaper(
     bitmap: Bitmap,
     targets: Set<WallpaperTarget> = setOf(WallpaperTarget.HOME, WallpaperTarget.LOCKSCREEN),
 ) {
-    val allowed = wallpaperManager.isWallpaperSupportedCompat
-            && wallpaperManager.isSetWallpaperAllowedCompat
-    if (!allowed) return
+    if (!this.checkSetWallpaperPermission()) return
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         wallpaperManager.setBitmap(
             bitmap,
@@ -202,3 +203,9 @@ fun Context.findActivity(): Activity {
     }
     throw IllegalStateException("Permissions should be called in the context of an Activity")
 }
+
+val Context.workManager
+    get() = WorkManager.getInstance(this)
+
+val Context.notificationManager
+    get() = NotificationManagerCompat.from(this)

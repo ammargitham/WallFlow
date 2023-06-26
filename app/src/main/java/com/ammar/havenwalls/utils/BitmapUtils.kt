@@ -69,12 +69,12 @@ fun decodeSampledBitmapFromUri(
     )
 }
 
-fun decodeSampledBitmapFromUri(
+fun getDecodeSampledBitmapOptions(
     context: Context,
     uri: Uri,
     reqWidth: Int,
     reqHeight: Int,
-): Pair<Bitmap, Int>? {
+): Pair<BitmapFactory.Options, Int>? {
     val inSampleSize = context.contentResolver.openInputStream(uri)?.use {
         BitmapFactory.Options().run {
             inJustDecodeBounds = true
@@ -82,12 +82,27 @@ fun decodeSampledBitmapFromUri(
             calculateInSampleSize(this, reqWidth, reqHeight)
         }
     } ?: return null
+    return BitmapFactory.Options().run {
+        inJustDecodeBounds = false
+        this.inSampleSize = inSampleSize
+        this
+    } to inSampleSize
+}
+
+fun decodeSampledBitmapFromUri(
+    context: Context,
+    uri: Uri,
+    reqWidth: Int,
+    reqHeight: Int,
+): Pair<Bitmap, Int>? {
+    val (opts, inSampleSize) = getDecodeSampledBitmapOptions(
+        context = context,
+        uri = uri,
+        reqWidth = reqWidth,
+        reqHeight = reqHeight,
+    ) ?: return null
     val bitmap = context.contentResolver.openInputStream(uri)?.use {
-        BitmapFactory.Options().run {
-            inJustDecodeBounds = false
-            this.inSampleSize = inSampleSize
-            BitmapFactory.decodeStream(it, null, this)
-        }
+        BitmapFactory.decodeStream(it, null, opts)
     } ?: return null
-    return Pair(bitmap, inSampleSize)
+    return bitmap to inSampleSize
 }

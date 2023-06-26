@@ -1,16 +1,15 @@
 package com.ammar.havenwalls.utils
 
 import android.content.Context
-import androidx.lifecycle.asFlow
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkInfo
-import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.ammar.havenwalls.extensions.getFileNameFromUrl
 import com.ammar.havenwalls.extensions.getMLModelsDir
 import com.ammar.havenwalls.extensions.getTempDir
+import com.ammar.havenwalls.extensions.workManager
 import com.ammar.havenwalls.model.Wallpaper
 import com.ammar.havenwalls.workers.DownloadWorker
 import com.ammar.havenwalls.workers.DownloadWorker.Companion.NotificationType
@@ -66,7 +65,7 @@ class DownloadManager @Inject constructor() {
                 )
             )
         }.build()
-        WorkManager.getInstance(context).enqueueUniqueWork(
+        context.workManager.enqueueUniqueWork(
             url,
             ExistingWorkPolicy.REPLACE,
             request,
@@ -77,28 +76,26 @@ class DownloadManager @Inject constructor() {
     fun getProgress(
         context: Context,
         workName: String,
-    ) = WorkManager.getInstance(context).getWorkInfosForUniqueWorkLiveData(workName)
-        .asFlow()
-        .map {
-            val info = it.firstOrNull() ?: return@map DownloadStatus.Failed(
-                IllegalArgumentException("No download request found with name $workName")
+    ) = context.workManager.getWorkInfosForUniqueWorkFlow(workName).map {
+        val info = it.firstOrNull() ?: return@map DownloadStatus.Failed(
+            IllegalArgumentException("No download request found with name $workName")
+        )
+        when (info.state) {
+            WorkInfo.State.ENQUEUED -> DownloadStatus.Pending
+            WorkInfo.State.RUNNING -> DownloadStatus.Running(
+                info.progress.getLong(DownloadWorker.PROGRESS_KEY_DOWNLOADED, 0),
+                info.progress.getLong(DownloadWorker.PROGRESS_KEY_TOTAL, 0),
             )
-            when (info.state) {
-                WorkInfo.State.ENQUEUED -> DownloadStatus.Pending
-                WorkInfo.State.RUNNING -> DownloadStatus.Running(
-                    info.progress.getLong(DownloadWorker.PROGRESS_KEY_DOWNLOADED, 0),
-                    info.progress.getLong(DownloadWorker.PROGRESS_KEY_TOTAL, 0),
-                )
-                WorkInfo.State.SUCCEEDED -> DownloadStatus.Success(
-                    info.outputData.getString(DownloadWorker.OUTPUT_KEY_FILE_PATH)
-                )
-                WorkInfo.State.FAILED -> DownloadStatus.Failed(
-                    DownloadException(info.outputData.getString(OUTPUT_KEY_ERROR))
-                )
-                WorkInfo.State.BLOCKED -> DownloadStatus.Pending
-                WorkInfo.State.CANCELLED -> DownloadStatus.Cancelled
-            }
+            WorkInfo.State.SUCCEEDED -> DownloadStatus.Success(
+                info.outputData.getString(DownloadWorker.OUTPUT_KEY_FILE_PATH)
+            )
+            WorkInfo.State.FAILED -> DownloadStatus.Failed(
+                DownloadException(info.outputData.getString(OUTPUT_KEY_ERROR))
+            )
+            WorkInfo.State.BLOCKED -> DownloadStatus.Pending
+            WorkInfo.State.CANCELLED -> DownloadStatus.Cancelled
         }
+    }
 
     companion object {
         // fun getWorkName(wallpaper: Wallpaper) = getWorkName(wallpaper.path.getFileNameFromUrl())

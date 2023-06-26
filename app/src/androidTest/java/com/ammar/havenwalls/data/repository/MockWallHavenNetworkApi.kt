@@ -22,6 +22,7 @@ class MockWallHavenNetworkApi : WallHavenNetworkApi {
         atleast: String?,
         resolutions: String?,
         colors: String?,
+        ratios: String?,
         page: Int?,
         seed: String?,
     ): NetworkResponse<List<NetworkWallpaper>> {

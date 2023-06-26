@@ -17,6 +17,10 @@ class SavedSearchRepository @Inject constructor(
 ) {
     fun getAll() = savedSearchDao.getAll().flowOn(ioDispatcher)
 
+    suspend fun getById(id: Long) = withContext(ioDispatcher) {
+        savedSearchDao.getById(id)
+    }
+
     suspend fun addOrUpdateSavedSearch(savedSearch: SavedSearch) = withContext(ioDispatcher) {
         val entity = if (savedSearch.id != 0L) {
             savedSearchDao.getById(savedSearch.id)

@@ -20,10 +20,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.geometry.center
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
@@ -33,7 +30,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
-import androidx.core.graphics.times
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.rememberAsyncImagePainter
 import coil.request.ImageRequest
@@ -100,22 +96,10 @@ fun CropScreen(
             val state = cropState ?: return@derivedStateOf Size.Zero
             val cropScale = state.transform.scale.x
             val imageSize = state.src.size.toSize() * cropScale
-            val imageAspectRatio = imageSize.width / imageSize.height
-            val deviceAspectRatio = resolution.aspectRatio
-            when {
-                imageAspectRatio == deviceAspectRatio -> Size(
-                    imageSize.width,
-                    imageSize.height,
-                )
-                imageAspectRatio < deviceAspectRatio -> Size(
-                    imageSize.width,
-                    imageSize.width / deviceAspectRatio,
-                )
-                else -> Size(
-                    imageSize.height * deviceAspectRatio,
-                    imageSize.height,
-                )
-            }
+            getMaxCropSize(
+                resolution,
+                imageSize
+            )
         }
     }
     var actionsSize by remember { mutableStateOf(IntSize.Zero) }
@@ -149,20 +133,14 @@ fun CropScreen(
             return@LaunchedEffect
         }
         val state = cropState ?: return@LaunchedEffect
-        val cropScale = state.transform.scale.x
-        val detectionRect = uiState.selectedDetection?.detection?.boundingBox
-        val center = if (detectionRect != null) {
-            val rectF = detectionRect * uiState.detectedRectScale * cropScale
-            Offset(rectF.centerX(), rectF.centerY())
-        } else {
-            val imageSize = state.src.size.toSize() * cropScale
-            imageSize.center
-        }
-        val left = (center.x - (maxCropSize.width / 2)).coerceAtLeast(0f)
-        val top = (center.y - (maxCropSize.height / 2)).coerceAtLeast(0f)
-        val newCropRegion = Rect(
-            offset = Offset(left, top),
-            size = maxCropSize,
+        val cropScale = cropState.transform.scale.x
+        val imageSize = state.src.size.toSize() * cropScale
+        val newCropRegion = getCropRect(
+            maxCropSize,
+            uiState.selectedDetection,
+            uiState.detectedRectScale,
+            imageSize,
+            state.transform.scale.x,
         )
         viewModel.setLastDetectionCropRegion(newCropRegion)
         state.region = newCropRegion

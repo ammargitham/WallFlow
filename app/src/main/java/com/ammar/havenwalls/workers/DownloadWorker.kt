@@ -1,55 +1,49 @@
 package com.ammar.havenwalls.workers
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
-import android.os.Build
+import android.media.MediaScannerConnection
+import android.net.Uri
 import android.util.Log
-import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
-import androidx.core.app.NotificationManagerCompat
+import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
-import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.ammar.havenwalls.IoDispatcher
 import com.ammar.havenwalls.R
 import com.ammar.havenwalls.extensions.TAG
-import com.ammar.havenwalls.extensions.await
 import com.ammar.havenwalls.extensions.getFileNameFromUrl
 import com.ammar.havenwalls.extensions.getShareChooserIntent
+import com.ammar.havenwalls.extensions.notificationManager
+import com.ammar.havenwalls.extensions.workManager
 import com.ammar.havenwalls.services.DownloadSuccessActionsService
+import com.ammar.havenwalls.ui.common.permissions.checkNotificationPermission
 import com.ammar.havenwalls.ui.wallpaper.getWallpaperScreenPendingIntent
-import com.ammar.havenwalls.utils.ContentDisposition
-import com.ammar.havenwalls.utils.NotificationChannels
 import com.ammar.havenwalls.utils.NotificationChannels.DOWNLOADS_CHANNEL_ID
 import com.ammar.havenwalls.utils.decodeSampledBitmapFromFile
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedInject
 import java.io.File
-import java.io.IOException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.Response
-import okio.buffer
-import okio.sink
 import kotlin.math.absoluteValue
 import kotlin.random.Random
 
-
-class DownloadWorker(
-    private val context: Context,
-    params: WorkerParameters,
-    private val coroutineDispatcher: CoroutineDispatcher,
+@HiltWorker
+class DownloadWorker @AssistedInject constructor(
+    @Assisted private val context: Context,
+    @Assisted params: WorkerParameters,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     private val okHttpClient: OkHttpClient,
 ) : CoroutineWorker(
     context,
     params,
 ) {
-    private val notificationManager by lazy { NotificationManagerCompat.from(context) }
     private val progressNotificationId by lazy { id.hashCode().absoluteValue }
     private val successNotificationId by lazy { progressNotificationId + 100 }
     private val progressNotificationBuilder by lazy {
@@ -63,7 +57,7 @@ class DownloadWorker(
                 NotificationCompat.Action.Builder(
                     null,
                     context.getString(R.string.cancel),
-                    WorkManager.getInstance(context).createCancelPendingIntent(id),
+                    context.workManager.createCancelPendingIntent(id),
                 ).build()
             )
         }
@@ -81,11 +75,7 @@ class DownloadWorker(
         } ?: NotificationType.VISIBLE
     }
 
-    init {
-        NotificationChannels.createDownloadChannel(context)
-    }
-
-    override suspend fun doWork() = withContext(coroutineDispatcher) {
+    override suspend fun doWork() = withContext(ioDispatcher) {
         val url = inputData.getString(INPUT_KEY_URL)
         if (url.isNullOrBlank()) {
             return@withContext Result.failure(
@@ -125,9 +115,11 @@ class DownloadWorker(
                 )
             } else {
                 download(
+                    okHttpClient = okHttpClient,
                     url = url,
                     dir = destinationDir,
                     fileName = fileName,
+                    progressCallback = this@DownloadWorker::notifyProgress,
                 )
             }
             Result.success(
@@ -159,90 +151,19 @@ class DownloadWorker(
         wallpaperId: String,
     ): File {
         val file = download(
+            okHttpClient = okHttpClient,
             url = url,
             dir = dir,
             fileName = fileName,
+            progressCallback = this::notifyProgress,
         )
+        scanFile(file)
         try {
             notifyWallpaperDownloadSuccess(wallpaperId, file)
         } catch (e: Exception) {
             Log.e(TAG, "download: Error notifying success", e)
         }
         return file
-    }
-
-    private suspend fun download(
-        url: String,
-        dir: String,
-        fileName: String? = null,
-    ): File {
-        notifyProgress(100, -1)
-        val downloadRequest = Request.Builder().url(url).build()
-        var file: File? = null
-        try {
-            okHttpClient.newCall(downloadRequest).await().use { response ->
-                if (!response.isSuccessful) {
-                    throw IOException("Unexpected code: $response")
-                }
-                val tempFile = createFile(response, dir, fileName)
-                (response.body ?: throw IOException("Response body is null")).use { body ->
-                    val contentLength = body.contentLength()
-                    val source = body.source()
-                    tempFile.sink().buffer().use { sink ->
-                        var totalBytesRead: Long = 0
-                        val bufferSize = 8 * 1024
-                        var bytesRead: Long
-                        while (source.read(
-                                sink.buffer,
-                                bufferSize.toLong(),
-                            ).also { bytesRead = it } != -1L
-                        ) {
-                            sink.emit()
-                            totalBytesRead += bytesRead
-                            notifyProgress(contentLength, totalBytesRead)
-                        }
-                        sink.flush()
-                    }
-                }
-                file = tempFile
-            }
-        } catch (e: Exception) {
-            // delete created file on any exception and rethrow the error
-            file?.delete()
-            throw e
-        }
-        return file ?: throw IOException("This will never be thrown")
-    }
-
-    private fun createFile(
-        response: Response,
-        dir: String,
-        fileName: String?,
-    ): File {
-        var fName = when {
-            fileName != null -> fileName
-            else -> {
-                val contentDispositionStr = response.header("Content-Disposition")
-                val parseExceptionMsg = "Could not parse file name from response"
-                if (contentDispositionStr.isNullOrEmpty()) {
-                    throw IllegalArgumentException(parseExceptionMsg)
-                }
-                ContentDisposition.parse(contentDispositionStr).filename
-                    ?: throw IllegalArgumentException(parseExceptionMsg)
-            }
-        }
-        var tempFile = File(dir, fName)
-        val extension = tempFile.extension
-        val nameWoExt = tempFile.nameWithoutExtension
-        var suffix = 0
-        while (tempFile.exists()) {
-            suffix++
-            fName = "$nameWoExt-$suffix${if (extension.isNotEmpty()) ".$extension" else ""}"
-            tempFile = File(dir, fName)
-        }
-        tempFile.parentFile?.mkdirs()
-        tempFile.createNewFile()
-        return tempFile
     }
 
     private suspend fun notifyProgress(
@@ -314,22 +235,31 @@ class DownloadWorker(
                 ).build()
             )
         }.build()
-        notificationManager.notify(successNotificationId, notification)
+        context.notificationManager.notify(successNotificationId, notification)
     }
 
-    private fun shouldShowNotification() =
-        !notificationType.isSilent() && hasNotificationPermission()
+    private fun shouldShowNotification() = !notificationType.isSilent()
+            && context.checkNotificationPermission()
 
     private fun shouldShowSuccessNotification() =
         shouldShowNotification() && notificationType == NotificationType.VISIBLE_SUCCESS
 
-    private fun hasNotificationPermission() = when {
-        Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> ActivityCompat.checkSelfPermission(
+    private fun scanFile(file: File) {
+        var connection: MediaScannerConnection? = null
+        connection = MediaScannerConnection(
             context,
-            Manifest.permission.POST_NOTIFICATIONS,
+            object : MediaScannerConnection.MediaScannerConnectionClient {
+                override fun onScanCompleted(path: String?, uri: Uri?) {
+                    connection?.disconnect()
+                }
+
+                override fun onMediaScannerConnected() {
+                    connection?.scanFile(file.absolutePath, null)
+                }
+            }
         )
-        else -> PackageManager.PERMISSION_GRANTED
-    } == PackageManager.PERMISSION_GRANTED
+        connection.connect()
+    }
 
     companion object {
         const val INPUT_KEY_URL = "url"

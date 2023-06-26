@@ -144,8 +144,8 @@ class WallpaperViewModel @Inject constructor(
         }
     }
 
-    fun showNotificationPermissionRationaleDialog(show: Boolean = true) = _uiState.update {
-        it.copy(showNotificationPermissionRationaleDialog = show)
+    fun showPermissionRationaleDialog(show: Boolean = true) = _uiState.update {
+        it.copy(showPermissionRationaleDialog = show)
     }
 
     fun setWallpaperId(wallpaperId: String?, thumbUrl: String?) {
@@ -164,5 +164,5 @@ data class WallpaperUiState(
     val showInfo: Boolean = false,
     val downloadStatus: DownloadStatus? = null,
     val loading: Boolean = true,
-    val showNotificationPermissionRationaleDialog: Boolean = false,
+    val showPermissionRationaleDialog: Boolean = false,
 )

@@ -4,6 +4,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.ammar.havenwalls.data.db.converters.Converters
+import com.ammar.havenwalls.data.db.dao.AutoWallpaperHistoryDao
 import com.ammar.havenwalls.data.db.dao.LastUpdatedDao
 import com.ammar.havenwalls.data.db.dao.ObjectDetectionModelDao
 import com.ammar.havenwalls.data.db.dao.PopularTagsDao
@@ -15,6 +16,7 @@ import com.ammar.havenwalls.data.db.dao.SearchQueryWallpapersDao
 import com.ammar.havenwalls.data.db.dao.TagsDao
 import com.ammar.havenwalls.data.db.dao.UploadersDao
 import com.ammar.havenwalls.data.db.dao.WallpapersDao
+import com.ammar.havenwalls.data.db.entity.AutoWallpaperHistoryEntity
 import com.ammar.havenwalls.data.db.entity.LastUpdatedEntity
 import com.ammar.havenwalls.data.db.entity.ObjectDetectionModelEntity
 import com.ammar.havenwalls.data.db.entity.PopularTagEntity
@@ -42,6 +44,7 @@ import com.ammar.havenwalls.data.db.entity.WallpaperTagsEntity
         SearchHistoryEntity::class,
         ObjectDetectionModelEntity::class,
         SavedSearchEntity::class,
+        AutoWallpaperHistoryEntity::class,
     ],
     version = 1,
 )
@@ -58,4 +61,5 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun searchHistoryDao(): SearchHistoryDao
     abstract fun objectDetectionModelDao(): ObjectDetectionModelDao
     abstract fun savedSearchDao(): SavedSearchDao
+    abstract fun autoWallpaperHistoryDao(): AutoWallpaperHistoryDao
 }

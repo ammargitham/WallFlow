@@ -1,9 +1,13 @@
 package com.ammar.havenwalls.ui.settings
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.content.res.Configuration
+import android.os.Build
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
@@ -13,29 +17,56 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ammar.havenwalls.R
 import com.ammar.havenwalls.data.preferences.AppPreferences
+import com.ammar.havenwalls.data.preferences.AutoWallpaperPreferences
 import com.ammar.havenwalls.data.preferences.ObjectDetectionPreferences
 import com.ammar.havenwalls.model.ObjectDetectionModel
+import com.ammar.havenwalls.model.SavedSearch
 import com.ammar.havenwalls.model.SavedSearchSaver
 import com.ammar.havenwalls.ui.common.TopBar
+import com.ammar.havenwalls.ui.common.bottomWindowInsets
 import com.ammar.havenwalls.ui.common.bottombar.LocalBottomBarController
 import com.ammar.havenwalls.ui.common.mainsearch.LocalMainSearchBarController
 import com.ammar.havenwalls.ui.common.mainsearch.MainSearchBarState
 import com.ammar.havenwalls.ui.common.navigation.TwoPaneNavigation
 import com.ammar.havenwalls.ui.common.navigation.TwoPaneNavigation.Mode
+import com.ammar.havenwalls.ui.common.permissions.DownloadPermissionsRationalDialog
+import com.ammar.havenwalls.ui.common.permissions.MultiplePermissionItem
+import com.ammar.havenwalls.ui.common.permissions.checkSetWallpaperPermission
+import com.ammar.havenwalls.ui.common.permissions.isGranted
+import com.ammar.havenwalls.ui.common.permissions.rememberMultiplePermissionsState
+import com.ammar.havenwalls.ui.common.permissions.shouldShowRationale
 import com.ammar.havenwalls.ui.common.searchedit.EditSearchModalBottomSheet
 import com.ammar.havenwalls.ui.common.searchedit.SavedSearchesDialog
 import com.ammar.havenwalls.ui.destinations.WallhavenApiKeyDialogDestination
+import com.ammar.havenwalls.ui.settings.composables.ConstraintOptionsDialog
+import com.ammar.havenwalls.ui.settings.composables.DeleteSavedSearchConfirmDialog
+import com.ammar.havenwalls.ui.settings.composables.EditSavedSearchBottomSheetHeader
+import com.ammar.havenwalls.ui.settings.composables.FrequencyDialog
+import com.ammar.havenwalls.ui.settings.composables.NextRunInfoDialog
+import com.ammar.havenwalls.ui.settings.composables.ObjectDetectionDelegateOptionsDialog
+import com.ammar.havenwalls.ui.settings.composables.ObjectDetectionModelDeleteConfirmDialog
+import com.ammar.havenwalls.ui.settings.composables.ObjectDetectionModelEditDialog
+import com.ammar.havenwalls.ui.settings.composables.ObjectDetectionModelOptionsDialog
+import com.ammar.havenwalls.ui.settings.composables.SavedSearchOptionsDialog
+import com.ammar.havenwalls.ui.settings.composables.accountSection
+import com.ammar.havenwalls.ui.settings.composables.autoWallpaperSection
+import com.ammar.havenwalls.ui.settings.composables.dividerItem
+import com.ammar.havenwalls.ui.settings.composables.generalSection
+import com.ammar.havenwalls.ui.settings.composables.objectDetectionSection
 import com.ammar.havenwalls.ui.theme.HavenWallsTheme
+import com.google.modernstorage.permissions.StoragePermissions
 import com.ramcosta.composedestinations.annotation.Destination
 import kotlinx.coroutines.launch
 
@@ -49,6 +80,42 @@ fun SettingsScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val searchBarController = LocalMainSearchBarController.current
     val bottomBarController = LocalBottomBarController.current
+    val context = LocalContext.current
+
+    val storagePerms = remember {
+        StoragePermissions.getPermissions(
+            action = StoragePermissions.Action.READ_AND_WRITE,
+            types = listOf(StoragePermissions.FileType.Image),
+            createdBy = StoragePermissions.CreatedBy.Self
+        ).map { MultiplePermissionItem(permission = it) }
+    }
+
+    @SuppressLint("InlinedApi")
+    val autoWallpaperPermissionsState = rememberMultiplePermissionsState(
+        permissions = storagePerms + MultiplePermissionItem(
+            permission = Manifest.permission.POST_NOTIFICATIONS,
+            minimumSdk = Build.VERSION_CODES.TIRAMISU,
+        )
+    ) { permissionStates ->
+        val showRationale = permissionStates.map { it.status.shouldShowRationale }.any { it }
+        if (showRationale) {
+            viewModel.showPermissionRationaleDialog(true)
+            return@rememberMultiplePermissionsState
+        }
+        // check if storage permissions are granted (notification permission is optional)
+        val storagePermStrings = storagePerms.map { it.permission }
+        val allGranted = permissionStates
+            .filter { it.permission in storagePermStrings }
+            .all { it.status.isGranted }
+        val updatedAutoWallpaperPreferences = if (!allGranted) {
+            // disable auto wallpaper
+            uiState.tempAutoWallpaperPreferences?.copy(enabled = false)
+        } else {
+            uiState.tempAutoWallpaperPreferences
+        } ?: AutoWallpaperPreferences()
+        viewModel.setTempAutoWallpaperPrefs(null)
+        viewModel.updateAutoWallpaperPrefs(updatedAutoWallpaperPreferences)
+    }
 
     LaunchedEffect(Unit) {
         twoPaneController.setPaneMode(Mode.SINGLE_PANE) // hide pane 2
@@ -57,7 +124,9 @@ fun SettingsScreen(
     }
 
     Column(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .windowInsetsPadding(bottomWindowInsets)
     ) {
         TopBar(
             navController = twoPaneController.pane1NavHostController,
@@ -72,6 +141,9 @@ fun SettingsScreen(
         SettingsScreenContent(
             appPreferences = uiState.appPreferences,
             model = uiState.selectedModel,
+            hasSetWallpaperPermission = context.checkSetWallpaperPermission(),
+            autoWallpaperNextRun = uiState.autoWallpaperNextRun,
+            autoWallpaperSavedSearch = uiState.autoWallpaperSavedSearch,
             onBlurSketchyCheckChange = viewModel::setBlurSketchy,
             onBlurNsfwCheckChange = viewModel::setBlurNsfw,
             onWallhavenApiKeyItemClick = {
@@ -80,7 +152,21 @@ fun SettingsScreen(
             onObjectDetectionPrefsChange = viewModel::updateSubjectDetectionPrefs,
             onObjectDetectionDelegateClick = { viewModel.showObjectDetectionDelegateOptions(true) },
             onObjectDetectionModelClick = { viewModel.showObjectDetectionModelOptions(true) },
-            onManageSavedSearchesClick = { viewModel.showSavedSearches(true) }
+            onManageSavedSearchesClick = { viewModel.showSavedSearches(true) },
+            onAutoWallpaperPresChange = {
+                if (it.enabled) {
+                    viewModel.setTempAutoWallpaperPrefs(it)
+                    // need to check if we have all permissions before enabling auto wallpaper
+                    autoWallpaperPermissionsState.launchMultiplePermissionRequest()
+                    return@SettingsScreenContent
+                }
+                viewModel.updateAutoWallpaperPrefs(it)
+            },
+            onAutoWallpaperSavedSearchClick = { viewModel.showAutoWallpaperSavedSearchesDialog(true) },
+            onAutoWallpaperFrequencyClick = { viewModel.showAutoWallpaperFrequencyDialog(true) },
+            onAutoWallpaperConstraintsClick = { viewModel.showAutoWallpaperConstraintsDialog(true) },
+            onAutoWallpaperChangeNowClick = viewModel::autoWallpaperChangeNow,
+            onAutoWallpaperNextRunInfoClick = { viewModel.showAutoWallpaperNextRunInfoDialog(true) },
         )
     }
 
@@ -187,6 +273,69 @@ fun SettingsScreen(
             onDismissRequest = { viewModel.deleteSavedSearch(null) }
         )
     }
+
+    if (uiState.showAutoWallpaperSavedSearchesDialog) {
+        SavedSearchOptionsDialog(
+            savedSearches = uiState.savedSearches,
+            selectedSavedSearchId = uiState.appPreferences.autoWallpaperPreferences.savedSearchId,
+            onSaveClick = {
+                val prefs = uiState.tempAutoWallpaperPreferences
+                    ?: uiState.appPreferences.autoWallpaperPreferences
+                viewModel.updateAutoWallpaperPrefs(
+                    prefs.copy(
+                        enabled = true,
+                        savedSearchId = it,
+                    )
+                )
+                viewModel.setTempAutoWallpaperPrefs(null)
+                viewModel.showAutoWallpaperSavedSearchesDialog(false)
+            },
+            onDismissRequest = { viewModel.showAutoWallpaperSavedSearchesDialog(false) }
+        )
+    }
+
+    if (uiState.showAutoWallpaperFrequencyDialog) {
+        FrequencyDialog(
+            frequency = uiState.appPreferences.autoWallpaperPreferences.frequency,
+            onSaveClick = {
+                viewModel.updateAutoWallpaperPrefs(
+                    uiState.appPreferences.autoWallpaperPreferences.copy(
+                        frequency = it,
+                    )
+                )
+                viewModel.showAutoWallpaperFrequencyDialog(false)
+            },
+            onDismissRequest = { viewModel.showAutoWallpaperFrequencyDialog(false) },
+        )
+    }
+
+    if (uiState.showAutoWallpaperConstraintsDialog) {
+        ConstraintOptionsDialog(
+            constraints = uiState.appPreferences.autoWallpaperPreferences.constraints,
+            onSaveClick = {
+                viewModel.updateAutoWallpaperPrefs(
+                    uiState.appPreferences.autoWallpaperPreferences.copy(
+                        constraints = it,
+                    )
+                )
+                viewModel.showAutoWallpaperConstraintsDialog(false)
+            },
+            onDismissRequest = { viewModel.showAutoWallpaperConstraintsDialog(false) },
+        )
+    }
+
+    if (uiState.showPermissionRationaleDialog) {
+        DownloadPermissionsRationalDialog(
+            permissions = autoWallpaperPermissionsState.shouldShowRationale.keys.map { it.permission },
+            onConfirmOrDismiss = { viewModel.showPermissionRationaleDialog(false) }
+        )
+    }
+
+    if (uiState.showAutoWallpaperNextRunInfoDialog) {
+        NextRunInfoDialog(
+            onDismissRequest = { viewModel.showAutoWallpaperNextRunInfoDialog(false) }
+        )
+    }
 }
 
 @Composable
@@ -194,6 +343,9 @@ fun SettingsScreenContent(
     modifier: Modifier = Modifier,
     appPreferences: AppPreferences = AppPreferences(),
     model: ObjectDetectionModel = ObjectDetectionModel.DEFAULT,
+    autoWallpaperSavedSearch: SavedSearch? = null,
+    hasSetWallpaperPermission: Boolean = true,
+    autoWallpaperNextRun: NextRun = NextRun.NotScheduled,
     onBlurSketchyCheckChange: (checked: Boolean) -> Unit = {},
     onBlurNsfwCheckChange: (checked: Boolean) -> Unit = {},
     onWallhavenApiKeyItemClick: () -> Unit = {},
@@ -201,6 +353,12 @@ fun SettingsScreenContent(
     onObjectDetectionDelegateClick: () -> Unit = {},
     onObjectDetectionModelClick: () -> Unit = {},
     onManageSavedSearchesClick: () -> Unit = {},
+    onAutoWallpaperPresChange: (AutoWallpaperPreferences) -> Unit = {},
+    onAutoWallpaperSavedSearchClick: () -> Unit = {},
+    onAutoWallpaperFrequencyClick: () -> Unit = {},
+    onAutoWallpaperConstraintsClick: () -> Unit = {},
+    onAutoWallpaperChangeNowClick: () -> Unit = {},
+    onAutoWallpaperNextRunInfoClick: () -> Unit = {},
 ) {
     LazyColumn(
         modifier = modifier.fillMaxWidth()
@@ -227,6 +385,43 @@ fun SettingsScreenContent(
             onDelegateClick = onObjectDetectionDelegateClick,
             onModelClick = onObjectDetectionModelClick,
         )
+        dividerItem()
+        if (hasSetWallpaperPermission) {
+            autoWallpaperSection(
+                enabled = appPreferences.autoWallpaperPreferences.enabled,
+                savedSearchName = autoWallpaperSavedSearch?.name,
+                useObjectDetection = appPreferences.autoWallpaperPreferences.useObjectDetection,
+                nextRun = autoWallpaperNextRun,
+                frequency = appPreferences.autoWallpaperPreferences.frequency,
+                showNotification = appPreferences.autoWallpaperPreferences.showNotification,
+                onEnabledChange = {
+                    onAutoWallpaperPresChange(
+                        appPreferences.autoWallpaperPreferences.copy(
+                            enabled = it,
+                        )
+                    )
+                },
+                onSavedSearchClick = onAutoWallpaperSavedSearchClick,
+                onFrequencyClick = onAutoWallpaperFrequencyClick,
+                onUseObjectDetectionChange = {
+                    onAutoWallpaperPresChange(
+                        appPreferences.autoWallpaperPreferences.copy(
+                            useObjectDetection = it,
+                        )
+                    )
+                },
+                onConstraintsClick = onAutoWallpaperConstraintsClick,
+                onChangeNowClick = onAutoWallpaperChangeNowClick,
+                onNextRunInfoClick = onAutoWallpaperNextRunInfoClick,
+                onShowNotificationChange = {
+                    onAutoWallpaperPresChange(
+                        appPreferences.autoWallpaperPreferences.copy(
+                            showNotification = it,
+                        )
+                    )
+                },
+            )
+        }
     }
 }
 
