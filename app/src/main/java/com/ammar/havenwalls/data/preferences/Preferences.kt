@@ -19,4 +19,13 @@ object PreferencesKeys {
     val ENABLE_OBJECT_DETECTION = booleanPreferencesKey("enable_object_detection")
     val OBJECT_DETECTION_DELEGATE = stringPreferencesKey("object_detection_delegate")
     val OBJECT_DETECTION_MODEL_ID = longPreferencesKey("object_detection_model_id")
+    val ENABLE_AUTO_WALLPAPER = booleanPreferencesKey("enable_auto_wallpaper")
+    val AUTO_WALLPAPER_SAVED_SEARCH_ID = longPreferencesKey("auto_wallpaper_saved_search_id")
+    val AUTO_WALLPAPER_USE_OBJECT_DETECTION = booleanPreferencesKey(
+        "auto_wallpaper_use_object_detection"
+    )
+    val AUTO_WALLPAPER_FREQUENCY = stringPreferencesKey("auto_wallpaper_frequency")
+    val AUTO_WALLPAPER_CONSTRAINTS = stringPreferencesKey("auto_wallpaper_constraints")
+    val AUTO_WALLPAPER_SHOW_NOTIFICATION = booleanPreferencesKey("auto_wallpaper_show_notification")
+    val AUTO_WALLPAPER_WORK_REQUEST_ID = stringPreferencesKey("auto_wallpaper_work_request_id")
 }

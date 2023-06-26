@@ -3,11 +3,10 @@ package com.ammar.havenwalls.data.repository
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import androidx.paging.map
 import androidx.room.withTransaction
 import com.ammar.havenwalls.IoDispatcher
-import com.ammar.havenwalls.model.Purity
-import com.ammar.havenwalls.model.SearchQuery
 import com.ammar.havenwalls.data.db.database.AppDatabase
 import com.ammar.havenwalls.data.db.entity.LastUpdatedCategory
 import com.ammar.havenwalls.data.db.entity.LastUpdatedEntity
@@ -27,8 +26,11 @@ import com.ammar.havenwalls.data.network.model.asWallpaperEntity
 import com.ammar.havenwalls.data.repository.utils.NetworkBoundResource
 import com.ammar.havenwalls.data.repository.utils.Resource
 import com.ammar.havenwalls.data.repository.utils.TagsDocumentParser.parsePopularTags
+import com.ammar.havenwalls.model.Purity
+import com.ammar.havenwalls.model.SearchQuery
 import com.ammar.havenwalls.model.Tag
 import com.ammar.havenwalls.model.Wallpaper
+import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
@@ -38,7 +40,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import javax.inject.Inject
 
 @OptIn(ExperimentalPagingApi::class)
 class DefaultWallHavenRepository @Inject constructor(
@@ -201,12 +202,17 @@ class DefaultWallHavenRepository @Inject constructor(
         return uploadersDao.insert(uploader.asUploaderEntity()).first()
     }
 
-    // override fun topWallpapers(topRange: TopRange) = Pager(config = PagingConfig(pageSize = 24)) {
-    //     TopWallpapersPageKeyedPagingSource(wallHavenNetwork, topRange)
-    // }.flow
-
-    override fun wallpapersPager(searchQuery: SearchQuery) = Pager(
-        config = PagingConfig(pageSize = 24),
+    override fun wallpapersPager(
+        searchQuery: SearchQuery,
+        pageSize: Int,
+        prefetchDistance: Int,
+        initialLoadSize: Int,
+    ): Flow<PagingData<Wallpaper>> = Pager(
+        config = PagingConfig(
+            pageSize = pageSize,
+            prefetchDistance = prefetchDistance,
+            initialLoadSize = initialLoadSize,
+        ),
         remoteMediator = WallpapersRemoteMediator(
             searchQuery,
             appDatabase,
@@ -231,7 +237,6 @@ class DefaultWallHavenRepository @Inject constructor(
     override suspend fun refreshPopularTags() {
         popularTagNetworkResource.refresh()
     }
-
 
     override fun wallpaper(wallpaperWallhavenId: String): Flow<Resource<Wallpaper?>> {
         val resource = getWallpaperNetworkResource(wallpaperWallhavenId)

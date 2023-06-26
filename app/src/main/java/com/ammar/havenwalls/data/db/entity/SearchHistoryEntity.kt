@@ -4,8 +4,8 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.ammar.havenwalls.model.SearchQuery
 import com.ammar.havenwalls.model.Search
+import com.ammar.havenwalls.model.SearchQuery
 import kotlinx.datetime.Instant
 
 @Entity(
@@ -19,7 +19,7 @@ import kotlinx.datetime.Instant
 )
 data class SearchHistoryEntity(
     @PrimaryKey(autoGenerate = true) val id: Long,
-    val query: String,
+    @ColumnInfo(collate = ColumnInfo.NOCASE) val query: String,
     val filters: String,
     @ColumnInfo(name = "last_updated_on") val lastUpdatedOn: Instant,
 )

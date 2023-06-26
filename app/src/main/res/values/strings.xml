@@ -70,7 +70,7 @@
     <string name="pending">Pending</string>
     <string name="downloading_model">Downloading model…</string>
     <string name="notification_permission_rationale">Notification permission is required to show download notifications.</string>
-    <string name="write_storage_permission_rationale">Storage write permission is required to save wallpapers to the download folder.</string>
+    <string name="write_storage_permission_rationale">Storage write permission is required to download wallpapers.</string>
     <string name="ok">OK</string>
     <string name="filters">Filters</string>
     <string name="full_screen">Full Screen</string>
@@ -93,6 +93,46 @@
     <string name="ultrawide">Ultrawide</string>
     <string name="square">Square</string>
     <string name="ratio">Ratio</string>
+    <string name="auto_wallpaper">Auto wallpaper</string>
+    <string name="enable_auto_wallpaper">Enable auto wallpaper</string>
+    <string name="search">Search</string>
+    <string name="use_object_detection">Use object detection</string>
+    <string name="use_object_detection_desc">Crop wallpaper using object detection</string>
+    <string name="search_to_use">Search to use</string>
+    <string name="constraints">Constraints</string>
+    <string name="constraints_desc">Constraints when auto wallpaper will run</string>
+    <string name="choose_saved_search">Choose a saved search</string>
+    <string name="no_saved_searches_desc">To save a search, go to Home and search for wallpapers. Tap the search options and save the search.</string>
+    <string name="frequency">Frequency</string>
+    <string name="hours">hours</string>
+    <string name="on_wifi">On Wi-Fi</string>
+    <string name="data_roaming">Data roaming</string>
+    <string name="charging">Charging</string>
+    <string name="on_wifi_desc">Device must be connected to Wi-Fi</string>
+    <string name="data_roaming_desc">Allow while on data roaming</string>
+    <string name="charging_desc">Device must be charging</string>
+    <string name="idle">Idle</string>
+    <string name="idle_desc">Device must be idle</string>
+    <string name="auto_wallpaper_channel_name">Auto wallpaper</string>
+    <string name="auto_wallpaper_channel_description">Channel to show auto wallpaper notifications</string>
+    <string name="running">Running…</string>
+    <string name="downloading_wallpaper">Downloading wallpaper…</string>
+    <string name="changing_wallpaper">Changing wallpaper</string>
+    <string name="change_now">Change now</string>
+    <string name="not_scheduled">Not scheduled</string>
+    <string name="next_run_at">Next run on %1s (<i>approximate</i>)</string>
+    <string name="next_run_time_info">
+        "This is the earliest time that the system will consider running auto wallpaper.
+Auto wallpaper will almost never run at this time. It is dependent on many factors like the underlying system scheduler, doze and power saving modes of the OS, and meeting any configured constraints."
+    </string>
+    <string name="show_change_notification">Show notification after wallpaper change</string>
+    <string name="notification">Notification</string>
+    <string name="auto_wallpaper_notification_desc">Show notification after wallpaper is changed</string>
+    <string name="new_wallpaper">New wallpaper</string>
+    <plurals name="every_x_hrs">
+        <item quantity="one">Every %d hour</item>
+        <item quantity="other">Every %d hours</item>
+    </plurals>
     <plurals name="num_detected_objects">
         <item quantity="one">%d object</item>
         <item quantity="other">%d objects</item>

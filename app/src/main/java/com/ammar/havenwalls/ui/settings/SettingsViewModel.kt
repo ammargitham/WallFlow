@@ -4,21 +4,25 @@ import android.app.Application
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.work.WorkInfo
 import com.ammar.havenwalls.EFFICIENT_DET_LITE_0_MODEL_NAME
 import com.ammar.havenwalls.data.db.entity.ObjectDetectionModelEntity
 import com.ammar.havenwalls.data.db.entity.toModel
 import com.ammar.havenwalls.data.db.entity.toSavedSearch
 import com.ammar.havenwalls.data.preferences.AppPreferences
+import com.ammar.havenwalls.data.preferences.AutoWallpaperPreferences
 import com.ammar.havenwalls.data.preferences.ObjectDetectionPreferences
 import com.ammar.havenwalls.data.repository.AppPreferencesRepository
 import com.ammar.havenwalls.data.repository.ObjectDetectionModelRepository
 import com.ammar.havenwalls.data.repository.SavedSearchRepository
 import com.ammar.havenwalls.extensions.TAG
 import com.ammar.havenwalls.extensions.getMLModelsFileIfExists
+import com.ammar.havenwalls.extensions.workManager
 import com.ammar.havenwalls.model.ObjectDetectionModel
 import com.ammar.havenwalls.model.SavedSearch
 import com.ammar.havenwalls.utils.DownloadManager
 import com.ammar.havenwalls.utils.DownloadStatus
+import com.ammar.havenwalls.workers.AutoWallpaperWorker
 import com.ammar.havenwalls.workers.DownloadWorker
 import com.github.materiiapps.partial.Partialize
 import com.github.materiiapps.partial.partial
@@ -29,9 +33,11 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
@@ -42,13 +48,15 @@ class SettingsViewModel @Inject constructor(
     private val savedSearchRepository: SavedSearchRepository,
 ) : AndroidViewModel(application) {
     private val localUiStateFlow = MutableStateFlow(SettingsUiStatePartial())
+    private val autoWallpaperNextRunFlow = getAutoWallpaperNextRun()
 
     val uiState = combine(
         appPreferencesRepository.appPreferencesFlow,
         objectDetectionModelRepository.getAll(),
         localUiStateFlow,
         savedSearchRepository.getAll(),
-    ) { appPreferences, objectDetectionModels, localUiState, savedSearches ->
+        autoWallpaperNextRunFlow,
+    ) { appPreferences, objectDetectionModels, localUiState, savedSearches, autoWallpaperNextRun ->
         val selectedModelId = appPreferences.objectDetectionPreferences.modelId
         val selectedModel = if (selectedModelId == 0L) ObjectDetectionModel.DEFAULT else {
             objectDetectionModels
@@ -56,12 +64,17 @@ class SettingsViewModel @Inject constructor(
                 ?.toModel()
                 ?: ObjectDetectionModel.DEFAULT
         }
+        val allSavedSearches = savedSearches.map { entity -> entity.toSavedSearch() }
         localUiState.merge(
             SettingsUiState(
                 appPreferences = appPreferences,
                 objectDetectionModels = objectDetectionModels,
                 selectedModel = selectedModel,
-                savedSearches = savedSearches.map { entity -> entity.toSavedSearch() },
+                savedSearches = allSavedSearches,
+                autoWallpaperSavedSearch = allSavedSearches.find {
+                    appPreferences.autoWallpaperPreferences.savedSearchId == it.id
+                },
+                autoWallpaperNextRun = autoWallpaperNextRun,
             )
         )
     }.stateIn(
@@ -265,6 +278,87 @@ class SettingsViewModel @Inject constructor(
         // show the dialog
         localUiStateFlow.update { it.copy(deleteSavedSearch = partial(savedSearch)) }
     }
+
+    fun updateAutoWallpaperPrefs(autoWallpaperPreferences: AutoWallpaperPreferences) {
+        if (autoWallpaperPreferences.enabled && autoWallpaperPreferences.savedSearchId <= 0) {
+            localUiStateFlow.update {
+                it.copy(
+                    tempAutoWallpaperPreferences = partial(autoWallpaperPreferences),
+                    showAutoWallpaperSavedSearchesDialog = partial(true),
+                )
+            }
+            return
+        }
+        viewModelScope.launch {
+            appPreferencesRepository.updateAutoWallpaperPrefs(autoWallpaperPreferences)
+            if (autoWallpaperPreferences.enabled) {
+                // only reschedule if enabled or frequency or constraints change
+                val currentPrefs = uiState.value.appPreferences.autoWallpaperPreferences
+                if (
+                    currentPrefs.enabled
+                    && currentPrefs.frequency == autoWallpaperPreferences.frequency
+                    && currentPrefs.constraints == autoWallpaperPreferences.constraints
+                ) {
+                    return@launch
+                }
+                // schedule worker with updated preferences
+                AutoWallpaperWorker.schedule(
+                    context = application,
+                    constraints = autoWallpaperPreferences.constraints,
+                    interval = autoWallpaperPreferences.frequency,
+                    appPreferencesRepository = appPreferencesRepository,
+                )
+            } else {
+                // stop the worker
+                AutoWallpaperWorker.stop(
+                    context = application,
+                    appPreferencesRepository = appPreferencesRepository,
+                )
+            }
+        }
+    }
+
+    fun showAutoWallpaperSavedSearchesDialog(show: Boolean) = localUiStateFlow.update {
+        it.copy(showAutoWallpaperSavedSearchesDialog = partial(show))
+    }
+
+    fun showAutoWallpaperFrequencyDialog(show: Boolean) = localUiStateFlow.update {
+        it.copy(showAutoWallpaperFrequencyDialog = partial(show))
+    }
+
+    fun showAutoWallpaperConstraintsDialog(show: Boolean) = localUiStateFlow.update {
+        it.copy(showAutoWallpaperConstraintsDialog = partial(show))
+    }
+
+    fun showPermissionRationaleDialog(show: Boolean = true) = localUiStateFlow.update {
+        it.copy(showPermissionRationaleDialog = partial(show))
+    }
+
+    fun setTempAutoWallpaperPrefs(autoWallpaperPreferences: AutoWallpaperPreferences?) =
+        localUiStateFlow.update {
+            it.copy(tempAutoWallpaperPreferences = partial(autoWallpaperPreferences))
+        }
+
+    fun autoWallpaperChangeNow() {
+        AutoWallpaperWorker.triggerImmediate(application)
+    }
+
+    fun showAutoWallpaperNextRunInfoDialog(show: Boolean) = localUiStateFlow.update {
+        it.copy(showAutoWallpaperNextRunInfoDialog = partial(show))
+    }
+
+    private fun getAutoWallpaperNextRun() = application.workManager.getWorkInfosForUniqueWorkFlow(
+        AutoWallpaperWorker.PERIODIC_WORK_NAME
+    ).map {
+        val info = it.firstOrNull() ?: return@map NextRun.NotScheduled
+        return@map when (info.state) {
+            WorkInfo.State.ENQUEUED -> {
+                NextRun.NextRunTime(Instant.fromEpochMilliseconds(info.nextScheduleTimeMillis))
+            }
+            WorkInfo.State.RUNNING -> NextRun.Running
+            else -> NextRun.NotScheduled
+        }
+    }
 }
 
 @Partialize
@@ -282,4 +376,18 @@ data class SettingsUiState(
     val savedSearches: List<SavedSearch> = emptyList(),
     val editSavedSearch: SavedSearch? = null,
     val deleteSavedSearch: SavedSearch? = null,
+    val autoWallpaperSavedSearch: SavedSearch? = null,
+    val showAutoWallpaperSavedSearchesDialog: Boolean = false,
+    val showAutoWallpaperFrequencyDialog: Boolean = false,
+    val showAutoWallpaperConstraintsDialog: Boolean = false,
+    val showPermissionRationaleDialog: Boolean = false,
+    val tempAutoWallpaperPreferences: AutoWallpaperPreferences? = null,
+    val autoWallpaperNextRun: NextRun = NextRun.NotScheduled,
+    val showAutoWallpaperNextRunInfoDialog: Boolean = false,
 )
+
+sealed class NextRun {
+    object NotScheduled : NextRun()
+    object Running : NextRun()
+    data class NextRunTime(val instant: Instant) : NextRun()
+}

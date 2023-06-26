@@ -59,6 +59,10 @@ class DatabaseModule {
     @Provides
     fun providesSavedSearchDao(appDatabase: AppDatabase) = appDatabase.savedSearchDao()
 
+    @Provides
+    fun providesAutoWallpaperHistoryDao(appDatabase: AppDatabase) =
+        appDatabase.autoWallpaperHistoryDao()
+
     lateinit var appDatabase: AppDatabase
 
     @Provides
