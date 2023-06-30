@@ -34,6 +34,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
 import coil.compose.AsyncImage
 import coil.memory.MemoryCache
@@ -95,10 +96,11 @@ fun WallpaperCard(
         if (it) 1f else 0f
     }
     val checkImage = remember(context) {
-        context.resources
-            .getDrawable(R.drawable.baseline_check_24, null)
-            .toBitmap()
-            .asImageBitmap()
+        ResourcesCompat.getDrawable(
+            context.resources,
+            R.drawable.baseline_check_24,
+            null,
+        )?.toBitmap()?.asImageBitmap()
     }
 
     Card(
@@ -118,6 +120,7 @@ fun WallpaperCard(
                         color = selectionCircleColor,
                         radius = radius
                     )
+                    if (checkImage == null) return@drawWithContent
                     val imageSize = (radius * 1.5).roundToInt()
                     drawImage(
                         image = checkImage,
