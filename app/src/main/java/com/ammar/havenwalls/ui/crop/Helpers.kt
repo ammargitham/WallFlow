@@ -1,5 +1,6 @@
 package com.ammar.havenwalls.ui.crop
 
+import android.graphics.RectF
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
@@ -7,7 +8,6 @@ import androidx.compose.ui.geometry.center
 import androidx.compose.ui.unit.IntSize
 import androidx.core.graphics.times
 import com.ammar.havenwalls.extensions.aspectRatio
-import com.ammar.havenwalls.model.DetectionWithBitmap
 
 fun getMaxCropSize(
     screenResolution: IntSize,
@@ -33,13 +33,12 @@ fun getMaxCropSize(
 
 fun getCropRect(
     maxCropSize: Size,
-    detectionWithBitmap: DetectionWithBitmap?,
-    detectedRectScale: Int,
+    detectionRect: RectF? = null,
+    detectedRectScale: Int? = null,
     imageSize: Size,
     cropScale: Float,
 ): Rect {
-    val detectionRect = detectionWithBitmap?.detection?.boundingBox
-    val center = if (detectionRect != null) {
+    val center = if (detectionRect != null && detectedRectScale != null) {
         val rectF = detectionRect * detectedRectScale * cropScale
         Offset(rectF.centerX(), rectF.centerY())
     } else {

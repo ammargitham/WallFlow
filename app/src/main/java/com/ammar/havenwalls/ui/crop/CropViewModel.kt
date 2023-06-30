@@ -4,7 +4,7 @@ import android.app.Application
 import android.net.Uri
 import android.util.Log
 import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -12,6 +12,7 @@ import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
+import com.ammar.havenwalls.R
 import com.ammar.havenwalls.activities.setwallpaper.SetWallpaperActivity.Companion.EXTRA_URI
 import com.ammar.havenwalls.data.db.entity.toModel
 import com.ammar.havenwalls.data.preferences.ObjectDetectionPreferences
@@ -22,8 +23,10 @@ import com.ammar.havenwalls.extensions.TAG
 import com.ammar.havenwalls.extensions.getMLModelsFileIfExists
 import com.ammar.havenwalls.extensions.getScreenResolution
 import com.ammar.havenwalls.extensions.setWallpaper
+import com.ammar.havenwalls.extensions.toast
 import com.ammar.havenwalls.model.DetectionWithBitmap
 import com.ammar.havenwalls.model.ObjectDetectionModel
+import com.ammar.havenwalls.model.WallpaperTarget
 import com.ammar.havenwalls.utils.DownloadManager
 import com.ammar.havenwalls.utils.DownloadManager.Companion.DownloadLocation
 import com.ammar.havenwalls.utils.DownloadStatus
@@ -162,14 +165,20 @@ class CropViewModel(
                 maxResultSize = application.getScreenResolution(true),
                 cacheBeforeUse = false,
             )
-            if (result is CropResult.Cancelled) {
-                _uiState.update { it.copy(result = Result.CANCELLED) }
+            val cropRect = uiState.value.lastCropRegion
+            if (result is CropResult.Cancelled || cropRect == null) {
+                _uiState.update { it.copy(result = Result.Cancelled) }
                 return@launch
             }
-            val bitmap = (result as CropResult.Success).bitmap.asAndroidBitmap()
+            val success = result as CropResult.Success
+            _uiState.update { it.copy(result = Result.Pending(success.bitmap)) }
             application.setWallpaper(
-                bitmap = bitmap,
+                uri = uri,
+                cropRect = cropRect,
+                targets = uiState.value.wallpaperTargets,
             )
+            application.toast(application.getString(R.string.wallpaper_changed))
+            _uiState.update { it.copy(result = Result.Success(result)) }
         }
     }
 
@@ -216,11 +225,20 @@ class CropViewModel(
         it.copy(selectedDetection = detection)
     }
 
-    fun setLastDetectionCropRegion(region: Rect) = _uiState.update {
-        it.copy(lastDetectionCropRegion = region)
+    fun setLastCropRegion(region: Rect) = _uiState.update {
+        it.copy(lastCropRegion = region)
     }
 
-    fun removeSelectedDetection() = _uiState.update { it.copy(selectedDetection = null) }
+    fun removeSelectedDetectionAndUpdateRegion(region: Rect) = _uiState.update {
+        it.copy(
+            selectedDetection = null,
+            lastCropRegion = region,
+        )
+    }
+
+    fun setWallpaperTargets(wallpaperTargets: Set<WallpaperTarget>) = _uiState.update {
+        it.copy(wallpaperTargets = wallpaperTargets)
+    }
 
     companion object {
         fun getFactory(
@@ -251,12 +269,17 @@ data class CropUiState(
     val detectedRectScale: Int = 1,
     val selectedDetection: DetectionWithBitmap? = null,
     val showDetections: Boolean = false,
-    val lastDetectionCropRegion: Rect? = null,
-    val result: Result = Result.PENDING,
+    val lastCropRegion: Rect? = null,
+    val result: Result = Result.NotStarted,
+    val wallpaperTargets: Set<WallpaperTarget> = setOf(
+        WallpaperTarget.HOME,
+        WallpaperTarget.LOCKSCREEN,
+    ),
 )
 
 sealed class Result {
-    object PENDING : Result()
-    object CANCELLED : Result()
-    data class SUCCESS(val result: CropResult) : Result()
+    object NotStarted : Result()
+    object Cancelled : Result()
+    data class Pending(val bitmap: ImageBitmap) : Result()
+    data class Success(val result: CropResult) : Result()
 }

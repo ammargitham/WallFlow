@@ -1,6 +1,7 @@
 package com.ammar.havenwalls.ui.crop
 
 import android.util.Log
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -122,36 +123,39 @@ fun CropScreen(
     }
 
     LaunchedEffect(
-        cropState,
+        cropState?.transform,
+        cropState?.src?.size,
         maxCropSize,
         uiState.detectedRectScale,
         uiState.selectedDetection,
     ) {
         // when lastDetectionCropRegion != null and selectedDetection == null,
         // it means user manually updated the crop region. Do nothing in such cases.
-        if (uiState.lastDetectionCropRegion != null && uiState.selectedDetection == null) {
+        if (uiState.lastCropRegion != null && uiState.selectedDetection == null) {
             return@LaunchedEffect
         }
         val state = cropState ?: return@LaunchedEffect
-        val cropScale = cropState.transform.scale.x
+        val cropScale = state.transform.scale.x
         val imageSize = state.src.size.toSize() * cropScale
         val newCropRegion = getCropRect(
             maxCropSize,
-            uiState.selectedDetection,
+            uiState.selectedDetection?.detection?.boundingBox,
             uiState.detectedRectScale,
             imageSize,
             state.transform.scale.x,
         )
-        viewModel.setLastDetectionCropRegion(newCropRegion)
+        viewModel.setLastCropRegion(newCropRegion)
         state.region = newCropRegion
         state.aspectLock = true
     }
 
     LaunchedEffect(cropState?.region) {
-        if (uiState.selectedDetection == null) return@LaunchedEffect
         // set uiState selectedDetection null when user updates crop region manually
-        if (uiState.lastDetectionCropRegion == cropState?.region) return@LaunchedEffect
-        viewModel.removeSelectedDetection()
+        if (uiState.lastCropRegion == cropState?.region) return@LaunchedEffect
+        if (cropState?.region == null) {
+            return@LaunchedEffect
+        }
+        viewModel.removeSelectedDetectionAndUpdateRegion(cropState.region)
     }
 
     Box(
@@ -176,19 +180,30 @@ fun CropScreen(
             )
         }
 
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = actionsSize.height.toDp() + 16.dp)
-        ) {
-            cropState?.run {
-                CompositionLocalProvider(LocalCropperStyle provides cropperStyle) {
-                    CropperPreview(
-                        modifier = Modifier.fillMaxSize(),
-                        state = this,
-                        bringToViewDelay = 200,
-                        extraPadding = WindowInsets.mandatorySystemGestures.asPaddingValues(),
-                    )
+        Crossfade(targetState = cropState to uiState.result) {
+            val (innerCropState, innerResult) = it
+            if (innerResult is Result.Pending) {
+                Image(
+                    modifier = Modifier.fillMaxSize(),
+                    bitmap = (uiState.result as Result.Pending).bitmap,
+                    contentDescription = "Cropped Image",
+                    contentScale = ContentScale.Fit,
+                )
+            }
+            innerCropState?.run {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(bottom = actionsSize.height.toDp() + 16.dp)
+                ) {
+                    CompositionLocalProvider(LocalCropperStyle provides cropperStyle) {
+                        CropperPreview(
+                            modifier = Modifier.fillMaxSize(),
+                            state = this@run,
+                            bringToViewDelay = 200,
+                            extraPadding = WindowInsets.mandatorySystemGestures.asPaddingValues(),
+                        )
+                    }
                 }
             }
         }
@@ -204,7 +219,10 @@ fun CropScreen(
             detections = uiState.detectedObjects,
             onDetectionsClick = { viewModel.showDetections(true) },
             onCancelClick = { cropState?.done(false) },
-            onSetClick = { cropState?.done(true) }
+            onSetClick = {
+                viewModel.setWallpaperTargets(it)
+                cropState?.done(true)
+            }
         )
 
         if (uiState.showDetections) {

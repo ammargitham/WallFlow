@@ -3,6 +3,7 @@ package com.ammar.havenwalls.ui.crop
 import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.RectF
+import android.os.Build
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,11 +13,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.ListItem
@@ -26,6 +30,10 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
@@ -40,6 +48,7 @@ import com.ammar.havenwalls.R
 import com.ammar.havenwalls.data.repository.utils.Resource
 import com.ammar.havenwalls.extensions.capitalise
 import com.ammar.havenwalls.model.DetectionWithBitmap
+import com.ammar.havenwalls.model.WallpaperTarget
 import com.ammar.havenwalls.ui.theme.HavenWallsTheme
 import com.ammar.havenwalls.utils.DownloadStatus
 import org.tensorflow.lite.task.vision.detector.Detection
@@ -50,7 +59,7 @@ internal fun Actions(
     objectDetectionEnabled: Boolean = false,
     modelDownloadStatus: DownloadStatus? = null,
     detections: Resource<List<DetectionWithBitmap>> = Resource.Success(emptyList()),
-    onSetClick: () -> Unit = {},
+    onSetClick: (Set<WallpaperTarget>) -> Unit = {},
     onCancelClick: () -> Unit = {},
     onDetectionsClick: () -> Unit = {},
 ) {
@@ -113,12 +122,14 @@ internal fun Actions(
         }
         Spacer(modifier = Modifier.requiredWidth(8.dp))
         Column {
-            Button(onClick = onSetClick) {
-                Text(
-                    text = stringResource(R.string.set),
-                    maxLines = 1,
-                )
-            }
+            SetButton(
+                showTargetOptions = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N,
+                onHomeScreenClick = { onSetClick(setOf(WallpaperTarget.HOME)) },
+                onLockScreenClick = { onSetClick(setOf(WallpaperTarget.LOCKSCREEN)) },
+                onBothClick = {
+                    onSetClick(setOf(WallpaperTarget.HOME, WallpaperTarget.LOCKSCREEN))
+                },
+            )
         }
     }
 }
@@ -134,6 +145,60 @@ private fun PreviewActions() {
                 modifier = Modifier.padding(horizontal = 32.dp)
             )
         }
+    }
+}
+
+@Composable
+private fun SetButton(
+    modifier: Modifier = Modifier,
+    showTargetOptions: Boolean = true,
+    onHomeScreenClick: () -> Unit = {},
+    onLockScreenClick: () -> Unit = {},
+    onBothClick: () -> Unit = {},
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Button(
+        modifier = modifier,
+        onClick = {
+            if (showTargetOptions) {
+                expanded = true
+                return@Button
+            }
+            onBothClick()
+        },
+    ) {
+        Text(
+            text = stringResource(R.string.set),
+            maxLines = 1,
+        )
+    }
+    DropdownMenu(
+        modifier = Modifier.widthIn(min = 150.dp),
+        expanded = expanded,
+        onDismissRequest = { expanded = false },
+    ) {
+        DropdownMenuItem(
+            text = { Text(text = stringResource(R.string.home_screen)) },
+            onClick = {
+                expanded = false
+                onHomeScreenClick()
+            },
+        )
+        DropdownMenuItem(
+            text = { Text(text = stringResource(R.string.lock_screen)) },
+            onClick = {
+                expanded = false
+                onLockScreenClick()
+            },
+        )
+        DropdownMenuItem(
+            text = { Text(text = stringResource(R.string.both)) },
+            onClick = {
+                expanded = false
+                onBothClick()
+            },
+        )
     }
 }
 

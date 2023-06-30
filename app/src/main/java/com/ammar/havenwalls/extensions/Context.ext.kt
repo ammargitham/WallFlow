@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import android.graphics.Bitmap
+import android.graphics.BitmapRegionDecoder
 import android.net.Uri
 import android.os.Build
 import android.util.Log
@@ -16,9 +17,12 @@ import android.view.Surface
 import android.view.WindowManager
 import android.webkit.MimeTypeMap
 import android.widget.Toast
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.graphics.toAndroidRectF
 import androidx.compose.ui.unit.IntSize
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.FileProvider
+import androidx.core.graphics.toRect
 import androidx.core.hardware.display.DisplayManagerCompat
 import androidx.core.net.toUri
 import androidx.work.WorkManager
@@ -26,10 +30,12 @@ import com.ammar.havenwalls.FILE_PROVIDER_AUTHORITY
 import com.ammar.havenwalls.model.WallpaperTarget
 import com.ammar.havenwalls.model.toWhichInt
 import com.ammar.havenwalls.ui.common.permissions.checkSetWallpaperPermission
+import com.ammar.havenwalls.utils.getDecodeSampledBitmapOptions
 import com.ammar.havenwalls.utils.isExternalStorageWritable
 import com.ammar.havenwalls.utils.withMLModelsDir
 import com.ammar.havenwalls.utils.withTempDir
 import java.io.File
+import java.io.InputStream
 
 fun Context.openUrl(url: String) {
     var tempUrl = url
@@ -61,10 +67,39 @@ fun parseMimeType(file: File): String {
 fun Context.toast(message: String) = Toast.makeText(this, message, Toast.LENGTH_LONG).show()
 
 fun Context.setWallpaper(
+    uri: Uri,
+    cropRect: Rect,
+    targets: Set<WallpaperTarget> = setOf(WallpaperTarget.HOME, WallpaperTarget.LOCKSCREEN),
+) = this.contentResolver.openInputStream(uri).use {
+    val screenResolution = this.getScreenResolution(true)
+    if (it == null) return@use false
+    val decoder = getBitmapRegionDecoder(it) ?: return@use false
+    val (opts, _) = getDecodeSampledBitmapOptions(
+        context = this,
+        uri = uri,
+        reqWidth = screenResolution.width,
+        reqHeight = screenResolution.height,
+    ) ?: return@use false
+    val bitmap = decoder.decodeRegion(
+        cropRect.toAndroidRectF().toRect(),
+        opts
+    ) ?: return@use false
+    return this.setWallpaper(bitmap, targets)
+}
+
+private fun getBitmapRegionDecoder(`is`: InputStream) =
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        BitmapRegionDecoder.newInstance(`is`)
+    } else {
+        @Suppress("DEPRECATION")
+        BitmapRegionDecoder.newInstance(`is`, false)
+    }
+
+fun Context.setWallpaper(
     bitmap: Bitmap,
     targets: Set<WallpaperTarget> = setOf(WallpaperTarget.HOME, WallpaperTarget.LOCKSCREEN),
-) {
-    if (!this.checkSetWallpaperPermission()) return
+): Boolean {
+    if (!this.checkSetWallpaperPermission()) return false
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         wallpaperManager.setBitmap(
             bitmap,
@@ -72,9 +107,10 @@ fun Context.setWallpaper(
             true,
             targets.toWhichInt(),
         )
-        return
+        return true
     }
     wallpaperManager.setBitmap(bitmap)
+    return true
 }
 
 fun Context.share(

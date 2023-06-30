@@ -89,7 +89,7 @@ class SetWallpaperActivity : ComponentActivity() {
         lifecycleScope.launch {
             repeatOnLifecycle(Lifecycle.State.STARTED) {
                 viewModel.uiState.collectLatest {
-                    if (it.result == Result.CANCELLED) {
+                    if (it.result == Result.Cancelled || it.result is Result.Success) {
                         finishAndRemoveTask()
                         return@collectLatest
                     }

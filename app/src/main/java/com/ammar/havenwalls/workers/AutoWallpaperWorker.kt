@@ -2,14 +2,10 @@ package com.ammar.havenwalls.workers
 
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.BitmapRegionDecoder
 import android.net.Uri
-import android.os.Build
 import android.util.Log
-import androidx.compose.ui.graphics.toAndroidRectF
 import androidx.compose.ui.unit.toSize
 import androidx.core.app.NotificationCompat
-import androidx.core.graphics.toRect
 import androidx.hilt.work.HiltWorker
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
@@ -55,11 +51,9 @@ import com.ammar.havenwalls.ui.wallpaper.getWallpaperScreenPendingIntent
 import com.ammar.havenwalls.utils.NotificationChannels
 import com.ammar.havenwalls.utils.decodeSampledBitmapFromFile
 import com.ammar.havenwalls.utils.detectObjects
-import com.ammar.havenwalls.utils.getDecodeSampledBitmapOptions
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.io.File
-import java.io.InputStream
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.datetime.Clock
@@ -193,25 +187,14 @@ class AutoWallpaperWorker @AssistedInject constructor(
         }
         val rect = getCropRect(
             maxCropSize = maxCropSize,
-            detectionWithBitmap = detection,
+            detectionRect = detection?.detection?.boundingBox,
             detectedRectScale = detectionScale,
             imageSize = nextWallpaper.resolution.toSize(),
             cropScale = 1f,
         )
-        context.contentResolver.openInputStream(uri).use {
-            if (it == null) return false to null
-            val decoder = getBitmapRegionDecoder(it) ?: return false to null
-            val (opts, _) = getDecodeSampledBitmapOptions(
-                context = context,
-                uri = uri,
-                reqWidth = screenResolution.width,
-                reqHeight = screenResolution.height,
-            ) ?: return false to null
-            val bitmap = decoder.decodeRegion(rect.toAndroidRectF().toRect(), opts)
-                ?: return false to null
-            context.setWallpaper(
-                bitmap = bitmap,
-            )
+        val applied = context.setWallpaper(uri, rect)
+        if (!applied) {
+            return false to null
         }
         return true to wallpaperFile
     }
@@ -228,14 +211,6 @@ class AutoWallpaperWorker @AssistedInject constructor(
                 objectDetectionPreferences = appPreferences.objectDetectionPreferences,
             )
             scale to detectionWithBitmaps.firstOrNull()
-        }
-
-    private fun getBitmapRegionDecoder(`is`: InputStream) =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            BitmapRegionDecoder.newInstance(`is`)
-        } else {
-            @Suppress("DEPRECATION")
-            BitmapRegionDecoder.newInstance(`is`, false)
         }
 
     private suspend fun downloadWallpaper(wallpaper: Wallpaper): File {
@@ -355,7 +330,8 @@ class AutoWallpaperWorker @AssistedInject constructor(
                     wallpaper.id,
                 )
             )
-            setAutoCancel(true)
+            // setAutoCancel(true)
+            setAutoCancel(false)
         }.build()
         context.notificationManager.notify(SUCCESS_NOTIFICATION_ID, notification)
     }
