@@ -157,7 +157,9 @@ class DownloadWorker @AssistedInject constructor(
             fileName = fileName,
             progressCallback = this::notifyProgress,
         )
-        scanFile(file)
+        if (inputData.getBoolean(INPUT_KEY_SCAN_FILE, false)) {
+            scanFile(file)
+        }
         try {
             notifyWallpaperDownloadSuccess(wallpaperId, file)
         } catch (e: Exception) {
@@ -269,6 +271,7 @@ class DownloadWorker @AssistedInject constructor(
         const val INPUT_KEY_NOTIFICATION_TYPE = "notification_type"
         const val INPUT_KEY_NOTIFICATION_TITLE = "notification_title"
         const val INPUT_KEY_WALLPAPER_ID = "wallpaper_id"
+        const val INPUT_KEY_SCAN_FILE = "scan_file"
         const val OUTPUT_KEY_ERROR = "error"
         const val OUTPUT_KEY_FILE_PATH = "output_file_path"
         const val PROGRESS_KEY_TOTAL = "total"

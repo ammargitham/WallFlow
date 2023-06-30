@@ -51,6 +51,11 @@ class DownloadManager @Inject constructor() {
             DownloadLocation.DOWNLOADS -> getPublicDownloadsDir()
             DownloadLocation.APP_ML_MODELS -> context.getMLModelsDir()
         }
+        val scanFile = when (downloadLocation) {
+            DownloadLocation.APP_TEMP -> false
+            DownloadLocation.DOWNLOADS -> true
+            DownloadLocation.APP_ML_MODELS -> false
+        }
         val request = OneTimeWorkRequestBuilder<DownloadWorker>().apply {
             setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
             setInputData(
@@ -61,6 +66,7 @@ class DownloadManager @Inject constructor() {
                     DownloadWorker.INPUT_KEY_FILE_NAME_FROM_RESPONSE to inferFileNameFromResponse,
                     DownloadWorker.INPUT_KEY_NOTIFICATION_TYPE to notificationType.type,
                     DownloadWorker.INPUT_KEY_NOTIFICATION_TITLE to notificationTitle,
+                    DownloadWorker.INPUT_KEY_SCAN_FILE to scanFile,
                     *extraWorkerData,
                 )
             )
