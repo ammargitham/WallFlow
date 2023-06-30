@@ -1,15 +1,19 @@
 package com.ammar.havenwalls.extensions
 
+import android.os.Build
 import androidx.work.Constraints
 import androidx.work.NetworkType
 import com.ammar.havenwalls.model.ConstraintType
 
-fun Constraints.toConstraintTypeMap() = mapOf(
-    ConstraintType.WIFI to (this.requiredNetworkType == NetworkType.UNMETERED),
-    ConstraintType.ROAMING to (this.requiredNetworkType == NetworkType.CONNECTED),
-    ConstraintType.CHARGING to this.requiresCharging(),
-    ConstraintType.IDLE to this.requiresDeviceIdle(),
-)
+fun Constraints.toConstraintTypeMap() = buildMap {
+    val constraint = this@toConstraintTypeMap
+    put(ConstraintType.WIFI, constraint.requiredNetworkType == NetworkType.UNMETERED)
+    put(ConstraintType.ROAMING, constraint.requiredNetworkType == NetworkType.CONNECTED)
+    put(ConstraintType.CHARGING, constraint.requiresCharging())
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        put(ConstraintType.IDLE, constraint.requiresDeviceIdle())
+    }
+}
 
 private val wifiRoamingCombinations = mapOf(
     // if on wifi is true, network type should be un-metered (regardless of roaming boolean)
@@ -29,5 +33,7 @@ fun Map<ConstraintType, Boolean>.toConstraints() = Constraints.Builder().apply {
     )] ?: NetworkType.CONNECTED
     setRequiredNetworkType(networkType)
     setRequiresCharging(constraintMap[ConstraintType.CHARGING] ?: false)
-    setRequiresDeviceIdle(constraintMap[ConstraintType.IDLE] ?: false)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+        setRequiresDeviceIdle(constraintMap[ConstraintType.IDLE] ?: false)
+    }
 }.build()

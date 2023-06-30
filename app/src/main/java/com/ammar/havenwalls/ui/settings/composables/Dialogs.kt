@@ -908,25 +908,27 @@ private fun ConstraintOptionsDialogContent(
                 )
             },
         )
-        ListItem(
-            modifier = Modifier
-                .clickable(onClick = {
-                    val current = constraintTypeMap[ConstraintType.IDLE] ?: false
-                    onChange(constraintTypeMap + (ConstraintType.IDLE to !current))
-                })
-                .padding(horizontal = 8.dp),
-            headlineContent = { Text(text = stringResource(R.string.idle)) },
-            supportingContent = { Text(text = stringResource(R.string.idle_desc)) },
-            leadingContent = {
-                Checkbox(
-                    modifier = Modifier.size(24.dp),
-                    checked = constraintTypeMap[ConstraintType.IDLE] ?: false,
-                    onCheckedChange = {
-                        onChange(constraintTypeMap + (ConstraintType.IDLE to it))
-                    },
-                )
-            },
-        )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            ListItem(
+                modifier = Modifier
+                    .clickable(onClick = {
+                        val current = constraintTypeMap[ConstraintType.IDLE] ?: false
+                        onChange(constraintTypeMap + (ConstraintType.IDLE to !current))
+                    })
+                    .padding(horizontal = 8.dp),
+                headlineContent = { Text(text = stringResource(R.string.idle)) },
+                supportingContent = { Text(text = stringResource(R.string.idle_desc)) },
+                leadingContent = {
+                    Checkbox(
+                        modifier = Modifier.size(24.dp),
+                        checked = constraintTypeMap[ConstraintType.IDLE] ?: false,
+                        onCheckedChange = {
+                            onChange(constraintTypeMap + (ConstraintType.IDLE to it))
+                        },
+                    )
+                },
+            )
+        }
     }
 }
 
