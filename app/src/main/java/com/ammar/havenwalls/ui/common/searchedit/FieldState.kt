@@ -26,3 +26,26 @@ class NameState(
 }
 
 fun nameStateSaver(context: Context) = textFieldStateSaver(NameState(context))
+
+class IntState(
+    val value: Int? = null,
+    private val allowNegative: Boolean = false,
+    errorFor: (String) -> String = { "" },
+) :
+    TextFieldState(
+        validator = {
+            val valInt = it.toIntOrNull()
+            if (valInt == null) {
+                false
+            } else {
+                allowNegative || valInt >= 0
+            }
+        },
+        errorFor = { errorFor(it) }
+    ) {
+    init {
+        value?.let { text = it.toString() }
+    }
+}
+
+fun intStateSaver(errorFor: (String) -> String) = textFieldStateSaver(IntState(errorFor = errorFor))

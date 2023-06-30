@@ -2,6 +2,7 @@ package com.ammar.havenwalls.ui.common.searchedit
 
 import android.content.Context
 import android.content.res.Configuration
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.clickable
@@ -12,15 +13,17 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Delete
@@ -52,14 +55,18 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.capitalize
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -70,7 +77,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.ammar.havenwalls.COMMON_RESOLUTIONS
 import com.ammar.havenwalls.R
-import com.ammar.havenwalls.extensions.toPx
+import com.ammar.havenwalls.extensions.getScreenResolution
 import com.ammar.havenwalls.model.Category
 import com.ammar.havenwalls.model.Order
 import com.ammar.havenwalls.model.Purity
@@ -81,6 +88,7 @@ import com.ammar.havenwalls.model.Search
 import com.ammar.havenwalls.model.Sorting
 import com.ammar.havenwalls.model.TopRange
 import com.ammar.havenwalls.ui.common.ClearableChip
+import com.ammar.havenwalls.ui.common.drawVerticalScrollbar
 import com.ammar.havenwalls.ui.common.taginput.TagInputField
 import com.ammar.havenwalls.ui.theme.HavenWallsTheme
 
@@ -321,17 +329,45 @@ internal fun OrderFilter(
     }
 }
 
+@Composable
+internal fun MinResolutionFilter(
+    modifier: Modifier = Modifier,
+    resolution: IntSize? = null,
+    onChange: (IntSize?) -> Unit = {},
+    onAddCustomResolutionClick: () -> Unit = {},
+) {
+    Column(modifier = modifier) {
+        Text(
+            text = stringResource(R.string.min_resolution),
+            style = MaterialTheme.typography.labelLarge
+        )
+        if (resolution != null) {
+            ClearableChip(
+                label = { Text(resolution.toString()) },
+                onClear = { onChange(null) }
+            )
+        } else {
+            AddResolutionButton(
+                addedResolutions = emptySet(),
+                onAdd = { onChange(it) },
+                onCustomClick = onAddCustomResolutionClick,
+            )
+        }
+    }
+}
+
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun ResolutionsFilter(
+    modifier: Modifier = Modifier,
     resolutions: Set<IntSize> = emptySet(),
     onChange: (resolutions: Set<IntSize>) -> Unit = {},
     onAddCustomResolutionClick: () -> Unit = {},
 ) {
-    Column {
+    Column(modifier = modifier) {
         Text(
-            text = "Resolutions",
+            text = stringResource(R.string.resolutions),
             style = MaterialTheme.typography.labelLarge
         )
         FlowRow(
@@ -340,7 +376,7 @@ internal fun ResolutionsFilter(
         ) {
             if (resolutions.isEmpty()) {
                 ClearableChip(
-                    label = { Text("Any") },
+                    label = { Text(text = stringResource(R.string.any)) },
                     showClearIcon = false,
                 )
             }
@@ -368,18 +404,15 @@ private fun AddResolutionButton(
     onCustomClick: () -> Unit = {},
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val configuration = LocalConfiguration.current
-    val screenHeight = configuration.screenHeightDp.dp.toPx()
-    val screenWidth = configuration.screenWidthDp.dp.toPx()
-    val localResolution = remember(screenHeight, screenWidth) {
-        IntSize(screenWidth, screenHeight)
-    }
+    val context = LocalContext.current
+    val localResolution = context.getScreenResolution(true)
     val localInCommon = remember(localResolution) { localResolution in COMMON_RESOLUTIONS.values }
+    val scrollState = rememberScrollState()
 
     Box(
         modifier = modifier
-            .fillMaxSize()
-            .wrapContentSize(Alignment.TopStart),
+            .fillMaxWidth()
+            .wrapContentHeight(Alignment.Top),
     ) {
         FilledTonalButton(
             onClick = { expanded = true },
@@ -388,29 +421,47 @@ private fun AddResolutionButton(
             Icon(
                 modifier = Modifier.size(ButtonDefaults.IconSize),
                 imageVector = Icons.Outlined.Add,
-                contentDescription = "Add resolution",
+                contentDescription = stringResource(R.string.add_resolution),
             )
             Spacer(Modifier.size(ButtonDefaults.IconSpacing))
-            Text(text = "Add resolution")
+            Text(text = stringResource(R.string.add_resolution))
         }
         DropdownMenu(
-            modifier = Modifier.heightIn(max = 300.dp),
+            modifier = Modifier
+                .heightIn(max = 300.dp)
+                .drawVerticalScrollbar(
+                    state = scrollState,
+                    initiallyVisible = true,
+                ),
             expanded = expanded,
+            scrollState = scrollState,
             onDismissRequest = { expanded = false },
         ) {
             if (!localInCommon && localResolution !in addedResolutions) {
                 // if local device resolution is not in COMMON_RESOLUTIONS, add an entry
                 DropdownMenuItem(
-                    text = { Text(text = "Current ($localResolution)") },
+                    text = {
+                        Text(
+                            text = stringResource(
+                                R.string.current_resolution,
+                                localResolution.toString(),
+                            ),
+                        )
+                    },
                     onClick = { onAdd(localResolution) },
                 )
+                Divider()
             }
             COMMON_RESOLUTIONS.entries
                 .filter { it.value !in addedResolutions }
                 .map {
-                    // if this resolution is same as local, add Current label
                     val text = "${it.key} ${
-                        if (it.value == localResolution) "(Current)" else ""
+                        // if this resolution is same as local, add Current label
+                        if (it.value == localResolution) {
+                            "(${stringResource(R.string.current)})"
+                        } else {
+                            ""
+                        }
                     } (${it.value})"
 
                     DropdownMenuItem(
@@ -424,7 +475,10 @@ private fun AddResolutionButton(
                 }
             DropdownMenuItem(
                 text = { Text(text = "Custom...") },
-                onClick = onCustomClick,
+                onClick = {
+                    onCustomClick()
+                    expanded = false
+                },
             )
         }
     }
@@ -895,5 +949,137 @@ private fun PreviewSavedSearchesDialog(
             savedSearches = parameters.first,
             showActions = parameters.second,
         )
+    }
+}
+
+@Composable
+fun CustomResolutionDialog(
+    modifier: Modifier = Modifier,
+    resolution: IntSize? = null,
+    onSave: (IntSize) -> Unit = {},
+    onDismissRequest: () -> Unit = {},
+) {
+    val context = LocalContext.current
+
+    fun getValidationError(
+        value: String,
+        @StringRes blankError: Int,
+        @StringRes invalidValueError: Int,
+    ): String {
+        if (value.isBlank()) {
+            return context.getString(blankError)
+        }
+        val intVal = value.toIntOrNull()
+        return if (intVal == null || intVal <= 0) {
+            context.getString(invalidValueError)
+        } else {
+            ""
+        }
+    }
+
+    val widthState by rememberSaveable(stateSaver = intStateSaver {
+        getValidationError(it, R.string.width_cannot_be_blank, R.string.invalid_width)
+    }) { mutableStateOf(IntState(value = resolution?.width)) }
+    val heightState by rememberSaveable(stateSaver = intStateSaver {
+        getValidationError(it, R.string.height_cannot_be_blank, R.string.invalid_height)
+    }) { mutableStateOf(IntState(value = resolution?.height)) }
+    val focusRequester = remember { FocusRequester() }
+
+    LaunchedEffect(Unit) {
+        focusRequester.requestFocus()
+    }
+
+    AlertDialog(
+        modifier = modifier,
+        title = { Text(text = stringResource(R.string.custom_resolution)) },
+        text = {
+            val focusManager = LocalFocusManager.current
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                OutlinedTextField(
+                    modifier = Modifier
+                        .weight(1f)
+                        .focusRequester(focusRequester)
+                        .onFocusChanged { focusState ->
+                            widthState.onFocusChange(focusState.isFocused)
+                            if (!focusState.isFocused) {
+                                widthState.enableShowErrors()
+                            }
+                        },
+                    keyboardOptions = KeyboardOptions(
+                        autoCorrect = false,
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Next,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onNext = { focusManager.moveFocus(FocusDirection.Next) },
+                    ),
+                    label = { Text(text = stringResource(R.string.width)) },
+                    value = widthState.text,
+                    onValueChange = {
+                        widthState.text = it
+                        widthState.enableShowErrors()
+                    },
+                )
+                Text(
+                    modifier = Modifier.padding(horizontal = 4.dp),
+                    text = "x",
+                    fontWeight = FontWeight.Bold,
+                )
+                OutlinedTextField(
+                    modifier = Modifier
+                        .weight(1f)
+                        .onFocusChanged { focusState ->
+                            heightState.onFocusChange(focusState.isFocused)
+                            if (!focusState.isFocused) {
+                                heightState.enableShowErrors()
+                            }
+                        },
+                    keyboardOptions = KeyboardOptions(
+                        autoCorrect = false,
+                        keyboardType = KeyboardType.Number,
+                        imeAction = ImeAction.Done,
+                    ),
+                    keyboardActions = KeyboardActions(
+                        onDone = {
+                            if (!widthState.isValid || !heightState.isValid) {
+                                return@KeyboardActions
+                            }
+                            onSave(IntSize(widthState.text.toInt(), heightState.text.toInt()))
+                        },
+                    ),
+                    label = { Text(text = stringResource(R.string.height)) },
+                    value = heightState.text,
+                    onValueChange = {
+                        heightState.text = it
+                        heightState.enableShowErrors()
+                    },
+                )
+            }
+        },
+        confirmButton = {
+            TextButton(
+                enabled = widthState.isValid && heightState.isValid,
+                onClick = { onSave(IntSize(widthState.text.toInt(), heightState.text.toInt())) },
+            ) {
+                Text(text = stringResource(R.string.save))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismissRequest) {
+                Text(text = stringResource(R.string.cancel))
+            }
+        },
+        onDismissRequest = onDismissRequest,
+    )
+}
+
+@Preview(showSystemUi = true)
+@Preview(showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun PreviewCustomResolutionDialog() {
+    HavenWallsTheme {
+        CustomResolutionDialog()
     }
 }

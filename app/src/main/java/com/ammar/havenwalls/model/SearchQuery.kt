@@ -8,6 +8,7 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntSize
 import androidx.core.graphics.toColorInt
+import com.ammar.havenwalls.data.db.converters.Converters.fromIntSizeStr
 import com.ammar.havenwalls.extensions.quoteIfSpaced
 import com.ammar.havenwalls.extensions.toHexString
 import com.ammar.havenwalls.extensions.toQueryString
@@ -145,16 +146,12 @@ data class SearchQuery(
                         if (it.isBlank()) {
                             return@let null
                         }
-                        val parts = it.split("x")
-                        IntSize(parts[0].toInt(), parts[1].toInt())
+                        fromIntSizeStr(it)
                     },
                 resolutions = map["resolutions"]
                     ?.split(",")
                     ?.filter { it.isNotBlank() }
-                    ?.map {
-                        val parts = it.split("x")
-                        IntSize(parts[0].toInt(), parts[1].toInt())
-                    }
+                    ?.map { fromIntSizeStr(it) }
                     ?.toSet()
                     ?: emptySet(),
                 ratios = map["ratios"]
@@ -169,8 +166,7 @@ data class SearchQuery(
                                 Ratio.fromCategory(CategoryRatio.Category.PORTRAIT)
                             }
                             else -> {
-                                val parts = it.split("x")
-                                Ratio.fromSize(IntSize(parts[0].toInt(), parts[1].toInt()))
+                                Ratio.fromSize(fromIntSizeStr(it))
                             }
                         }
                     }

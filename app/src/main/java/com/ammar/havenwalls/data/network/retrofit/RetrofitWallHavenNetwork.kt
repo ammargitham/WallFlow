@@ -19,10 +19,10 @@ class RetrofitWallHavenNetwork constructor(
             sorting = sorting.value,
             order = order.value,
             topRange = topRange.value,
-            atleast = atleast?.toString(),
-            resolutions = resolutions.joinToString(","),
+            atleast = atleast?.toString()?.replace(" ", ""),
+            resolutions = resolutions.joinToString(",") { "${it.width}x${it.height}" },
             colors = colors?.toHexString()?.removePrefix("#"),
-            ratios = ratios.joinToString(",") { it.toRatioString() },
+            ratios = ratios.joinToString(",") { it.toRatioString().replace(" ", "") },
             page = page,
             seed = seed,
         )

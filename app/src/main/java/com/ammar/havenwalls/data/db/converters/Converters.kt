@@ -5,6 +5,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.core.graphics.toColorInt
 import androidx.room.TypeConverter
 import com.ammar.havenwalls.extensions.toHexString
+import com.ammar.havenwalls.extensions.trimAll
 import com.ammar.havenwalls.model.Category
 import com.ammar.havenwalls.model.Order
 import com.ammar.havenwalls.model.Purity
@@ -84,7 +85,10 @@ object Converters {
 
     @TypeConverter
     fun fromIntSizeStr(value: String): IntSize {
-        val parts = value.split("x")
+        val parts = value
+            .split("x")
+            .map { s -> s.trimAll() }
+            .filter { s -> s.isNotBlank() }
         return IntSize(parts[0].toInt(), parts[1].toInt())
     }
 
