@@ -348,7 +348,6 @@ class SettingsViewModel @Inject constructor(
                 application,
                 AutoWallpaperWorker.IMMEDIATE_WORK_NAME,
             ).collectLatest { status ->
-                Log.d(TAG, "autoWallpaperChangeNow: $status")
                 localUiStateFlow.update { it.copy(autoWallpaperStatus = partial(status)) }
                 if (status.isSuccessOrFail()) {
                     // clear status after success or failure
