@@ -56,6 +56,7 @@ import dagger.assisted.AssistedInject
 import java.io.File
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimePeriod
 import okhttp3.OkHttpClient
@@ -341,7 +342,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
         const val SUCCESS_NEXT_WALLPAPER_ID = "success_wallpaper_id"
         const val NOTIFICATION_ID = 123
         const val SUCCESS_NOTIFICATION_ID = 234
-        private const val IMMEDIATE_WORK_NAME = "auto_wallpaper_immediate"
+        internal const val IMMEDIATE_WORK_NAME = "auto_wallpaper_immediate"
         internal const val PERIODIC_WORK_NAME = "auto_wallpaper_periodic"
 
         enum class FailureReason {
@@ -406,6 +407,36 @@ class AutoWallpaperWorker @AssistedInject constructor(
                 Log.e(TAG, "checkScheduled: ", e)
             }
             return running
+        }
+
+        fun getProgress(
+            context: Context,
+            workName: String,
+        ) = context.workManager.getWorkInfosForUniqueWorkFlow(workName).map {
+            val info = it.firstOrNull() ?: return@map Status.Failed(
+                IllegalArgumentException("No download request found with name $workName")
+            )
+            when (info.state) {
+                WorkInfo.State.ENQUEUED -> Status.Pending
+                WorkInfo.State.RUNNING -> Status.Running
+                WorkInfo.State.SUCCEEDED -> Status.Success
+                WorkInfo.State.FAILED -> Status.Failed(
+                    AutoWallpaperException(info.outputData.getString(FAILURE_REASON))
+                )
+                WorkInfo.State.BLOCKED -> Status.Pending
+                WorkInfo.State.CANCELLED -> Status.Failed(AutoWallpaperException("Work cancelled"))
+            }
+        }
+
+        class AutoWallpaperException(message: String? = null) : Exception(message ?: "")
+
+        sealed class Status {
+            object Running : Status()
+            object Pending : Status()
+            object Success : Status()
+            data class Failed(val e: Throwable? = null) : Status()
+
+            fun isSuccessOrFail() = this is Success || this is Failed
         }
     }
 }

@@ -30,6 +30,7 @@ import com.github.materiiapps.partial.partial
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.File
 import javax.inject.Inject
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.collectLatest
@@ -342,6 +343,20 @@ class SettingsViewModel @Inject constructor(
 
     fun autoWallpaperChangeNow() {
         AutoWallpaperWorker.triggerImmediate(application)
+        viewModelScope.launch {
+            AutoWallpaperWorker.getProgress(
+                application,
+                AutoWallpaperWorker.IMMEDIATE_WORK_NAME,
+            ).collectLatest { status ->
+                Log.d(TAG, "autoWallpaperChangeNow: $status")
+                localUiStateFlow.update { it.copy(autoWallpaperStatus = partial(status)) }
+                if (status.isSuccessOrFail()) {
+                    // clear status after success or failure
+                    delay(2000)
+                    localUiStateFlow.update { it.copy(autoWallpaperStatus = partial(null)) }
+                }
+            }
+        }
     }
 
     fun showAutoWallpaperNextRunInfoDialog(show: Boolean) = localUiStateFlow.update {
@@ -385,6 +400,7 @@ data class SettingsUiState(
     val tempAutoWallpaperPreferences: AutoWallpaperPreferences? = null,
     val autoWallpaperNextRun: NextRun = NextRun.NotScheduled,
     val showAutoWallpaperNextRunInfoDialog: Boolean = false,
+    val autoWallpaperStatus: AutoWallpaperWorker.Companion.Status? = null,
 )
 
 sealed class NextRun {

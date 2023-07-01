@@ -2,6 +2,9 @@ package com.ammar.havenwalls.ui.settings.composables
 
 import android.content.res.Configuration
 import android.text.format.DateFormat
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateValueAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,11 +14,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -27,10 +32,17 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -38,9 +50,14 @@ import com.ammar.havenwalls.DISABLED_ALPHA
 import com.ammar.havenwalls.R
 import com.ammar.havenwalls.data.preferences.defaultAutoWallpaperFreq
 import com.ammar.havenwalls.model.ObjectDetectionModel
+import com.ammar.havenwalls.ui.common.ProgressIndicator
+import com.ammar.havenwalls.ui.common.getPaddingValuesConverter
 import com.ammar.havenwalls.ui.settings.NextRun
 import com.ammar.havenwalls.ui.theme.HavenWallsTheme
+import com.ammar.havenwalls.workers.AutoWallpaperWorker
 import java.util.Locale
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.datetime.DateTimePeriod
 import org.tensorflow.lite.task.core.ComputeSettings.Delegate
 
@@ -296,6 +313,7 @@ internal fun LazyListScope.autoWallpaperSection(
     frequency: DateTimePeriod = defaultAutoWallpaperFreq,
     nextRun: NextRun = NextRun.NotScheduled,
     showNotification: Boolean = false,
+    autoWallpaperStatus: AutoWallpaperWorker.Companion.Status? = null,
     onEnabledChange: (Boolean) -> Unit = {},
     onSavedSearchClick: () -> Unit = {},
     onFrequencyClick: () -> Unit = {},
@@ -483,12 +501,11 @@ internal fun LazyListScope.autoWallpaperSection(
         Box(
             modifier = Modifier.padding(horizontal = 16.dp),
         ) {
-            OutlinedButton(
+            ChangeNowButton(
+                autoWallpaperStatus = autoWallpaperStatus,
                 enabled = enabled,
-                onClick = onChangeNowClick,
-            ) {
-                Text(text = stringResource(R.string.change_now))
-            }
+                onChangeNowClick = onChangeNowClick
+            )
         }
     }
 }
@@ -515,6 +532,82 @@ private fun PreviewAutoWallpaperSectionEnabled() {
             LazyColumn {
                 autoWallpaperSection(
                     enabled = true,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun ChangeNowButton(
+    autoWallpaperStatus: AutoWallpaperWorker.Companion.Status? = null,
+    enabled: Boolean = true,
+    onChangeNowClick: () -> Unit = {},
+) {
+    val layoutDirection = LocalLayoutDirection.current
+    val changing = autoWallpaperStatus?.isSuccessOrFail() == false
+    val contentPadding by animateValueAsState(
+        targetValue = if (changing) {
+            ButtonDefaults.ButtonWithIconContentPadding
+        } else {
+            ButtonDefaults.ContentPadding
+        },
+        typeConverter = getPaddingValuesConverter(layoutDirection),
+        animationSpec = remember { tween(delayMillis = 200) },
+    )
+    OutlinedButton(
+        enabled = if (!enabled) {
+            false
+        } else {
+            !changing
+        },
+        contentPadding = contentPadding,
+        onClick = onChangeNowClick,
+    ) {
+        AnimatedVisibility(visible = changing) {
+            Row(Modifier.clearAndSetSemantics {}) {
+                ProgressIndicator(
+                    modifier = Modifier.size(ButtonDefaults.IconSize),
+                )
+                Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+            }
+        }
+        Text(text = stringResource(R.string.change_now))
+    }
+}
+
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun PreviewChangeNowButton() {
+    HavenWallsTheme {
+        Surface {
+            val coroutineScope = rememberCoroutineScope()
+            var status: AutoWallpaperWorker.Companion.Status? by remember {
+                mutableStateOf(null)
+            }
+            Column {
+                ChangeNowButton(
+                    autoWallpaperStatus = status,
+                    onChangeNowClick = {
+                        status = AutoWallpaperWorker.Companion.Status.Pending
+                        coroutineScope.launch {
+                            delay(5000)
+                            status = null
+                        }
+                    }
+                )
+                ChangeNowButton(
+                    autoWallpaperStatus = AutoWallpaperWorker.Companion.Status.Pending,
+                )
+                ChangeNowButton(
+                    autoWallpaperStatus = AutoWallpaperWorker.Companion.Status.Running,
+                )
+                ChangeNowButton(
+                    autoWallpaperStatus = AutoWallpaperWorker.Companion.Status.Success,
+                )
+                ChangeNowButton(
+                    autoWallpaperStatus = AutoWallpaperWorker.Companion.Status.Failed(),
                 )
             }
         }

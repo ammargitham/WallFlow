@@ -4,12 +4,18 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.res.Configuration
 import android.os.Build
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -21,10 +27,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ammar.havenwalls.R
@@ -66,8 +74,10 @@ import com.ammar.havenwalls.ui.settings.composables.dividerItem
 import com.ammar.havenwalls.ui.settings.composables.generalSection
 import com.ammar.havenwalls.ui.settings.composables.objectDetectionSection
 import com.ammar.havenwalls.ui.theme.HavenWallsTheme
+import com.ammar.havenwalls.workers.AutoWallpaperWorker
 import com.google.modernstorage.permissions.StoragePermissions
 import com.ramcosta.composedestinations.annotation.Destination
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -144,6 +154,7 @@ fun SettingsScreen(
             hasSetWallpaperPermission = context.checkSetWallpaperPermission(),
             autoWallpaperNextRun = uiState.autoWallpaperNextRun,
             autoWallpaperSavedSearch = uiState.autoWallpaperSavedSearch,
+            autoWallpaperStatus = uiState.autoWallpaperStatus,
             onBlurSketchyCheckChange = viewModel::setBlurSketchy,
             onBlurNsfwCheckChange = viewModel::setBlurNsfw,
             onWallhavenApiKeyItemClick = {
@@ -346,6 +357,7 @@ fun SettingsScreenContent(
     autoWallpaperSavedSearch: SavedSearch? = null,
     hasSetWallpaperPermission: Boolean = true,
     autoWallpaperNextRun: NextRun = NextRun.NotScheduled,
+    autoWallpaperStatus: AutoWallpaperWorker.Companion.Status? = null,
     onBlurSketchyCheckChange: (checked: Boolean) -> Unit = {},
     onBlurNsfwCheckChange: (checked: Boolean) -> Unit = {},
     onWallhavenApiKeyItemClick: () -> Unit = {},
@@ -360,69 +372,90 @@ fun SettingsScreenContent(
     onAutoWallpaperChangeNowClick: () -> Unit = {},
     onAutoWallpaperNextRunInfoClick: () -> Unit = {},
 ) {
-    LazyColumn(
-        modifier = modifier.fillMaxWidth()
-    ) {
-        accountSection(onWallhavenApiKeyItemClick = onWallhavenApiKeyItemClick)
-        dividerItem()
-        generalSection(
-            blurSketchy = appPreferences.blurSketchy,
-            blurNsfw = appPreferences.blurNsfw,
-            onBlurSketchyCheckChange = onBlurSketchyCheckChange,
-            onBlurNsfwCheckChange = onBlurNsfwCheckChange,
-            onManageSavedSearchesClick = onManageSavedSearchesClick,
-        )
-        dividerItem()
-        objectDetectionSection(
-            enabled = appPreferences.objectDetectionPreferences.enabled,
-            delegate = appPreferences.objectDetectionPreferences.delegate,
-            model = model,
-            onEnabledChange = {
-                onObjectDetectionPrefsChange(
-                    appPreferences.objectDetectionPreferences.copy(enabled = it)
-                )
-            },
-            onDelegateClick = onObjectDetectionDelegateClick,
-            onModelClick = onObjectDetectionModelClick,
-        )
-        dividerItem()
-        if (hasSetWallpaperPermission) {
-            autoWallpaperSection(
-                enabled = appPreferences.autoWallpaperPreferences.enabled,
-                savedSearchName = autoWallpaperSavedSearch?.name,
-                useObjectDetection = appPreferences.autoWallpaperPreferences.useObjectDetection,
-                nextRun = autoWallpaperNextRun,
-                frequency = appPreferences.autoWallpaperPreferences.frequency,
-                showNotification = appPreferences.autoWallpaperPreferences.showNotification,
-                onEnabledChange = {
-                    onAutoWallpaperPresChange(
-                        appPreferences.autoWallpaperPreferences.copy(
-                            enabled = it,
-                        )
-                    )
-                },
-                onSavedSearchClick = onAutoWallpaperSavedSearchClick,
-                onFrequencyClick = onAutoWallpaperFrequencyClick,
-                onUseObjectDetectionChange = {
-                    onAutoWallpaperPresChange(
-                        appPreferences.autoWallpaperPreferences.copy(
-                            useObjectDetection = it,
-                        )
-                    )
-                },
-                onConstraintsClick = onAutoWallpaperConstraintsClick,
-                onChangeNowClick = onAutoWallpaperChangeNowClick,
-                onNextRunInfoClick = onAutoWallpaperNextRunInfoClick,
-                onShowNotificationChange = {
-                    onAutoWallpaperPresChange(
-                        appPreferences.autoWallpaperPreferences.copy(
-                            showNotification = it,
-                        )
-                    )
-                },
+    Box {
+        LazyColumn(
+            modifier = modifier.fillMaxWidth()
+        ) {
+            accountSection(onWallhavenApiKeyItemClick = onWallhavenApiKeyItemClick)
+            dividerItem()
+            generalSection(
+                blurSketchy = appPreferences.blurSketchy,
+                blurNsfw = appPreferences.blurNsfw,
+                onBlurSketchyCheckChange = onBlurSketchyCheckChange,
+                onBlurNsfwCheckChange = onBlurNsfwCheckChange,
+                onManageSavedSearchesClick = onManageSavedSearchesClick,
             )
+            dividerItem()
+            objectDetectionSection(
+                enabled = appPreferences.objectDetectionPreferences.enabled,
+                delegate = appPreferences.objectDetectionPreferences.delegate,
+                model = model,
+                onEnabledChange = {
+                    onObjectDetectionPrefsChange(
+                        appPreferences.objectDetectionPreferences.copy(enabled = it)
+                    )
+                },
+                onDelegateClick = onObjectDetectionDelegateClick,
+                onModelClick = onObjectDetectionModelClick,
+            )
+            dividerItem()
+            if (hasSetWallpaperPermission) {
+                autoWallpaperSection(
+                    enabled = appPreferences.autoWallpaperPreferences.enabled,
+                    savedSearchName = autoWallpaperSavedSearch?.name,
+                    useObjectDetection = appPreferences.autoWallpaperPreferences.useObjectDetection,
+                    nextRun = autoWallpaperNextRun,
+                    frequency = appPreferences.autoWallpaperPreferences.frequency,
+                    showNotification = appPreferences.autoWallpaperPreferences.showNotification,
+                    autoWallpaperStatus = autoWallpaperStatus,
+                    onEnabledChange = {
+                        onAutoWallpaperPresChange(
+                            appPreferences.autoWallpaperPreferences.copy(
+                                enabled = it,
+                            )
+                        )
+                    },
+                    onSavedSearchClick = onAutoWallpaperSavedSearchClick,
+                    onFrequencyClick = onAutoWallpaperFrequencyClick,
+                    onUseObjectDetectionChange = {
+                        onAutoWallpaperPresChange(
+                            appPreferences.autoWallpaperPreferences.copy(
+                                useObjectDetection = it,
+                            )
+                        )
+                    },
+                    onConstraintsClick = onAutoWallpaperConstraintsClick,
+                    onChangeNowClick = onAutoWallpaperChangeNowClick,
+                    onNextRunInfoClick = onAutoWallpaperNextRunInfoClick,
+                    onShowNotificationChange = {
+                        onAutoWallpaperPresChange(
+                            appPreferences.autoWallpaperPreferences.copy(
+                                showNotification = it,
+                            )
+                        )
+                    },
+                )
+            }
+        }
+
+        AnimatedVisibility(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            visible = autoWallpaperStatus?.isSuccessOrFail() == true,
+            enter = slideInVertically(
+                initialOffsetY = { x -> x },
+            ),
+            exit = slideOutVertically(
+                targetOffsetY = { x -> x },
+            ),
+        ) {
+            Snackbar(
+                modifier = Modifier.padding(16.dp),
+            ) {
+                Text(text = stringResource(R.string.wallpaper_changed))
+            }
         }
     }
+
 }
 
 @Preview
@@ -431,7 +464,25 @@ fun SettingsScreenContent(
 private fun PreviewSettingsScreenContent() {
     HavenWallsTheme {
         Surface {
-            SettingsScreenContent()
+            val coroutineScope = rememberCoroutineScope()
+            var autoWallpaperStatus: AutoWallpaperWorker.Companion.Status? by remember {
+                mutableStateOf(null)
+            }
+            SettingsScreenContent(
+                appPreferences = AppPreferences(
+                    autoWallpaperPreferences = AutoWallpaperPreferences(
+                        enabled = true,
+                    ),
+                ),
+                autoWallpaperStatus = autoWallpaperStatus,
+                onAutoWallpaperChangeNowClick = {
+                    autoWallpaperStatus = AutoWallpaperWorker.Companion.Status.Success
+                    coroutineScope.launch {
+                        delay(5000)
+                        autoWallpaperStatus = null
+                    }
+                }
+            )
         }
     }
 }
