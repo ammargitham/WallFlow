@@ -3,6 +3,8 @@ package com.ammar.havenwalls.extensions
 import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.layout
@@ -48,3 +50,12 @@ fun Modifier.ignoreVerticalParentPadding(vertical: Dp, oneSide: Boolean = false)
 
 val IntSize.aspectRatio
     get() = if (height != 0) width.toFloat() / height else 0F
+
+fun Rect.constrainOffset(bounds: Rect): Rect {
+    var (x, y) = topLeft
+    if (right > bounds.right) x += bounds.right - right
+    if (bottom > bounds.bottom) y += bounds.bottom - bottom
+    if (x < bounds.left) x += bounds.left - x
+    if (y < bounds.top) y += bounds.top - y
+    return Rect(Offset(x, y), size)
+}

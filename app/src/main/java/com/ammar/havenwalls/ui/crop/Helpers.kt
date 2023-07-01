@@ -5,9 +5,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.center
+import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.unit.IntSize
 import androidx.core.graphics.times
 import com.ammar.havenwalls.extensions.aspectRatio
+import com.ammar.havenwalls.extensions.constrainOffset
 
 fun getMaxCropSize(
     screenResolution: IntSize,
@@ -45,9 +47,9 @@ fun getCropRect(
         imageSize.center
     }
     val left = (center.x - (maxCropSize.width / 2)).coerceAtLeast(0f)
-    val top = (center.y - (maxCropSize.height / 2)).coerceAtLeast(0f)
+    val top = 0f
     return Rect(
         offset = Offset(left, top),
         size = maxCropSize,
-    )
+    ).constrainOffset(imageSize.toRect())
 }

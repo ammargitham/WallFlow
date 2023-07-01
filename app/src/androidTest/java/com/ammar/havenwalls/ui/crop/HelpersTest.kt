@@ -30,14 +30,14 @@ class HelpersTest {
 
     @Test
     fun shouldCalculateCorrectCropRectAroundDetection() {
-        val deviceSize = IntSize(500, 1000)
-        val imageSize = IntSize(1280, 768)
+        val deviceSize = IntSize(1080, 2340)
+        val imageSize = IntSize(2047, 1335)
         val maxCropSize = getMaxCropSize(
             screenResolution = deviceSize,
             imageSize = imageSize.toSize(),
         )
-        val detectionScale = 2
-        val detectionRect = RectF(110f, 340f, 210f, 368f) * (1 / detectionScale)
+        val detectionScale = 1
+        val detectionRect = RectF(1746f, 978f, 2040f, 1292f) * (1 / detectionScale)
         val cropRect = getCropRect(
             maxCropSize = maxCropSize,
             imageSize = imageSize.toSize(),
@@ -45,9 +45,10 @@ class HelpersTest {
             detectionRect = detectionRect,
             detectedRectScale = detectionScale,
         )
-        assertEquals(
-            Rect(0f, 0f, 384f, 768f),
-            cropRect,
-        )
+        val expected = Rect(1430.8462f, 0f, 2047f, 1335f)
+        assertEquals(expected.left, cropRect.left)
+        assertEquals(expected.right, cropRect.right)
+        assertEquals(expected.top, cropRect.top)
+        assertEquals(expected.bottom, cropRect.bottom)
     }
 }
