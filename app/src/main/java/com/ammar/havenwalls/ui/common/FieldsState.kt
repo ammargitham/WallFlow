@@ -1,11 +1,10 @@
-package com.ammar.havenwalls.ui.common.searchedit
+package com.ammar.havenwalls.ui.common
 
 import android.content.Context
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
+import androidx.core.util.PatternsCompat
 import com.ammar.havenwalls.R
-import com.ammar.havenwalls.ui.common.TextFieldState
-import com.ammar.havenwalls.ui.common.textFieldStateSaver
 
 class NameState(
     val context: Context,
@@ -26,6 +25,25 @@ class NameState(
 }
 
 fun nameStateSaver(context: Context) = textFieldStateSaver(NameState(context))
+
+class UrlState(
+    val context: Context,
+    val url: String? = null,
+) :
+    TextFieldState(
+        validator = { it.isNotBlank() && PatternsCompat.WEB_URL.matcher(it).matches() },
+        errorFor = {
+            context.getString(
+                if (it.isBlank()) R.string.url_cannot_be_empty else R.string.invalid_url
+            )
+        }
+    ) {
+    init {
+        url?.let { text = it }
+    }
+}
+
+fun urlStateSaver(context: Context) = textFieldStateSaver(UrlState(context))
 
 class IntState(
     val value: Int? = null,

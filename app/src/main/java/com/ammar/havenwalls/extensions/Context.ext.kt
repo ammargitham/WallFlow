@@ -27,6 +27,7 @@ import androidx.core.hardware.display.DisplayManagerCompat
 import androidx.core.net.toUri
 import androidx.work.WorkManager
 import com.ammar.havenwalls.FILE_PROVIDER_AUTHORITY
+import com.ammar.havenwalls.R
 import com.ammar.havenwalls.model.WallpaperTarget
 import com.ammar.havenwalls.model.toWhichInt
 import com.ammar.havenwalls.ui.common.permissions.checkSetWallpaperPermission
@@ -47,7 +48,7 @@ fun Context.openUrl(url: String) {
     try {
         startActivity(intent)
     } catch (e: ActivityNotFoundException) {
-        toast("No Browser found!")
+        toast(getString(R.string.no_browser_found))
     } catch (e: Exception) {
         Log.e(TAG, "openUrl", e)
     }

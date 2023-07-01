@@ -27,7 +27,7 @@ fun DownloadPermissionsRationalDialog(
                 when (it) {
                     Manifest.permission.POST_NOTIFICATIONS -> stringResource(R.string.notification_permission_rationale)
                     Manifest.permission.WRITE_EXTERNAL_STORAGE -> stringResource(R.string.write_storage_permission_rationale)
-                    else -> "$it is required"
+                    else -> stringResource(R.string.permission_is_required, it)
                 }
             }.filter { it.isNotBlank() }
             Text(text = rationales.joinToString("\n\n"))

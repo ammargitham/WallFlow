@@ -119,7 +119,11 @@ fun CropScreen(
     LaunchedEffect(uiState.detectedObjects) {
         if (uiState.detectedObjects !is Resource.Error) return@LaunchedEffect
         val e = (uiState.detectedObjects as Resource.Error).throwable
-        context.toast(e.localizedMessage ?: e.message ?: "Error detecting objects.")
+        context.toast(
+            e.localizedMessage
+                ?: e.message
+                ?: context.getString(R.string.error_detecting_objects)
+        )
     }
 
     LaunchedEffect(
@@ -186,7 +190,7 @@ fun CropScreen(
                 Image(
                     modifier = Modifier.fillMaxSize(),
                     bitmap = (uiState.result as Result.Pending).bitmap,
-                    contentDescription = "Cropped Image",
+                    contentDescription = stringResource(R.string.cropped_image),
                     contentScale = ContentScale.Fit,
                 )
             }

@@ -18,10 +18,12 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ammar.havenwalls.R
 import com.ammar.havenwalls.extensions.capitalise
 import com.ammar.havenwalls.model.Tag
 import com.ammar.havenwalls.model.Wallpaper
@@ -103,7 +105,7 @@ fun WallpaperInfoBottomSheetContent(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             if (wallpaper.source.isNotBlank()) {
-                PropertyRow(title = "Source") {
+                PropertyRow(title = stringResource(R.string.source)) {
                     Box(
                         modifier = Modifier
                             .alignByBaseline()
@@ -126,7 +128,7 @@ fun WallpaperInfoBottomSheetContent(
                     onClick = onUploaderClick,
                 )
             }
-            PropertyRow(title = "Category") {
+            PropertyRow(title = stringResource(R.string.category)) {
                 Box(
                     modifier = Modifier
                         .alignByBaseline()
@@ -138,19 +140,19 @@ fun WallpaperInfoBottomSheetContent(
                 }
             }
             PropertyRow(
-                title = "Resolution",
+                title = stringResource(R.string.resolution),
                 text = wallpaper.resolution.toString(),
             )
             PropertyRow(
-                title = "Size",
+                title = stringResource(R.string.size),
                 text = Formatter.formatShortFileSize(context, wallpaper.fileSize),
             )
             PropertyRow(
-                title = "Views",
+                title = stringResource(R.string.views),
                 text = wallpaper.views.toString()
             )
             PropertyRow(
-                title = "Favorites",
+                title = stringResource(R.string.favorites),
                 text = wallpaper.favorites.toString()
             )
         }

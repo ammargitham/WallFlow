@@ -128,7 +128,10 @@ class CropViewModel(
             url = objectDetectionModel.url,
             downloadLocation = DownloadLocation.APP_ML_MODELS,
             notificationType = NotificationType.VISIBLE,
-            notificationTitle = "ML model: ${objectDetectionModel.name}",
+            notificationTitle = application.getString(
+                R.string.model_download_title,
+                objectDetectionModel.name,
+            ),
             inferFileNameFromResponse = true,
         )
         viewModelScope.launch {

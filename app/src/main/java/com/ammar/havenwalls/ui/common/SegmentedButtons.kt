@@ -25,9 +25,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ammar.havenwalls.R
 import com.ammar.havenwalls.ui.theme.HavenWallsTheme
 
 @Composable
@@ -154,7 +156,7 @@ fun <T> SegmentedButtons(
                         Icon(
                             modifier = Modifier.size(18.dp),
                             imageVector = Icons.Outlined.Check,
-                            contentDescription = "Selected"
+                            contentDescription = stringResource(R.string.selected)
                         )
                         Spacer(modifier = Modifier.requiredWidth(4.dp))
                     }

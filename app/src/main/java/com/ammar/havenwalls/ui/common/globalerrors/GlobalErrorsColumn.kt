@@ -5,6 +5,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.ammar.havenwalls.R
 import com.ammar.havenwalls.data.repository.GlobalErrorsRepository.GlobalError
 import com.ammar.havenwalls.data.repository.GlobalErrorsRepository.WallHavenRateLimitError
 import com.ammar.havenwalls.data.repository.GlobalErrorsRepository.WallHavenUnauthorisedError
@@ -20,12 +22,12 @@ fun GlobalErrorsColumn(
     LazyColumn(modifier = modifier) {
         items(globalErrors) {
             val errorMsg = when (it) {
-                is WallHavenUnauthorisedError -> "Invalid API key provided."
-                is WallHavenRateLimitError -> "Rate limited. Please try again after some time."
-                else -> "Error"
+                is WallHavenUnauthorisedError -> stringResource(R.string.invalid_api_key_provided)
+                is WallHavenRateLimitError -> stringResource(R.string.rate_limited_please_try_again_after_some_time)
+                else -> stringResource(R.string.error)
             }
             val actionText = when (it) {
-                is WallHavenUnauthorisedError -> "Fix"
+                is WallHavenUnauthorisedError -> stringResource(R.string.fix)
                 else -> null
             }
             val onActionClick = when (it) {

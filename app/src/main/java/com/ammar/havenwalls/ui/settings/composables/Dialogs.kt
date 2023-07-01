@@ -46,6 +46,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -68,13 +69,13 @@ import com.ammar.havenwalls.extensions.trimAll
 import com.ammar.havenwalls.model.ConstraintType
 import com.ammar.havenwalls.model.SavedSearch
 import com.ammar.havenwalls.model.Search
+import com.ammar.havenwalls.ui.common.NameState
 import com.ammar.havenwalls.ui.common.ProgressIndicator
 import com.ammar.havenwalls.ui.common.TextFieldState
 import com.ammar.havenwalls.ui.common.UnpaddedAlertDialogContent
-import com.ammar.havenwalls.ui.settings.NameState
-import com.ammar.havenwalls.ui.settings.NameStateSaver
-import com.ammar.havenwalls.ui.settings.UrlState
-import com.ammar.havenwalls.ui.settings.UrlStateSaver
+import com.ammar.havenwalls.ui.common.UrlState
+import com.ammar.havenwalls.ui.common.nameStateSaver
+import com.ammar.havenwalls.ui.common.urlStateSaver
 import com.ammar.havenwalls.ui.theme.HavenWallsTheme
 import com.ammar.havenwalls.utils.DownloadStatus
 import kotlinx.datetime.DateTimePeriod
@@ -97,7 +98,7 @@ fun ObjectDetectionDelegateOptionsDialog(
         onDismissRequest = onDismissRequest,
     ) {
         UnpaddedAlertDialogContent(
-            title = { Text(text = "Choose delegate for TFLite") },
+            title = { Text(text = stringResource(R.string.choose_delegate_for_tflite)) },
             text = {
                 ObjectDetectionDelegateOptionsContent(
                     selectedDelegate = localSelectedDelegate,
@@ -191,7 +192,7 @@ fun ObjectDetectionModelOptionsDialog(
                         contentDescription = ""
                     )
                 },
-                title = { Text(text = "Choose a TFLite model") },
+                title = { Text(text = stringResource(R.string.choose_a_tflite_model)) },
                 text = {
                     ObjectDetectionModelOptionsContent(
                         models = models,
@@ -272,7 +273,7 @@ private fun ObjectDetectionModelOptionsContent(
                             Icon(
                                 modifier = Modifier.size(24.dp),
                                 imageVector = Icons.Default.Edit,
-                                contentDescription = "Edit",
+                                contentDescription = stringResource(R.string.edit),
                             )
                         }
                     }
@@ -292,7 +293,7 @@ private fun ObjectDetectionModelOptionsContent(
                 Icon(
                     modifier = Modifier.size(24.dp),
                     imageVector = Icons.Default.Add,
-                    contentDescription = "Add"
+                    contentDescription = stringResource(R.string.add),
                 )
             },
         )
@@ -315,11 +316,12 @@ fun ObjectDetectionModelEditDialog(
 ) {
     val nameExists = remember { mutableStateOf(false) } // do not change to `by`
     var saving by rememberSaveable { mutableStateOf(false) }
-    val nameState by rememberSaveable(stateSaver = NameStateSaver) {
-        mutableStateOf(NameState(model?.name ?: "", nameExists))
+    val context = LocalContext.current
+    val nameState by rememberSaveable(stateSaver = nameStateSaver(context)) {
+        mutableStateOf(NameState(context, model?.name ?: "", nameExists))
     }
-    val urlState by rememberSaveable(stateSaver = UrlStateSaver) {
-        mutableStateOf(UrlState(model?.url ?: ""))
+    val urlState by rememberSaveable(stateSaver = urlStateSaver(context)) {
+        mutableStateOf(UrlState(context, model?.url ?: ""))
     }
 
     LaunchedEffect(nameState.text) {
@@ -334,7 +336,9 @@ fun ObjectDetectionModelEditDialog(
             UnpaddedAlertDialogContent(
                 title = {
                     Text(
-                        text = if (model == null) "Add a TFLite model" else "Edit model",
+                        text = stringResource(
+                            if (model == null) R.string.add_a_tflite_model else R.string.edit_model
+                        )
                     )
                 },
                 text = {
@@ -454,7 +458,7 @@ fun ObjectDetectionModelEditContent(
                 nameState.enableShowErrors()
             },
             singleLine = true,
-            label = { Text(text = "Name") },
+            label = { Text(text = stringResource(R.string.name)) },
             isError = nameState.showErrors(),
             supportingText = { Text(text = nameState.getError() ?: "") }
         )
@@ -524,8 +528,8 @@ fun ObjectDetectionModelDeleteConfirmDialog(
 ) {
     AlertDialog(
         modifier = modifier,
-        title = { Text(text = "Delete model '${model.name}'?") },
-        text = { Text(text = "Downloaded model will by permanently removed from local storage.") },
+        title = { Text(text = stringResource(R.string.delete_model_dialog_title, model.name)) },
+        text = { Text(text = stringResource(R.string.delete_model_dialog_text)) },
         confirmButton = {
             TextButton(onClick = onConfirmClick) {
                 Text(text = stringResource(R.string.delete))
@@ -567,7 +571,14 @@ fun DeleteSavedSearchConfirmDialog(
 ) {
     AlertDialog(
         modifier = modifier,
-        title = { Text(text = "Delete saved search '${savedSearch.name}'?") },
+        title = {
+            Text(
+                text = stringResource(
+                    R.string.delete_saved_search_dialog_title,
+                    savedSearch.name,
+                )
+            )
+        },
         confirmButton = {
             TextButton(onClick = onConfirmClick) {
                 Text(text = stringResource(R.string.delete))

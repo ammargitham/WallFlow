@@ -21,6 +21,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.MutableCreationExtras
 import com.ammar.havenwalls.IoDispatcher
+import com.ammar.havenwalls.R
 import com.ammar.havenwalls.data.repository.AppPreferencesRepository
 import com.ammar.havenwalls.data.repository.ObjectDetectionModelRepository
 import com.ammar.havenwalls.extensions.getParcelExtra
@@ -65,7 +66,7 @@ class SetWallpaperActivity : ComponentActivity() {
 
         val uri = intent.getParcelExtra(EXTRA_URI, Uri::class.java)
         if (uri == null) {
-            toast("Invalid URI!")
+            toast(getString(R.string.invalid_uri))
             finishAndRemoveTask()
             return
         }

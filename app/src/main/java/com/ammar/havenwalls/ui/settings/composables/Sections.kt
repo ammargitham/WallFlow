@@ -159,7 +159,7 @@ internal fun LazyListScope.generalSection(
     item {
         ListItem(
             modifier = Modifier.clickable { onBlurSketchyCheckChange(!blurSketchy) },
-            headlineContent = { Text(text = "Blur sketchy wallpapers") },
+            headlineContent = { Text(text = stringResource(R.string.blur_sketchy_wallpapers)) },
             trailingContent = {
                 Switch(
                     modifier = Modifier.height(24.dp),
@@ -172,7 +172,7 @@ internal fun LazyListScope.generalSection(
     item {
         ListItem(
             modifier = Modifier.clickable { onBlurNsfwCheckChange(!blurNsfw) },
-            headlineContent = { Text(text = "Blur NSFW wallpapers") },
+            headlineContent = { Text(text = stringResource(R.string.blur_nsfw_wallpapers)) },
             trailingContent = {
                 Switch(
                     modifier = Modifier.height(24.dp),
@@ -224,7 +224,7 @@ internal fun LazyListScope.objectDetectionSection(
     item {
         ListItem(
             modifier = Modifier.clickable { onEnabledChange(!enabled) },
-            headlineContent = { Text(text = "Enable object detection") },
+            headlineContent = { Text(text = stringResource(R.string.enable_object_detection)) },
             trailingContent = {
                 Switch(
                     modifier = Modifier.height(24.dp),
@@ -242,7 +242,7 @@ internal fun LazyListScope.objectDetectionSection(
             ),
             headlineContent = {
                 Text(
-                    text = "TFLite delegate",
+                    text = stringResource(R.string.tflite_delegate),
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha)
                 )
             },
@@ -262,7 +262,7 @@ internal fun LazyListScope.objectDetectionSection(
             ),
             headlineContent = {
                 Text(
-                    text = "TFLite model",
+                    text = stringResource(R.string.tflite_model),
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha)
                 )
             },
@@ -348,7 +348,10 @@ internal fun LazyListScope.autoWallpaperSection(
                 },
                 trailingContent = {
                     IconButton(onClick = onNextRunInfoClick) {
-                        Icon(imageVector = Icons.Outlined.Info, contentDescription = "Info")
+                        Icon(
+                            imageVector = Icons.Outlined.Info,
+                            contentDescription = stringResource(R.string.info),
+                        )
                     }
                 }
             )

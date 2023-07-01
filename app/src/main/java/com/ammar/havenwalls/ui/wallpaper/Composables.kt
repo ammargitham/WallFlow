@@ -56,8 +56,8 @@ import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ammar.havenwalls.R
-import com.ammar.havenwalls.model.Purity
 import com.ammar.havenwalls.model.Avatar
+import com.ammar.havenwalls.model.Purity
 import com.ammar.havenwalls.model.Tag
 import com.ammar.havenwalls.model.Uploader
 import com.ammar.havenwalls.ui.common.ProgressIndicator
@@ -333,7 +333,7 @@ private fun ShareButton(
             onDismissRequest = { expanded = false },
         ) {
             DropdownMenuItem(
-                text = { Text("Link") },
+                text = { Text(text = stringResource(R.string.link)) },
                 onClick = {
                     expanded = false
                     onLinkClick()
@@ -346,7 +346,7 @@ private fun ShareButton(
                 },
             )
             DropdownMenuItem(
-                text = { Text("Image") },
+                text = { Text(text = stringResource(R.string.image)) },
                 onClick = {
                     expanded = false
                     onImageClick()

@@ -44,6 +44,7 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
@@ -385,9 +386,11 @@ fun WallpaperScreenContent(
             override fun onError(request: ImageRequest, result: ErrorResult) {
                 val throwable = result.throwable
                 when (throwable) {
-                    is SocketTimeoutException -> context.toast("Request timed out!")
+                    is SocketTimeoutException -> context.toast(context.getString(R.string.request_timed_out))
                     is NullRequestDataException -> return // Do nothing
-                    else -> context.toast(throwable.message ?: "Error occurred!")
+                    else -> context.toast(
+                        throwable.message ?: context.getString(R.string.error_occurred)
+                    )
                 }
                 Log.e(TAG, "onError: ", throwable)
             }
@@ -522,14 +525,14 @@ private fun NotSelectedPlaceholder(
         Image(
             modifier = Modifier.size((containerIntSize.width / 2).toDp()),
             painter = painterResource(R.drawable.outline_image_24),
-            contentDescription = "No wallpaper selected",
+            contentDescription = stringResource(R.string.no_wallpaper_selected),
             contentScale = ContentScale.FillWidth,
             colorFilter = ColorFilter.tint(
                 MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f)
             )
         )
         Text(
-            text = "No wallpaper selected",
+            text = stringResource(R.string.no_wallpaper_selected),
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.5f),
             style = MaterialTheme.typography.headlineSmall,
         )

@@ -88,7 +88,11 @@ import com.ammar.havenwalls.model.Search
 import com.ammar.havenwalls.model.Sorting
 import com.ammar.havenwalls.model.TopRange
 import com.ammar.havenwalls.ui.common.ClearableChip
+import com.ammar.havenwalls.ui.common.IntState
+import com.ammar.havenwalls.ui.common.NameState
 import com.ammar.havenwalls.ui.common.drawVerticalScrollbar
+import com.ammar.havenwalls.ui.common.intStateSaver
+import com.ammar.havenwalls.ui.common.nameStateSaver
 import com.ammar.havenwalls.ui.common.taginput.TagInputField
 import com.ammar.havenwalls.ui.theme.HavenWallsTheme
 
@@ -101,7 +105,7 @@ internal fun IncludedTagsFilter(
     TagInputField(
         modifier = modifier,
         tags = tags,
-        label = { Text(text = "Included Tags/Keywords") },
+        label = { Text(text = stringResource(R.string.included_tags_keywords)) },
         onAddTag = { onChange(tags + it) },
         onRemoveTag = { onChange(tags - it) },
         tagFromInputString = { it },
@@ -116,7 +120,7 @@ internal fun ExcludedTagsFilter(
 ) {
     TagInputField(
         modifier = modifier,
-        label = { Text(text = "Excluded Tags/Keywords") },
+        label = { Text(text = stringResource(R.string.excluded_tags_keywords)) },
         tags = tags,
         onAddTag = { onChange(tags + it) },
         onRemoveTag = { onChange(tags - it) },
@@ -132,7 +136,7 @@ internal fun CategoriesFilter(
 ) {
     Column {
         Text(
-            text = "Categories",
+            text = stringResource(R.string.categories),
             style = MaterialTheme.typography.labelLarge,
         )
         Spacer(modifier = Modifier.requiredHeight(8.dp))
@@ -169,7 +173,7 @@ internal fun PurityFilter(
 ) {
     Column {
         Text(
-            text = "Purity",
+            text = stringResource(R.string.purity),
             style = MaterialTheme.typography.labelLarge
         )
         Spacer(modifier = Modifier.requiredHeight(8.dp))
@@ -206,7 +210,7 @@ internal fun SortingFilter(
 ) {
     Column {
         Text(
-            text = "Sorting",
+            text = stringResource(R.string.sorting),
             style = MaterialTheme.typography.labelLarge
         )
         Spacer(modifier = Modifier.requiredHeight(8.dp))
@@ -246,7 +250,7 @@ internal fun TopRangeFilter(
 ) {
     Column {
         Text(
-            text = "Top Range",
+            text = stringResource(R.string.top_range),
             style = MaterialTheme.typography.labelLarge
         )
         Spacer(modifier = Modifier.requiredHeight(8.dp))
@@ -283,7 +287,7 @@ internal fun OrderFilter(
 ) {
     Column {
         Text(
-            text = "Order",
+            text = stringResource(R.string.order),
             style = MaterialTheme.typography.labelLarge
         )
         Spacer(modifier = Modifier.requiredHeight(8.dp))
@@ -474,7 +478,7 @@ private fun AddResolutionButton(
                     Divider()
                 }
             DropdownMenuItem(
-                text = { Text(text = "Custom...") },
+                text = { Text(text = stringResource(R.string.custom)) },
                 onClick = {
                     onCustomClick()
                     expanded = false

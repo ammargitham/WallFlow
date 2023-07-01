@@ -14,8 +14,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.ammar.havenwalls.R
 import com.ammar.havenwalls.ui.theme.HavenWallsTheme
 
 @Composable
@@ -23,7 +25,7 @@ fun SingleLineError(
     modifier: Modifier = Modifier,
     errorMsg: String,
     actionText: String? = null,
-    dismissText: String = "Dismiss",
+    dismissText: String = stringResource(R.string.dismiss),
     onActionClick: () -> Unit = {},
     onDismissClick: () -> Unit = {},
 ) {

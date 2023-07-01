@@ -29,9 +29,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ammar.havenwalls.R
-import com.ammar.havenwalls.model.SearchQuery
 import com.ammar.havenwalls.model.MenuItem
 import com.ammar.havenwalls.model.Search
+import com.ammar.havenwalls.model.SearchQuery
 import com.ammar.havenwalls.model.TagSearchMeta
 import com.ammar.havenwalls.model.UploaderSearchMeta
 import com.ammar.havenwalls.ui.common.OverflowMenu
@@ -69,7 +69,8 @@ fun MainSearchBar(
     onSaveAsClick: () -> Unit = {},
     onLoadClick: () -> Unit = {},
 ) {
-    val placeholder: @Composable () -> Unit = remember { { Text(text = "Search") } }
+    val placeholder: @Composable () -> Unit =
+        remember { { Text(text = stringResource(R.string.search)) } }
 
     AnimatedVisibility(
         modifier = modifier,
@@ -155,10 +156,10 @@ fun MainSearchBar(
     deleteSuggestion?.run {
         AlertDialog(
             title = { Text(text = this.query) },
-            text = { Text(text = "Remove from history?") },
+            text = { Text(text = stringResource(R.string.delete_suggestion_dialog_text)) },
             confirmButton = {
                 TextButton(onClick = onDeleteSuggestionConfirmClick) {
-                    Text(text = "Confirm")
+                    Text(text = stringResource(R.string.confirm))
                 }
             },
             dismissButton = {

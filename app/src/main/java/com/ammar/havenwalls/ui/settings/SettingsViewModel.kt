@@ -6,6 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkInfo
 import com.ammar.havenwalls.EFFICIENT_DET_LITE_0_MODEL_NAME
+import com.ammar.havenwalls.R
 import com.ammar.havenwalls.data.db.entity.ObjectDetectionModelEntity
 import com.ammar.havenwalls.data.db.entity.toModel
 import com.ammar.havenwalls.data.db.entity.toSavedSearch
@@ -190,7 +191,7 @@ class SettingsViewModel @Inject constructor(
             url = url,
             downloadLocation = DownloadManager.Companion.DownloadLocation.APP_ML_MODELS,
             notificationType = DownloadWorker.Companion.NotificationType.VISIBLE,
-            notificationTitle = "ML model: $name",
+            notificationTitle = application.getString(R.string.model_download_title, name),
             inferFileNameFromResponse = true,
         )
         downloadManager.getProgress(application, workName).collectLatest { state ->
