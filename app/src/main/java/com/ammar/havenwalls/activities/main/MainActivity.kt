@@ -3,6 +3,7 @@ package com.ammar.havenwalls.activities.main
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -19,6 +20,7 @@ import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.compose.currentBackStackEntryAsState
+import com.ammar.havenwalls.data.preferences.Theme
 import com.ammar.havenwalls.extensions.trimAll
 import com.ammar.havenwalls.model.Search
 import com.ammar.havenwalls.model.TagSearchMeta
@@ -105,6 +107,11 @@ class MainActivity : ComponentActivity() {
             }
 
             HavenWallsTheme(
+                darkTheme = when (uiState.theme) {
+                    Theme.SYSTEM -> isSystemInDarkTheme()
+                    Theme.LIGHT -> false
+                    Theme.DARK -> true
+                },
                 statusBarVisible = systemBarsState.statusBarVisible,
                 statusBarColor = systemBarsState.statusBarColor,
                 navigationBarVisible = systemBarsState.navigationBarVisible,

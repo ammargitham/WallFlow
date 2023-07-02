@@ -200,6 +200,9 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="fixed_size">Fixed size</string>
     <string name="rounded_corners">Rounded corners</string>
     <string name="wallpaper_preview">Wallpaper preview</string>
+    <string name="system">System</string>
+    <string name="light">Light</string>
+    <string name="dark">Dark</string>
     <plurals name="every_x_hrs">
         <item quantity="one">Every %d hour</item>
         <item quantity="other">Every %d hours</item>

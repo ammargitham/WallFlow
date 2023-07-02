@@ -3,10 +3,10 @@ package com.ammar.havenwalls.activities.main
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.ammar.havenwalls.model.SearchQuery
-import com.ammar.havenwalls.model.Sorting
 import com.ammar.havenwalls.data.db.entity.toSavedSearch
 import com.ammar.havenwalls.data.db.entity.toSearch
+import com.ammar.havenwalls.data.preferences.Theme
+import com.ammar.havenwalls.data.repository.AppPreferencesRepository
 import com.ammar.havenwalls.data.repository.GlobalErrorsRepository
 import com.ammar.havenwalls.data.repository.GlobalErrorsRepository.GlobalError
 import com.ammar.havenwalls.data.repository.SavedSearchRepository
@@ -14,6 +14,8 @@ import com.ammar.havenwalls.data.repository.SearchHistoryRepository
 import com.ammar.havenwalls.extensions.trimAll
 import com.ammar.havenwalls.model.SavedSearch
 import com.ammar.havenwalls.model.Search
+import com.ammar.havenwalls.model.SearchQuery
+import com.ammar.havenwalls.model.Sorting
 import com.ammar.havenwalls.model.getSupportingText
 import com.ammar.havenwalls.ui.common.Suggestion
 import com.github.materiiapps.partial.Partialize
@@ -35,10 +37,11 @@ import kotlinx.coroutines.launch
  */
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
+    private val application: Application,
     private val globalErrorsRepository: GlobalErrorsRepository,
     private val searchHistoryRepository: SearchHistoryRepository,
     private val savedSearchRepository: SavedSearchRepository,
-    private val application: Application,
+    appPreferencesRepository: AppPreferencesRepository,
 ) : AndroidViewModel(application) {
     private val localUiState = MutableStateFlow(MainUiStatePartial())
 
@@ -47,7 +50,8 @@ class MainActivityViewModel @Inject constructor(
         searchHistoryRepository.getAll(),
         globalErrorsRepository.errors,
         savedSearchRepository.getAll(),
-    ) { local, searchHistory, errors, savedSearchEntities ->
+        appPreferencesRepository.appPreferencesFlow,
+    ) { local, searchHistory, errors, savedSearchEntities, appPreferences ->
         val localQuery = local.searchBarSearch.getOrNull()?.query?.trimAll()?.lowercase() ?: ""
         local.merge(
             MainUiState(
@@ -66,6 +70,7 @@ class MainActivityViewModel @Inject constructor(
                     },
                 globalErrors = errors,
                 savedSearches = savedSearchEntities.map { entity -> entity.toSavedSearch() },
+                theme = appPreferences.lookAndFeelPreferences.theme,
             )
         )
     }.stateIn(
@@ -148,4 +153,5 @@ data class MainUiState(
     val saveSearchAsSearch: Search? = null,
     val showSavedSearchesDialog: Boolean = false,
     val savedSearches: List<SavedSearch> = emptyList(),
+    val theme: Theme = Theme.SYSTEM,
 )

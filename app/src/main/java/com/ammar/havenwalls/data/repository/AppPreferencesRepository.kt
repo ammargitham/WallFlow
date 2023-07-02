@@ -13,6 +13,7 @@ import com.ammar.havenwalls.data.preferences.LayoutPreferences
 import com.ammar.havenwalls.data.preferences.LookAndFeelPreferences
 import com.ammar.havenwalls.data.preferences.ObjectDetectionPreferences
 import com.ammar.havenwalls.data.preferences.PreferencesKeys
+import com.ammar.havenwalls.data.preferences.Theme
 import com.ammar.havenwalls.data.preferences.defaultAutoWallpaperConstraints
 import com.ammar.havenwalls.data.preferences.defaultAutoWallpaperFreq
 import com.ammar.havenwalls.extensions.TAG
@@ -103,13 +104,14 @@ class AppPreferencesRepository @Inject constructor(
             }
         }
 
-    suspend fun updateLayoutPreferences(layoutPreferences: LayoutPreferences) =
+    suspend fun updateLookAndFeelPreferences(lookAndFeelPreferences: LookAndFeelPreferences) =
         withContext(ioDispatcher) {
             dataStore.edit {
-                with(layoutPreferences) {
-                    it[PreferencesKeys.LAYOUT_GRID_TYPE] = gridType.name
-                    it[PreferencesKeys.LAYOUT_GRID_COL_COUNT] = gridColCount
-                    it[PreferencesKeys.LAYOUT_ROUNDED_CORNERS] = roundedCorners
+                with(lookAndFeelPreferences) {
+                    it[PreferencesKeys.THEME] = theme.name
+                    it[PreferencesKeys.LAYOUT_GRID_TYPE] = layoutPreferences.gridType.name
+                    it[PreferencesKeys.LAYOUT_GRID_COL_COUNT] = layoutPreferences.gridColCount
+                    it[PreferencesKeys.LAYOUT_ROUNDED_CORNERS] = layoutPreferences.roundedCorners
                 }
             }
         }
@@ -165,6 +167,11 @@ class AppPreferencesRepository @Inject constructor(
             )
         },
         lookAndFeelPreferences = LookAndFeelPreferences(
+            theme = try {
+                Theme.valueOf(preferences[PreferencesKeys.THEME] ?: "")
+            } catch (e: Exception) {
+                Theme.SYSTEM
+            },
             layoutPreferences = LayoutPreferences(
                 gridType = try {
                     GridType.valueOf(preferences[PreferencesKeys.LAYOUT_GRID_TYPE] ?: "")

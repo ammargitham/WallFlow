@@ -60,6 +60,7 @@ import com.ammar.havenwalls.DISABLED_ALPHA
 import com.ammar.havenwalls.INTERNAL_MODELS
 import com.ammar.havenwalls.R
 import com.ammar.havenwalls.data.db.entity.ObjectDetectionModelEntity
+import com.ammar.havenwalls.data.preferences.Theme
 import com.ammar.havenwalls.data.preferences.defaultAutoWallpaperConstraints
 import com.ammar.havenwalls.data.preferences.defaultAutoWallpaperFreq
 import com.ammar.havenwalls.extensions.DELETE
@@ -122,7 +123,7 @@ fun ObjectDetectionDelegateOptionsDialog(
 }
 
 @Composable
-fun ObjectDetectionDelegateOptionsContent(
+private fun ObjectDetectionDelegateOptionsContent(
     modifier: Modifier = Modifier,
     selectedDelegate: ComputeSettings.Delegate = ComputeSettings.Delegate.NONE,
     onOptionClick: (delegate: ComputeSettings.Delegate) -> Unit = {},
@@ -979,6 +980,89 @@ private fun PreviewNextRunInfoDialog() {
     HavenWallsTheme {
         Surface {
             NextRunInfoDialog()
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ThemeOptionsDialog(
+    modifier: Modifier = Modifier,
+    theme: Theme = Theme.SYSTEM,
+    onSaveClick: (Theme) -> Unit = {},
+    onDismissRequest: () -> Unit = {},
+) {
+    var localSelectedTheme by remember(theme) { mutableStateOf(theme) }
+
+    AlertDialog(
+        modifier = modifier,
+        onDismissRequest = onDismissRequest,
+    ) {
+        UnpaddedAlertDialogContent(
+            title = { Text(text = stringResource(R.string.theme)) },
+            text = {
+                ThemeOptionsContent(
+                    selectedTheme = localSelectedTheme,
+                    onOptionClick = { localSelectedTheme = it },
+                )
+            },
+            buttons = {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    TextButton(onClick = onDismissRequest) {
+                        Text(text = stringResource(R.string.cancel))
+                    }
+                    TextButton(onClick = { onSaveClick(localSelectedTheme) }) {
+                        Text(text = stringResource(R.string.save))
+                    }
+                }
+            },
+        )
+    }
+}
+
+@Composable
+private fun ThemeOptionsContent(
+    modifier: Modifier = Modifier,
+    selectedTheme: Theme = Theme.SYSTEM,
+    onOptionClick: (Theme) -> Unit = {},
+) {
+    Column(modifier = modifier) {
+        Theme.values().map {
+            ListItem(
+                modifier = Modifier
+                    .clickable(onClick = { onOptionClick(it) })
+                    .padding(horizontal = 8.dp),
+                headlineContent = { Text(text = themeString(it)) },
+                leadingContent = {
+                    RadioButton(
+                        modifier = Modifier.size(24.dp),
+                        selected = selectedTheme == it,
+                        onClick = { onOptionClick(it) },
+                    )
+                },
+            )
+        }
+    }
+}
+
+@Composable
+private fun themeString(theme: Theme) = stringResource(
+    when (theme) {
+        Theme.SYSTEM -> R.string.system
+        Theme.LIGHT -> R.string.light
+        Theme.DARK -> R.string.dark
+    }
+)
+
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun PreviewThemeOptionsDialog() {
+    HavenWallsTheme {
+        Surface {
+            ThemeOptionsDialog()
         }
     }
 }

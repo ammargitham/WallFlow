@@ -12,6 +12,7 @@ import com.ammar.havenwalls.data.db.entity.toModel
 import com.ammar.havenwalls.data.db.entity.toSavedSearch
 import com.ammar.havenwalls.data.preferences.AppPreferences
 import com.ammar.havenwalls.data.preferences.AutoWallpaperPreferences
+import com.ammar.havenwalls.data.preferences.LookAndFeelPreferences
 import com.ammar.havenwalls.data.preferences.ObjectDetectionPreferences
 import com.ammar.havenwalls.data.repository.AppPreferencesRepository
 import com.ammar.havenwalls.data.repository.ObjectDetectionModelRepository
@@ -362,6 +363,15 @@ class SettingsViewModel @Inject constructor(
         it.copy(showAutoWallpaperNextRunInfoDialog = partial(show))
     }
 
+    fun showThemeOptionsDialog(show: Boolean) = localUiStateFlow.update {
+        it.copy(showThemeOptionsDialog = partial(show))
+    }
+
+    fun updateLookAndFeelPrefs(lookAndFeelPreferences: LookAndFeelPreferences) =
+        viewModelScope.launch {
+            appPreferencesRepository.updateLookAndFeelPreferences(lookAndFeelPreferences)
+        }
+
     private fun getAutoWallpaperNextRun() = application.workManager.getWorkInfosForUniqueWorkFlow(
         AutoWallpaperWorker.PERIODIC_WORK_NAME
     ).map {
@@ -400,6 +410,7 @@ data class SettingsUiState(
     val autoWallpaperNextRun: NextRun = NextRun.NotScheduled,
     val showAutoWallpaperNextRunInfoDialog: Boolean = false,
     val autoWallpaperStatus: AutoWallpaperWorker.Companion.Status? = null,
+    val showThemeOptionsDialog: Boolean = false,
 )
 
 sealed class NextRun {

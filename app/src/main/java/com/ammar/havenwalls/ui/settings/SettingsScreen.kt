@@ -69,6 +69,7 @@ import com.ammar.havenwalls.ui.settings.composables.ObjectDetectionModelDeleteCo
 import com.ammar.havenwalls.ui.settings.composables.ObjectDetectionModelEditDialog
 import com.ammar.havenwalls.ui.settings.composables.ObjectDetectionModelOptionsDialog
 import com.ammar.havenwalls.ui.settings.composables.SavedSearchOptionsDialog
+import com.ammar.havenwalls.ui.settings.composables.ThemeOptionsDialog
 import com.ammar.havenwalls.ui.settings.composables.accountSection
 import com.ammar.havenwalls.ui.settings.composables.autoWallpaperSection
 import com.ammar.havenwalls.ui.settings.composables.dividerItem
@@ -180,9 +181,8 @@ fun SettingsScreen(
             onAutoWallpaperConstraintsClick = { viewModel.showAutoWallpaperConstraintsDialog(true) },
             onAutoWallpaperChangeNowClick = viewModel::autoWallpaperChangeNow,
             onAutoWallpaperNextRunInfoClick = { viewModel.showAutoWallpaperNextRunInfoDialog(true) },
-            onLayoutClick = {
-                twoPaneController.navigate(LayoutSettingsScreenDestination)
-            }
+            onThemeClick = { viewModel.showThemeOptionsDialog(true) },
+            onLayoutClick = { twoPaneController.navigate(LayoutSettingsScreenDestination) }
         )
     }
 
@@ -352,6 +352,21 @@ fun SettingsScreen(
             onDismissRequest = { viewModel.showAutoWallpaperNextRunInfoDialog(false) }
         )
     }
+
+    if (uiState.showThemeOptionsDialog) {
+        ThemeOptionsDialog(
+            theme = uiState.appPreferences.lookAndFeelPreferences.theme,
+            onSaveClick = {
+                viewModel.updateLookAndFeelPrefs(
+                    uiState.appPreferences.lookAndFeelPreferences.copy(
+                        theme = it,
+                    )
+                )
+                viewModel.showThemeOptionsDialog(false)
+            },
+            onDismissRequest = { viewModel.showThemeOptionsDialog(false) },
+        )
+    }
 }
 
 @Composable
@@ -376,6 +391,7 @@ fun SettingsScreenContent(
     onAutoWallpaperConstraintsClick: () -> Unit = {},
     onAutoWallpaperChangeNowClick: () -> Unit = {},
     onAutoWallpaperNextRunInfoClick: () -> Unit = {},
+    onThemeClick: () -> Unit = {},
     onLayoutClick: () -> Unit = {},
 ) {
     Box(modifier = modifier) {
@@ -393,6 +409,7 @@ fun SettingsScreenContent(
             )
             dividerItem()
             lookAndFeelSection(
+                onThemeClick = onThemeClick,
                 onLayoutClick = onLayoutClick,
             )
             dividerItem()

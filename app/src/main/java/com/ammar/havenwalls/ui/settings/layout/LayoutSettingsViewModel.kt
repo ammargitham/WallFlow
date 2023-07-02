@@ -38,7 +38,11 @@ class LayoutSettingsViewModel @Inject constructor(
     )
 
     fun updatePreferences(preferences: LayoutPreferences) = viewModelScope.launch {
-        appPreferencesRepository.updateLayoutPreferences(preferences)
+        appPreferencesRepository.updateLookAndFeelPreferences(
+            uiState.value.appPreferences.lookAndFeelPreferences.copy(
+                layoutPreferences = preferences,
+            )
+        )
     }
 }
 

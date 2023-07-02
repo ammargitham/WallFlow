@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.systemBars
@@ -17,11 +18,13 @@ import androidx.compose.ui.Modifier
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.DEFAULT_ARGS_KEY
 import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.lifecycle.viewmodel.MutableCreationExtras
 import com.ammar.havenwalls.IoDispatcher
 import com.ammar.havenwalls.R
+import com.ammar.havenwalls.data.preferences.Theme
 import com.ammar.havenwalls.data.repository.AppPreferencesRepository
 import com.ammar.havenwalls.data.repository.ObjectDetectionModelRepository
 import com.ammar.havenwalls.extensions.getParcelExtra
@@ -99,10 +102,16 @@ class SetWallpaperActivity : ComponentActivity() {
         }
 
         setContent {
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             val systemBarsController = LocalSystemBarsController.current
             val systemBarsState by systemBarsController.state
 
             HavenWallsTheme(
+                darkTheme = when (uiState.theme) {
+                    Theme.SYSTEM -> isSystemInDarkTheme()
+                    Theme.LIGHT -> false
+                    Theme.DARK -> true
+                },
                 statusBarVisible = systemBarsState.statusBarVisible,
                 statusBarColor = systemBarsState.statusBarColor,
                 navigationBarVisible = systemBarsState.navigationBarVisible,

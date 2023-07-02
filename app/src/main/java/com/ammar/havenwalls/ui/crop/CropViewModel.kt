@@ -16,6 +16,7 @@ import com.ammar.havenwalls.R
 import com.ammar.havenwalls.activities.setwallpaper.SetWallpaperActivity.Companion.EXTRA_URI
 import com.ammar.havenwalls.data.db.entity.toModel
 import com.ammar.havenwalls.data.preferences.ObjectDetectionPreferences
+import com.ammar.havenwalls.data.preferences.Theme
 import com.ammar.havenwalls.data.repository.AppPreferencesRepository
 import com.ammar.havenwalls.data.repository.ObjectDetectionModelRepository
 import com.ammar.havenwalls.data.repository.utils.Resource
@@ -75,7 +76,12 @@ class CropViewModel(
                 Triple(uri, appPreferences, downloadedModel)
             }.collectLatest { (uri, appPreferences, downloadedModel) ->
                 val objectDetectionPreferences = appPreferences.objectDetectionPreferences
-                _uiState.update { it.copy(objectDetectionEnabled = objectDetectionPreferences.enabled) }
+                _uiState.update {
+                    it.copy(
+                        objectDetectionEnabled = objectDetectionPreferences.enabled,
+                        theme = appPreferences.lookAndFeelPreferences.theme,
+                    )
+                }
                 initObjectDetection(
                     preferences = objectDetectionPreferences,
                     uri = uri,
@@ -278,6 +284,7 @@ data class CropUiState(
         WallpaperTarget.HOME,
         WallpaperTarget.LOCKSCREEN,
     ),
+    val theme: Theme = Theme.SYSTEM,
 )
 
 sealed class Result {
