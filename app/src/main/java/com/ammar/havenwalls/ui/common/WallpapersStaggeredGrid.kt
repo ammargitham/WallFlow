@@ -14,6 +14,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.itemContentType
 import androidx.paging.compose.itemKey
+import com.ammar.havenwalls.data.preferences.GridType
 import com.ammar.havenwalls.model.Purity
 import com.ammar.havenwalls.model.Wallpaper
 
@@ -28,6 +29,9 @@ fun WallpaperStaggeredGrid(
     blurNsfw: Boolean = false,
     selectedWallpaper: Wallpaper? = null,
     showSelection: Boolean = false,
+    gridType: GridType = GridType.STAGGERED,
+    gridColCount: Int = 2,
+    roundedCorners: Boolean = true,
     onWallpaperClick: (wallpaper: Wallpaper) -> Unit = {},
 ) {
     val isRefreshing = wallpapers.loadState.refresh == LoadState.Loading
@@ -36,7 +40,7 @@ fun WallpaperStaggeredGrid(
         modifier = modifier,
         state = state,
         contentPadding = contentPadding,
-        columns = StaggeredGridCells.Adaptive(minSize = 150.dp),
+        columns = StaggeredGridCells.Fixed(count = gridColCount),
         verticalItemSpacing = 8.dp,
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
@@ -62,6 +66,8 @@ fun WallpaperStaggeredGrid(
                         Purity.NSFW -> blurNsfw
                     },
                     isSelected = showSelection && selectedWallpaper?.id == it.id,
+                    fixedHeight = gridType == GridType.FIXED_SIZE,
+                    roundedCorners = roundedCorners,
                     onClick = { onWallpaperClick(it) }
                 )
             } ?: PlaceholderWallpaperCard()

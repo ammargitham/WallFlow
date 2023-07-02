@@ -220,6 +220,38 @@ private fun PreviewGeneralSection() {
     }
 }
 
+internal fun LazyListScope.lookAndFeelSection(
+    onThemeClick: () -> Unit = {},
+    onLayoutClick: () -> Unit = {},
+) {
+    item { Header(stringResource(R.string.look_and_feel)) }
+    item {
+        ListItem(
+            modifier = Modifier.clickable(onClick = onThemeClick),
+            headlineContent = { Text(text = stringResource(R.string.theme)) },
+        )
+    }
+    item {
+        ListItem(
+            modifier = Modifier.clickable(onClick = onLayoutClick),
+            headlineContent = { Text(text = stringResource(R.string.layout)) },
+        )
+    }
+}
+
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun PreviewLookAndFeelSection() {
+    HavenWallsTheme {
+        Surface {
+            LazyColumn {
+                lookAndFeelSection()
+            }
+        }
+    }
+}
+
 internal fun LazyListScope.objectDetectionSection(
     enabled: Boolean = false,
     delegate: Delegate = Delegate.GPU,

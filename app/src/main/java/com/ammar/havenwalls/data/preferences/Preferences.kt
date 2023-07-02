@@ -2,6 +2,7 @@ package com.ammar.havenwalls.data.preferences
 
 import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -28,4 +29,7 @@ object PreferencesKeys {
     val AUTO_WALLPAPER_CONSTRAINTS = stringPreferencesKey("auto_wallpaper_constraints")
     val AUTO_WALLPAPER_SHOW_NOTIFICATION = booleanPreferencesKey("auto_wallpaper_show_notification")
     val AUTO_WALLPAPER_WORK_REQUEST_ID = stringPreferencesKey("auto_wallpaper_work_request_id")
+    val LAYOUT_GRID_TYPE = stringPreferencesKey("layout_grid_type")
+    val LAYOUT_GRID_COL_COUNT = intPreferencesKey("layout_grid_col_count")
+    val LAYOUT_ROUNDED_CORNERS = booleanPreferencesKey("layout_rounded_corners")
 }

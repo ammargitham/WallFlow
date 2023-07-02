@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.surfaceColorAtElevation
@@ -59,6 +60,8 @@ fun WallpaperCard(
     modifier: Modifier = Modifier,
     wallpaper: Wallpaper,
     blur: Boolean = false,
+    fixedHeight: Boolean = false,
+    roundedCorners: Boolean = true,
     isSelected: Boolean = false,
     onClick: () -> Unit = {},
 ) {
@@ -104,7 +107,14 @@ fun WallpaperCard(
     }
 
     Card(
-        modifier = modifier.aspectRatio(wallpaper.resolution.aspectRatio),
+        modifier = modifier.let {
+            if (fixedHeight) {
+                it.height(200.dp)
+            } else {
+                it.aspectRatio(wallpaper.resolution.aspectRatio)
+            }
+        },
+        shape = if (roundedCorners) CardDefaults.shape else RectangleShape,
         onClick = onClick,
     ) {
         AsyncImage(

@@ -8,6 +8,9 @@ import androidx.datastore.preferences.core.emptyPreferences
 import com.ammar.havenwalls.IoDispatcher
 import com.ammar.havenwalls.data.preferences.AppPreferences
 import com.ammar.havenwalls.data.preferences.AutoWallpaperPreferences
+import com.ammar.havenwalls.data.preferences.GridType
+import com.ammar.havenwalls.data.preferences.LayoutPreferences
+import com.ammar.havenwalls.data.preferences.LookAndFeelPreferences
 import com.ammar.havenwalls.data.preferences.ObjectDetectionPreferences
 import com.ammar.havenwalls.data.preferences.PreferencesKeys
 import com.ammar.havenwalls.data.preferences.defaultAutoWallpaperConstraints
@@ -100,6 +103,17 @@ class AppPreferencesRepository @Inject constructor(
             }
         }
 
+    suspend fun updateLayoutPreferences(layoutPreferences: LayoutPreferences) =
+        withContext(ioDispatcher) {
+            dataStore.edit {
+                with(layoutPreferences) {
+                    it[PreferencesKeys.LAYOUT_GRID_TYPE] = gridType.name
+                    it[PreferencesKeys.LAYOUT_GRID_COL_COUNT] = gridColCount
+                    it[PreferencesKeys.LAYOUT_ROUNDED_CORNERS] = roundedCorners
+                }
+            }
+        }
+
     suspend fun updateAutoWallpaperWorkRequestId(id: UUID?) = withContext(ioDispatcher) {
         dataStore.edit {
             it[PreferencesKeys.AUTO_WALLPAPER_WORK_REQUEST_ID] = id?.toString() ?: ""
@@ -149,7 +163,18 @@ class AppPreferencesRepository @Inject constructor(
                 ),
                 showNotification = get(PreferencesKeys.AUTO_WALLPAPER_SHOW_NOTIFICATION) ?: false,
             )
-        }
+        },
+        lookAndFeelPreferences = LookAndFeelPreferences(
+            layoutPreferences = LayoutPreferences(
+                gridType = try {
+                    GridType.valueOf(preferences[PreferencesKeys.LAYOUT_GRID_TYPE] ?: "")
+                } catch (e: Exception) {
+                    GridType.STAGGERED
+                },
+                gridColCount = preferences[PreferencesKeys.LAYOUT_GRID_COL_COUNT] ?: 2,
+                roundedCorners = preferences[PreferencesKeys.LAYOUT_ROUNDED_CORNERS] ?: true,
+            )
+        )
     )
 
     private fun parseFrequency(freqStr: String?) = try {

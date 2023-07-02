@@ -1,5 +1,6 @@
 package com.ammar.havenwalls.data.preferences
 
+import androidx.annotation.IntRange
 import androidx.work.Constraints
 import androidx.work.NetworkType
 import com.ammar.havenwalls.model.Search
@@ -22,6 +23,7 @@ data class AppPreferences(
     val blurNsfw: Boolean = false,
     val objectDetectionPreferences: ObjectDetectionPreferences = ObjectDetectionPreferences(),
     val autoWallpaperPreferences: AutoWallpaperPreferences = AutoWallpaperPreferences(),
+    val lookAndFeelPreferences: LookAndFeelPreferences = LookAndFeelPreferences(),
 )
 
 data class ObjectDetectionPreferences(
@@ -43,4 +45,29 @@ data class AutoWallpaperPreferences(
     val constraints: Constraints = defaultAutoWallpaperConstraints,
     val showNotification: Boolean = false,
     val workRequestId: UUID? = null,
+)
+
+enum class Theme {
+    SYSTEM,
+    LIGHT,
+    DARK,
+}
+
+data class LookAndFeelPreferences(
+    val theme: Theme = Theme.SYSTEM,
+    val layoutPreferences: LayoutPreferences = LayoutPreferences(),
+)
+
+enum class GridType {
+    STAGGERED,
+    FIXED_SIZE;
+}
+
+const val minGridCols = 1L
+const val maxGridCols = 5L
+
+data class LayoutPreferences(
+    val gridType: GridType = GridType.STAGGERED,
+    @IntRange(minGridCols, maxGridCols) val gridColCount: Int = 2,
+    val roundedCorners: Boolean = true,
 )

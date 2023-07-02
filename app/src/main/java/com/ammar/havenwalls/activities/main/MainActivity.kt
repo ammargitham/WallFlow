@@ -58,7 +58,8 @@ class MainActivity : ComponentActivity() {
             val isExpanded = windowSizeClass.widthSizeClass >= WindowWidthSizeClass.Expanded
 
             twoPaneController = rememberTwoPaneNavController(
-                initialPaneMode = if (isExpanded) Mode.TWO_PANE else Mode.SINGLE_PANE
+                initialPaneMode = if (isExpanded) Mode.TWO_PANE else Mode.SINGLE_PANE,
+                supportsTwoPane = isExpanded,
             )
             val pane1NavController = twoPaneController.pane1NavHostController
             val isTwoPaneMode = twoPaneController.paneMode.value == Mode.TWO_PANE

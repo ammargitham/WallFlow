@@ -191,6 +191,15 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="request_timed_out">Request timed out!</string>
     <string name="error_occurred">Error occurred!</string>
     <string name="no_wallpaper_selected">No wallpaper selected</string>
+    <string name="look_and_feel">Look &amp; Feel</string>
+    <string name="theme">Theme</string>
+    <string name="layout">Layout</string>
+    <string name="no_of_columns">No. of columns</string>
+    <string name="grid_type">Grid type</string>
+    <string name="staggered">Staggered</string>
+    <string name="fixed_size">Fixed size</string>
+    <string name="rounded_corners">Rounded corners</string>
+    <string name="wallpaper_preview">Wallpaper preview</string>
     <plurals name="every_x_hrs">
         <item quantity="one">Every %d hour</item>
         <item quantity="other">Every %d hours</item>

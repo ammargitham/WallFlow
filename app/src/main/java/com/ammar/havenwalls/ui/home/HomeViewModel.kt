@@ -4,19 +4,20 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
-import com.ammar.havenwalls.model.Purity
-import com.ammar.havenwalls.model.SearchQuery
-import com.ammar.havenwalls.model.Sorting
-import com.ammar.havenwalls.model.TopRange
 import com.ammar.havenwalls.data.db.entity.toSavedSearch
+import com.ammar.havenwalls.data.preferences.LayoutPreferences
 import com.ammar.havenwalls.data.repository.AppPreferencesRepository
 import com.ammar.havenwalls.data.repository.SavedSearchRepository
 import com.ammar.havenwalls.data.repository.WallHavenRepository
 import com.ammar.havenwalls.data.repository.utils.Resource
 import com.ammar.havenwalls.data.repository.utils.successOr
+import com.ammar.havenwalls.model.Purity
 import com.ammar.havenwalls.model.SavedSearch
 import com.ammar.havenwalls.model.Search
+import com.ammar.havenwalls.model.SearchQuery
+import com.ammar.havenwalls.model.Sorting
 import com.ammar.havenwalls.model.Tag
+import com.ammar.havenwalls.model.TopRange
 import com.ammar.havenwalls.model.Wallpaper
 import com.ammar.havenwalls.model.toSearchQuery
 import com.ammar.havenwalls.ui.navargs.ktxserializable.DefaultKtxSerializableNavTypeSerializer
@@ -105,6 +106,7 @@ class HomeViewModel @Inject constructor(
                 blurNsfw = appPreferences.blurNsfw,
                 isHome = search == appPreferences.homeSearch,
                 savedSearches = savedSearchEntities.map { entity -> entity.toSavedSearch() },
+                layoutPreferences = appPreferences.lookAndFeelPreferences.layoutPreferences,
             )
         )
     }.stateIn(
@@ -172,4 +174,5 @@ data class HomeUiState(
     val saveSearchAsSearch: Search? = null,
     val showSavedSearchesDialog: Boolean = false,
     val savedSearches: List<SavedSearch> = emptyList(),
+    val layoutPreferences: LayoutPreferences = LayoutPreferences(),
 )

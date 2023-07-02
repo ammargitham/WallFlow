@@ -17,6 +17,7 @@ import com.ramcosta.composedestinations.spec.Direction
 object TwoPaneNavigation {
     class Controller constructor(
         initialPaneMode: Mode = Mode.TWO_PANE,
+        val supportsTwoPane: Boolean = true,
         val pane1NavHostController: NavHostController,
         val pane2NavHostController: NavHostController,
     ) {
@@ -62,12 +63,14 @@ object TwoPaneNavigation {
 @Composable
 fun rememberTwoPaneNavController(
     initialPaneMode: Mode = Mode.SINGLE_PANE,
+    supportsTwoPane: Boolean = false,
 ): TwoPaneNavigation.Controller {
     val pane1NavController = rememberAnimatedNavController()
     val pane2NavController = rememberAnimatedNavController()
     return remember {
         TwoPaneNavigation.Controller(
             initialPaneMode = initialPaneMode,
+            supportsTwoPane = supportsTwoPane,
             pane1NavHostController = pane1NavController,
             pane2NavHostController = pane2NavController,
         )

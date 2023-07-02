@@ -46,6 +46,7 @@ import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.ammar.havenwalls.R
+import com.ammar.havenwalls.data.preferences.LayoutPreferences
 import com.ammar.havenwalls.extensions.findActivity
 import com.ammar.havenwalls.extensions.rememberLazyStaggeredGridState
 import com.ammar.havenwalls.extensions.search
@@ -69,10 +70,10 @@ import com.ammar.havenwalls.ui.common.mainsearch.LocalMainSearchBarController
 import com.ammar.havenwalls.ui.common.mainsearch.MainSearchBarState
 import com.ammar.havenwalls.ui.common.navigation.TwoPaneNavigation
 import com.ammar.havenwalls.ui.common.navigation.TwoPaneNavigation.Mode
-import com.ammar.havenwalls.ui.common.topWindowInsets
 import com.ammar.havenwalls.ui.common.searchedit.EditSearchModalBottomSheet
 import com.ammar.havenwalls.ui.common.searchedit.SaveAsDialog
 import com.ammar.havenwalls.ui.common.searchedit.SavedSearchesDialog
+import com.ammar.havenwalls.ui.common.topWindowInsets
 import com.ammar.havenwalls.ui.destinations.SettingsScreenDestination
 import com.ammar.havenwalls.ui.destinations.WallpaperScreenDestination
 import com.ammar.havenwalls.ui.theme.HavenWallsTheme
@@ -207,6 +208,7 @@ fun HomeScreen(
             blurNsfw = uiState.blurNsfw,
             selectedWallpaper = uiState.selectedWallpaper,
             showSelection = isTwoPaneMode,
+            layoutPreferences = uiState.layoutPreferences,
             onWallpaperClick = {
                 if (isTwoPaneMode) {
                     viewModel.setSelectedWallpaper(it)
@@ -340,6 +342,7 @@ internal fun HomeScreenContent(
     blurNsfw: Boolean = false,
     selectedWallpaper: Wallpaper? = null,
     showSelection: Boolean = false,
+    layoutPreferences: LayoutPreferences = LayoutPreferences(),
     onWallpaperClick: (wallpaper: Wallpaper) -> Unit = {},
     onTagClick: (tag: Tag) -> Unit = {},
 ) {
@@ -363,6 +366,9 @@ internal fun HomeScreenContent(
         },
         selectedWallpaper = selectedWallpaper,
         showSelection = showSelection,
+        gridType = layoutPreferences.gridType,
+        gridColCount = layoutPreferences.gridColCount,
+        roundedCorners = layoutPreferences.roundedCorners,
         onWallpaperClick = onWallpaperClick,
     )
 }

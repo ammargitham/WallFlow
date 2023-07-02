@@ -57,6 +57,7 @@ import com.ammar.havenwalls.ui.common.permissions.rememberMultiplePermissionsSta
 import com.ammar.havenwalls.ui.common.permissions.shouldShowRationale
 import com.ammar.havenwalls.ui.common.searchedit.EditSearchModalBottomSheet
 import com.ammar.havenwalls.ui.common.searchedit.SavedSearchesDialog
+import com.ammar.havenwalls.ui.destinations.LayoutSettingsScreenDestination
 import com.ammar.havenwalls.ui.destinations.WallhavenApiKeyDialogDestination
 import com.ammar.havenwalls.ui.settings.composables.ConstraintOptionsDialog
 import com.ammar.havenwalls.ui.settings.composables.DeleteSavedSearchConfirmDialog
@@ -72,6 +73,7 @@ import com.ammar.havenwalls.ui.settings.composables.accountSection
 import com.ammar.havenwalls.ui.settings.composables.autoWallpaperSection
 import com.ammar.havenwalls.ui.settings.composables.dividerItem
 import com.ammar.havenwalls.ui.settings.composables.generalSection
+import com.ammar.havenwalls.ui.settings.composables.lookAndFeelSection
 import com.ammar.havenwalls.ui.settings.composables.objectDetectionSection
 import com.ammar.havenwalls.ui.theme.HavenWallsTheme
 import com.ammar.havenwalls.workers.AutoWallpaperWorker
@@ -178,6 +180,9 @@ fun SettingsScreen(
             onAutoWallpaperConstraintsClick = { viewModel.showAutoWallpaperConstraintsDialog(true) },
             onAutoWallpaperChangeNowClick = viewModel::autoWallpaperChangeNow,
             onAutoWallpaperNextRunInfoClick = { viewModel.showAutoWallpaperNextRunInfoDialog(true) },
+            onLayoutClick = {
+                twoPaneController.navigate(LayoutSettingsScreenDestination)
+            }
         )
     }
 
@@ -371,10 +376,11 @@ fun SettingsScreenContent(
     onAutoWallpaperConstraintsClick: () -> Unit = {},
     onAutoWallpaperChangeNowClick: () -> Unit = {},
     onAutoWallpaperNextRunInfoClick: () -> Unit = {},
+    onLayoutClick: () -> Unit = {},
 ) {
-    Box {
+    Box(modifier = modifier) {
         LazyColumn(
-            modifier = modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth()
         ) {
             accountSection(onWallhavenApiKeyItemClick = onWallhavenApiKeyItemClick)
             dividerItem()
@@ -384,6 +390,10 @@ fun SettingsScreenContent(
                 onBlurSketchyCheckChange = onBlurSketchyCheckChange,
                 onBlurNsfwCheckChange = onBlurNsfwCheckChange,
                 onManageSavedSearchesClick = onManageSavedSearchesClick,
+            )
+            dividerItem()
+            lookAndFeelSection(
+                onLayoutClick = onLayoutClick,
             )
             dividerItem()
             objectDetectionSection(
