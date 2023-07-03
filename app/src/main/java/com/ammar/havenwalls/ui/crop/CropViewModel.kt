@@ -209,7 +209,6 @@ class CropViewModel(
                 model = model,
                 objectDetectionPreferences = objectDetectionPreferences,
             )
-            if (detectionWithBitmaps.isEmpty()) return@launch
             _uiState.update {
                 it.copy(
                     detectedRectScale = scale,
