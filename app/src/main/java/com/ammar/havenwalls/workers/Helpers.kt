@@ -25,34 +25,35 @@ suspend fun download(
             if (!response.isSuccessful) {
                 throw IOException("Unexpected code: $response")
             }
-            val tempFile = createFile(response, dir, fileName)
-            (response.body ?: throw IOException("Response body is null")).use { body ->
-                val contentLength = body.contentLength()
-                val source = body.source()
-                tempFile.sink().buffer().use { sink ->
-                    var totalBytesRead: Long = 0
-                    val bufferSize = 8 * 1024
-                    var bytesRead: Long
-                    while (source.read(
-                            sink.buffer,
-                            bufferSize.toLong(),
-                        ).also { bytesRead = it } != -1L
-                    ) {
-                        sink.emit()
-                        totalBytesRead += bytesRead
-                        progressCallback(contentLength, totalBytesRead)
+            file = createFile(response, dir, fileName).also {
+                (response.body ?: throw IOException("Response body is null")).use { body ->
+                    val contentLength = body.contentLength()
+                    val source = body.source()
+                    it.sink().buffer().use { sink ->
+                        var totalBytesRead: Long = 0
+                        val bufferSize = 8 * 1024
+                        var bytesRead: Long
+                        while (
+                            source.read(
+                                sink.buffer,
+                                bufferSize.toLong(),
+                            ).also { bytesRead = it } != -1L
+                        ) {
+                            sink.emit()
+                            totalBytesRead += bytesRead
+                            progressCallback(contentLength, totalBytesRead)
+                        }
+                        sink.flush()
                     }
-                    sink.flush()
                 }
             }
-            file = tempFile
         }
     } catch (e: Exception) {
         // delete created file on any exception and rethrow the error
         file?.delete()
         throw e
     }
-    return file ?: throw IOException("This will never be thrown")
+    return file ?: throw IOException("File null!")
 }
 
 private fun createFile(

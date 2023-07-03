@@ -160,7 +160,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
     }
 
     private suspend fun setWallpaper(nextWallpaper: Wallpaper): Pair<Boolean, File?> {
-        val wallpaperFile = downloadWallpaper(nextWallpaper)
+        val wallpaperFile = safeDownloadWallpaper(nextWallpaper) ?: return false to null
         try {
             setForeground(
                 ForegroundInfo(
@@ -213,6 +213,29 @@ class AutoWallpaperWorker @AssistedInject constructor(
             )
             scale to detectionWithBitmaps.firstOrNull()
         }
+
+    private suspend fun safeDownloadWallpaper(wallpaper: Wallpaper): File? {
+        var downloadTries = 0
+        while (true) {
+            val wallpaperFile = downloadWallpaper(wallpaper)
+            // check if file size matches
+            if (wallpaperFile.length() == wallpaper.fileSize) {
+                // file was correctly downloaded
+                return wallpaperFile
+            }
+            // increment try count
+            downloadTries++
+            // max 3 tries
+            if (downloadTries < 3) {
+                // retry downloading the file
+                continue
+            }
+            // delete the file and return
+            wallpaperFile.delete()
+            // TODO skip this file next time
+            return null
+        }
+    }
 
     private suspend fun downloadWallpaper(wallpaper: Wallpaper): File {
         val fileName = wallpaper.path.getFileNameFromUrl()
