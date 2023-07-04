@@ -211,8 +211,8 @@ fun CropScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(
-                            top = topActionsSize.height.toDp(),
-                            bottom = actionsSize.height.toDp(),
+                            top = topActionsSize.height.toDp() + if (uiState.displays.size > 1) 16.dp else 0.dp,
+                            bottom = actionsSize.height.toDp() + 16.dp,
                         )
                 ) {
                     CompositionLocalProvider(LocalCropperStyle provides cropperStyle) {
@@ -234,8 +234,9 @@ fun CropScreen(
                     .wrapContentHeight()
                     .background(overlayColor)
                     .padding(
-                        horizontal = 32.dp,
-                        vertical = 16.dp,
+                        start = 32.dp,
+                        end = 32.dp,
+                        top = 16.dp,
                     )
                     .onSizeChanged { topActionsSize = it },
             ) {
@@ -252,8 +253,9 @@ fun CropScreen(
                 .align(Alignment.BottomCenter)
                 .background(overlayColor)
                 .padding(
-                    horizontal = 32.dp,
-                    vertical = 16.dp,
+                    start = 32.dp,
+                    end = 32.dp,
+                    bottom = 16.dp,
                 )
                 .onSizeChanged { actionsSize = it },
             objectDetectionEnabled = uiState.objectDetectionPreferences.enabled,
