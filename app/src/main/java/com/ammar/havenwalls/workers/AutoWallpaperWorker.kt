@@ -4,6 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
+import android.view.Display
 import androidx.compose.ui.unit.toSize
 import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
@@ -29,6 +30,7 @@ import com.ammar.havenwalls.data.repository.AutoWallpaperHistoryRepository
 import com.ammar.havenwalls.data.repository.ObjectDetectionModelRepository
 import com.ammar.havenwalls.data.repository.SavedSearchRepository
 import com.ammar.havenwalls.extensions.TAG
+import com.ammar.havenwalls.extensions.displayManager
 import com.ammar.havenwalls.extensions.getFileNameFromUrl
 import com.ammar.havenwalls.extensions.getMLModelsDir
 import com.ammar.havenwalls.extensions.getMLModelsFileIfExists
@@ -193,7 +195,8 @@ class AutoWallpaperWorker @AssistedInject constructor(
             imageSize = nextWallpaper.resolution.toSize(),
             cropScale = 1f,
         )
-        val applied = context.setWallpaper(uri, rect)
+        val display = context.displayManager.getDisplay(Display.DEFAULT_DISPLAY)
+        val applied = context.setWallpaper(display, uri, rect)
         if (!applied) {
             return false to null
         }

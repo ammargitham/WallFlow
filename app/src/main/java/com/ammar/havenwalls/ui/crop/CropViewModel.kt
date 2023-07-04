@@ -1,8 +1,11 @@
 package com.ammar.havenwalls.ui.crop
 
 import android.app.Application
+import android.hardware.display.DisplayManager
 import android.net.Uri
+import android.os.Handler
 import android.util.Log
+import android.view.Display
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.AndroidViewModel
@@ -21,6 +24,7 @@ import com.ammar.havenwalls.data.repository.AppPreferencesRepository
 import com.ammar.havenwalls.data.repository.ObjectDetectionModelRepository
 import com.ammar.havenwalls.data.repository.utils.Resource
 import com.ammar.havenwalls.extensions.TAG
+import com.ammar.havenwalls.extensions.displayManager
 import com.ammar.havenwalls.extensions.getMLModelsFileIfExists
 import com.ammar.havenwalls.extensions.getScreenResolution
 import com.ammar.havenwalls.extensions.setWallpaper
@@ -32,16 +36,20 @@ import com.ammar.havenwalls.utils.DownloadManager
 import com.ammar.havenwalls.utils.DownloadManager.Companion.DownloadLocation
 import com.ammar.havenwalls.utils.DownloadStatus
 import com.ammar.havenwalls.workers.DownloadWorker.Companion.NotificationType
+import com.github.materiiapps.partial.Partialize
+import com.github.materiiapps.partial.partial
 import com.mr0xf00.easycrop.CropResult
 import com.mr0xf00.easycrop.ImageCropper
 import com.mr0xf00.easycrop.crop
 import java.io.File
 import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
@@ -55,38 +63,94 @@ class CropViewModel(
     private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
     val imageCropper: ImageCropper by lazy { ImageCropper() }
-
-    private val _uiState = MutableStateFlow(CropUiState())
-    val uiState: StateFlow<CropUiState> = _uiState.asStateFlow()
+    private val uri: Uri? = savedStateHandle[EXTRA_URI]
+    private val localUiStateFlow = MutableStateFlow(CropUiStatePartial())
     private val modelDownloadStatusFlow = MutableStateFlow<DownloadStatus?>(null)
     private val downloadedModelFlow = MutableStateFlow<File?>(null)
-    private val uriFlow = savedStateHandle.getStateFlow<Uri?>(EXTRA_URI, null)
     private val appPreferencesFlow = appPreferencesRepository.appPreferencesFlow
+    private val displaysFlow = callbackFlow {
+        val displayManager = application.displayManager
+        val displays = displayManager.displays
+            .associateBy { it.displayId }
+            .toMutableMap()
+
+        val listener = object : DisplayManager.DisplayListener {
+            override fun onDisplayAdded(displayId: Int) {
+                displays[displayId] = displayManager.getDisplay(displayId) ?: return
+                trySend(displays.values.toList())
+            }
+
+            override fun onDisplayChanged(displayId: Int) {
+                displays[displayId] = application.displayManager.getDisplay(displayId) ?: return
+                trySend(displays.values.toList())
+            }
+
+            override fun onDisplayRemoved(displayId: Int) {
+                displays.remove(displayId)
+                trySend(displays.values.toList())
+            }
+        }
+
+        trySend(displays.values.toList())
+        val handler = Handler(application.mainLooper)
+        displayManager.registerDisplayListener(listener, handler)
+
+        awaitClose {
+            displayManager.unregisterDisplayListener(listener)
+        }
+    }
+
+    val uiState = combine(
+        localUiStateFlow,
+        appPreferencesFlow,
+        displaysFlow,
+    ) { localUiState, appPreferences, displays ->
+        val objectDetectionPreferences = appPreferences.objectDetectionPreferences
+        localUiState.merge(
+            CropUiState(
+                uri = uri,
+                objectDetectionPreferences = objectDetectionPreferences,
+                theme = appPreferences.lookAndFeelPreferences.theme,
+                displays = displays,
+                selectedDisplay = displays.firstOrNull(),
+            )
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = CropUiState(),
+    )
+
+    private val detectionState = combine(
+        appPreferencesFlow,
+        downloadedModelFlow,
+    ) { appPreferences, downloadedModel ->
+        val objectDetectionPreferences = appPreferences.objectDetectionPreferences
+        DetectionState(
+            objectDetectionPreferences = objectDetectionPreferences,
+            objectDetectionModelFile = downloadedModel,
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = DetectionState(),
+    )
 
     init {
         viewModelScope.launch {
-            uriFlow.collectLatest { it?.run { setUri(this) } }
+            setUri(uri ?: return@launch)
         }
         viewModelScope.launch {
-            combine(
-                uriFlow,
-                appPreferencesFlow,
-                downloadedModelFlow,
-            ) { uri, appPreferences, downloadedModel ->
-                Triple(uri, appPreferences, downloadedModel)
-            }.collectLatest { (uri, appPreferences, downloadedModel) ->
-                val objectDetectionPreferences = appPreferences.objectDetectionPreferences
-                _uiState.update {
-                    it.copy(
-                        objectDetectionEnabled = objectDetectionPreferences.enabled,
-                        theme = appPreferences.lookAndFeelPreferences.theme,
+            detectionState.collectLatest {
+                try {
+                    initObjectDetection(
+                        preferences = it.objectDetectionPreferences,
+                        uri = uri,
+                        modelFile = it.objectDetectionModelFile,
                     )
+                } catch (e: Exception) {
+                    Log.e(TAG, "detection error: ", e)
                 }
-                initObjectDetection(
-                    preferences = objectDetectionPreferences,
-                    uri = uri,
-                    modelFile = downloadedModel,
-                )
             }
         }
     }
@@ -101,7 +165,7 @@ class CropViewModel(
         if (!enabled || uri == null || modelDownloadStatus is DownloadStatus.Running) {
             return
         }
-        _uiState.update { it.copy(detectedObjects = Resource.Loading(emptyList())) }
+        localUiStateFlow.update { it.copy(detectedObjects = partial(Resource.Loading(emptyList()))) }
         if (modelFile != null) {
             // file was downloaded, trigger objectDetection directly
             detectObjects(uri, modelFile, preferences)
@@ -144,7 +208,7 @@ class CropViewModel(
             downloadManager.getProgress(application, workName).collectLatest { state ->
                 // Log.d(TAG, "state: $state")
                 modelDownloadStatusFlow.update { state }
-                _uiState.update { it.copy(modelDownloadStatus = state) }
+                localUiStateFlow.update { it.copy(modelDownloadStatus = partial(state)) }
                 if (!state.isSuccessOrFail()) return@collectLatest
                 if (state is DownloadStatus.Failed) {
                     // application.toast("Model download failed: ${state.e?.message ?: "Unknown reason"}")
@@ -162,33 +226,42 @@ class CropViewModel(
         }
     }
 
-    private fun setUri(uri: Uri) {
-        if (uiState.value.uri == uri) {
+    private suspend fun setUri(uri: Uri) {
+        val result = imageCropper.crop(
+            uri = uri,
+            context = application,
+            maxResultSize = application.getScreenResolution(
+                true,
+                uiState.value.selectedDisplay?.displayId ?: Display.DEFAULT_DISPLAY,
+            ),
+            cacheBeforeUse = false,
+        )
+        val cropRect = uiState.value.lastCropRegion
+        if (result is CropResult.Cancelled || cropRect == null) {
+            localUiStateFlow.update { it.copy(result = partial(Result.Cancelled)) }
             return
         }
-        _uiState.update { it.copy(uri = uri) }
-        viewModelScope.launch {
-            val result = imageCropper.crop(
-                uri = uri,
-                context = application,
-                maxResultSize = application.getScreenResolution(true),
-                cacheBeforeUse = false,
+        val success = result as CropResult.Success
+        localUiStateFlow.update { it.copy(result = partial(Result.Pending(success.bitmap))) }
+        val display = uiState.value.displays.find {
+            it.displayId == uiState.value.selectedDisplay?.displayId
+        } ?: application.displayManager.getDisplay(Display.DEFAULT_DISPLAY)
+        val applied = application.setWallpaper(
+            display = display,
+            uri = uri,
+            cropRect = cropRect,
+            targets = uiState.value.wallpaperTargets,
+        )
+        application.toast(
+            application.getString(
+                if (applied) {
+                    R.string.wallpaper_changed
+                } else {
+                    R.string.failed_to_change_wallpaper
+                }
             )
-            val cropRect = uiState.value.lastCropRegion
-            if (result is CropResult.Cancelled || cropRect == null) {
-                _uiState.update { it.copy(result = Result.Cancelled) }
-                return@launch
-            }
-            val success = result as CropResult.Success
-            _uiState.update { it.copy(result = Result.Pending(success.bitmap)) }
-            application.setWallpaper(
-                uri = uri,
-                cropRect = cropRect,
-                targets = uiState.value.wallpaperTargets,
-            )
-            application.toast(application.getString(R.string.wallpaper_changed))
-            _uiState.update { it.copy(result = Result.Success(result)) }
-        }
+        )
+        localUiStateFlow.update { it.copy(result = partial(Result.Success(result))) }
     }
 
     private fun detectObjects(
@@ -197,10 +270,10 @@ class CropViewModel(
         objectDetectionPreferences: ObjectDetectionPreferences,
     ) = viewModelScope.launch(ioDispatcher) {
         try {
-            _uiState.update {
+            localUiStateFlow.update {
                 it.copy(
-                    detectedObjects = Resource.Loading(emptyList()),
-                    selectedDetection = null,
+                    detectedObjects = partial(Resource.Loading(emptyList())),
+                    selectedDetection = partial(null),
                 )
             }
             val (scale, detectionWithBitmaps) = com.ammar.havenwalls.utils.detectObjects(
@@ -209,43 +282,49 @@ class CropViewModel(
                 model = model,
                 objectDetectionPreferences = objectDetectionPreferences,
             )
-            _uiState.update {
+            localUiStateFlow.update {
                 it.copy(
-                    detectedRectScale = scale,
-                    detectedObjects = Resource.Success(detectionWithBitmaps),
-                    selectedDetection = detectionWithBitmaps.firstOrNull(),
+                    detectedRectScale = partial(scale),
+                    detectedObjects = partial(Resource.Success(detectionWithBitmaps)),
+                    selectedDetection = partial(detectionWithBitmaps.firstOrNull()),
                 )
             }
         } catch (e: Exception) {
             Log.e(TAG, "detectObjects: ", e)
-            _uiState.update {
+            localUiStateFlow.update {
                 it.copy(
-                    detectedObjects = Resource.Error(e),
-                    selectedDetection = null,
+                    detectedObjects = partial(Resource.Error(e)),
+                    selectedDetection = partial(null),
                 )
             }
         }
     }
 
-    fun showDetections(show: Boolean) = _uiState.update { it.copy(showDetections = show) }
-
-    fun selectDetection(detection: DetectionWithBitmap) = _uiState.update {
-        it.copy(selectedDetection = detection)
+    fun showDetections(show: Boolean) = localUiStateFlow.update {
+        it.copy(showDetections = partial(show))
     }
 
-    fun setLastCropRegion(region: Rect) = _uiState.update {
-        it.copy(lastCropRegion = region)
+    fun selectDetection(detection: DetectionWithBitmap) = localUiStateFlow.update {
+        it.copy(selectedDetection = partial(detection))
     }
 
-    fun removeSelectedDetectionAndUpdateRegion(region: Rect) = _uiState.update {
+    fun setLastCropRegion(region: Rect) = localUiStateFlow.update {
+        it.copy(lastCropRegion = partial(region))
+    }
+
+    fun removeSelectedDetectionAndUpdateRegion(region: Rect) = localUiStateFlow.update {
         it.copy(
-            selectedDetection = null,
-            lastCropRegion = region,
+            selectedDetection = partial(null),
+            lastCropRegion = partial(region),
         )
     }
 
-    fun setWallpaperTargets(wallpaperTargets: Set<WallpaperTarget>) = _uiState.update {
-        it.copy(wallpaperTargets = wallpaperTargets)
+    fun setWallpaperTargets(wallpaperTargets: Set<WallpaperTarget>) = localUiStateFlow.update {
+        it.copy(wallpaperTargets = partial(wallpaperTargets))
+    }
+
+    fun setSelectedDisplay(display: Display) = localUiStateFlow.update {
+        it.copy(selectedDisplay = partial(display))
     }
 
     companion object {
@@ -269,11 +348,14 @@ class CropViewModel(
     }
 }
 
+@Partialize
 data class CropUiState(
     val uri: Uri? = null,
-    val objectDetectionEnabled: Boolean = false,
+    val objectDetectionPreferences: ObjectDetectionPreferences = ObjectDetectionPreferences(
+        enabled = false,
+    ),
     val modelDownloadStatus: DownloadStatus? = null,
-    val detectedObjects: Resource<List<DetectionWithBitmap>> = Resource.Success(emptyList()),
+    val detectedObjects: Resource<List<DetectionWithBitmap>>? = null,
     val detectedRectScale: Int = 1,
     val selectedDetection: DetectionWithBitmap? = null,
     val showDetections: Boolean = false,
@@ -284,6 +366,15 @@ data class CropUiState(
         WallpaperTarget.LOCKSCREEN,
     ),
     val theme: Theme = Theme.SYSTEM,
+    val displays: List<Display> = emptyList(),
+    val selectedDisplay: Display? = null,
+)
+
+data class DetectionState(
+    val objectDetectionPreferences: ObjectDetectionPreferences = ObjectDetectionPreferences(
+        enabled = false,
+    ),
+    val objectDetectionModelFile: File? = null,
 )
 
 sealed class Result {

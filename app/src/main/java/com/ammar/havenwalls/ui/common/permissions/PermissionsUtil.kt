@@ -109,5 +109,8 @@ internal fun Activity.shouldShowRationale(permission: String) =
 internal fun Context.checkNotificationPermission() = NotificationManagerCompat.from(this)
     .areNotificationsEnabled()
 
-internal fun Context.checkSetWallpaperPermission() = wallpaperManager.isWallpaperSupportedCompat
-        && wallpaperManager.isSetWallpaperAllowedCompat
+internal fun Context.checkSetWallpaperPermission(): Boolean {
+    val wallpaperManager = wallpaperManager
+    return wallpaperManager.isWallpaperSupportedCompat
+            && wallpaperManager.isSetWallpaperAllowedCompat
+}

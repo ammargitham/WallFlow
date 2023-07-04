@@ -203,6 +203,9 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="system">System</string>
     <string name="light">Light</string>
     <string name="dark">Dark</string>
+    <string name="displays">Displays</string>
+    <string name="select_display">Select display</string>
+    <string name="failed_to_change_wallpaper">Failed to change wallpaper!</string>
     <plurals name="every_x_hrs">
         <item quantity="one">Every %d hour</item>
         <item quantity="other">Every %d hours</item>

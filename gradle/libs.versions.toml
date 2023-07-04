@@ -18,6 +18,7 @@ androidxTest = "1.5.0" # https://github.com/android/android-test/issues/1412
 androidxTestExt = "1.1.5"
 androidxTestRunner = "1.5.2"
 androidxTestServices = "1.4.2"
+androidXWindow="1.2.0-alpha03"
 androidxWork = "2.9.0-alpha01"
 cloudy = "0.1.2"
 coil = "2.4.0"
@@ -78,6 +79,7 @@ androidx-test-core = { module = "androidx.test:core", version.ref = "androidxTes
 androidx-test-ext-junit = { module = "androidx.test.ext:junit", version.ref = "androidxTestExt" }
 androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidxTestRunner" }
 androidx-test-services = { module = "androidx.test.services:test-services", version.ref = "androidxTestServices" }
+androidx-window = { module = "androidx.window:window", version.ref = "androidXWindow" }
 androidx-work-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "androidxWork" }
 androidx-work-testing = { module = "androidx.work:work-testing", version.ref = "androidxWork" }
 cloudy = { module = "com.github.skydoves:cloudy", version.ref = "cloudy" }

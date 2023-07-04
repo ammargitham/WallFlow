@@ -1,15 +1,19 @@
 package com.ammar.havenwalls.ui.crop
 
 import android.util.Log
+import android.view.Display
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.mandatorySystemGestures
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -86,7 +90,13 @@ fun CropScreen(
     val resolution by produceState(
         initialValue = IntSize.Zero,
         key1 = context,
-        producer = { value = context.getScreenResolution(true) },
+        key2 = uiState.selectedDisplay,
+        producer = {
+            value = context.getScreenResolution(
+                inDefaultOrientation = true,
+                displayId = uiState.selectedDisplay?.displayId ?: Display.DEFAULT_DISPLAY,
+            )
+        },
     )
     val maxCropSize by remember(
         cropState?.transform?.scale?.x,
@@ -104,6 +114,7 @@ fun CropScreen(
         }
     }
     var actionsSize by remember { mutableStateOf(IntSize.Zero) }
+    var topActionsSize by remember { mutableStateOf(IntSize.Zero) }
 
     LaunchedEffect(Unit) {
         systemBarsController.update {
@@ -139,6 +150,7 @@ fun CropScreen(
             return@LaunchedEffect
         }
         val state = cropState ?: return@LaunchedEffect
+        state.reset()
         val cropScale = state.transform.scale.x
         val imageSize = state.src.size.toSize() * cropScale
         val newCropRegion = getCropRect(
@@ -189,7 +201,7 @@ fun CropScreen(
             if (innerResult is Result.Pending) {
                 Image(
                     modifier = Modifier.fillMaxSize(),
-                    bitmap = (uiState.result as Result.Pending).bitmap,
+                    bitmap = innerResult.bitmap,
                     contentDescription = stringResource(R.string.cropped_image),
                     contentScale = ContentScale.Fit,
                 )
@@ -198,7 +210,10 @@ fun CropScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(bottom = actionsSize.height.toDp() + 16.dp)
+                        .padding(
+                            top = topActionsSize.height.toDp(),
+                            bottom = actionsSize.height.toDp(),
+                        )
                 ) {
                     CompositionLocalProvider(LocalCropperStyle provides cropperStyle) {
                         CropperPreview(
@@ -212,15 +227,38 @@ fun CropScreen(
             }
         }
 
+        if (uiState.displays.size > 1) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight()
+                    .background(overlayColor)
+                    .padding(
+                        horizontal = 32.dp,
+                        vertical = 16.dp,
+                    )
+                    .onSizeChanged { topActionsSize = it },
+            ) {
+                DisplayButton(
+                    selectedDisplay = uiState.selectedDisplay,
+                    displays = uiState.displays,
+                    onChange = viewModel::setSelectedDisplay,
+                )
+            }
+        }
+
         Actions(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .background(overlayColor)
-                .padding(start = 32.dp, end = 32.dp, bottom = 16.dp)
+                .padding(
+                    horizontal = 32.dp,
+                    vertical = 16.dp,
+                )
                 .onSizeChanged { actionsSize = it },
-            objectDetectionEnabled = uiState.objectDetectionEnabled,
+            objectDetectionEnabled = uiState.objectDetectionPreferences.enabled,
             modelDownloadStatus = uiState.modelDownloadStatus,
-            detections = uiState.detectedObjects,
+            detections = uiState.detectedObjects ?: Resource.Success(emptyList()),
             onDetectionsClick = { viewModel.showDetections(true) },
             onCancelClick = { cropState?.done(false) },
             onSetClick = {
@@ -231,7 +269,7 @@ fun CropScreen(
 
         if (uiState.showDetections) {
             DetectionsBottomSheet(
-                detections = uiState.detectedObjects.successOr(emptyList()),
+                detections = uiState.detectedObjects?.successOr(emptyList()) ?: emptyList(),
                 onDetectionClick = viewModel::selectDetection,
                 onDismissRequest = { viewModel.showDetections(false) }
             )

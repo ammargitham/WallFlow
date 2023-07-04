@@ -16,12 +16,12 @@ kapt {
 
 android {
     namespace = "com.ammar.havenwalls"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.ammar.havenwalls"
         minSdk = 22
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -107,6 +107,9 @@ dependencies {
     implementation(libs.androidx.lifecycle.service)
     implementation(libs.androidx.lifecycle.process)
     implementation(libs.androidx.activity.compose)
+
+    // Window
+    implementation(libs.androidx.window)
 
     // Hilt Dependency Injection
     implementation(libs.hilt.android)

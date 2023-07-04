@@ -9,8 +9,10 @@ import android.content.ContextWrapper
 import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapRegionDecoder
+import android.hardware.display.DisplayManager
 import android.net.Uri
 import android.os.Build
+import android.util.DisplayMetrics
 import android.util.Log
 import android.view.Display
 import android.view.Surface
@@ -23,7 +25,6 @@ import androidx.compose.ui.unit.IntSize
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.FileProvider
 import androidx.core.graphics.toRect
-import androidx.core.hardware.display.DisplayManagerCompat
 import androidx.core.net.toUri
 import androidx.work.WorkManager
 import com.ammar.havenwalls.FILE_PROVIDER_AUTHORITY
@@ -68,11 +69,12 @@ fun parseMimeType(file: File): String {
 fun Context.toast(message: String) = Toast.makeText(this, message, Toast.LENGTH_LONG).show()
 
 fun Context.setWallpaper(
+    display: Display,
     uri: Uri,
     cropRect: Rect,
     targets: Set<WallpaperTarget> = setOf(WallpaperTarget.HOME, WallpaperTarget.LOCKSCREEN),
 ) = this.contentResolver.openInputStream(uri).use {
-    val screenResolution = this.getScreenResolution(true)
+    val screenResolution = getScreenResolution(true, display.displayId)
     if (it == null) return@use false
     val decoder = getBitmapRegionDecoder(it) ?: return@use false
     val (opts, _) = getDecodeSampledBitmapOptions(
@@ -85,7 +87,7 @@ fun Context.setWallpaper(
         cropRect.toAndroidRectF().toRect(),
         opts
     ) ?: return@use false
-    return this.setWallpaper(bitmap, targets)
+    return createDisplayContext(display).setWallpaper(bitmap, targets)
 }
 
 private fun getBitmapRegionDecoder(`is`: InputStream) =
@@ -100,7 +102,8 @@ fun Context.setWallpaper(
     bitmap: Bitmap,
     targets: Set<WallpaperTarget> = setOf(WallpaperTarget.HOME, WallpaperTarget.LOCKSCREEN),
 ): Boolean {
-    if (!this.checkSetWallpaperPermission()) return false
+    if (!checkSetWallpaperPermission()) return false
+    val wallpaperManager = wallpaperManager
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         wallpaperManager.setBitmap(
             bitmap,
@@ -187,34 +190,31 @@ fun Context.getMLModelsFileIfExists(fileName: String): File? {
 }
 
 val Context.displayManager
-    get() = DisplayManagerCompat.getInstance(this)
+    get() = getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
 
 val Context.windowManager
     get() = getSystemService(Context.WINDOW_SERVICE) as WindowManager
 
 fun Context.getScreenResolution(
     inDefaultOrientation: Boolean = false,
+    displayId: Int = Display.DEFAULT_DISPLAY,
 ): IntSize {
+    val display = displayManager.getDisplay(displayId) ?: return IntSize.Zero
     var changeOrientation = false
     if (inDefaultOrientation) {
-        val display = displayManager.getDisplay(Display.DEFAULT_DISPLAY) ?: return IntSize.Zero
         val rotation = display.rotation
         // if current rotation is 90 or 270, device is rotated, so we will swap width and height
         changeOrientation = rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270
     }
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-        val bounds = windowManager.currentWindowMetrics.bounds
-        IntSize(
-            width = if (changeOrientation) bounds.height() else bounds.width(),
-            height = if (changeOrientation) bounds.width() else bounds.height(),
-        )
-    } else {
-        val displayMetrics = resources.displayMetrics
-        IntSize(
-            width = if (changeOrientation) displayMetrics.heightPixels else displayMetrics.widthPixels,
-            height = if (changeOrientation) displayMetrics.widthPixels else displayMetrics.heightPixels,
-        )
-    }
+    val metrics = DisplayMetrics()
+    @Suppress("DEPRECATION")
+    display.getRealMetrics(metrics)
+    val height = metrics.heightPixels
+    val width = metrics.widthPixels
+    return IntSize(
+        width = if (changeOrientation) height else width,
+        height = if (changeOrientation) width else height,
+    )
 }
 
 fun Context.getUriForFile(file: File): Uri = FileProvider.getUriForFile(

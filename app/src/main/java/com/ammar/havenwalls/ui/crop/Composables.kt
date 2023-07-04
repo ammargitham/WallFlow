@@ -4,8 +4,11 @@ import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.RectF
 import android.os.Build
+import android.view.Display
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,17 +18,22 @@ import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -34,6 +42,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
@@ -285,6 +294,69 @@ private fun PreviewDetectionItem() {
                     Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888),
                 )
             )
+        }
+    }
+}
+
+@Composable
+internal fun DisplayButton(
+    modifier: Modifier = Modifier,
+    selectedDisplay: Display? = null,
+    displays: List<Display> = emptyList(),
+    onChange: (Display) -> Unit = {},
+) {
+    var expanded by remember { mutableStateOf(false) }
+
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .wrapContentSize(Alignment.TopStart)
+    ) {
+        FilledTonalButton(
+            modifier = modifier,
+            contentPadding = PaddingValues(
+                start = 16.dp,
+                top = 8.dp,
+                end = 16.dp,
+                bottom = 8.dp
+            ),
+            onClick = { expanded = true },
+        ) {
+            Text(
+                text = selectedDisplay?.name ?: stringResource(R.string.select_display),
+                maxLines = 1,
+            )
+            Spacer(Modifier.size(ButtonDefaults.IconSpacing))
+            Icon(
+                modifier = Modifier.size(ButtonDefaults.IconSize),
+                imageVector = Icons.Outlined.ArrowDropDown,
+                contentDescription = stringResource(R.string.add_resolution),
+            )
+        }
+        DropdownMenu(
+            modifier = Modifier.widthIn(min = 150.dp),
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+        ) {
+            displays.map {
+                DropdownMenuItem(
+                    text = { Text(text = it.name) },
+                    leadingIcon = {
+                        RadioButton(
+                            modifier = Modifier.size(24.dp),
+                            selected = selectedDisplay?.displayId == it.displayId,
+                            onClick = {
+                                expanded = false
+                                onChange(it)
+                            },
+                        )
+                    },
+                    onClick = {
+                        expanded = false
+                        onChange(it)
+                    },
+                )
+            }
         }
     }
 }
