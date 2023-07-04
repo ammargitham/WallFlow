@@ -1,6 +1,5 @@
 package com.ammar.havenwalls.ui.crop
 
-import android.util.Log
 import android.view.Display
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.Image
@@ -27,7 +26,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
@@ -36,17 +34,13 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import coil.compose.rememberAsyncImagePainter
-import coil.request.ImageRequest
 import com.ammar.havenwalls.R
 import com.ammar.havenwalls.data.repository.utils.Resource
 import com.ammar.havenwalls.data.repository.utils.successOr
-import com.ammar.havenwalls.extensions.TAG
 import com.ammar.havenwalls.extensions.aspectRatio
 import com.ammar.havenwalls.extensions.getScreenResolution
 import com.ammar.havenwalls.extensions.toDp
 import com.ammar.havenwalls.extensions.toast
-import com.ammar.havenwalls.ui.common.BlurTransformation
 import com.ammar.havenwalls.ui.common.LocalSystemBarsController
 import com.mr0xf00.easycrop.CropperStyle
 import com.mr0xf00.easycrop.LocalCropperStyle
@@ -69,24 +63,24 @@ fun CropScreen(
     }
     val cropState = viewModel.imageCropper.cropState
     val context = LocalContext.current
-    val request by produceState(
-        initialValue = null as ImageRequest?,
-        key1 = context,
-        key2 = uiState.uri,
-    ) {
-        if (uiState.uri == null) {
-            return@produceState
-        }
-        value = ImageRequest.Builder(context).apply {
-            data(uiState.uri)
-            crossfade(true)
-            transformations(BlurTransformation())
-            listener(onError = { _, result ->
-                Log.e(TAG, "Error loading: $this", result.throwable)
-            })
-        }.build()
-    }
-    val backdropPainter = rememberAsyncImagePainter(model = request)
+    // val request by produceState(
+    //     initialValue = null as ImageRequest?,
+    //     key1 = context,
+    //     key2 = uiState.uri,
+    // ) {
+    //     if (uiState.uri == null) {
+    //         return@produceState
+    //     }
+    //     value = ImageRequest.Builder(context).apply {
+    //         data(uiState.uri)
+    //         crossfade(true)
+    //         transformations(BlurTransformation())
+    //         listener(onError = { _, result ->
+    //             Log.e(TAG, "Error loading: $this", result.throwable)
+    //         })
+    //     }.build()
+    // }
+    // val backdropPainter = rememberAsyncImagePainter(model = request)
     val resolution by produceState(
         initialValue = IntSize.Zero,
         key1 = context,
@@ -175,26 +169,28 @@ fun CropScreen(
     }
 
     Box(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier
+            .fillMaxSize()
+            .background(Color.Black),
     ) {
-        uiState.uri?.run {
-            Image(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .graphicsLayer {
-                        scaleX = 1.2f
-                        scaleY = 1.2f
-                    },
-                painter = backdropPainter,
-                contentDescription = stringResource(R.string.wallpaper_description),
-                contentScale = ContentScale.Crop,
-            )
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(color = overlayColor)
-            )
-        }
+        // uiState.uri?.run {
+        //     Image(
+        //         modifier = Modifier
+        //             .fillMaxSize()
+        //             .graphicsLayer {
+        //                 scaleX = 1.2f
+        //                 scaleY = 1.2f
+        //             },
+        //         painter = backdropPainter,
+        //         contentDescription = stringResource(R.string.wallpaper_description),
+        //         contentScale = ContentScale.Crop,
+        //     )
+        //     Box(
+        //         modifier = Modifier
+        //             .fillMaxSize()
+        //             .background(color = overlayColor)
+        //     )
+        // }
 
         Crossfade(targetState = cropState to uiState.result) {
             val (innerCropState, innerResult) = it
