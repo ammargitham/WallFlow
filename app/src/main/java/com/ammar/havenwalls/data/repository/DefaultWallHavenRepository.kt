@@ -95,7 +95,7 @@ class DefaultWallHavenRepository @Inject constructor(
 
         }
 
-    private suspend fun insertTags(
+    internal suspend fun insertTags(
         tags: List<NetworkTag>,
         shouldUpdate: Boolean,
     ): List<TagEntity> {
@@ -194,7 +194,7 @@ class DefaultWallHavenRepository @Inject constructor(
 
         }
 
-    private suspend fun insertUploader(uploader: NetworkUploader): Long {
+    internal suspend fun insertUploader(uploader: NetworkUploader): Long {
         val existingUploader = uploadersDao.getByUsername(uploader.username)
         if (existingUploader != null) {
             return existingUploader.id
@@ -248,7 +248,7 @@ class DefaultWallHavenRepository @Inject constructor(
         }
     }
 
-    private suspend fun upsertLastUpdated(
+    internal suspend fun upsertLastUpdated(
         category: LastUpdatedCategory,
         lastUpdatedOn: Instant = Clock.System.now(),
     ) {
