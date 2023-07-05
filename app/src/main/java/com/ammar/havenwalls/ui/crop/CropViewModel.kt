@@ -9,14 +9,11 @@ import android.view.Display
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
-import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.ammar.havenwalls.R
-import com.ammar.havenwalls.activities.setwallpaper.SetWallpaperActivity.Companion.EXTRA_URI
 import com.ammar.havenwalls.data.db.entity.toModel
 import com.ammar.havenwalls.data.preferences.ObjectDetectionPreferences
 import com.ammar.havenwalls.data.preferences.Theme
@@ -53,17 +50,15 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-
 class CropViewModel(
     private val application: Application,
-    savedStateHandle: SavedStateHandle,
+    private val uri: Uri,
     private val appPreferencesRepository: AppPreferencesRepository,
     private val objectDetectionModelRepository: ObjectDetectionModelRepository,
     private val downloadManager: DownloadManager,
     private val ioDispatcher: CoroutineDispatcher,
 ) : AndroidViewModel(application) {
     val imageCropper: ImageCropper by lazy { ImageCropper() }
-    private val uri: Uri? = savedStateHandle[EXTRA_URI]
     private val localUiStateFlow = MutableStateFlow(CropUiStatePartial())
     private val modelDownloadStatusFlow = MutableStateFlow<DownloadStatus?>(null)
     private val downloadedModelFlow = MutableStateFlow<File?>(null)
@@ -137,9 +132,7 @@ class CropViewModel(
     )
 
     init {
-        viewModelScope.launch {
-            setUri(uri ?: return@launch)
-        }
+        viewModelScope.launch { setUri(uri) }
         viewModelScope.launch {
             detectionState.collectLatest {
                 try {
@@ -329,6 +322,7 @@ class CropViewModel(
 
     companion object {
         fun getFactory(
+            uri: Uri,
             appPreferencesRepository: AppPreferencesRepository,
             objectDetectionModelRepository: ObjectDetectionModelRepository,
             downloadManager: DownloadManager,
@@ -337,7 +331,7 @@ class CropViewModel(
             initializer {
                 CropViewModel(
                     application = this[APPLICATION_KEY] as Application,
-                    savedStateHandle = createSavedStateHandle(),
+                    uri = uri,
                     appPreferencesRepository = appPreferencesRepository,
                     objectDetectionModelRepository = objectDetectionModelRepository,
                     downloadManager = downloadManager,

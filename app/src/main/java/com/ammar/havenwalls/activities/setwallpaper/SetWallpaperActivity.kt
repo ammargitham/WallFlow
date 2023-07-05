@@ -1,5 +1,6 @@
 package com.ammar.havenwalls.activities.setwallpaper
 
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -67,7 +68,7 @@ class SetWallpaperActivity : ComponentActivity() {
             }
         })
 
-        val uri = intent.getParcelExtra(EXTRA_URI, Uri::class.java)
+        val uri = getUri()
         if (uri == null) {
             toast(getString(R.string.invalid_uri))
             finishAndRemoveTask()
@@ -82,6 +83,7 @@ class SetWallpaperActivity : ComponentActivity() {
             },
             factoryProducer = {
                 CropViewModel.getFactory(
+                    uri = uri,
                     appPreferencesRepository = appPreferencesRepository,
                     objectDetectionModelRepository = objectDetectionModelRepository,
                     downloadManager = downloadManager,
@@ -130,6 +132,16 @@ class SetWallpaperActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    private fun getUri() = if (intent?.action == Intent.ACTION_SEND) {
+        if (intent.type?.startsWith("image/") == true) {
+            intent.getParcelExtra(Intent.EXTRA_STREAM, Uri::class.java)
+        } else {
+            null
+        }
+    } else {
+        intent.getParcelExtra(EXTRA_URI, Uri::class.java)
     }
 
     companion object {

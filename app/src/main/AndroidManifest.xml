@@ -49,8 +49,16 @@
         </activity>
         <activity
             android:name=".activities.setwallpaper.SetWallpaperActivity"
-            android:exported="false"
-            android:theme="@style/Theme.HavenWalls" />
+            android:exported="true"
+            android:label="@string/set_wallpaper"
+            android:theme="@style/Theme.HavenWalls">
+            <intent-filter>
+                <action android:name="android.intent.action.SEND" />
+                <category android:name="android.intent.category.DEFAULT" />
+
+                <data android:mimeType="image/*" />
+            </intent-filter>
+        </activity>
 
         <service
             android:name=".services.DownloadSuccessActionsService"
