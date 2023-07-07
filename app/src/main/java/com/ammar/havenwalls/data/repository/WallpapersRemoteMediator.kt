@@ -22,10 +22,11 @@ class WallpapersRemoteMediator(
     private val searchQuery: SearchQuery,
     private val appDatabase: AppDatabase,
     private val wallHavenNetwork: WallHavenNetworkDataSource,
+    private val clock: Clock = Clock.System,
 ) : RemoteMediator<Int, WallpaperEntity>() {
     private val wallpapersDao = appDatabase.wallpapersDao()
     private val searchQueryDao = appDatabase.searchQueryDao()
-    private val remoteKeyDao = appDatabase.searchQueryRemoteKeysDao()
+    private val remoteKeysDao = appDatabase.searchQueryRemoteKeysDao()
     private val searchQueryWallpapersDao = appDatabase.searchQueryWallpapersDao()
 
     override suspend fun initialize(): InitializeAction {
@@ -33,7 +34,7 @@ class WallpapersRemoteMediator(
         val lastUpdatedOn =
             searchQueryEntity?.lastUpdatedOn ?: return InitializeAction.LAUNCH_INITIAL_REFRESH
         val cacheTimeout = 3 // hours
-        val diffHours = (Clock.System.now() - lastUpdatedOn).absoluteValue.inWholeMinutes / 60f
+        val diffHours = (clock.now() - lastUpdatedOn).absoluteValue.inWholeMinutes / 60f
         return if (diffHours <= cacheTimeout) {
             // Cached data is up-to-date, so there is no need to re-fetch from the network.
             InitializeAction.SKIP_INITIAL_REFRESH
@@ -56,17 +57,18 @@ class WallpapersRemoteMediator(
                 LoadType.REFRESH -> null
                 LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
                 LoadType.APPEND -> {
-                    searchQueryEntity?.run { remoteKeyDao.getBySearchQueryId(id) }
+                    searchQueryEntity?.run { remoteKeysDao.getBySearchQueryId(id) }
                         ?.nextPageNumber
                         ?: return MediatorResult.Success(endOfPaginationReached = true)
                 }
             }
             val response = wallHavenNetwork.search(searchQuery, nextPage)
             // if at last page, next page is null else current + 1
-            val nextPageNumber =
-                response.meta?.run { if (current_page != last_page) current_page + 1 else null }
+            val nextPageNumber = response.meta?.run {
+                if (current_page != last_page) current_page + 1 else null
+            }
             appDatabase.withTransaction {
-                val now = Clock.System.now()
+                val now = clock.now()
                 val searchQueryId = searchQueryEntity?.id ?: searchQueryDao.upsert(
                     SearchQueryEntity(
                         id = 0,
@@ -76,7 +78,7 @@ class WallpapersRemoteMediator(
                 ).first()
 
                 if (loadType == LoadType.REFRESH) {
-                    remoteKeyDao.deleteBySearchQueryId(searchQueryId)
+                    remoteKeysDao.deleteBySearchQueryId(searchQueryId)
                     wallpapersDao.deleteAllUniqueToSearchQueryId(searchQueryId)
                     searchQueryWallpapersDao.deleteBySearchQueryId(searchQueryId)
                     (searchQueryEntity ?: searchQueryDao.getById(searchQueryId))?.run {
@@ -86,14 +88,14 @@ class WallpapersRemoteMediator(
                 }
 
                 // Update RemoteKey for this query.
-                val remoteKey = remoteKeyDao.getBySearchQueryId(searchQueryId)
+                val remoteKey = remoteKeysDao.getBySearchQueryId(searchQueryId)
                 val updatedRemoteKey = remoteKey?.copy(nextPageNumber = nextPageNumber)
                     ?: SearchQueryRemoteKeyEntity(
                         id = 0,
                         searchQueryId = searchQueryId,
                         nextPageNumber = nextPageNumber,
                     )
-                remoteKeyDao.insertOrReplace(updatedRemoteKey)
+                remoteKeysDao.insertOrReplace(updatedRemoteKey)
 
                 val networkWallpapers = response.data
                 val wallhavenWallpaperIds = networkWallpapers.map { it.id }

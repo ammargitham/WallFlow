@@ -67,8 +67,6 @@ import kotlin.time.Duration.Companion.hours
 @RunWith(AndroidJUnit4::class)
 class AutoWallpaperTest {
     private lateinit var context: Context
-
-    // private lateinit var workerParameters: WorkerParameters
     private val testDispatcher = StandardTestDispatcher()
 
     private open class TestSavedSearchDao : SavedSearchDao {
@@ -172,7 +170,6 @@ class AutoWallpaperTest {
     @Before
     fun setUp() {
         context = ApplicationProvider.getApplicationContext()
-        // workerParameters = mockkClass(WorkerParameters::class)
     }
 
     @After
@@ -604,44 +601,6 @@ class AutoWallpaperTest {
         it.parentFile?.mkdirs()
         it.createNewFile()
     }
-    //
-    // private val testWallpaper: Wallpaper
-    //     get() {
-    //         val id = Random.nextInt().toString()
-    //         return Wallpaper(
-    //             id = id,
-    //             url = "https://example.com/wallpaper_${id}",
-    //             shortUrl = "short test",
-    //             uploader = null,
-    //             views = Random.nextInt(),
-    //             favorites = Random.nextInt(),
-    //             source = "source",
-    //             purity = Purity.SFW,
-    //             category = "test",
-    //             resolution = IntSize(10, 10),
-    //             fileSize = 100,
-    //             fileType = "jpg",
-    //             createdAt = Clock.System.now(),
-    //             colors = emptyList(),
-    //             path = "wallpaper_path_${id}",
-    //             thumbs = Thumbs(
-    //                 large = "test",
-    //                 original = "test",
-    //                 small = "test",
-    //             ),
-    //             tags = listOf(
-    //                 Tag(
-    //                     id = Random.nextLong(),
-    //                     name = "test",
-    //                     alias = emptyList(),
-    //                     categoryId = 1,
-    //                     category = "test",
-    //                     purity = Purity.SFW,
-    //                     createdAt = Clock.System.now(),
-    //                 )
-    //             ),
-    //         )
-    //     }
 
     private val testNetworkWallpaper: NetworkWallpaper
         get() {

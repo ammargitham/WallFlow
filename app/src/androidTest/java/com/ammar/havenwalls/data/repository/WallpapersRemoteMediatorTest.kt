@@ -8,13 +8,13 @@ import androidx.paging.RemoteMediator.MediatorResult
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.ammar.havenwalls.model.SearchQuery
 import com.ammar.havenwalls.data.db.database.AppDatabase
 import com.ammar.havenwalls.data.db.entity.WallpaperEntity
 import com.ammar.havenwalls.data.network.model.NetworkMeta
 import com.ammar.havenwalls.data.network.model.StringNetworkMetaQuery
 import com.ammar.havenwalls.data.network.retrofit.RetrofitWallHavenNetwork
 import com.ammar.havenwalls.extensions.randomList
+import com.ammar.havenwalls.model.SearchQuery
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.After
@@ -22,10 +22,11 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
-import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 
+// somehow Android Studio complaints @OptIn not required, but it is required
+@Suppress("UnnecessaryOptInAnnotation")
 @OptIn(
     ExperimentalCoroutinesApi::class,
     ExperimentalPagingApi::class,
@@ -53,10 +54,9 @@ class WallpapersRemoteMediatorTest {
     fun refreshLoadReturnsSuccessResultWhenMoreDataIsPresent() = runTest {
         val query = "test"
         val searchQuery = SearchQuery(includedTags = setOf(query))
-
         val mockNetworkWallpapers = MockFactory.generateNetworkWallpapers(20)
         mockNetworkApi.setWallpapersForQuery(
-            query = query,
+            query = searchQuery.getQString(),
             networkWallpapers = mockNetworkWallpapers,
             meta = NetworkMeta(
                 query = StringNetworkMetaQuery(""),
@@ -168,7 +168,7 @@ class WallpapersRemoteMediatorTest {
         val queryWallpapers1 = MockFactory.generateNetworkWallpapers(20)
         val queryWallpaperWallhavenIds = queryWallpapers1.map { it.id }
         mockNetworkApi.setWallpapersForQuery(
-            query = queryStr,
+            query = searchQuery.getQString(),
             networkWallpapers = queryWallpapers1,
             meta = NetworkMeta(
                 query = StringNetworkMetaQuery(""),
@@ -201,7 +201,7 @@ class WallpapersRemoteMediatorTest {
 
         val queryWallpapers2 = MockFactory.generateNetworkWallpapers(10)
         mockNetworkApi.setWallpapersForQuery(
-            query = queryStr,
+            query = searchQuery.getQString(),
             networkWallpapers = queryWallpapers2,
             meta = NetworkMeta(
                 query = StringNetworkMetaQuery(""),
@@ -224,11 +224,9 @@ class WallpapersRemoteMediatorTest {
         val queryStr2 = "test2"
         val searchQuery2 = SearchQuery(includedTags = setOf(queryStr2))
 
-        assertNotEquals(searchQuery1.hashCode(), searchQuery2.hashCode())
-
         val query1Wallpapers = MockFactory.generateNetworkWallpapers(20)
         mockNetworkApi.setWallpapersForQuery(
-            query = queryStr1,
+            query = searchQuery1.getQString(),
             networkWallpapers = query1Wallpapers,
             meta = NetworkMeta(
                 query = StringNetworkMetaQuery(""),
@@ -254,7 +252,7 @@ class WallpapersRemoteMediatorTest {
         val query2Wallpapers =
             query1Wallpapers.randomList(5) + MockFactory.generateNetworkWallpaper(21)
         mockNetworkApi.setWallpapersForQuery(
-            query = queryStr2,
+            query = searchQuery2.getQString(),
             networkWallpapers = query2Wallpapers,
             meta = NetworkMeta(
                 query = StringNetworkMetaQuery(""),

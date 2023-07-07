@@ -51,6 +51,8 @@ import com.ammar.havenwalls.ui.crop.getCropRect
 import com.ammar.havenwalls.ui.crop.getMaxCropSize
 import com.ammar.havenwalls.ui.wallpaper.getWallpaperScreenPendingIntent
 import com.ammar.havenwalls.utils.NotificationChannels
+import com.ammar.havenwalls.utils.NotificationIds.AUTO_WALLPAPER_NOTIFICATION_ID
+import com.ammar.havenwalls.utils.NotificationIds.AUTO_WALLPAPER_SUCCESS_NOTIFICATION_ID
 import com.ammar.havenwalls.utils.decodeSampledBitmapFromFile
 import com.ammar.havenwalls.utils.detectObjects
 import dagger.assisted.Assisted
@@ -92,7 +94,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
     private var cachedWallpapers = mutableListOf<Wallpaper>()
 
     override suspend fun getForegroundInfo() = ForegroundInfo(
-        NOTIFICATION_ID,
+        AUTO_WALLPAPER_NOTIFICATION_ID,
         notificationBuilder.apply {
             setProgress(0, 0, true)
         }.build()
@@ -166,7 +168,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
         try {
             setForeground(
                 ForegroundInfo(
-                    NOTIFICATION_ID,
+                    AUTO_WALLPAPER_NOTIFICATION_ID,
                     notificationBuilder.apply {
                         setContentText(context.getString(R.string.changing_wallpaper))
                         setProgress(100, 0, true)
@@ -251,7 +253,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
                 try {
                     setForeground(
                         ForegroundInfo(
-                            NOTIFICATION_ID,
+                            AUTO_WALLPAPER_NOTIFICATION_ID,
                             notificationBuilder.apply {
                                 setContentText(context.getString(R.string.downloading_wallpaper))
                                 setProgress(total.toInt(), downloaded.toInt(), downloaded <= -1)
@@ -360,14 +362,15 @@ class AutoWallpaperWorker @AssistedInject constructor(
             // setAutoCancel(true)
             setAutoCancel(false)
         }.build()
-        context.notificationManager.notify(SUCCESS_NOTIFICATION_ID, notification)
+        context.notificationManager.notify(
+            AUTO_WALLPAPER_SUCCESS_NOTIFICATION_ID,
+            notification
+        )
     }
 
     companion object {
         const val FAILURE_REASON = "failure_reason"
         const val SUCCESS_NEXT_WALLPAPER_ID = "success_wallpaper_id"
-        const val NOTIFICATION_ID = 123
-        const val SUCCESS_NOTIFICATION_ID = 234
         internal const val IMMEDIATE_WORK_NAME = "auto_wallpaper_immediate"
         internal const val PERIODIC_WORK_NAME = "auto_wallpaper_periodic"
 

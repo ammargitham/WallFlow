@@ -27,7 +27,7 @@ object MockFactory {
         file_type = "jpg",
         created_at = Clock.System.now(),
         colors = List(Random.nextInt(5)) { RandomColors.nextColor().toHexString() },
-        path = "wallpapers/wallpaper${idNumber + 1}",
+        path = "wallpapers/wallpaper${idNumber + 1}.jpg",
         thumbs = NetworkThumbs(
             large = "https://example.com/wallpaper${idNumber + 1}/large",
             original = "https://example.com/wallpaper${idNumber + 1}/original",

@@ -10,6 +10,7 @@ import com.ammar.havenwalls.data.repository.AppPreferencesRepository
 import com.ammar.havenwalls.extensions.TAG
 import com.ammar.havenwalls.utils.NotificationChannels
 import com.ammar.havenwalls.workers.AutoWallpaperWorker
+import com.ammar.havenwalls.workers.CleanupWorker
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -50,6 +51,7 @@ class HavenWalls : Application(), Configuration.Provider {
         super.onCreate()
         NotificationChannels.createChannels(this)
         scheduleAutoWallpaperWorker()
+        scheduleCleanupWorker()
     }
 
     private fun scheduleAutoWallpaperWorker() {
@@ -68,6 +70,16 @@ class HavenWalls : Application(), Configuration.Provider {
                     interval = prefs.frequency,
                     appPreferencesRepository = appPreferencesRepository,
                 )
+            }
+        }
+    }
+
+    private fun scheduleCleanupWorker() {
+        with(ProcessLifecycleOwner.get()) {
+            lifecycleScope.launch {
+                val scheduled = CleanupWorker.checkIfScheduled(context = this@HavenWalls)
+                if (scheduled) return@launch
+                CleanupWorker.schedule(context = this@HavenWalls)
             }
         }
     }

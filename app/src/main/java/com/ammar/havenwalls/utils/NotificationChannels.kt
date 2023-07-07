@@ -9,6 +9,7 @@ import com.ammar.havenwalls.R
 object NotificationChannels {
     const val DOWNLOADS_CHANNEL_ID = "downloads"
     const val AUTO_WALLPAPER_CHANNEL_ID = "auto_wallpaper"
+    const val CLEANUP_CHANNEL_ID = "cleanup"
 
     fun createChannels(context: Context) {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) return
@@ -26,6 +27,13 @@ object NotificationChannels {
         ).apply {
             description = context.getString(R.string.auto_wallpaper_channel_description)
         }
+        val cleanupChannel = NotificationChannel(
+            CLEANUP_CHANNEL_ID,
+            context.getString(R.string.cleanup_channel_name),
+            NotificationManager.IMPORTANCE_LOW
+        ).apply {
+            description = context.getString(R.string.cleanup_channel_description)
+        }
         // Register the channel with the system
         val notificationManager: NotificationManager = context.getSystemService(
             Context.NOTIFICATION_SERVICE
@@ -33,6 +41,7 @@ object NotificationChannels {
         notificationManager.apply {
             createNotificationChannel(downloadsChannel)
             createNotificationChannel(autoWallpaperChannel)
+            createNotificationChannel(cleanupChannel)
         }
     }
 }

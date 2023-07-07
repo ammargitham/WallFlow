@@ -207,6 +207,9 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="select_display">Select display</string>
     <string name="failed_to_change_wallpaper">Failed to change wallpaper!</string>
     <string name="set_wallpaper">Set as wallpaper</string>
+    <string name="cleanup_channel_name">Clean up</string>
+    <string name="cleanup_channel_description">Channel to show old cache and files clean up progress notification</string>
+    <string name="cache_clean_up">Cache clean up</string>
     <plurals name="every_x_hrs">
         <item quantity="one">Every %d hour</item>
         <item quantity="other">Every %d hours</item>
