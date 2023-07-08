@@ -8,5 +8,5 @@
         path="temp/" />
     <external-path
         name="external_downloads"
-        path="Download/HavenWalls/" />
+        path="Download/WallFlow/" />
 </paths>

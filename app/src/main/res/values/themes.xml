@@ -17,5 +17,5 @@
 
 <resources>
 
-    <style name="Theme.HavenWalls" parent="android:Theme.Material.Light.NoActionBar" />
+    <style name="Theme.WallFlow" parent="android:Theme.Material.Light.NoActionBar" />
 </resources>

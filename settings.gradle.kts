@@ -31,6 +31,6 @@ dependencyResolutionManagement {
         maven("https://jitpack.io")
     }
 }
-rootProject.name = "HavenWalls"
+rootProject.name = "WallFlow"
 
 include(":app")

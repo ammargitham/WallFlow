@@ -15,7 +15,7 @@
     </queries>
 
     <application
-        android:name=".HavenWalls"
+        android:name=".WallFlowApplication"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:enableOnBackInvokedCallback="true"
@@ -24,12 +24,12 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.HavenWalls"
+        android:theme="@style/Theme.WallFlow"
         tools:targetApi="tiramisu">
         <activity
             android:name=".activities.main.MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.HavenWalls">
+            android:theme="@style/Theme.WallFlow">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -51,7 +51,7 @@
             android:name=".activities.setwallpaper.SetWallpaperActivity"
             android:exported="true"
             android:label="@string/set_wallpaper"
-            android:theme="@style/Theme.HavenWalls">
+            android:theme="@style/Theme.WallFlow">
             <intent-filter>
                 <action android:name="android.intent.action.SEND" />
                 <category android:name="android.intent.category.DEFAULT" />

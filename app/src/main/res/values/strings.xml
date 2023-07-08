@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">HavenWalls</string>
+    <string name="app_name">WallFlow</string>
     <string name="home">Home</string>
     <string name="explore">Explore</string>
     <string name="wallpaper_description">Wallpaper</string>
@@ -59,7 +59,7 @@
     <string name="confidence_score">Confidence: %.2f</string>
     <string name="object_detection">Object detection</string>
     <string name="wallhaven_api_key_desc_2">Can be obtained from https://wallhaven.cc/settings/account</string>
-    <string name="object_detection_setting_desc">HavenWalls can detect objects in images using Tensorflow Lite for better wallpaper cropping experience. <b>This is entirely on-device and offline.</b></string>
+    <string name="object_detection_setting_desc">WallFlow can detect objects in images using Tensorflow Lite for better wallpaper cropping experience. <b>This is entirely on-device and offline.</b></string>
     <string name="cpu">CPU</string>
     <string name="nnapi">NNAPI</string>
     <string name="gpu">GPU</string>

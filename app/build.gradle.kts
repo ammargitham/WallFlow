@@ -15,11 +15,11 @@ kapt {
 }
 
 android {
-    namespace = "com.ammar.havenwalls"
+    namespace = "com.ammar.wallflow"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.ammar.havenwalls"
+        applicationId = "com.ammar.wallflow"
         minSdk = 22
         targetSdk = 34
         versionCode = 1
