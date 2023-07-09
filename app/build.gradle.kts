@@ -16,12 +16,12 @@ kapt {
 
 android {
     namespace = "com.ammar.wallflow"
-    compileSdk = 34
+    compileSdk = 33
 
     defaultConfig {
         applicationId = "com.ammar.wallflow"
         minSdk = 22
-        targetSdk = 34
+        targetSdk = 33
         versionCode = 1
         versionName = "1.0"
 
@@ -107,9 +107,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.service)
     implementation(libs.androidx.lifecycle.process)
     implementation(libs.androidx.activity.compose)
-
-    // Window
-    implementation(libs.androidx.window)
 
     // Hilt Dependency Injection
     implementation(libs.hilt.android)
