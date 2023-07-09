@@ -40,6 +40,7 @@ partial = "1.1.0"
 okhttp = "4.11.0"
 retrofit = "2.9.0"
 retrofitKotlinxSerializationJson = "1.0.0"
+telephoto="0.4.0"
 tflite = "0.4.3"
 tflite-gpu = "2.13.0"
 zoomables = "1.4.0"
@@ -106,10 +107,10 @@ partial = { module = "io.github.materiiapps:partial", version.ref = "partial" }
 partial-ksp = { module = "io.github.materiiapps:partial-ksp", version.ref = "partial" }
 retrofit-core = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit-kotlin-serialization = { module = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter", version.ref = "retrofitKotlinxSerializationJson" }
+telephoto-zoomable-image-coil = { module = "me.saket.telephoto:zoomable-image-coil", version.ref = "telephoto" }
 tflite-gpu = { module = "org.tensorflow:tensorflow-lite-gpu", version.ref = "tflite-gpu" }
 tflite-gpu-delegate-plugin = { module = "org.tensorflow:tensorflow-lite-gpu-delegate-plugin", version.ref = "tflite" }
 tflite-task-vision = { module = "org.tensorflow:tensorflow-lite-task-vision", version.ref = "tflite" }
-zoomables = { module = "de.mr-pine.utils:zoomables", version.ref = "zoomables" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }

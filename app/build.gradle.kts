@@ -20,7 +20,7 @@ android {
 
     defaultConfig {
         applicationId = "com.ammar.wallflow"
-        minSdk = 22
+        minSdk = 23
         targetSdk = 33
         versionCode = 1
         versionName = "1.0"
@@ -84,11 +84,6 @@ android {
         }
 
         sourceSets {
-            // all {
-            //     languageSettings {
-            //         languageVersion = "2.0"
-            //     }
-            // }
             debug {
                 kotlin.srcDir("build/generated/ksp/debug/kotlin")
             }
@@ -168,9 +163,6 @@ dependencies {
     // jsoup
     implementation(libs.jsoup)
 
-    // zoomables
-    implementation(libs.zoomables)
-
     // DataStore
     implementation(libs.androidx.datastore.preferences)
 
@@ -197,6 +189,9 @@ dependencies {
 
     // cloudy
     implementation(libs.cloudy)
+
+    // telephoto
+    implementation(libs.telephoto.zoomable.image.coil)
 
     // Local tests: jUnit, coroutines, Android runner
     testImplementation(libs.junit)

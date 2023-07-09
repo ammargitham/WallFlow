@@ -32,11 +32,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
@@ -47,7 +45,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.toSize
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -99,10 +96,10 @@ import com.ammar.wallflow.utils.DownloadStatus
 import com.google.modernstorage.permissions.StoragePermissions
 import com.ramcosta.composedestinations.annotation.DeepLink
 import com.ramcosta.composedestinations.annotation.Destination
-import de.mr_pine.zoomables.ZoomableImage
-import de.mr_pine.zoomables.ZoomableState
-import de.mr_pine.zoomables.rememberZoomableState
 import java.net.SocketTimeoutException
+import me.saket.telephoto.zoomable.ZoomSpec
+import me.saket.telephoto.zoomable.rememberZoomableState
+import me.saket.telephoto.zoomable.zoomable
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -419,26 +416,20 @@ fun WallpaperScreenContent(
     }
     val painter = rememberAsyncImagePainter(model = request)
     val zoomableState = rememberZoomableState(
-        rotationBehavior = ZoomableState.Rotation.DISABLED,
-        onTransformation = { zoomChange, panChange, _ ->
-            val newScale = (scale.value * zoomChange).coerceIn(1f, 5f)
-            scale.value = newScale
-            val containerSize = containerIntSize.toSize()
-            val scaledImageSize = imageSize.toSize() * newScale
-            val newOffset = offset.value + panChange
-            val offsetX = if (scaledImageSize.width <= containerSize.width) 0F else {
-                val maxX = (scaledImageSize.width - containerSize.width) / 2
-                newOffset.x.coerceIn(-maxX, maxX)
-            }
-            val offsetY = if (scaledImageSize.height <= containerSize.height) 0F else {
-                val maxY = (scaledImageSize.height - containerSize.height) / 2
-                newOffset.y.coerceIn(-maxY, maxY)
-            }
-            offset.value = Offset(offsetX, offsetY)
-            onWallpaperTransform()
-        },
+        zoomSpec = ZoomSpec(
+            maxZoomFactor = 5f,
+        )
     )
-    val coroutineScope = rememberCoroutineScope()
+
+    LaunchedEffect(zoomableState.contentTransformation, painter) {
+        if (
+            painter.state is AsyncImagePainter.State.Loading
+            || painter.request.data is NullRequestData
+        ) {
+            return@LaunchedEffect
+        }
+        onWallpaperTransform()
+    }
     val applyWallpaperEnabled by remember(context) {
         val wallpaperManager = context.wallpaperManager
         derivedStateOf {
@@ -454,25 +445,29 @@ fun WallpaperScreenContent(
             modifier = Modifier.fillMaxSize(),
             targetState = painter,
         ) {
-            if (it.request.data is NullRequestData) {
+            val imageRequest = it.request
+            if (
+                showFullScreenAction // means two pane mode
+                && it.state !is AsyncImagePainter.State.Loading
+                && imageRequest.data is NullRequestData
+            ) {
                 NotSelectedPlaceholder(
                     containerIntSize = containerIntSize,
                 )
                 return@Crossfade
             }
-            ZoomableImage(
-                modifier = Modifier.fillMaxSize(),
-                coroutineScope = coroutineScope,
-                zoomableState = zoomableState,
+            Image(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .zoomable(
+                        state = zoomableState,
+                        onClick = { _ ->
+                            if (it.state !is AsyncImagePainter.State.Success) return@zoomable
+                            onWallpaperTap()
+                        },
+                    ),
                 painter = it,
-                onTap = {
-                    if (painter.state !is AsyncImagePainter.State.Success) return@ZoomableImage
-                    onWallpaperTap()
-                },
-                doubleTapBehaviour = zoomableState.DefaultDoubleTapBehaviour(
-                    coroutineScope = coroutineScope,
-                    zoomScale = 5f,
-                ),
+                contentDescription = stringResource(R.string.wallpaper),
             )
         }
 
