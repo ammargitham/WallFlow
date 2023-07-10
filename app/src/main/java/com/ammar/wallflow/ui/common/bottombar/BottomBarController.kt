@@ -13,7 +13,8 @@ abstract class BottomBarController {
 }
 
 data class BottomBarState(
-    val visible: Boolean = true,
+    // val visible: Boolean = true,
+    val visible: Boolean = false,
     val size: IntSize = IntSize.Zero,
     val isRail: Boolean = false,
 )
@@ -25,7 +26,7 @@ class DefaultBottomBarController(initialState: BottomBarState) : BottomBarContro
     override fun update(fn: (prevState: BottomBarState) -> BottomBarState) {
         val newState = fn(state.value)
         _state.value = _state.value.copy(
-            visible = newState.visible,
+            // visible = newState.visible,
             size = newState.size,
             isRail = newState.isRail,
         )
