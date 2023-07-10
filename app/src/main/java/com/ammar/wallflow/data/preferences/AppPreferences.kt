@@ -27,7 +27,7 @@ data class AppPreferences(
 )
 
 data class ObjectDetectionPreferences(
-    val enabled: Boolean = true,
+    val enabled: Boolean = false,
     val delegate: Delegate = Delegate.GPU,
     val modelId: Long = 0,
 )

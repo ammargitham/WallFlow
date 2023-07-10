@@ -143,7 +143,7 @@ class AppPreferencesRepository @Inject constructor(
                 Delegate.GPU
             }
             ObjectDetectionPreferences(
-                enabled = get(PreferencesKeys.ENABLE_OBJECT_DETECTION) ?: true,
+                enabled = get(PreferencesKeys.ENABLE_OBJECT_DETECTION) ?: false,
                 delegate = delegate,
                 modelId = get(PreferencesKeys.OBJECT_DETECTION_MODEL_ID) ?: 0,
             )
