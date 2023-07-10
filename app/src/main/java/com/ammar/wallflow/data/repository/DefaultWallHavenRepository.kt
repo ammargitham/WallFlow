@@ -1,5 +1,6 @@
 package com.ammar.wallflow.data.repository
 
+import android.util.Log
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -26,6 +27,7 @@ import com.ammar.wallflow.data.network.model.asWallpaperEntity
 import com.ammar.wallflow.data.repository.utils.NetworkBoundResource
 import com.ammar.wallflow.data.repository.utils.Resource
 import com.ammar.wallflow.data.repository.utils.TagsDocumentParser.parsePopularTags
+import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.SearchQuery
 import com.ammar.wallflow.model.Tag
@@ -91,7 +93,9 @@ class DefaultWallHavenRepository @Inject constructor(
 
             override fun entityConverter(dbData: List<TagEntity>) = dbData.map { it.asTag() }
 
-            override fun onFetchFailed(throwable: Throwable) {}
+            override fun onFetchFailed(throwable: Throwable) {
+                Log.e(TAG, "onFetchFailed: ", throwable)
+            }
 
         }
 
@@ -190,7 +194,9 @@ class DefaultWallHavenRepository @Inject constructor(
                     wallpaper.asWallpaper(uploader, tags)
                 }
 
-            override fun onFetchFailed(throwable: Throwable) {}
+            override fun onFetchFailed(throwable: Throwable) {
+                Log.e(TAG, "onFetchFailed: ", throwable)
+            }
 
         }
 
