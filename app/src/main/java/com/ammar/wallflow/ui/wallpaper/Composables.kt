@@ -82,7 +82,7 @@ fun WallpaperActions(
 ) {
     BottomAppBar(
         modifier = modifier,
-        containerColor = BottomAppBarDefaults.containerColor.copy(alpha = 0.9f),
+        containerColor = BottomAppBarDefaults.containerColor.copy(alpha = 0.8f),
         actions = {
             if (showFullScreenAction) {
                 FullScreenButton(onClick = onFullScreenClick)
