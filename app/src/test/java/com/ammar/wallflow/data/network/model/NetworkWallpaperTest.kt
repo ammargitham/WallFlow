@@ -5,7 +5,6 @@ import com.ammar.wallflow.data.db.entity.WallpaperEntity
 import com.ammar.wallflow.model.Purity
 import kotlinx.datetime.Instant
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.junit.Test
