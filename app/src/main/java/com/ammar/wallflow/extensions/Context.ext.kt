@@ -226,9 +226,6 @@ fun Context.getUriForFile(file: File): Uri = FileProvider.getUriForFile(
 val Context.wallpaperManager: WallpaperManager
     get() = WallpaperManager.getInstance(this)
 
-val WallpaperManager.isWallpaperSupportedCompat
-    get() = (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) this.isWallpaperSupported else true)
-
 val WallpaperManager.isSetWallpaperAllowedCompat
     get() = (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) this.isSetWallpaperAllowed else true)
 

@@ -1,6 +1,5 @@
 package com.ammar.wallflow.extensions
 
-import android.os.Build
 import androidx.work.Constraints
 import androidx.work.NetworkType
 import com.ammar.wallflow.model.ConstraintType
@@ -10,9 +9,7 @@ fun Constraints.toConstraintTypeMap() = buildMap {
     put(ConstraintType.WIFI, constraint.requiredNetworkType == NetworkType.UNMETERED)
     put(ConstraintType.ROAMING, constraint.requiredNetworkType == NetworkType.CONNECTED)
     put(ConstraintType.CHARGING, constraint.requiresCharging())
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        put(ConstraintType.IDLE, constraint.requiresDeviceIdle())
-    }
+    put(ConstraintType.IDLE, constraint.requiresDeviceIdle())
 }
 
 private val wifiRoamingCombinations = mapOf(
@@ -33,7 +30,5 @@ fun Map<ConstraintType, Boolean>.toConstraints() = Constraints.Builder().apply {
     )] ?: NetworkType.CONNECTED
     setRequiredNetworkType(networkType)
     setRequiresCharging(constraintMap[ConstraintType.CHARGING] ?: false)
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        setRequiresDeviceIdle(constraintMap[ConstraintType.IDLE] ?: false)
-    }
+    setRequiresDeviceIdle(constraintMap[ConstraintType.IDLE] ?: false)
 }.build()

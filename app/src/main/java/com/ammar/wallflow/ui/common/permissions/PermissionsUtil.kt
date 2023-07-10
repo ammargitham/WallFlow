@@ -14,7 +14,6 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.ammar.wallflow.extensions.isSetWallpaperAllowedCompat
-import com.ammar.wallflow.extensions.isWallpaperSupportedCompat
 import com.ammar.wallflow.extensions.wallpaperManager
 
 @Stable
@@ -111,6 +110,6 @@ internal fun Context.checkNotificationPermission() = NotificationManagerCompat.f
 
 internal fun Context.checkSetWallpaperPermission(): Boolean {
     val wallpaperManager = wallpaperManager
-    return wallpaperManager.isWallpaperSupportedCompat
+    return wallpaperManager.isWallpaperSupported
             && wallpaperManager.isSetWallpaperAllowedCompat
 }

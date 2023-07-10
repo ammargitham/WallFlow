@@ -66,7 +66,6 @@ import com.ammar.wallflow.extensions.aspectRatio
 import com.ammar.wallflow.extensions.getFileNameFromUrl
 import com.ammar.wallflow.extensions.getUriForFile
 import com.ammar.wallflow.extensions.isSetWallpaperAllowedCompat
-import com.ammar.wallflow.extensions.isWallpaperSupportedCompat
 import com.ammar.wallflow.extensions.openUrl
 import com.ammar.wallflow.extensions.parseMimeType
 import com.ammar.wallflow.extensions.search
@@ -443,7 +442,7 @@ fun WallpaperScreenContent(
     val applyWallpaperEnabled by remember(context) {
         val wallpaperManager = context.wallpaperManager
         derivedStateOf {
-            wallpaperManager.isWallpaperSupportedCompat && wallpaperManager.isSetWallpaperAllowedCompat
+            wallpaperManager.isWallpaperSupported && wallpaperManager.isSetWallpaperAllowedCompat
         }
     }
     Box(
