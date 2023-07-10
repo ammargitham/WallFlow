@@ -63,24 +63,6 @@ fun CropScreen(
     }
     val cropState = viewModel.imageCropper.cropState
     val context = LocalContext.current
-    // val request by produceState(
-    //     initialValue = null as ImageRequest?,
-    //     key1 = context,
-    //     key2 = uiState.uri,
-    // ) {
-    //     if (uiState.uri == null) {
-    //         return@produceState
-    //     }
-    //     value = ImageRequest.Builder(context).apply {
-    //         data(uiState.uri)
-    //         crossfade(true)
-    //         transformations(BlurTransformation())
-    //         listener(onError = { _, result ->
-    //             Log.e(TAG, "Error loading: $this", result.throwable)
-    //         })
-    //     }.build()
-    // }
-    // val backdropPainter = rememberAsyncImagePainter(model = request)
     val resolution by produceState(
         initialValue = IntSize.Zero,
         key1 = context,
@@ -173,25 +155,6 @@ fun CropScreen(
             .fillMaxSize()
             .background(Color.Black),
     ) {
-        // uiState.uri?.run {
-        //     Image(
-        //         modifier = Modifier
-        //             .fillMaxSize()
-        //             .graphicsLayer {
-        //                 scaleX = 1.2f
-        //                 scaleY = 1.2f
-        //             },
-        //         painter = backdropPainter,
-        //         contentDescription = stringResource(R.string.wallpaper_description),
-        //         contentScale = ContentScale.Crop,
-        //     )
-        //     Box(
-        //         modifier = Modifier
-        //             .fillMaxSize()
-        //             .background(color = overlayColor)
-        //     )
-        // }
-
         Crossfade(targetState = cropState to uiState.result) {
             val (innerCropState, innerResult) = it
             if (innerResult is Result.Pending) {
