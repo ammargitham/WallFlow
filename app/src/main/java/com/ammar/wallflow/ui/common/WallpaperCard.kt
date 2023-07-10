@@ -145,7 +145,7 @@ fun WallpaperCard(
                 },
             model = request,
             placeholder = ColorPainter(wallpaper.colors.firstOrNull() ?: Color.White),
-            contentDescription = stringResource(R.string.wallpaper_description),
+            contentDescription = stringResource(R.string.wallpaper),
             contentScale = ContentScale.Crop,
             onError = {
                 Log.e(TAG, "Error loading: ${wallpaper.path}", it.result.throwable)

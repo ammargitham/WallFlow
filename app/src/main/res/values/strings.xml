@@ -2,7 +2,6 @@
     <string name="app_name">WallFlow</string>
     <string name="home">Home</string>
     <string name="explore">Explore</string>
-    <string name="wallpaper_description">Wallpaper</string>
     <string name="popular_tags">Popular tags</string>
     <string name="info">Info</string>
     <string name="download">Download</string>
@@ -113,7 +112,6 @@
     <string name="charging_desc">Device must be charging</string>
     <string name="idle">Idle</string>
     <string name="idle_desc">Device must be idle</string>
-    <string name="auto_wallpaper_channel_name">Auto wallpaper</string>
     <string name="auto_wallpaper_channel_description">Channel to show auto wallpaper notifications</string>
     <string name="running">Running…</string>
     <string name="downloading_wallpaper">Downloading wallpaper…</string>

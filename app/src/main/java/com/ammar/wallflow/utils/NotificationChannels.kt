@@ -22,7 +22,7 @@ object NotificationChannels {
         }
         val autoWallpaperChannel = NotificationChannel(
             AUTO_WALLPAPER_CHANNEL_ID,
-            context.getString(R.string.auto_wallpaper_channel_name),
+            context.getString(R.string.auto_wallpaper),
             NotificationManager.IMPORTANCE_DEFAULT
         ).apply {
             description = context.getString(R.string.auto_wallpaper_channel_description)
