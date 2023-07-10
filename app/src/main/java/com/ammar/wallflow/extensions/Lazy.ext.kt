@@ -2,7 +2,6 @@ package com.ammar.wallflow.extensions
 
 import android.os.Parcel
 import android.os.Parcelable
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.lazy.grid.LazyGridItemScope
 import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyGridState
@@ -34,7 +33,6 @@ fun <T : Any> LazyGridScope.items(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 fun <T : Any> LazyStaggeredGridScope.items(
     items: LazyPagingItems<T>,
     key: ((item: T) -> Any)? = null,
@@ -96,7 +94,6 @@ fun <T : Any> LazyPagingItems<T>.rememberLazyGridState(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun <T : Any> LazyPagingItems<T>.rememberLazyStaggeredGridState(
     initialFirstVisibleItemIndex: Int = 0,

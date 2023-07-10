@@ -14,7 +14,6 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import java.util.concurrent.TimeUnit
 import javax.inject.Singleton
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
@@ -57,7 +56,6 @@ object NetworkModule {
             client(okHttpClient)
             addConverterFactory(DocumentConverterFactory())
             addConverterFactory(
-                @OptIn(ExperimentalSerializationApi::class)
                 networkJson.asConverterFactory("application/json".toMediaType())
             )
         }
