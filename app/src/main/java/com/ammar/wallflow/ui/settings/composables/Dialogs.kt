@@ -37,9 +37,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -79,6 +79,8 @@ import com.ammar.wallflow.ui.common.nameStateSaver
 import com.ammar.wallflow.ui.common.urlStateSaver
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import com.ammar.wallflow.utils.DownloadStatus
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.datetime.DateTimePeriod
 import org.tensorflow.lite.task.core.ComputeSettings
 import kotlin.math.roundToInt
@@ -181,42 +183,40 @@ fun ObjectDetectionModelOptionsDialog(
     var localSelectedModel by remember(selectedModelId) {
         mutableStateOf(models.find { it.id == selectedModelId } ?: models.firstOrNull())
     }
-    key(models.size) {
-        AlertDialog(
-            modifier = modifier,
-            onDismissRequest = onDismissRequest,
-        ) {
-            UnpaddedAlertDialogContent(
-                icon = {
-                    Icon(
-                        painter = painterResource(R.drawable.tensorflow),
-                        contentDescription = ""
-                    )
-                },
-                title = { Text(text = stringResource(R.string.choose_a_tflite_model)) },
-                text = {
-                    ObjectDetectionModelOptionsContent(
-                        models = models,
-                        selectedModel = localSelectedModel,
-                        onOptionClick = { localSelectedModel = it },
-                        onOptionEditClick = onOptionEditClick,
-                        onAddClick = onAddClick,
-                    )
-                },
-                buttons = {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        TextButton(onClick = onDismissRequest) {
-                            Text(text = stringResource(R.string.cancel))
-                        }
-                        TextButton(onClick = { onSaveClick(localSelectedModel) }) {
-                            Text(text = stringResource(R.string.save))
-                        }
+    AlertDialog(
+        modifier = modifier,
+        onDismissRequest = onDismissRequest,
+    ) {
+        UnpaddedAlertDialogContent(
+            icon = {
+                Icon(
+                    painter = painterResource(R.drawable.tensorflow),
+                    contentDescription = ""
+                )
+            },
+            title = { Text(text = stringResource(R.string.choose_a_tflite_model)) },
+            text = {
+                ObjectDetectionModelOptionsContent(
+                    models = models,
+                    selectedModel = localSelectedModel,
+                    onOptionClick = { localSelectedModel = it },
+                    onOptionEditClick = onOptionEditClick,
+                    onAddClick = onAddClick,
+                )
+            },
+            buttons = {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    TextButton(onClick = onDismissRequest) {
+                        Text(text = stringResource(R.string.cancel))
                     }
-                },
-            )
-        }
+                    TextButton(onClick = { onSaveClick(localSelectedModel) }) {
+                        Text(text = stringResource(R.string.save))
+                    }
+                }
+            },
+        )
     }
 }
 
@@ -224,15 +224,27 @@ fun ObjectDetectionModelOptionsDialog(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun PreviewObjectDetectionModelOptionsDialog() {
+    var models by remember {
+        mutableStateOf(List(3) {
+            ObjectDetectionModelEntity(
+                id = it.toLong(),
+                name = "model_$it",
+                fileName = "file_name_$it",
+                url = "url_$it",
+            )
+        })
+    }
     WallFlowTheme {
         Surface {
             ObjectDetectionModelOptionsDialog(
-                models = List(3) {
-                    ObjectDetectionModelEntity(
-                        id = it.toLong(),
-                        name = "model_$it",
-                        fileName = "file_name_$it",
-                        url = "url_$it",
+                models = models,
+                onAddClick = {
+                    val size = models.size
+                    models = models + ObjectDetectionModelEntity(
+                        id = size.toLong(),
+                        name = "model_$size",
+                        fileName = "file_name_$size",
+                        url = "url_$size",
                     )
                 }
             )
@@ -329,74 +341,72 @@ fun ObjectDetectionModelEditDialog(
         nameExists.value = checkNameExists(nameState.text.trimAll(), model?.id)
     }
 
-    key(saving) {
-        AlertDialog(
-            modifier = modifier,
-            onDismissRequest = onDismissRequest,
-        ) {
-            UnpaddedAlertDialogContent(
-                title = {
-                    Text(
-                        text = stringResource(
-                            if (model == null) R.string.add_a_tflite_model else R.string.edit_model
-                        )
+    AlertDialog(
+        modifier = modifier,
+        onDismissRequest = onDismissRequest,
+    ) {
+        UnpaddedAlertDialogContent(
+            title = {
+                Text(
+                    text = stringResource(
+                        if (model == null) R.string.add_a_tflite_model else R.string.edit_model
                     )
-                },
-                text = {
-                    ObjectDetectionModelEditContent(
-                        modifier = modifier.padding(24.dp),
-                        nameState = nameState,
-                        urlState = urlState,
-                        saving = saving,
-                        downloadStatus = downloadStatus,
-                    )
-                },
-                buttons = {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    ) {
-                        if (model != null) {
-                            FilledTonalButton(
-                                enabled = !saving,
-                                colors = ButtonDefaults.filledTonalButtonColors(
-                                    containerColor = Color.DELETE,
-                                    contentColor = Color.White,
-                                ),
-                                onClick = onDeleteClick,
-                            ) {
-                                Text(text = stringResource(R.string.delete))
-                            }
-                            Spacer(modifier = Modifier.weight(1f))
-                        }
-                        TextButton(
+                )
+            },
+            text = {
+                ObjectDetectionModelEditContent(
+                    modifier = modifier.padding(24.dp),
+                    nameState = nameState,
+                    urlState = urlState,
+                    saving = saving,
+                    downloadStatus = downloadStatus,
+                )
+            },
+            buttons = {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    if (model != null) {
+                        FilledTonalButton(
                             enabled = !saving,
-                            onClick = onDismissRequest,
+                            colors = ButtonDefaults.filledTonalButtonColors(
+                                containerColor = Color.DELETE,
+                                contentColor = Color.White,
+                            ),
+                            onClick = onDeleteClick,
                         ) {
-                            Text(text = stringResource(R.string.cancel))
+                            Text(text = stringResource(R.string.delete))
                         }
-                        TextButton(
-                            enabled = !saving && nameState.isValid && urlState.isValid,
-                            onClick = {
-                                saving = true
-                                onSaveClick(
-                                    model?.copy(
-                                        name = nameState.text.trimAll(),
-                                        url = urlState.text.trimAll(),
-                                    ) ?: ObjectDetectionModelEntity(
-                                        id = 0L,
-                                        name = nameState.text.trimAll(),
-                                        url = urlState.text.trimAll(),
-                                        fileName = "",
-                                    )
-                                ) { saving = false }
-                            },
-                        ) {
-                            Text(text = stringResource(if (model == null) R.string.add else R.string.save))
-                        }
+                        Spacer(modifier = Modifier.weight(1f))
                     }
-                },
-            )
-        }
+                    TextButton(
+                        enabled = !saving,
+                        onClick = onDismissRequest,
+                    ) {
+                        Text(text = stringResource(R.string.cancel))
+                    }
+                    TextButton(
+                        enabled = !saving && nameState.isValid && urlState.isValid,
+                        onClick = {
+                            saving = true
+                            onSaveClick(
+                                model?.copy(
+                                    name = nameState.text.trimAll(),
+                                    url = urlState.text.trimAll(),
+                                ) ?: ObjectDetectionModelEntity(
+                                    id = 0L,
+                                    name = nameState.text.trimAll(),
+                                    url = urlState.text.trimAll(),
+                                    fileName = "",
+                                )
+                            ) { saving = false }
+                        },
+                    ) {
+                        Text(text = stringResource(if (model == null) R.string.add else R.string.save))
+                    }
+                }
+            },
+        )
     }
 }
 
@@ -419,14 +429,25 @@ private class ModelParameterProvider :
 private fun PreviewObjectDetectionModelEditDialog(
     @PreviewParameter(ModelParameterProvider::class) model: ObjectDetectionModelEntity?,
 ) {
+    val coroutineScope = rememberCoroutineScope()
+    var downloadStatus: DownloadStatus? by remember { mutableStateOf(null) }
     WallFlowTheme {
         Surface {
             ObjectDetectionModelEditDialog(
                 model = model,
-                downloadStatus = DownloadStatus.Running(
-                    downloadedBytes = 500,
-                    totalBytes = 1000,
-                )
+                downloadStatus = downloadStatus,
+                checkNameExists = { _, _ -> false },
+                onSaveClick = { _, onDone ->
+                    coroutineScope.launch {
+                        downloadStatus = DownloadStatus.Running(
+                            downloadedBytes = 500,
+                            totalBytes = 1000,
+                        )
+                        delay(5000)
+                        downloadStatus = null
+                        onDone(null)
+                    }
+                }
             )
         }
     }
