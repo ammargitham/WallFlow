@@ -32,12 +32,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.ScaleFactor
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -420,15 +422,23 @@ fun WallpaperScreenContent(
             maxZoomFactor = 5f,
         )
     )
+    var hasTransformed by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(zoomableState.contentTransformation, painter) {
+        val scale = zoomableState.contentTransformation.scale
         if (
-            painter.state is AsyncImagePainter.State.Loading
+            painter.state !is AsyncImagePainter.State.Success
             || painter.request.data is NullRequestData
+            || scale == ScaleFactor(0f, 0f)
         ) {
             return@LaunchedEffect
         }
+        // if user has not interacted yet, do nothing
+        if (!hasTransformed && scale.scaleX <= 1f) {
+            return@LaunchedEffect
+        }
         onWallpaperTransform()
+        hasTransformed = true
     }
     val applyWallpaperEnabled by remember(context) {
         val wallpaperManager = context.wallpaperManager
