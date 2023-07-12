@@ -16,13 +16,21 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.items
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Surface
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -201,4 +209,74 @@ private fun PreviewLayoutPreview(
             )
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+internal fun LazyListScope.gridTypeSection(
+    layoutPreferences: LayoutPreferences = LayoutPreferences(),
+    onLayoutPreferencesChange: (LayoutPreferences) -> Unit = {},
+) {
+    item {
+        ListItem(
+            headlineContent = {
+                Text(text = stringResource(R.string.grid_type))
+            },
+            trailingContent = {
+                val options = GridType.values().associateWith { getLabelForGridType(it) }
+                var expanded by remember { mutableStateOf(false) }
+
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = !expanded },
+                ) {
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth(0.5f),
+                        readOnly = true,
+                        value = options[layoutPreferences.gridType] ?: "",
+                        onValueChange = {},
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                        colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                    )
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                    ) {
+                        options.forEach { (type, label) ->
+                            DropdownMenuItem(
+                                text = { Text(text = label) },
+                                onClick = {
+                                    onLayoutPreferencesChange(
+                                        layoutPreferences.copy(gridType = type)
+                                    )
+                                    expanded = false
+                                },
+                                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                            )
+                        }
+                    }
+                }
+            }
+        )
+    }
+}
+
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun PreviewGridTypeSection() {
+    WallFlowTheme {
+        Surface {
+            LazyColumn {
+                gridTypeSection()
+            }
+        }
+    }
+}
+
+@Composable
+private fun getLabelForGridType(gridType: GridType) = when (gridType) {
+    GridType.STAGGERED -> stringResource(R.string.staggered)
+    GridType.FIXED_SIZE -> stringResource(R.string.fixed_size)
 }

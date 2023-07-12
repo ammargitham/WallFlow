@@ -17,12 +17,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
@@ -47,7 +43,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ammar.wallflow.R
-import com.ammar.wallflow.data.preferences.GridType
 import com.ammar.wallflow.data.preferences.LayoutPreferences
 import com.ammar.wallflow.data.preferences.maxGridCols
 import com.ammar.wallflow.data.preferences.minGridCols
@@ -103,7 +98,6 @@ fun LayoutSettingsScreen(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LayoutSettingsScreenContent(
     modifier: Modifier = Modifier,
@@ -135,50 +129,7 @@ fun LayoutSettingsScreenContent(
                 .fillMaxWidth(),
             contentPadding = PaddingValues(vertical = 8.dp),
         ) {
-            item {
-                ListItem(
-                    headlineContent = {
-                        Text(text = stringResource(R.string.grid_type))
-                    },
-                    trailingContent = {
-                        val options = GridType.values().associateWith { getLabelForGridType(it) }
-                        var expanded by remember { mutableStateOf(false) }
-
-                        ExposedDropdownMenuBox(
-                            expanded = expanded,
-                            onExpandedChange = { expanded = !expanded },
-                        ) {
-                            OutlinedTextField(
-                                modifier = Modifier
-                                    .menuAnchor()
-                                    .fillMaxWidth(0.5f),
-                                readOnly = true,
-                                value = options[layoutPreferences.gridType] ?: "",
-                                onValueChange = {},
-                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                                colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                            )
-                            ExposedDropdownMenu(
-                                expanded = expanded,
-                                onDismissRequest = { expanded = false },
-                            ) {
-                                options.forEach { (type, label) ->
-                                    DropdownMenuItem(
-                                        text = { Text(text = label) },
-                                        onClick = {
-                                            onLayoutPreferencesChange(
-                                                layoutPreferences.copy(gridType = type)
-                                            )
-                                            expanded = false
-                                        },
-                                        contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                                    )
-                                }
-                            }
-                        }
-                    }
-                )
-            }
+            gridTypeSection(layoutPreferences, onLayoutPreferencesChange)
             item {
                 val sliderPosition = layoutPreferences.gridColCount.toFloat()
                 ListItem(
@@ -244,12 +195,6 @@ fun LayoutSettingsScreenContent(
             }
         }
     }
-}
-
-@Composable
-private fun getLabelForGridType(gridType: GridType) = when (gridType) {
-    GridType.STAGGERED -> stringResource(R.string.staggered)
-    GridType.FIXED_SIZE -> stringResource(R.string.fixed_size)
 }
 
 @Preview
