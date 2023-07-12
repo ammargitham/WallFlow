@@ -47,6 +47,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -61,6 +62,7 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.capitalize
@@ -502,21 +504,24 @@ internal fun RatioFilter(
         expanded = expanded,
         onExpandedChange = { expanded = !expanded },
     ) {
-        TagInputField(
-            modifier = Modifier
-                .fillMaxWidth()
-                .menuAnchor(),
-            readOnly = true,
-            tags = ratios,
-            showTagClearAction = false,
-            onAddTag = {},
-            onRemoveTag = { onChange(ratios - it) },
-            label = { Text(text = stringResource(R.string.ratio)) },
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-            colors = ExposedDropdownMenuDefaults.textFieldColors(),
-            tagFromInputString = { Ratio.fromSize(IntSize(1, 1)) }, // dummy method
-            getTagString = { it.toRatioString().capitalize(Locale.current) }
-        )
+        // workaround for issue: https://issuetracker.google.com/289237728
+        CompositionLocalProvider(LocalTextInputService provides null) {
+            TagInputField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .menuAnchor(),
+                readOnly = true,
+                tags = ratios,
+                showTagClearAction = false,
+                onAddTag = {},
+                onRemoveTag = { onChange(ratios - it) },
+                label = { Text(text = stringResource(R.string.ratio)) },
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                tagFromInputString = { Ratio.fromSize(IntSize(1, 1)) }, // dummy method
+                getTagString = { it.toRatioString().capitalize(Locale.current) }
+            )
+        }
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
