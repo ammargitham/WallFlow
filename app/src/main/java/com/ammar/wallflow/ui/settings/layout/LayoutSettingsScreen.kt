@@ -2,24 +2,18 @@ package com.ammar.wallflow.ui.settings.layout
 
 import android.content.res.Configuration
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.mandatorySystemGestures
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -29,14 +23,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
@@ -44,8 +33,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.preferences.LayoutPreferences
-import com.ammar.wallflow.data.preferences.maxGridCols
-import com.ammar.wallflow.data.preferences.minGridCols
 import com.ammar.wallflow.ui.common.TopBar
 import com.ammar.wallflow.ui.common.bottomWindowInsets
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
@@ -55,7 +42,6 @@ import com.ammar.wallflow.ui.common.navigation.TwoPaneNavigation
 import com.ammar.wallflow.ui.common.navigation.TwoPaneNavigation.Mode
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import com.ramcosta.composedestinations.annotation.Destination
-import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination
@@ -105,7 +91,6 @@ fun LayoutSettingsScreenContent(
     layoutPreferences: LayoutPreferences = LayoutPreferences(),
     onLayoutPreferencesChange: (LayoutPreferences) -> Unit = {},
 ) {
-    val context = LocalContext.current
     val layoutDirection = LocalLayoutDirection.current
     val paddingValues = WindowInsets.mandatorySystemGestures.asPaddingValues()
     val sliderPadding = remember(paddingValues) {
@@ -129,49 +114,15 @@ fun LayoutSettingsScreenContent(
                 .fillMaxWidth(),
             contentPadding = PaddingValues(vertical = 8.dp),
         ) {
-            gridTypeSection(layoutPreferences, onLayoutPreferencesChange)
-            item {
-                val sliderPosition = layoutPreferences.gridColCount.toFloat()
-                ListItem(
-                    headlineContent = {
-                        Text(text = stringResource(R.string.no_of_columns))
-                    },
-                    supportingContent = {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        ) {
-                            Text(
-                                modifier = Modifier.widthIn(min = sliderPadding),
-                                text = sliderPosition.roundToInt().toString(),
-                                textAlign = TextAlign.Center,
-                            )
-                            Slider(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .semantics {
-                                        contentDescription = context.getString(
-                                            R.string.no_of_columns
-                                        )
-                                    },
-                                value = sliderPosition,
-                                onValueChange = {
-                                    onLayoutPreferencesChange(
-                                        layoutPreferences.copy(gridColCount = it.roundToInt())
-                                    )
-                                },
-                                valueRange = minGridCols.toFloat()..maxGridCols.toFloat(),
-                                onValueChangeFinished = {
-                                    // launch some business logic update with the state you hold
-                                    // viewModel.updateSelectedSliderValue(sliderPosition)
-                                },
-                                steps = (maxGridCols - minGridCols + 1).toInt(),
-                            )
-                            Spacer(modifier = Modifier.width(sliderPadding))
-                        }
-                    }
-                )
-            }
+            gridTypeSection(
+                layoutPreferences = layoutPreferences,
+                onLayoutPreferencesChange = onLayoutPreferencesChange,
+            )
+            noOfColumnsSection(
+                layoutPreferences = layoutPreferences,
+                sliderPadding = sliderPadding,
+                onLayoutPreferencesChange = onLayoutPreferencesChange,
+            )
             item {
                 ListItem(
                     modifier = Modifier.clickable {

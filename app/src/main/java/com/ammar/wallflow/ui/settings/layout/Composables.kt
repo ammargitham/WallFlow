@@ -9,12 +9,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
@@ -30,6 +32,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -49,21 +52,27 @@ import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.COMMON_RESOLUTIONS
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.preferences.GridType
 import com.ammar.wallflow.data.preferences.LayoutPreferences
+import com.ammar.wallflow.data.preferences.maxGridCols
+import com.ammar.wallflow.data.preferences.minGridCols
 import com.ammar.wallflow.extensions.aspectRatio
 import com.ammar.wallflow.extensions.getScreenResolution
 import com.ammar.wallflow.extensions.toDp
 import com.ammar.wallflow.extensions.toPxF
 import com.ammar.wallflow.ui.theme.WallFlowTheme
+import kotlin.math.roundToInt
 import kotlin.random.Random
 
 private val random = Random(seed = 206)
@@ -279,4 +288,64 @@ private fun PreviewGridTypeSection() {
 private fun getLabelForGridType(gridType: GridType) = when (gridType) {
     GridType.STAGGERED -> stringResource(R.string.staggered)
     GridType.FIXED_SIZE -> stringResource(R.string.fixed_size)
+}
+
+internal fun LazyListScope.noOfColumnsSection(
+    layoutPreferences: LayoutPreferences = LayoutPreferences(),
+    sliderPadding: Dp = 0.dp,
+    onLayoutPreferencesChange: (LayoutPreferences) -> Unit = {},
+) {
+    item {
+        val context = LocalContext.current
+        val sliderPosition = layoutPreferences.gridColCount.toFloat()
+        ListItem(
+            headlineContent = {
+                Text(text = stringResource(R.string.no_of_columns))
+            },
+            supportingContent = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Text(
+                        modifier = Modifier.widthIn(min = sliderPadding),
+                        text = sliderPosition.roundToInt().toString(),
+                        textAlign = TextAlign.Center,
+                    )
+                    Slider(
+                        modifier = Modifier
+                            .weight(1f)
+                            .semantics {
+                                contentDescription = context.getString(
+                                    R.string.no_of_columns
+                                )
+                            },
+                        value = sliderPosition,
+                        onValueChange = {
+                            onLayoutPreferencesChange(
+                                layoutPreferences.copy(gridColCount = it.roundToInt())
+                            )
+                        },
+                        valueRange = minGridCols.toFloat()..maxGridCols.toFloat(),
+                        onValueChangeFinished = {},
+                        steps = (maxGridCols - minGridCols + 1).toInt(),
+                    )
+                    Spacer(modifier = Modifier.width(sliderPadding))
+                }
+            }
+        )
+    }
+}
+
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun PreviewNoOfColumnsSection() {
+    WallFlowTheme {
+        Surface {
+            LazyColumn {
+                noOfColumnsSection()
+            }
+        }
+    }
 }
