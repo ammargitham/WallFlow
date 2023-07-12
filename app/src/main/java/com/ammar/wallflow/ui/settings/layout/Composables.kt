@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.width
@@ -34,6 +36,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -345,6 +348,46 @@ private fun PreviewNoOfColumnsSection() {
         Surface {
             LazyColumn {
                 noOfColumnsSection()
+            }
+        }
+    }
+}
+
+internal fun LazyListScope.roundedCornersSection(
+    layoutPreferences: LayoutPreferences = LayoutPreferences(),
+    onLayoutPreferencesChange: (LayoutPreferences) -> Unit = {},
+) {
+    item {
+        ListItem(
+            modifier = Modifier.clickable {
+                onLayoutPreferencesChange(
+                    layoutPreferences.copy(roundedCorners = !layoutPreferences.roundedCorners)
+                )
+            },
+            headlineContent = { Text(text = stringResource(R.string.rounded_corners)) },
+            trailingContent = {
+                Switch(
+                    modifier = Modifier.height(24.dp),
+                    checked = layoutPreferences.roundedCorners,
+                    onCheckedChange = {
+                        onLayoutPreferencesChange(
+                            layoutPreferences.copy(roundedCorners = it)
+                        )
+                    },
+                )
+            },
+        )
+    }
+}
+
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun PreviewRoundedCornersSection() {
+    WallFlowTheme {
+        Surface {
+            LazyColumn {
+                roundedCornersSection()
             }
         }
     }

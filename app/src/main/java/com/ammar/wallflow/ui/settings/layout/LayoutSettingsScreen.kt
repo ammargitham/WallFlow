@@ -1,21 +1,17 @@
 package com.ammar.wallflow.ui.settings.layout
 
 import android.content.res.Configuration
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.mandatorySystemGestures
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -123,27 +119,10 @@ fun LayoutSettingsScreenContent(
                 sliderPadding = sliderPadding,
                 onLayoutPreferencesChange = onLayoutPreferencesChange,
             )
-            item {
-                ListItem(
-                    modifier = Modifier.clickable {
-                        onLayoutPreferencesChange(
-                            layoutPreferences.copy(roundedCorners = !layoutPreferences.roundedCorners)
-                        )
-                    },
-                    headlineContent = { Text(text = stringResource(R.string.rounded_corners)) },
-                    trailingContent = {
-                        Switch(
-                            modifier = Modifier.height(24.dp),
-                            checked = layoutPreferences.roundedCorners,
-                            onCheckedChange = {
-                                onLayoutPreferencesChange(
-                                    layoutPreferences.copy(roundedCorners = it)
-                                )
-                            },
-                        )
-                    },
-                )
-            }
+            roundedCornersSection(
+                layoutPreferences = layoutPreferences,
+                onLayoutPreferencesChange = onLayoutPreferencesChange,
+            )
         }
     }
 }
