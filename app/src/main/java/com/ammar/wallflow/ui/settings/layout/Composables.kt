@@ -94,7 +94,10 @@ internal fun LayoutPreview(
     layoutPreferences: LayoutPreferences = LayoutPreferences(),
 ) {
     val context = LocalContext.current
-    val deviceAspectRatio = context.getScreenResolution(true).let {
+    val screenResolution = remember(context) {
+        context.getScreenResolution(true)
+    }
+    val deviceAspectRatio = screenResolution.let {
         if (it == IntSize.Zero) {
             9f / 16
         } else {
@@ -108,11 +111,22 @@ internal fun LayoutPreview(
     val cornerRadiusPx by animateFloatAsState(
         targetValue = if (layoutPreferences.roundedCorners) paddingPx else 0f
     )
+    val maxDeviceHeight = screenResolution.height.toDp() / 4
 
     BoxWithConstraints(
         modifier = modifier.background(MaterialTheme.colorScheme.surfaceVariant),
     ) {
-        val deviceWidth = maxWidth / 3
+        val deviceWidth = remember(maxWidth) {
+            var tempWidth = maxWidth / 3
+            if (maxDeviceHeight > 0.dp) {
+                val calcDeviceHeight = tempWidth / deviceAspectRatio
+                if (calcDeviceHeight > maxDeviceHeight) {
+                    // use maxDeviceHeight to calc tempWidth
+                    tempWidth = maxDeviceHeight * deviceAspectRatio
+                }
+            }
+            tempWidth
+        }
 
         BoxWithConstraints(
             modifier = Modifier
