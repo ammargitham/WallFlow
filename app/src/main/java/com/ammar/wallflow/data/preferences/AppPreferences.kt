@@ -63,11 +63,20 @@ enum class GridType {
     FIXED_SIZE;
 }
 
+enum class GridColType {
+    ADAPTIVE,
+    FIXED;
+}
+
 const val minGridCols = 1L
 const val maxGridCols = 5L
+const val minGridColWidthPct = 10L
+const val maxGridColWidthPct = 50L
 
 data class LayoutPreferences(
     val gridType: GridType = GridType.STAGGERED,
+    val gridColType: GridColType = GridColType.ADAPTIVE,
     @IntRange(minGridCols, maxGridCols) val gridColCount: Int = 2,
+    @IntRange(minGridColWidthPct, maxGridColWidthPct) val gridColMinWidthPct: Int = 30,
     val roundedCorners: Boolean = true,
 )

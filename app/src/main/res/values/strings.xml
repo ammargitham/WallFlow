@@ -209,6 +209,10 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="cleanup_channel_description">Channel to show old cache and files clean up progress notification</string>
     <string name="cache_clean_up">Cache clean up</string>
     <string name="object_detection_setting_warning">Note: If you face any errors or crash during object detection, try choosing a different delegate. If none of the delegates work on your device, turn off object detection</string>
+    <string name="grid_col_type">Grid Column Type</string>
+    <string name="adaptive">Adaptive</string>
+    <string name="fixed">Fixed</string>
+    <string name="min_col_width">Min. column width</string>
     <plurals name="every_x_hrs">
         <item quantity="one">Every %d hour</item>
         <item quantity="other">Every %d hours</item>

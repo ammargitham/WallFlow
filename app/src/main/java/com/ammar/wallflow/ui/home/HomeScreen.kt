@@ -367,7 +367,9 @@ internal fun HomeScreenContent(
         selectedWallpaper = selectedWallpaper,
         showSelection = showSelection,
         gridType = layoutPreferences.gridType,
+        gridColType = layoutPreferences.gridColType,
         gridColCount = layoutPreferences.gridColCount,
+        gridColMinWidthPct = layoutPreferences.gridColMinWidthPct,
         roundedCorners = layoutPreferences.roundedCorners,
         onWallpaperClick = onWallpaperClick,
     )

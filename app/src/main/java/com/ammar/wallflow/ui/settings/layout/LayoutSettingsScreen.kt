@@ -28,6 +28,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ammar.wallflow.R
+import com.ammar.wallflow.data.preferences.GridColType
 import com.ammar.wallflow.data.preferences.LayoutPreferences
 import com.ammar.wallflow.ui.common.TopBar
 import com.ammar.wallflow.ui.common.bottomWindowInsets
@@ -118,15 +119,34 @@ fun LayoutSettingsScreenContent(
                     )
                 },
             )
-            noOfColumnsSection(
-                noOfColumns = layoutPreferences.gridColCount,
-                sliderPadding = sliderPadding,
-                onNoOfColumnsChange = {
+            gridColTypeSection(
+                gridColType = layoutPreferences.gridColType,
+                onGridColTypeChange = {
                     onLayoutPreferencesChange(
-                        layoutPreferences.copy(gridColCount = it)
+                        layoutPreferences.copy(gridColType = it)
                     )
                 },
             )
+            when (layoutPreferences.gridColType) {
+                GridColType.ADAPTIVE -> adaptiveColMinWidthPctSection(
+                    minWidthPct = layoutPreferences.gridColMinWidthPct,
+                    sliderPadding = sliderPadding,
+                    onMinWidthPctChange = {
+                        onLayoutPreferencesChange(
+                            layoutPreferences.copy(gridColMinWidthPct = it)
+                        )
+                    }
+                )
+                GridColType.FIXED -> noOfColumnsSection(
+                    noOfColumns = layoutPreferences.gridColCount,
+                    sliderPadding = sliderPadding,
+                    onNoOfColumnsChange = {
+                        onLayoutPreferencesChange(
+                            layoutPreferences.copy(gridColCount = it)
+                        )
+                    },
+                )
+            }
             roundedCornersSection(
                 roundedCorners = layoutPreferences.roundedCorners,
                 onRoundedCornersChange = {

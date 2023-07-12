@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.emptyPreferences
 import com.ammar.wallflow.IoDispatcher
 import com.ammar.wallflow.data.preferences.AppPreferences
 import com.ammar.wallflow.data.preferences.AutoWallpaperPreferences
+import com.ammar.wallflow.data.preferences.GridColType
 import com.ammar.wallflow.data.preferences.GridType
 import com.ammar.wallflow.data.preferences.LayoutPreferences
 import com.ammar.wallflow.data.preferences.LookAndFeelPreferences
@@ -110,7 +111,10 @@ class AppPreferencesRepository @Inject constructor(
                 with(lookAndFeelPreferences) {
                     it[PreferencesKeys.THEME] = theme.name
                     it[PreferencesKeys.LAYOUT_GRID_TYPE] = layoutPreferences.gridType.name
+                    it[PreferencesKeys.LAYOUT_GRID_COL_TYPE] = layoutPreferences.gridColType.name
                     it[PreferencesKeys.LAYOUT_GRID_COL_COUNT] = layoutPreferences.gridColCount
+                    it[PreferencesKeys.LAYOUT_GRID_COL_MIN_WIDTH_PCT] =
+                        layoutPreferences.gridColMinWidthPct
                     it[PreferencesKeys.LAYOUT_ROUNDED_CORNERS] = layoutPreferences.roundedCorners
                 }
             }
@@ -178,7 +182,14 @@ class AppPreferencesRepository @Inject constructor(
                 } catch (e: Exception) {
                     GridType.STAGGERED
                 },
+                gridColType = try {
+                    GridColType.valueOf(preferences[PreferencesKeys.LAYOUT_GRID_COL_TYPE] ?: "")
+                } catch (e: Exception) {
+                    GridColType.ADAPTIVE
+                },
                 gridColCount = preferences[PreferencesKeys.LAYOUT_GRID_COL_COUNT] ?: 2,
+                gridColMinWidthPct = preferences[PreferencesKeys.LAYOUT_GRID_COL_MIN_WIDTH_PCT]
+                    ?: 30,
                 roundedCorners = preferences[PreferencesKeys.LAYOUT_ROUNDED_CORNERS] ?: true,
             )
         )

@@ -68,9 +68,12 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.COMMON_RESOLUTIONS
 import com.ammar.wallflow.R
+import com.ammar.wallflow.data.preferences.GridColType
 import com.ammar.wallflow.data.preferences.GridType
 import com.ammar.wallflow.data.preferences.LayoutPreferences
+import com.ammar.wallflow.data.preferences.maxGridColWidthPct
 import com.ammar.wallflow.data.preferences.maxGridCols
+import com.ammar.wallflow.data.preferences.minGridColWidthPct
 import com.ammar.wallflow.data.preferences.minGridCols
 import com.ammar.wallflow.extensions.aspectRatio
 import com.ammar.wallflow.extensions.getScreenResolution
@@ -94,6 +97,7 @@ internal fun LayoutPreview(
     layoutPreferences: LayoutPreferences = LayoutPreferences(),
 ) {
     val context = LocalContext.current
+    var gridSize by remember { mutableStateOf(IntSize.Zero) }
     val screenResolution = remember(context) {
         context.getScreenResolution(true)
     }
@@ -107,11 +111,26 @@ internal fun LayoutPreview(
     val outlineColor = MaterialTheme.colorScheme.onSurfaceVariant
     val paddingDp = 4.dp
     val paddingPx = paddingDp.toPxF()
-    var gridSize by remember { mutableStateOf(IntSize.Zero) }
     val cornerRadiusPx by animateFloatAsState(
         targetValue = if (layoutPreferences.roundedCorners) paddingPx else 0f
     )
     val maxDeviceHeight = screenResolution.height.toDp() / 4
+    val gridWidthDp = gridSize.width.toDp()
+    val adaptiveMinWidth = remember(
+        layoutPreferences.gridColType,
+        layoutPreferences.gridColMinWidthPct,
+        gridSize
+    ) {
+        if (layoutPreferences.gridColType != GridColType.ADAPTIVE) {
+            return@remember 0.dp
+        }
+        val availWidth = gridWidthDp - (paddingDp * 2)
+        var wDp = availWidth * layoutPreferences.gridColMinWidthPct / 100
+        if (wDp <= 0.dp) {
+            wDp = 30.dp
+        }
+        return@remember wDp
+    }
 
     BoxWithConstraints(
         modifier = modifier.background(MaterialTheme.colorScheme.surfaceVariant),
@@ -170,7 +189,10 @@ internal fun LayoutPreview(
                         .weight(1f)
                         .onSizeChanged { gridSize = it },
                     contentPadding = PaddingValues(paddingDp),
-                    columns = StaggeredGridCells.Fixed(layoutPreferences.gridColCount),
+                    columns = when (layoutPreferences.gridColType) {
+                        GridColType.ADAPTIVE -> StaggeredGridCells.Adaptive(adaptiveMinWidth)
+                        GridColType.FIXED -> StaggeredGridCells.Fixed(layoutPreferences.gridColCount)
+                    },
                     verticalItemSpacing = 4.dp,
                     horizontalArrangement = Arrangement.spacedBy(paddingDp),
                 ) {
@@ -252,6 +274,7 @@ internal fun LazyListScope.gridTypeSection(
                 val options = GridType.values().associateWith { getLabelForGridType(it) }
                 var expanded by remember { mutableStateOf(false) }
 
+                // TODO: Replace with DropDown composable
                 ExposedDropdownMenuBox(
                     expanded = expanded,
                     onExpandedChange = { expanded = !expanded },
@@ -307,6 +330,78 @@ private fun PreviewGridTypeSection() {
 private fun getLabelForGridType(gridType: GridType) = when (gridType) {
     GridType.STAGGERED -> stringResource(R.string.staggered)
     GridType.FIXED_SIZE -> stringResource(R.string.fixed_size)
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+internal fun LazyListScope.gridColTypeSection(
+    gridColType: GridColType = GridColType.ADAPTIVE,
+    onGridColTypeChange: (GridColType) -> Unit = {},
+) {
+    item {
+        ListItem(
+            headlineContent = {
+                Text(text = stringResource(R.string.grid_col_type))
+            },
+            trailingContent = {
+                val options = GridColType.values().associateWith { getLabelForGridColType(it) }
+                var expanded by remember { mutableStateOf(false) }
+
+                // TODO: Replace with DropDown composable
+                ExposedDropdownMenuBox(
+                    expanded = expanded,
+                    onExpandedChange = { expanded = !expanded },
+                ) {
+                    // workaround for issue: https://issuetracker.google.com/289237728
+                    CompositionLocalProvider(LocalTextInputService provides null) {
+                        OutlinedTextField(
+                            modifier = Modifier
+                                .menuAnchor()
+                                .fillMaxWidth(0.5f),
+                            readOnly = true,
+                            value = options[gridColType] ?: "",
+                            onValueChange = {},
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                            colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                        )
+                    }
+                    ExposedDropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false },
+                    ) {
+                        options.forEach { (type, label) ->
+                            DropdownMenuItem(
+                                text = { Text(text = label) },
+                                onClick = {
+                                    onGridColTypeChange(type)
+                                    expanded = false
+                                },
+                                contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                            )
+                        }
+                    }
+                }
+            }
+        )
+    }
+}
+
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun PreviewGridColTypeSection() {
+    WallFlowTheme {
+        Surface {
+            LazyColumn {
+                gridColTypeSection()
+            }
+        }
+    }
+}
+
+@Composable
+private fun getLabelForGridColType(gridColType: GridColType) = when (gridColType) {
+    GridColType.ADAPTIVE -> stringResource(R.string.adaptive)
+    GridColType.FIXED -> stringResource(R.string.fixed)
 }
 
 internal fun LazyListScope.noOfColumnsSection(
@@ -369,6 +464,68 @@ private fun PreviewNoOfColumnsSection() {
         }
     }
 }
+
+internal fun LazyListScope.adaptiveColMinWidthPctSection(
+    minWidthPct: Int = 30,
+    sliderPadding: Dp = 0.dp,
+    onMinWidthPctChange: (Int) -> Unit = {},
+) {
+    item {
+        val context = LocalContext.current
+        var tempPct by remember(minWidthPct) { mutableIntStateOf(minWidthPct) }
+        val sliderPosition = tempPct.toFloat()
+        ListItem(
+            headlineContent = {
+                Text(text = "${stringResource(R.string.min_col_width)}: $tempPct%")
+            },
+            supportingContent = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Text(
+                        modifier = Modifier.widthIn(min = sliderPadding),
+                        text = minGridColWidthPct.toString(),
+                        textAlign = TextAlign.Center,
+                    )
+                    Slider(
+                        modifier = Modifier
+                            .weight(1f)
+                            .semantics {
+                                contentDescription = context.getString(
+                                    R.string.no_of_columns
+                                )
+                            },
+                        value = sliderPosition,
+                        onValueChange = { tempPct = it.toInt() },
+                        valueRange = minGridColWidthPct.toFloat()..maxGridColWidthPct.toFloat(),
+                        onValueChangeFinished = { onMinWidthPctChange(tempPct) },
+                        steps = ((maxGridColWidthPct - minGridColWidthPct) / 5 - 1).toInt(),
+                    )
+                    Text(
+                        modifier = Modifier.widthIn(min = sliderPadding),
+                        text = maxGridColWidthPct.toString(),
+                        textAlign = TextAlign.Center,
+                    )
+                }
+            }
+        )
+    }
+}
+
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun PreviewAdaptiveColMinWidthPctSection() {
+    WallFlowTheme {
+        Surface {
+            LazyColumn {
+                adaptiveColMinWidthPctSection()
+            }
+        }
+    }
+}
+
 
 internal fun LazyListScope.roundedCornersSection(
     roundedCorners: Boolean = true,

@@ -31,6 +31,8 @@ object PreferencesKeys {
     val AUTO_WALLPAPER_WORK_REQUEST_ID = stringPreferencesKey("auto_wallpaper_work_request_id")
     val THEME = stringPreferencesKey("theme")
     val LAYOUT_GRID_TYPE = stringPreferencesKey("layout_grid_type")
+    val LAYOUT_GRID_COL_TYPE = stringPreferencesKey("layout_grid_col_type")
     val LAYOUT_GRID_COL_COUNT = intPreferencesKey("layout_grid_col_count")
+    val LAYOUT_GRID_COL_MIN_WIDTH_PCT = intPreferencesKey("layout_grid_col_min_width_pct")
     val LAYOUT_ROUNDED_CORNERS = booleanPreferencesKey("layout_rounded_corners")
 }
