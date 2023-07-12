@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -78,7 +77,6 @@ import com.ammar.wallflow.extensions.getScreenResolution
 import com.ammar.wallflow.extensions.toDp
 import com.ammar.wallflow.extensions.toPxF
 import com.ammar.wallflow.ui.theme.WallFlowTheme
-import kotlin.math.roundToInt
 import kotlin.random.Random
 
 private val random = Random(seed = 206)
@@ -308,7 +306,7 @@ internal fun LazyListScope.noOfColumnsSection(
         val sliderPosition = tempCols.toFloat()
         ListItem(
             headlineContent = {
-                Text(text = stringResource(R.string.no_of_columns))
+                Text(text = "${stringResource(R.string.no_of_columns)}: $tempCols")
             },
             supportingContent = {
                 Row(
@@ -317,7 +315,7 @@ internal fun LazyListScope.noOfColumnsSection(
                 ) {
                     Text(
                         modifier = Modifier.widthIn(min = sliderPadding),
-                        text = sliderPosition.roundToInt().toString(),
+                        text = minGridCols.toString(),
                         textAlign = TextAlign.Center,
                     )
                     Slider(
@@ -334,7 +332,11 @@ internal fun LazyListScope.noOfColumnsSection(
                         onValueChangeFinished = { onNoOfColumnsChange(tempCols) },
                         steps = (maxGridCols - minGridCols - 1).toInt(),
                     )
-                    Spacer(modifier = Modifier.width(sliderPadding))
+                    Text(
+                        modifier = Modifier.widthIn(min = sliderPadding),
+                        text = maxGridCols.toString(),
+                        textAlign = TextAlign.Center,
+                    )
                 }
             }
         )
