@@ -39,7 +39,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -54,6 +56,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -225,8 +228,8 @@ private fun PreviewLayoutPreview(
 
 @OptIn(ExperimentalMaterial3Api::class)
 internal fun LazyListScope.gridTypeSection(
-    layoutPreferences: LayoutPreferences = LayoutPreferences(),
-    onLayoutPreferencesChange: (LayoutPreferences) -> Unit = {},
+    gridType: GridType = GridType.STAGGERED,
+    onGridTypeChange: (GridType) -> Unit = {},
 ) {
     item {
         ListItem(
@@ -241,16 +244,19 @@ internal fun LazyListScope.gridTypeSection(
                     expanded = expanded,
                     onExpandedChange = { expanded = !expanded },
                 ) {
-                    OutlinedTextField(
-                        modifier = Modifier
-                            .menuAnchor()
-                            .fillMaxWidth(0.5f),
-                        readOnly = true,
-                        value = options[layoutPreferences.gridType] ?: "",
-                        onValueChange = {},
-                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                        colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                    )
+                    // workaround for issue: https://issuetracker.google.com/289237728
+                    CompositionLocalProvider(LocalTextInputService provides null) {
+                        OutlinedTextField(
+                            modifier = Modifier
+                                .menuAnchor()
+                                .fillMaxWidth(0.5f),
+                            readOnly = true,
+                            value = options[gridType] ?: "",
+                            onValueChange = {},
+                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                            colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                        )
+                    }
                     ExposedDropdownMenu(
                         expanded = expanded,
                         onDismissRequest = { expanded = false },
@@ -259,9 +265,7 @@ internal fun LazyListScope.gridTypeSection(
                             DropdownMenuItem(
                                 text = { Text(text = label) },
                                 onClick = {
-                                    onLayoutPreferencesChange(
-                                        layoutPreferences.copy(gridType = type)
-                                    )
+                                    onGridTypeChange(type)
                                     expanded = false
                                 },
                                 contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
@@ -294,13 +298,14 @@ private fun getLabelForGridType(gridType: GridType) = when (gridType) {
 }
 
 internal fun LazyListScope.noOfColumnsSection(
-    layoutPreferences: LayoutPreferences = LayoutPreferences(),
+    noOfColumns: Int = 2,
     sliderPadding: Dp = 0.dp,
-    onLayoutPreferencesChange: (LayoutPreferences) -> Unit = {},
+    onNoOfColumnsChange: (Int) -> Unit = {},
 ) {
     item {
         val context = LocalContext.current
-        val sliderPosition = layoutPreferences.gridColCount.toFloat()
+        var tempCols by remember(noOfColumns) { mutableIntStateOf(noOfColumns) }
+        val sliderPosition = tempCols.toFloat()
         ListItem(
             headlineContent = {
                 Text(text = stringResource(R.string.no_of_columns))
@@ -324,14 +329,10 @@ internal fun LazyListScope.noOfColumnsSection(
                                 )
                             },
                         value = sliderPosition,
-                        onValueChange = {
-                            onLayoutPreferencesChange(
-                                layoutPreferences.copy(gridColCount = it.roundToInt())
-                            )
-                        },
+                        onValueChange = { tempCols = it.toInt() },
                         valueRange = minGridCols.toFloat()..maxGridCols.toFloat(),
-                        onValueChangeFinished = {},
-                        steps = (maxGridCols - minGridCols + 1).toInt(),
+                        onValueChangeFinished = { onNoOfColumnsChange(tempCols) },
+                        steps = (maxGridCols - minGridCols - 1).toInt(),
                     )
                     Spacer(modifier = Modifier.width(sliderPadding))
                 }
@@ -354,26 +355,18 @@ private fun PreviewNoOfColumnsSection() {
 }
 
 internal fun LazyListScope.roundedCornersSection(
-    layoutPreferences: LayoutPreferences = LayoutPreferences(),
-    onLayoutPreferencesChange: (LayoutPreferences) -> Unit = {},
+    roundedCorners: Boolean = true,
+    onRoundedCornersChange: (Boolean) -> Unit = {},
 ) {
     item {
         ListItem(
-            modifier = Modifier.clickable {
-                onLayoutPreferencesChange(
-                    layoutPreferences.copy(roundedCorners = !layoutPreferences.roundedCorners)
-                )
-            },
+            modifier = Modifier.clickable { onRoundedCornersChange(!roundedCorners) },
             headlineContent = { Text(text = stringResource(R.string.rounded_corners)) },
             trailingContent = {
                 Switch(
                     modifier = Modifier.height(24.dp),
-                    checked = layoutPreferences.roundedCorners,
-                    onCheckedChange = {
-                        onLayoutPreferencesChange(
-                            layoutPreferences.copy(roundedCorners = it)
-                        )
-                    },
+                    checked = roundedCorners,
+                    onCheckedChange = { onRoundedCornersChange(it) },
                 )
             },
         )

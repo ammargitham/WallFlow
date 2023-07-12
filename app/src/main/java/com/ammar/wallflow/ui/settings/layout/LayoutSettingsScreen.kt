@@ -111,17 +111,29 @@ fun LayoutSettingsScreenContent(
             contentPadding = PaddingValues(vertical = 8.dp),
         ) {
             gridTypeSection(
-                layoutPreferences = layoutPreferences,
-                onLayoutPreferencesChange = onLayoutPreferencesChange,
+                gridType = layoutPreferences.gridType,
+                onGridTypeChange = {
+                    onLayoutPreferencesChange(
+                        layoutPreferences.copy(gridType = it)
+                    )
+                },
             )
             noOfColumnsSection(
-                layoutPreferences = layoutPreferences,
+                noOfColumns = layoutPreferences.gridColCount,
                 sliderPadding = sliderPadding,
-                onLayoutPreferencesChange = onLayoutPreferencesChange,
+                onNoOfColumnsChange = {
+                    onLayoutPreferencesChange(
+                        layoutPreferences.copy(gridColCount = it)
+                    )
+                },
             )
             roundedCornersSection(
-                layoutPreferences = layoutPreferences,
-                onLayoutPreferencesChange = onLayoutPreferencesChange,
+                roundedCorners = layoutPreferences.roundedCorners,
+                onRoundedCornersChange = {
+                    onLayoutPreferencesChange(
+                        layoutPreferences.copy(roundedCorners = it)
+                    )
+                },
             )
         }
     }
