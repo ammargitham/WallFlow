@@ -109,6 +109,7 @@ retrofit-core = { module = "com.squareup.retrofit2:retrofit", version.ref = "ret
 retrofit-kotlin-serialization = { module = "com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter", version.ref = "retrofitKotlinxSerializationJson" }
 telephoto-zoomable-image-coil = { module = "me.saket.telephoto:zoomable-image-coil", version.ref = "telephoto" }
 tflite-gpu = { module = "org.tensorflow:tensorflow-lite-gpu", version.ref = "tflite-gpu" }
+tflite-gpu-api = { module = "org.tensorflow:tensorflow-lite-gpu-api", version.ref = "tflite-gpu" }
 tflite-gpu-delegate-plugin = { module = "org.tensorflow:tensorflow-lite-gpu-delegate-plugin", version.ref = "tflite" }
 tflite-task-vision = { module = "org.tensorflow:tensorflow-lite-task-vision", version.ref = "tflite" }
 

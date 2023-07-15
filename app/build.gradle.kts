@@ -1,4 +1,13 @@
-@file:Suppress("UnstableApiUsage")
+@file:Suppress("UnstableApiUsage", "DEPRECATION")
+
+import com.android.build.gradle.api.ApplicationVariant
+import com.android.build.gradle.api.BaseVariantOutput
+import com.android.build.gradle.internal.api.BaseVariantOutputImpl
+import java.util.Properties
+
+val localProperties = Properties().apply {
+    load(rootProject.file("local.properties").reader())
+}
 
 @Suppress("DSL_SCOPE_VIOLATION") // Remove when fixed https://youtrack.jetbrains.com/issue/KTIJ-19369
 plugins {
@@ -39,15 +48,45 @@ android {
         }
     }
 
+    signingConfigs {
+        create("release") {
+            storeFile = file(localProperties.getProperty("release.jks.file", ""))
+            storePassword = localProperties.getProperty("release.jks.password", "")
+            keyAlias = localProperties.getProperty("release.jks.key.alias", "")
+            keyPassword = localProperties.getProperty("release.jks.key.password", "")
+        }
+    }
+
     buildTypes {
         getByName("release") {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
+
+    splits {
+        // Configures multiple APKs based on ABI.
+        abi {
+            // Enables building multiple APKs per ABI.
+            isEnable = gradle.startParameter.taskNames.isNotEmpty()
+                    && gradle.startParameter.taskNames[0].contains("Release")
+
+            // Resets the list of ABIs that Gradle should create APKs for to none.
+            reset()
+
+            // Specifies a list of ABIs that Gradle should create APKs for.
+            include("x86", "x86_64", "arm64-v8a", "armeabi-v7a")
+
+            // Specifies that we want to also generate a universal APK that includes all ABIs.
+            isUniversalApk = true
+        }
+    }
+
+    applicationVariants.all(ApplicationVariantAction())
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -179,6 +218,7 @@ dependencies {
     implementation(libs.tflite.task.vision)
     implementation(libs.tflite.gpu.delegate.plugin)
     implementation(libs.tflite.gpu)
+    implementation(libs.tflite.gpu.api)
 
     // partial
     implementation(libs.partial)
@@ -207,4 +247,44 @@ dependencies {
 
     // mockk
     androidTestImplementation(libs.mockk.android)
+}
+
+class ApplicationVariantAction : Action<ApplicationVariant> {
+    override fun execute(variant: ApplicationVariant) {
+        val fileName = createFileName(variant)
+        variant.outputs.all(VariantOutputAction(fileName))
+    }
+
+    private fun createFileName(variant: ApplicationVariant): String {
+        val buildType = variant.buildType.name
+        val versionName = variant.versionName
+        val flavor = variant.flavorName
+        println("$buildType, $versionName, $flavor")
+        val flavorBuildType = if (flavor.isNotBlank()) {
+            "${flavor}_${buildType}"
+        } else {
+            buildType
+        }
+        val suffix = if (flavorBuildType.isBlank() || versionName.contains(flavorBuildType)) {
+            versionName
+        } else {
+            "$versionName-$flavorBuildType" // eg. 1.0-github_debug or release
+        }
+        return suffix
+    }
+
+    class VariantOutputAction(
+        private val suffix: String,
+    ) : Action<BaseVariantOutput> {
+        override fun execute(output: BaseVariantOutput) {
+            if (output is BaseVariantOutputImpl) {
+                val abi = output.getFilter(com.android.build.OutputFile.ABI)
+                output.outputFileName = if (abi == null) {
+                    "wallflow_${suffix}.apk"
+                } else {
+                    "wallflow_${suffix}_${abi}.apk"
+                }
+            }
+        }
+    }
 }
