@@ -137,6 +137,7 @@ class MainActivity : ComponentActivity() {
                         showSearchBarFilters = uiState.showSearchBarFilters,
                         searchBarDeleteSuggestion = uiState.searchBarDeleteSuggestion,
                         searchBarOverflowIcon = searchBarControllerState.overflowIcon,
+                        searchBarShowNSFW = uiState.searchBarShowNSFW,
                         onSearchBarQueryChange = viewModel::onSearchBarQueryChange,
                         onBackClick = { pane1NavController.navigateUp() },
                         onSearchBarSearch = {

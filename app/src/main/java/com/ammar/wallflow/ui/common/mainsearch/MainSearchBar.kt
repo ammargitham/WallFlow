@@ -55,6 +55,7 @@ fun MainSearchBar(
     showFilters: Boolean = false,
     deleteSuggestion: Search? = null,
     overflowIcon: @Composable (() -> Unit)? = null,
+    showNSFW: Boolean = false,
     onQueryChange: (String) -> Unit = {},
     onBackClick: (() -> Unit)? = null,
     onSearch: (query: String) -> Unit = {},
@@ -69,8 +70,9 @@ fun MainSearchBar(
     onSaveAsClick: () -> Unit = {},
     onLoadClick: () -> Unit = {},
 ) {
-    val placeholder: @Composable () -> Unit =
-        remember { { Text(text = stringResource(R.string.search)) } }
+    val placeholder: @Composable () -> Unit = remember {
+        { Text(text = stringResource(R.string.search)) }
+    }
 
     AnimatedVisibility(
         modifier = modifier,
@@ -145,6 +147,7 @@ fun MainSearchBar(
                                 .padding(16.dp),
                             showQueryField = false,
                             search = search,
+                            showNSFW = showNSFW,
                             onChange = { onFiltersChange(it.filters) },
                         )
                     }

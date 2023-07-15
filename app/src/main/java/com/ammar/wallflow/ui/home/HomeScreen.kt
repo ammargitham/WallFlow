@@ -288,6 +288,7 @@ fun HomeScreen(
                         onLoadClick = viewModel::showSavedSearches,
                     )
                 },
+                showNSFW = uiState.showNSFW,
                 onChange = { localSearch = it },
                 onDismissRequest = { viewModel.showFilters(false) }
             )

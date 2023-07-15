@@ -171,6 +171,7 @@ internal fun CategoriesFilter(
 @Composable
 internal fun PurityFilter(
     purities: Set<Purity> = setOf(Purity.SFW),
+    showNSFW: Boolean = false,
     onChange: (purities: Set<Purity>) -> Unit = {},
 ) {
     Column {
@@ -182,7 +183,9 @@ internal fun PurityFilter(
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Purity.values().map {
+            Purity.values().filter {
+                if (it == Purity.NSFW) showNSFW else true
+            }.map {
                 val selected = it in purities
 
                 FilterChip(
@@ -199,6 +202,20 @@ internal fun PurityFilter(
                     selected = selected,
                     onClick = { onChange(if (selected && purities.size > 1) purities - it else purities + it) }
                 )
+            }
+        }
+    }
+}
+
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun PreviewPurityFilter() {
+    WallFlowTheme {
+        Surface {
+            Column {
+                PurityFilter()
+                PurityFilter(showNSFW = true)
             }
         }
     }

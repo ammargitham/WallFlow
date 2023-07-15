@@ -47,6 +47,7 @@ fun EditSearchModalBottomSheet(
     state: SheetState = rememberModalBottomSheetState(),
     search: Search = Search(),
     header: @Composable (ColumnScope.() -> Unit)? = null,
+    showNSFW: Boolean = false,
     onChange: (Search) -> Unit = {},
     onDismissRequest: () -> Unit = {},
 ) {
@@ -81,6 +82,7 @@ fun EditSearchModalBottomSheet(
                     bottom = imePadding + 44.dp,
                 ),
             search = search,
+            showNSFW = showNSFW,
             onChange = onChange,
             onMinResAddCustomResClick = { showMinResAddCustomResDialog = true },
             onResolutionsAddCustomResClick = { showResolutionsAddCustomResDialog = true },
@@ -127,6 +129,7 @@ fun EditSearchContent(
     modifier: Modifier = Modifier,
     search: Search = Search(),
     showQueryField: Boolean = true,
+    showNSFW: Boolean = false,
     onChange: (Search) -> Unit = {},
     onMinResAddCustomResClick: () -> Unit = {},
     onResolutionsAddCustomResClick: () -> Unit = {},
@@ -157,6 +160,7 @@ fun EditSearchContent(
         )
         PurityFilter(
             purities = search.filters.purity,
+            showNSFW = showNSFW,
             onChange = { onChange(search.copy(filters = search.filters.copy(purity = it))) },
         )
         SortingFilter(

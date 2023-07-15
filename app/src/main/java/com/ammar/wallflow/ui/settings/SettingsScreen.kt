@@ -278,6 +278,7 @@ fun SettingsScreen(
                     },
                 )
             },
+            showNSFW = uiState.appPreferences.wallhavenApiKey.isNotBlank(),
             onChange = { localSavedSearch = localSavedSearch.copy(search = it) },
             onDismissRequest = { viewModel.editSavedSearch(null) },
         )

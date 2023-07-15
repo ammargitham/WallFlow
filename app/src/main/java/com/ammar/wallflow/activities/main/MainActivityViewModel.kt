@@ -71,6 +71,7 @@ class MainActivityViewModel @Inject constructor(
                 globalErrors = errors,
                 savedSearches = savedSearchEntities.map { entity -> entity.toSavedSearch() },
                 theme = appPreferences.lookAndFeelPreferences.theme,
+                searchBarShowNSFW = appPreferences.wallhavenApiKey.isNotBlank(),
             )
         )
     }.stateIn(
@@ -154,4 +155,5 @@ data class MainUiState(
     val showSavedSearchesDialog: Boolean = false,
     val savedSearches: List<SavedSearch> = emptyList(),
     val theme: Theme = Theme.SYSTEM,
+    val searchBarShowNSFW: Boolean = false,
 )
