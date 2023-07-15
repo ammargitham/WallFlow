@@ -1,5 +1,6 @@
 package com.ammar.wallflow.ui.home
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -26,6 +27,9 @@ import com.github.materiiapps.partial.Partialize
 import com.github.materiiapps.partial.partial
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
@@ -88,7 +92,7 @@ class HomeViewModel @Inject constructor(
     ) { search, tags, appPreferences, local, wallpapersLoading, savedSearchEntities ->
         local.merge(
             HomeUiState(
-                tags = if (tags is Resource.Loading) List(3) {
+                tags = (if (tags is Resource.Loading) List(3) {
                     Tag(
                         id = it + 1L,
                         name = "Loading...", // no need for string resource as "Loading..." won't be visible
@@ -98,7 +102,7 @@ class HomeViewModel @Inject constructor(
                         purity = Purity.SFW,
                         createdAt = Clock.System.now(),
                     )
-                } else tags.successOr(emptyList()),
+                } else tags.successOr(emptyList())).toImmutableList(),
                 areTagsLoading = tags is Resource.Loading,
                 search = search,
                 wallpapersLoading = wallpapersLoading,
@@ -156,9 +160,10 @@ class HomeViewModel @Inject constructor(
     }
 }
 
+@Stable
 @Partialize
 data class HomeUiState(
-    val tags: List<Tag> = emptyList(),
+    val tags: ImmutableList<Tag> = persistentListOf(),
     val areTagsLoading: Boolean = true,
     val search: Search = Search(
         filters = SearchQuery(

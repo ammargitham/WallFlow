@@ -56,7 +56,7 @@ fun WallpaperStaggeredGrid(
     val adaptiveMinWidth = remember(
         gridColType,
         gridColMinWidthPct,
-        gridSize,
+        gridWidthDp,
         contentPadding,
     ) {
         if (gridColType != GridColType.ADAPTIVE) {

@@ -39,6 +39,7 @@ import com.ammar.wallflow.ui.common.topWindowInsets
 import com.ammar.wallflow.ui.destinations.TypedDestination
 import com.ammar.wallflow.ui.home.HomeScreenContent
 import com.ammar.wallflow.ui.theme.WallFlowTheme
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.datetime.Clock
 
@@ -239,7 +240,7 @@ private fun PreviewContent(
             purity = Purity.SFW,
             createdAt = Clock.System.now(),
         )
-    }
+    }.toPersistentList()
 
     WallFlowTheme {
         Surface {

@@ -1,8 +1,10 @@
 package com.ammar.wallflow.model
 
+import androidx.compose.runtime.Stable
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
+@Stable
 @Serializable
 data class Tag(
     val id: Long,

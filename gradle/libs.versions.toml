@@ -13,6 +13,7 @@ androidxLifecycle = "2.6.1"
 androidxNavigation = "2.6.0"
 androidxPaging = "3.2.0-rc01"
 androidxPagingCompose = "3.2.0-rc01"
+androidxRuntime = "1.0.0-alpha02"
 androidxRoom = "2.6.0-alpha01"
 androidxTest = "1.5.0"
 androidxTestExt = "1.1.5"
@@ -31,6 +32,7 @@ jsoup = "1.16.1"
 junit = "4.13.2"
 kotlin = "1.8.22"
 kotlinTest = "1.8.22"
+kotlinxCollectionsImmutable = "0.3.5"
 kotlinxDatetime = "0.4.0"
 kotlinxSerializationJson = "1.5.1"
 ksp = "1.8.22-1.0.11"
@@ -72,6 +74,7 @@ androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "androidxNavigation" }
 androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref = "androidxPagingCompose" }
 androidx-paging-runtime = { module = "androidx.paging:paging-runtime", version.ref = "androidxPaging" }
+androidx-runtime-tracing = { module = "androidx.compose.runtime:runtime-tracing", version.ref = "androidxRuntime" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidxRoom" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidxRoom" }
 androidx-room-paging = { module = "androidx.room:room-paging", version.ref = "androidxRoom" }
@@ -97,6 +100,7 @@ hilt-gradle-plugin = { module = "com.google.dagger:hilt-android-gradle-plugin", 
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 junit = { module = "junit:junit", version.ref = "junit" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlinTest" }
+kotlinx-collections-immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "kotlinxCollectionsImmutable" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinxDatetime" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }

@@ -34,13 +34,16 @@ import com.ammar.wallflow.model.Tag
 import com.ammar.wallflow.ui.common.OverflowMenu
 import com.ammar.wallflow.ui.common.TagChip
 import com.ammar.wallflow.ui.theme.WallFlowTheme
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.datetime.Clock
 
 
 @Composable
 fun PopularTagsRow(
     modifier: Modifier = Modifier,
-    tags: List<Tag> = emptyList(),
+    tags: ImmutableList<Tag> = persistentListOf(),
     loading: Boolean = false,
     onTagClick: (tag: Tag) -> Unit = {},
 ) {
@@ -81,7 +84,7 @@ private fun PreviewPopularTagsRow() {
                         purity = Purity.SFW,
                         createdAt = Clock.System.now(),
                     )
-                }
+                }.toPersistentList()
             )
         }
     }

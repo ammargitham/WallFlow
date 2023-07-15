@@ -2,6 +2,7 @@
 
 package com.ammar.wallflow.model
 
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntSize
 import androidx.core.graphics.toColorInt
@@ -11,6 +12,7 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import kotlinx.serialization.UseSerializers
 
+@Stable
 @kotlinx.serialization.Serializable
 data class Wallpaper(
     val id: String,

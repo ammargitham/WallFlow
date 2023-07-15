@@ -81,6 +81,8 @@ import com.ammar.wallflow.ui.wallpaper.WallpaperScreenNavArgs
 import com.ammar.wallflow.ui.wallpaper.WallpaperViewModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 
@@ -187,6 +189,36 @@ fun HomeScreen(
         )
     }
 
+    val onWallpaperClick: (wallpaper: Wallpaper) -> Unit = remember(isTwoPaneMode) {
+        {
+            if (isTwoPaneMode) {
+                viewModel.setSelectedWallpaper(it)
+
+            } else {
+                // navigate to wallpaper screen
+                twoPaneController.navigatePane1(
+                    WallpaperScreenDestination(
+                        wallpaperId = it.id,
+                        thumbUrl = it.thumbs.original,
+                    )
+                )
+            }
+        }
+    }
+
+    val onTagClick: (tag: Tag) -> Unit = remember {
+        {
+            twoPaneController.pane1NavHostController.search(
+                Search(
+                    query = "id:${it.id}",
+                    meta = TagSearchMeta(it),
+                )
+            )
+        }
+    }
+
+    val onFilterFABClick = remember { { viewModel.showFilters(true) } }
+
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -201,7 +233,7 @@ fun HomeScreen(
                 end = 8.dp,
                 bottom = bottomPadding + 8.dp,
             ),
-            tags = if (uiState.isHome) uiState.tags else emptyList(),
+            tags = if (uiState.isHome) uiState.tags else persistentListOf(),
             isTagsLoading = uiState.areTagsLoading,
             wallpapers = wallpapers,
             blurSketchy = uiState.blurSketchy,
@@ -209,27 +241,8 @@ fun HomeScreen(
             selectedWallpaper = uiState.selectedWallpaper,
             showSelection = isTwoPaneMode,
             layoutPreferences = uiState.layoutPreferences,
-            onWallpaperClick = {
-                if (isTwoPaneMode) {
-                    viewModel.setSelectedWallpaper(it)
-                    return@HomeScreenContent
-                }
-                // navigate to wallpaper screen
-                twoPaneController.navigatePane1(
-                    WallpaperScreenDestination(
-                        wallpaperId = it.id,
-                        thumbUrl = it.thumbs.original,
-                    )
-                )
-            },
-            onTagClick = {
-                twoPaneController.pane1NavHostController.search(
-                    Search(
-                        query = "id:${it.id}",
-                        meta = TagSearchMeta(it),
-                    )
-                )
-            }
+            onWallpaperClick = onWallpaperClick,
+            onTagClick = onTagClick
         )
 
         PullRefreshIndicator(
@@ -245,7 +258,7 @@ fun HomeScreen(
                     // .windowInsetsPadding(bottomWindowInsets)
                     .align(Alignment.BottomEnd)
                     .offset(x = (-16).dp, y = (-16).dp - bottomPadding),
-                onClick = { viewModel.showFilters(true) },
+                onClick = onFilterFABClick,
                 expanded = expandedFab,
                 icon = {
                     Icon(
@@ -336,7 +349,7 @@ internal fun HomeScreenContent(
     modifier: Modifier = Modifier,
     gridState: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
     contentPadding: PaddingValues = PaddingValues(8.dp),
-    tags: List<Tag> = emptyList(),
+    tags: ImmutableList<Tag> = persistentListOf(),
     isTagsLoading: Boolean = false,
     wallpapers: LazyPagingItems<Wallpaper>,
     blurSketchy: Boolean = false,
@@ -382,7 +395,7 @@ private fun DefaultPreview() {
     WallFlowTheme {
         val wallpapers = flowOf(PagingData.from(listOf(wallpaper1, wallpaper2)))
         val pagingItems = wallpapers.collectAsLazyPagingItems()
-        HomeScreenContent(tags = emptyList(), wallpapers = pagingItems)
+        HomeScreenContent(tags = persistentListOf(), wallpapers = pagingItems)
     }
 }
 
@@ -392,6 +405,6 @@ private fun PortraitPreview() {
     WallFlowTheme {
         val wallpapers = flowOf(PagingData.from(listOf(wallpaper1, wallpaper2)))
         val pagingItems = wallpapers.collectAsLazyPagingItems()
-        HomeScreenContent(tags = emptyList(), wallpapers = pagingItems)
+        HomeScreenContent(tags = persistentListOf(), wallpapers = pagingItems)
     }
 }

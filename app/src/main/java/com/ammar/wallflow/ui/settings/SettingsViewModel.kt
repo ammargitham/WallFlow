@@ -2,6 +2,7 @@ package com.ammar.wallflow.ui.settings
 
 import android.app.Application
 import android.util.Log
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkInfo
@@ -416,5 +417,7 @@ data class SettingsUiState(
 sealed class NextRun {
     object NotScheduled : NextRun()
     object Running : NextRun()
+
+    @Stable
     data class NextRunTime(val instant: Instant) : NextRun()
 }

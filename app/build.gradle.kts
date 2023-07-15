@@ -165,6 +165,24 @@ android {
     }
 }
 
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    kotlinOptions {
+        if (project.findProperty("composeCompilerReports") == "true") {
+            freeCompilerArgs += listOf(
+                "-P",
+                "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=${project.buildDir.absolutePath}/compose_compiler"
+            )
+        }
+        if (project.findProperty("composeCompilerMetrics") == "true") {
+            freeCompilerArgs += listOf(
+                "-P",
+                "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=${project.buildDir.absolutePath}/compose_compiler"
+            )
+        }
+    }
+}
+
+
 val plusImplementation by configurations
 
 dependencies {
@@ -175,6 +193,9 @@ dependencies {
     implementation(libs.androidx.lifecycle.service)
     implementation(libs.androidx.lifecycle.process)
     implementation(libs.androidx.activity.compose)
+
+    // Runtime tracing
+    debugImplementation(libs.androidx.runtime.tracing)
 
     // Hilt Dependency Injection
     implementation(libs.hilt.android)
@@ -266,6 +287,9 @@ dependencies {
 
     // telephoto
     implementation(libs.telephoto.zoomable.image.coil)
+
+    // kotlinx collections immutable
+    implementation(libs.kotlinx.collections.immutable)
 
     // Local tests: jUnit, coroutines, Android runner
     testImplementation(libs.junit)

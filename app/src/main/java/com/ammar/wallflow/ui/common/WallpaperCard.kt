@@ -4,21 +4,18 @@ import android.util.Log
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
@@ -38,9 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
 import coil.compose.AsyncImage
-import coil.memory.MemoryCache
 import coil.request.ImageRequest
-import coil.request.SuccessResult
 import com.ammar.wallflow.R
 import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.extensions.aspectRatio
@@ -54,7 +49,6 @@ import kotlin.math.roundToInt
 
 private val cardHeight = 300.dp
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WallpaperCard(
     modifier: Modifier = Modifier,
@@ -65,24 +59,14 @@ fun WallpaperCard(
     isSelected: Boolean = false,
     onClick: () -> Unit = {},
 ) {
-    var memoryCacheKey: MemoryCache.Key? by remember { mutableStateOf(null) }
-    val listener = remember {
-        object : ImageRequest.Listener {
-            override fun onSuccess(request: ImageRequest, result: SuccessResult) {
-                memoryCacheKey = result.memoryCacheKey
-            }
-        }
-    }
     val context = LocalContext.current
     val request = remember(
         context,
         wallpaper,
-        listener
     ) {
         ImageRequest.Builder(context).apply {
             data(wallpaper.thumbs.original)
             crossfade(true)
-            listener(listener)
         }.build()
     }
     val transition = updateTransition(isSelected, label = "selection state")
@@ -106,16 +90,17 @@ fun WallpaperCard(
         )?.toBitmap()?.asImageBitmap()
     }
 
-    Card(
-        modifier = modifier.let {
-            if (fixedHeight) {
-                it.height(200.dp)
-            } else {
-                it.aspectRatio(wallpaper.resolution.aspectRatio)
+    Column(
+        modifier = modifier
+            .let {
+                if (fixedHeight) {
+                    it.height(200.dp)
+                } else {
+                    it.aspectRatio(wallpaper.resolution.aspectRatio)
+                }
             }
-        },
-        shape = if (roundedCorners) CardDefaults.shape else RectangleShape,
-        onClick = onClick,
+            .clip(if (roundedCorners) CardDefaults.shape else RectangleShape)
+            .clickable(onClick = onClick),
     ) {
         AsyncImage(
             modifier = Modifier
