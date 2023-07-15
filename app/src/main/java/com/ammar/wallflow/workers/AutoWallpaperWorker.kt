@@ -54,7 +54,7 @@ import com.ammar.wallflow.utils.NotificationChannels
 import com.ammar.wallflow.utils.NotificationIds.AUTO_WALLPAPER_NOTIFICATION_ID
 import com.ammar.wallflow.utils.NotificationIds.AUTO_WALLPAPER_SUCCESS_NOTIFICATION_ID
 import com.ammar.wallflow.utils.decodeSampledBitmapFromFile
-import com.ammar.wallflow.utils.detectObjects
+import com.ammar.wallflow.utils.objectdetection.detectObjects
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.io.File

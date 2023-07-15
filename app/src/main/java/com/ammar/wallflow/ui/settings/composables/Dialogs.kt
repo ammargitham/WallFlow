@@ -60,6 +60,7 @@ import com.ammar.wallflow.DISABLED_ALPHA
 import com.ammar.wallflow.INTERNAL_MODELS
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.db.entity.ObjectDetectionModelEntity
+import com.ammar.wallflow.data.preferences.ObjectDetectionDelegate
 import com.ammar.wallflow.data.preferences.Theme
 import com.ammar.wallflow.data.preferences.defaultAutoWallpaperConstraints
 import com.ammar.wallflow.data.preferences.defaultAutoWallpaperFreq
@@ -82,19 +83,18 @@ import com.ammar.wallflow.utils.DownloadStatus
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DateTimePeriod
-import org.tensorflow.lite.task.core.ComputeSettings
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ObjectDetectionDelegateOptionsDialog(
     modifier: Modifier = Modifier,
-    selectedDelegate: ComputeSettings.Delegate? = null,
-    onSaveClick: (delegate: ComputeSettings.Delegate) -> Unit = {},
+    selectedDelegate: ObjectDetectionDelegate? = null,
+    onSaveClick: (delegate: ObjectDetectionDelegate) -> Unit = {},
     onDismissRequest: () -> Unit = {},
 ) {
     var localSelectedDelegate by remember(selectedDelegate) {
-        mutableStateOf(selectedDelegate ?: ComputeSettings.Delegate.NONE)
+        mutableStateOf(selectedDelegate ?: ObjectDetectionDelegate.NONE)
     }
     AlertDialog(
         modifier = modifier,
@@ -127,13 +127,13 @@ fun ObjectDetectionDelegateOptionsDialog(
 @Composable
 private fun ObjectDetectionDelegateOptionsContent(
     modifier: Modifier = Modifier,
-    selectedDelegate: ComputeSettings.Delegate = ComputeSettings.Delegate.NONE,
-    onOptionClick: (delegate: ComputeSettings.Delegate) -> Unit = {},
+    selectedDelegate: ObjectDetectionDelegate = ObjectDetectionDelegate.NONE,
+    onOptionClick: (delegate: ObjectDetectionDelegate) -> Unit = {},
 ) {
     Column(modifier = modifier) {
-        ComputeSettings.Delegate.values()
+        ObjectDetectionDelegate.values()
             .filter {
-                if (it != ComputeSettings.Delegate.NNAPI) {
+                if (it != ObjectDetectionDelegate.NNAPI) {
                     true
                 } else {
                     // NNAPI is only supported for Android Pie or above

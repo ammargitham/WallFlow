@@ -49,6 +49,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import com.ammar.wallflow.utils.objectdetection.detectObjects as actualDetectObjects
 
 class CropViewModel(
     private val application: Application,
@@ -269,7 +270,7 @@ class CropViewModel(
                     selectedDetection = partial(null),
                 )
             }
-            val (scale, detectionWithBitmaps) = com.ammar.wallflow.utils.detectObjects(
+            val (scale, detectionWithBitmaps) = actualDetectObjects(
                 context = application,
                 uri = uri,
                 model = model,

@@ -77,6 +77,7 @@ import com.ammar.wallflow.ui.settings.composables.generalSection
 import com.ammar.wallflow.ui.settings.composables.lookAndFeelSection
 import com.ammar.wallflow.ui.settings.composables.objectDetectionSection
 import com.ammar.wallflow.ui.theme.WallFlowTheme
+import com.ammar.wallflow.utils.objectdetection.objectsDetector
 import com.ammar.wallflow.workers.AutoWallpaperWorker
 import com.google.modernstorage.permissions.StoragePermissions
 import com.ramcosta.composedestinations.annotation.Destination
@@ -412,19 +413,21 @@ fun SettingsScreenContent(
                 onThemeClick = onThemeClick,
                 onLayoutClick = onLayoutClick,
             )
-            dividerItem()
-            objectDetectionSection(
-                enabled = appPreferences.objectDetectionPreferences.enabled,
-                delegate = appPreferences.objectDetectionPreferences.delegate,
-                model = model,
-                onEnabledChange = {
-                    onObjectDetectionPrefsChange(
-                        appPreferences.objectDetectionPreferences.copy(enabled = it)
-                    )
-                },
-                onDelegateClick = onObjectDetectionDelegateClick,
-                onModelClick = onObjectDetectionModelClick,
-            )
+            if (objectsDetector.isEnabled) {
+                dividerItem()
+                objectDetectionSection(
+                    enabled = appPreferences.objectDetectionPreferences.enabled,
+                    delegate = appPreferences.objectDetectionPreferences.delegate,
+                    model = model,
+                    onEnabledChange = {
+                        onObjectDetectionPrefsChange(
+                            appPreferences.objectDetectionPreferences.copy(enabled = it)
+                        )
+                    },
+                    onDelegateClick = onObjectDetectionDelegateClick,
+                    onModelClick = onObjectDetectionModelClick,
+                )
+            }
             dividerItem()
             if (hasSetWallpaperPermission) {
                 autoWallpaperSection(

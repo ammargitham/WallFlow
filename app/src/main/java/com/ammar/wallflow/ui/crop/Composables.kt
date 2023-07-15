@@ -2,7 +2,6 @@ package com.ammar.wallflow.ui.crop
 
 import android.content.res.Configuration
 import android.graphics.Bitmap
-import android.graphics.RectF
 import android.os.Build
 import android.view.Display
 import androidx.compose.foundation.clickable
@@ -56,11 +55,11 @@ import coil.compose.AsyncImage
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.repository.utils.Resource
 import com.ammar.wallflow.extensions.capitalise
+import com.ammar.wallflow.model.Detection
 import com.ammar.wallflow.model.DetectionWithBitmap
 import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import com.ammar.wallflow.utils.DownloadStatus
-import org.tensorflow.lite.task.vision.detector.Detection
 
 @Composable
 internal fun Actions(
@@ -257,7 +256,7 @@ internal fun DetectionsItem(
     detection: DetectionWithBitmap,
     onClick: () -> Unit = {},
 ) {
-    val category = detection.detection.categories?.firstOrNull()
+    val category = detection.detection.categories.firstOrNull()
     ListItem(
         modifier = modifier.clickable(onClick = onClick),
         headlineContent = {
@@ -287,10 +286,7 @@ private fun PreviewDetectionItem() {
         Surface {
             DetectionsItem(
                 detection = DetectionWithBitmap(
-                    Detection.create(
-                        RectF(0f, 0f, 0f, 0f),
-                        emptyList(),
-                    ),
+                    Detection.EMPTY,
                     Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888),
                 )
             )

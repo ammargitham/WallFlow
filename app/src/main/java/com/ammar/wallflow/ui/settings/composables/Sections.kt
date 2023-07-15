@@ -49,18 +49,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.DISABLED_ALPHA
 import com.ammar.wallflow.R
+import com.ammar.wallflow.data.preferences.ObjectDetectionDelegate
 import com.ammar.wallflow.data.preferences.defaultAutoWallpaperFreq
 import com.ammar.wallflow.model.ObjectDetectionModel
 import com.ammar.wallflow.ui.common.ProgressIndicator
 import com.ammar.wallflow.ui.common.getPaddingValuesConverter
 import com.ammar.wallflow.ui.settings.NextRun
 import com.ammar.wallflow.ui.theme.WallFlowTheme
+import com.ammar.wallflow.utils.objectdetection.objectsDetector
 import com.ammar.wallflow.workers.AutoWallpaperWorker
 import java.util.Locale
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DateTimePeriod
-import org.tensorflow.lite.task.core.ComputeSettings.Delegate
 
 @Composable
 fun EditSavedSearchBottomSheetHeader(
@@ -255,7 +256,7 @@ private fun PreviewLookAndFeelSection() {
 
 internal fun LazyListScope.objectDetectionSection(
     enabled: Boolean = false,
-    delegate: Delegate = Delegate.GPU,
+    delegate: ObjectDetectionDelegate = ObjectDetectionDelegate.GPU,
     model: ObjectDetectionModel = ObjectDetectionModel.DEFAULT,
     onEnabledChange: (enabled: Boolean) -> Unit = {},
     onDelegateClick: () -> Unit = {},
@@ -462,33 +463,35 @@ internal fun LazyListScope.autoWallpaperSection(
             },
         )
     }
-    item {
-        ListItem(
-            modifier = Modifier.clickable(
-                enabled = enabled,
-                onClick = { onUseObjectDetectionChange(!useObjectDetection) },
-            ),
-            headlineContent = {
-                Text(
-                    text = stringResource(R.string.use_object_detection),
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
-                )
-            },
-            trailingContent = {
-                Switch(
-                    modifier = Modifier.height(24.dp),
+    if (objectsDetector.isEnabled) {
+        item {
+            ListItem(
+                modifier = Modifier.clickable(
                     enabled = enabled,
-                    checked = useObjectDetection,
-                    onCheckedChange = onUseObjectDetectionChange,
-                )
-            },
-            supportingContent = {
-                Text(
-                    text = stringResource(R.string.use_object_detection_desc),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = alpha),
-                )
-            },
-        )
+                    onClick = { onUseObjectDetectionChange(!useObjectDetection) },
+                ),
+                headlineContent = {
+                    Text(
+                        text = stringResource(R.string.use_object_detection),
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
+                    )
+                },
+                trailingContent = {
+                    Switch(
+                        modifier = Modifier.height(24.dp),
+                        enabled = enabled,
+                        checked = useObjectDetection,
+                        onCheckedChange = onUseObjectDetectionChange,
+                    )
+                },
+                supportingContent = {
+                    Text(
+                        text = stringResource(R.string.use_object_detection_desc),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = alpha),
+                    )
+                },
+            )
+        }
     }
     item {
         ListItem(

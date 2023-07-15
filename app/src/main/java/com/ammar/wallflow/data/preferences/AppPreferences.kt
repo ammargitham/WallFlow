@@ -9,7 +9,6 @@ import com.ammar.wallflow.model.Sorting
 import com.ammar.wallflow.model.TopRange
 import java.util.UUID
 import kotlinx.datetime.DateTimePeriod
-import org.tensorflow.lite.task.core.ComputeSettings.Delegate
 
 data class AppPreferences(
     val wallhavenApiKey: String = "",
@@ -26,9 +25,15 @@ data class AppPreferences(
     val lookAndFeelPreferences: LookAndFeelPreferences = LookAndFeelPreferences(),
 )
 
+enum class ObjectDetectionDelegate {
+    NONE,
+    NNAPI,
+    GPU;
+}
+
 data class ObjectDetectionPreferences(
     val enabled: Boolean = false,
-    val delegate: Delegate = Delegate.GPU,
+    val delegate: ObjectDetectionDelegate = ObjectDetectionDelegate.GPU,
     val modelId: Long = 0,
 )
 

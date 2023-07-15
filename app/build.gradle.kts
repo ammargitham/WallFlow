@@ -1,15 +1,15 @@
-@file:Suppress("UnstableApiUsage", "DEPRECATION")
+@file:Suppress("UnstableApiUsage")
 
-import com.android.build.gradle.api.ApplicationVariant
-import com.android.build.gradle.api.BaseVariantOutput
-import com.android.build.gradle.internal.api.BaseVariantOutputImpl
+import com.android.build.api.variant.FilterConfiguration.FilterType.ABI
 import java.util.Properties
 
 val localProperties = Properties().apply {
     load(rootProject.file("local.properties").reader())
 }
 
-@Suppress("DSL_SCOPE_VIOLATION") // Remove when fixed https://youtrack.jetbrains.com/issue/KTIJ-19369
+val abiCodes = mapOf("x86" to 0, "x86_64" to 1, "armeabi-v7a" to 2, "arm64-v8a" to 3)
+
+@Suppress("DSL_SCOPE_VIOLATION") // Remove in Gradle v8.1: https://youtrack.jetbrains.com/issue/KTIJ-19369
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -58,13 +58,33 @@ android {
     }
 
     buildTypes {
+        getByName("debug") {
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-dev"
+            isDebuggable = true
+        }
+
         getByName("release") {
             isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
             signingConfig = signingConfigs.getByName("release")
+        }
+    }
+
+    flavorDimensions += "feature"
+    productFlavors {
+        create("base") {
+            dimension = "feature"
+        }
+
+        create("plus") {
+            dimension = "feature"
+            applicationIdSuffix = ".plus"
+            versionNameSuffix = "-plus"
         }
     }
 
@@ -82,11 +102,23 @@ android {
             include("x86", "x86_64", "arm64-v8a", "armeabi-v7a")
 
             // Specifies that we want to also generate a universal APK that includes all ABIs.
-            isUniversalApk = true
+            isUniversalApk = false
         }
     }
 
-    applicationVariants.all(ApplicationVariantAction())
+    // applicationVariants.all(ApplicationVariantAction())
+    androidComponents {
+        onVariants { variant ->
+            variant.outputs.forEach { output ->
+                val name = output.filters.find { it.filterType == ABI }?.identifier
+                val baseAbiCode = abiCodes[name]
+                if (baseAbiCode != null) {
+                    @Suppress("USELESS_ELVIS")
+                    output.versionCode.set(baseAbiCode + (output.versionCode.get() ?: 0) * 100)
+                }
+            }
+        }
+    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
@@ -132,6 +164,8 @@ android {
         }
     }
 }
+
+val plusImplementation by configurations
 
 dependencies {
     // Core Android dependencies
@@ -215,10 +249,10 @@ dependencies {
     implementation(libs.easycrop.fork)
 
     // tf-lite
-    implementation(libs.tflite.task.vision)
-    implementation(libs.tflite.gpu.delegate.plugin)
-    implementation(libs.tflite.gpu)
-    implementation(libs.tflite.gpu.api)
+    plusImplementation(libs.tflite.task.vision)
+    plusImplementation(libs.tflite.gpu.delegate.plugin)
+    plusImplementation(libs.tflite.gpu)
+    plusImplementation(libs.tflite.gpu.api)
 
     // partial
     implementation(libs.partial)
@@ -247,44 +281,4 @@ dependencies {
 
     // mockk
     androidTestImplementation(libs.mockk.android)
-}
-
-class ApplicationVariantAction : Action<ApplicationVariant> {
-    override fun execute(variant: ApplicationVariant) {
-        val fileName = createFileName(variant)
-        variant.outputs.all(VariantOutputAction(fileName))
-    }
-
-    private fun createFileName(variant: ApplicationVariant): String {
-        val buildType = variant.buildType.name
-        val versionName = variant.versionName
-        val flavor = variant.flavorName
-        println("$buildType, $versionName, $flavor")
-        val flavorBuildType = if (flavor.isNotBlank()) {
-            "${flavor}_${buildType}"
-        } else {
-            buildType
-        }
-        val suffix = if (flavorBuildType.isBlank() || versionName.contains(flavorBuildType)) {
-            versionName
-        } else {
-            "$versionName-$flavorBuildType" // eg. 1.0-github_debug or release
-        }
-        return suffix
-    }
-
-    class VariantOutputAction(
-        private val suffix: String,
-    ) : Action<BaseVariantOutput> {
-        override fun execute(output: BaseVariantOutput) {
-            if (output is BaseVariantOutputImpl) {
-                val abi = output.getFilter(com.android.build.OutputFile.ABI)
-                output.outputFileName = if (abi == null) {
-                    "wallflow_${suffix}.apk"
-                } else {
-                    "wallflow_${suffix}_${abi}.apk"
-                }
-            }
-        }
-    }
 }

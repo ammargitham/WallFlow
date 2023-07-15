@@ -12,6 +12,7 @@ import com.ammar.wallflow.data.preferences.GridColType
 import com.ammar.wallflow.data.preferences.GridType
 import com.ammar.wallflow.data.preferences.LayoutPreferences
 import com.ammar.wallflow.data.preferences.LookAndFeelPreferences
+import com.ammar.wallflow.data.preferences.ObjectDetectionDelegate
 import com.ammar.wallflow.data.preferences.ObjectDetectionPreferences
 import com.ammar.wallflow.data.preferences.PreferencesKeys
 import com.ammar.wallflow.data.preferences.Theme
@@ -25,6 +26,7 @@ import com.ammar.wallflow.model.SearchQuery
 import com.ammar.wallflow.model.Sorting
 import com.ammar.wallflow.model.TopRange
 import com.ammar.wallflow.model.serializers.constraintTypeMapSerializer
+import com.ammar.wallflow.utils.objectdetection.objectsDetector
 import java.io.IOException
 import java.util.UUID
 import javax.inject.Inject
@@ -38,7 +40,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.DateTimePeriod
 import kotlinx.serialization.json.Json
-import org.tensorflow.lite.task.core.ComputeSettings.Delegate
 
 @Singleton
 class AppPreferencesRepository @Inject constructor(
@@ -142,12 +143,18 @@ class AppPreferencesRepository @Inject constructor(
         objectDetectionPreferences = with(preferences) {
             val delegate = try {
                 val deletePref = get(PreferencesKeys.OBJECT_DETECTION_DELEGATE)
-                if (deletePref != null) Delegate.valueOf(deletePref) else Delegate.GPU
+                if (deletePref != null) {
+                    ObjectDetectionDelegate.valueOf(deletePref)
+                } else {
+                    ObjectDetectionDelegate.GPU
+                }
             } catch (e: Exception) {
-                Delegate.GPU
+                ObjectDetectionDelegate.GPU
             }
+            val enabled = objectsDetector.isEnabled
+                    && get(PreferencesKeys.ENABLE_OBJECT_DETECTION) ?: false
             ObjectDetectionPreferences(
-                enabled = get(PreferencesKeys.ENABLE_OBJECT_DETECTION) ?: false,
+                enabled = enabled,
                 delegate = delegate,
                 modelId = get(PreferencesKeys.OBJECT_DETECTION_MODEL_ID) ?: 0,
             )
