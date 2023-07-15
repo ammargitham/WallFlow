@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.ammar.wallflow.data.repository.GlobalErrorsRepository
 import com.ammar.wallflow.data.repository.GlobalErrorsRepository.GlobalError
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.Search
@@ -80,11 +81,6 @@ fun MainActivityContent(
     Column(
         modifier = modifier,
     ) {
-        GlobalErrorsColumn(
-            globalErrors = globalErrors,
-            onFixWallHavenApiKeyClick = onFixWallHavenApiKeyClick,
-            onDismiss = onDismissGlobalError,
-        )
         Scaffold(
             contentWindowInsets = WindowInsets(left = 0),
         ) {
@@ -118,6 +114,14 @@ fun MainActivityContent(
                     onSaveAsClick = onSearchBarSaveAsClick,
                     onLoadClick = onSearchBarLoadClick,
                 )
+                if (globalErrors.isNotEmpty()) {
+                    GlobalErrorsColumn(
+                        modifier = Modifier.windowInsetsPadding(topWindowInsets),
+                        globalErrors = globalErrors,
+                        onFixWallHavenApiKeyClick = onFixWallHavenApiKeyClick,
+                        onDismiss = onDismissGlobalError,
+                    )
+                }
                 if (useNavRail) {
                     NavRail(
                         modifier = Modifier
@@ -241,6 +245,9 @@ private fun PreviewContent(
         Surface {
             MainActivityContent(
                 useNavRail = useNavRail,
+                globalErrors = listOf(
+                    GlobalErrorsRepository.WallHavenUnauthorisedError()
+                )
             ) {
                 val pagingItems = previewWallpaperFlow.collectAsLazyPagingItems()
                 HomeScreenContent(
