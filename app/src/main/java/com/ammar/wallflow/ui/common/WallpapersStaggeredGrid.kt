@@ -45,7 +45,7 @@ fun WallpaperStaggeredGrid(
     gridType: GridType = GridType.STAGGERED,
     gridColType: GridColType = GridColType.ADAPTIVE,
     gridColCount: Int = 2,
-    gridColMinWidthPct: Int = 30,
+    gridColMinWidthPct: Int = 40,
     roundedCorners: Boolean = true,
     onWallpaperClick: (wallpaper: Wallpaper) -> Unit = {},
 ) {

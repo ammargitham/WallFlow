@@ -127,7 +127,7 @@ internal fun LayoutPreview(
         val availWidth = gridWidthDp - (paddingDp * 2)
         var wDp = availWidth * layoutPreferences.gridColMinWidthPct / 100
         if (wDp <= 0.dp) {
-            wDp = 30.dp
+            wDp = 40.dp
         }
         return@remember wDp
     }
@@ -466,7 +466,7 @@ private fun PreviewNoOfColumnsSection() {
 }
 
 internal fun LazyListScope.adaptiveColMinWidthPctSection(
-    minWidthPct: Int = 30,
+    minWidthPct: Int = 40,
     sliderPadding: Dp = 0.dp,
     onMinWidthPctChange: (Int) -> Unit = {},
 ) {

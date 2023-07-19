@@ -196,7 +196,7 @@ class AppPreferencesRepository @Inject constructor(
                 },
                 gridColCount = preferences[PreferencesKeys.LAYOUT_GRID_COL_COUNT] ?: 2,
                 gridColMinWidthPct = preferences[PreferencesKeys.LAYOUT_GRID_COL_MIN_WIDTH_PCT]
-                    ?: 30,
+                    ?: 40,
                 roundedCorners = preferences[PreferencesKeys.LAYOUT_ROUNDED_CORNERS] ?: true,
             )
         )

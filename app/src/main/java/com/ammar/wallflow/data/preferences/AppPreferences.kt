@@ -82,6 +82,6 @@ data class LayoutPreferences(
     val gridType: GridType = GridType.STAGGERED,
     val gridColType: GridColType = GridColType.ADAPTIVE,
     @IntRange(minGridCols, maxGridCols) val gridColCount: Int = 2,
-    @IntRange(minGridColWidthPct, maxGridColWidthPct) val gridColMinWidthPct: Int = 30,
+    @IntRange(minGridColWidthPct, maxGridColWidthPct) val gridColMinWidthPct: Int = 40,
     val roundedCorners: Boolean = true,
 )
