@@ -2,7 +2,9 @@ package com.ammar.wallflow.ui.home
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -37,6 +39,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -50,7 +53,6 @@ import com.ammar.wallflow.data.preferences.LayoutPreferences
 import com.ammar.wallflow.extensions.findActivity
 import com.ammar.wallflow.extensions.rememberLazyStaggeredGridState
 import com.ammar.wallflow.extensions.search
-import com.ammar.wallflow.extensions.toDp
 import com.ammar.wallflow.model.MenuItem
 import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.SearchSaver
@@ -120,7 +122,22 @@ fun HomeScreen(
     val searchBarController = LocalMainSearchBarController.current
     val bottomBarController = LocalBottomBarController.current
     val systemBarsController = LocalSystemBarsController.current
-    val (startPadding, bottomPadding) = getStartBottomPadding(bottomBarController)
+    val density = LocalDensity.current
+    val bottomWindowInsets = bottomWindowInsets
+    val navigationBarsInsets = WindowInsets.navigationBars
+    val (startPadding, bottomPadding) = remember(
+        bottomBarController.state,
+        density,
+        bottomWindowInsets.getBottom(density),
+        navigationBarsInsets.getBottom(density),
+    ) {
+        getStartBottomPadding(
+            density,
+            bottomBarController,
+            bottomWindowInsets,
+            navigationBarsInsets
+        )
+    }
     val context = LocalContext.current
     val windowSizeClass = calculateWindowSizeClass(context.findActivity())
     val isExpanded = windowSizeClass.widthSizeClass >= WindowWidthSizeClass.Expanded
@@ -256,7 +273,6 @@ fun HomeScreen(
         if (uiState.isHome) {
             ExtendedFloatingActionButton(
                 modifier = Modifier
-                    // .windowInsetsPadding(bottomWindowInsets)
                     .align(Alignment.BottomEnd)
                     .offset(x = (-16).dp, y = (-16).dp - bottomPadding),
                 onClick = onFilterFABClick,
@@ -331,18 +347,25 @@ fun HomeScreen(
     }
 }
 
-@Composable
-private fun getStartBottomPadding(bottomBarController: BottomBarController): Pair<Dp, Dp> {
+private fun getStartBottomPadding(
+    density: Density,
+    bottomBarController: BottomBarController,
+    bottomWindowInsets: WindowInsets,
+    navigationBarsInsets: WindowInsets,
+): Pair<Dp, Dp> = with(density) {
     val bottomBarState by bottomBarController.state
     val startPadding = if (bottomBarState.isRail) bottomBarState.size.width.toDp() else 0.dp
     val bottomInsetsPadding = if (bottomBarState.isRail) {
-        bottomWindowInsets.getBottom(LocalDensity.current).toDp()
+        bottomWindowInsets.getBottom(density).toDp()
     } else 0.dp
-    val bottomNavBarPadding = if (bottomBarState.isRail) 0.dp else {
+    val bottomNavPadding = if (bottomBarState.isRail) 0.dp else {
+        navigationBarsInsets.getBottom(density).toDp()
+    }
+    val bottomBarPadding = if (bottomBarState.isRail) 0.dp else {
         bottomBarState.size.height.toDp()
     }
-    val bottomPadding = bottomInsetsPadding + bottomNavBarPadding
-    return Pair(startPadding, bottomPadding)
+    val bottomPadding = bottomInsetsPadding + bottomBarPadding + bottomNavPadding
+    Pair(startPadding, bottomPadding)
 }
 
 @Composable
