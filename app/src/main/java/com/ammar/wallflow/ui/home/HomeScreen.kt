@@ -227,6 +227,7 @@ fun HomeScreen(
             .pullRefresh(state = refreshState),
     ) {
         HomeScreenContent(
+            modifier = Modifier.fillMaxSize(),
             gridState = gridState,
             contentPadding = PaddingValues(
                 start = startPadding + 8.dp,
