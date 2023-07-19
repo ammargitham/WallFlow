@@ -1,6 +1,5 @@
 package com.ammar.wallflow.ui.common
 
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.calculateEndPadding
@@ -30,7 +29,6 @@ import com.ammar.wallflow.extensions.toDp
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.Wallpaper
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WallpaperStaggeredGrid(
     modifier: Modifier = Modifier,
@@ -99,7 +97,6 @@ fun WallpaperStaggeredGrid(
             val wallpaper = wallpapers[index]
             wallpaper?.let {
                 WallpaperCard(
-                    modifier = Modifier.animateItemPlacement(),
                     wallpaper = it,
                     blur = when (it.purity) {
                         Purity.SFW -> false
