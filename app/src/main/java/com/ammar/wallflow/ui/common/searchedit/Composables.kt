@@ -549,7 +549,13 @@ internal fun RatioFilter(
                     .padding(horizontal = 16.dp),
                 selectedRatios = ratios,
                 onOptionClick = {
-                    onChange(ratios + it)
+                    onChange(
+                        if (it in ratios) {
+                            ratios - it
+                        } else {
+                            ratios + it
+                        }
+                    )
                     expanded = false
                 }
             )
