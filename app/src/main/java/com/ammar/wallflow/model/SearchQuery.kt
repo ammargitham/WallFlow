@@ -283,6 +283,7 @@ enum class TopRange(
 sealed class Ratio {
     abstract fun toRatioString(): String
 
+    @Serializable
     data class CategoryRatio(
         val category: Category,
     ) : Ratio() {
@@ -294,6 +295,7 @@ sealed class Ratio {
         override fun toRatioString() = this.category.categoryName
     }
 
+    @Serializable
     data class SizeRatio(
         val size: IntSize,
     ) : Ratio() {
