@@ -213,6 +213,8 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="adaptive">Adaptive</string>
     <string name="fixed">Fixed</string>
     <string name="min_col_width">Min. column width</string>
+    <string name="uploader">Uploader</string>
+    <string name="colors">Colors</string>
     <plurals name="every_x_hrs">
         <item quantity="one">Every %d hour</item>
         <item quantity="other">Every %d hours</item>

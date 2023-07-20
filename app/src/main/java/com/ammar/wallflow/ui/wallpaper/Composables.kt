@@ -512,7 +512,7 @@ fun ColorsRow(
             modifier = Modifier
                 .padding(top = 6.dp)
                 .weight(1f),
-            text = "Colors",
+            text = stringResource(R.string.colors),
             fontWeight = FontWeight.Bold,
         )
         Spacer(modifier = Modifier.requiredWidth(16.dp))
@@ -553,7 +553,7 @@ fun UploaderRow(
             modifier = Modifier
                 .align(Alignment.CenterVertically)
                 .weight(1f),
-            text = "Uploaded by",
+            text = stringResource(R.string.uploader),
             fontWeight = FontWeight.Bold,
         )
         Spacer(modifier = Modifier.requiredWidth(16.dp))
