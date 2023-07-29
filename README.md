@@ -8,50 +8,22 @@
 
 [![PR's Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat)](http://makeapullrequest.com)
 
-## Screenshots
-
-<div align="center" style="margin-bottom: 2rem">
+<div align="center">
   <img alt="devices" title="devices" src="./.github/readme-images/devices.png" width="500">
 </div>
 
-<div>
-  <figure style="display: inline-block">
-    <img src="./.github/readme-images/phoneScreenshots/1.png" alt="Home" width="150">
-    <figcaption align="center">
-      <b>Home</b>
-    </figcaption>
-  </figure>
-  <figure style="display: inline-block">
-    <img src="./.github/readme-images/phoneScreenshots/2_dark.png" alt="Home Filters" width="150">
-    <figcaption align="center">
-      <b>Filters</b>
-    </figcaption>
-  </figure>
-  <figure style="display: inline-block">
-    <img src="./.github/readme-images/phoneScreenshots/3.png" alt="Wallpaper Info" width="150">
-    <figcaption align="center">
-      <b>Wallpaper Info</b>
-    </figcaption>
-  </figure>
-  <figure style="display: inline-block">
-    <img src="./.github/readme-images/phoneScreenshots/4.png" alt="Search History" width="150">
-    <figcaption align="center">
-      <b>Search History</b>
-    </figcaption>
-  </figure>
-  <figure style="display: inline-block">
-    <img src="./.github/readme-images/phoneScreenshots/5.png" alt="Crop and Set Wallpaper" width="150">
-    <figcaption align="center">
-      <b>Crop and Set Wallpaper</b>
-    </figcaption>
-  </figure>
-  <figure style="display: inline-block">
-    <img src="./.github/readme-images/phoneScreenshots/6.png" alt="Settings 1" width="150">
-    <img src="./.github/readme-images/phoneScreenshots/7.png" alt="Settings 2" width="150">
-    <figcaption align="center">
-      <b>Settings</b>
-    </figcaption>
-  </figure>
+## Screenshots
+
+<div align="center">
+  
+  | <img src="./.github/readme-images/phoneScreenshots/1.png" alt="Home Filters" width="150"> | <img src="./.github/readme-images/phoneScreenshots/2_dark.png" alt="Home Filters" width="150"> | <img src="./.github/readme-images/phoneScreenshots/3.png" alt="Wallpaper Info" width="150"> | <img src="./.github/readme-images/phoneScreenshots/4.png" alt="Search History" width="150"> |
+  | :---------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------: |
+  | <b>Home</b>                                                                               | <b>Filters</b>                                                                                 | <b>Wallpaper Info</b>                                                                       | <b>Search History</b>                                                                       |
+
+  | <img src="./.github/readme-images/phoneScreenshots/5.png" alt="Crop and Set Wallpaper" width="150"> | <img src="./.github/readme-images/phoneScreenshots/6.png" alt="Settings 1" width="150"><img src="./.github/readme-images/phoneScreenshots/7.png" alt="Settings 2" width="150"> |
+  | :-------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+  | <b>Crop and Set Wallpaper</b>                                                                       | <b>Settings</b>                                                                                                                                                                |
+  
 </div>
 
 ## Features
