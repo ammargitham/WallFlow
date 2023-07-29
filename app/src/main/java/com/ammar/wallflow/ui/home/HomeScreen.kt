@@ -177,6 +177,7 @@ fun HomeScreen(
                     }
                 } else null,
                 search = uiState.search,
+                showQuery = !uiState.isHome,
                 onSearch = {
                     if (uiState.search == it) return@MainSearchBarState
                     twoPaneController.pane1NavHostController.search(it)

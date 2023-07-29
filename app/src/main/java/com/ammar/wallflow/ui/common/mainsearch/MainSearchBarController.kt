@@ -22,6 +22,7 @@ data class MainSearchBarState(
             sorting = Sorting.RELEVANCE,
         )
     ),
+    val showQuery: Boolean = true,
     val overflowIcon: @Composable (() -> Unit)? = null,
     val onActiveChange: (active: Boolean) -> Unit = {},
     val onSearch: (search: Search) -> Unit = {},
@@ -36,6 +37,7 @@ class DefaultMainSearchBarController(initialState: MainSearchBarState) : MainSea
         _state.value = _state.value.copy(
             visible = newState.visible,
             search = newState.search,
+            showQuery = newState.showQuery,
             onActiveChange = newState.onActiveChange,
             overflowIcon = newState.overflowIcon,
             onSearch = newState.onSearch,

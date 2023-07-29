@@ -56,6 +56,7 @@ fun MainSearchBar(
     deleteSuggestion: Search? = null,
     overflowIcon: @Composable (() -> Unit)? = null,
     showNSFW: Boolean = false,
+    showQuery: Boolean = true,
     onQueryChange: (String) -> Unit = {},
     onBackClick: (() -> Unit)? = null,
     onSearch: (query: String) -> Unit = {},
@@ -90,7 +91,7 @@ fun MainSearchBar(
                     else -> placeholder
                 }
             },
-            query = query,
+            query = if (showQuery) query else "",
             suggestions = suggestions,
             extraLeadingContent = when {
                 active -> null
