@@ -1,6 +1,6 @@
 [versions]
 accompanist = "0.31.5-beta"
-androidGradlePlugin = "8.0.2"
+androidGradlePlugin = "8.1.0"
 androidxActivity = "1.7.2"
 androidxComposeCompiler = "1.4.8"
 androidxComposeMaterial = "1.4.3"
