@@ -147,7 +147,7 @@ internal fun LayoutPreview(
             tempWidth
         }
 
-        BoxWithConstraints(
+        Box(
             modifier = Modifier
                 .padding(vertical = 16.dp)
                 .width(deviceWidth)
@@ -231,7 +231,6 @@ internal fun LayoutPreview(
                 }
             }
         }
-
     }
 }
 

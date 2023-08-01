@@ -3,9 +3,11 @@ package com.ammar.wallflow.workers
 import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
+import android.content.pm.ServiceInfo
 import android.graphics.Bitmap
 import android.media.MediaScannerConnection
 import android.net.Uri
+import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
@@ -185,7 +187,20 @@ class DownloadWorker @AssistedInject constructor(
             downloaded <= -1
         ).build()
         try {
-            setForeground(ForegroundInfo(progressNotificationId, notification))
+            setForeground(
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    ForegroundInfo(
+                        progressNotificationId,
+                        notification,
+                        ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC,
+                    )
+                } else {
+                    ForegroundInfo(
+                        progressNotificationId,
+                        notification,
+                    )
+                }
+            )
         } catch (e: Exception) {
             Log.e(TAG, "Error setting to foreground: ", e)
         }

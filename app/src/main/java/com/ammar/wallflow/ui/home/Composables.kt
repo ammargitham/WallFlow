@@ -10,8 +10,8 @@ import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
@@ -183,7 +183,7 @@ fun HomeFiltersBottomSheetHeader(
             }
         }
     }
-    Divider(modifier = Modifier.fillMaxWidth())
+    HorizontalDivider(modifier = Modifier.fillMaxWidth())
 }
 
 @Preview

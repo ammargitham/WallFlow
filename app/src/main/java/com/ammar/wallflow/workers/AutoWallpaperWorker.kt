@@ -1,8 +1,10 @@
 package com.ammar.wallflow.workers
 
 import android.content.Context
+import android.content.pm.ServiceInfo
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Build
 import android.util.Log
 import android.view.Display
 import androidx.compose.ui.unit.toSize
@@ -166,14 +168,23 @@ class AutoWallpaperWorker @AssistedInject constructor(
     private suspend fun setWallpaper(nextWallpaper: Wallpaper): Pair<Boolean, File?> {
         val wallpaperFile = safeDownloadWallpaper(nextWallpaper) ?: return false to null
         try {
+            val notification = notificationBuilder.apply {
+                setContentText(context.getString(R.string.changing_wallpaper))
+                setProgress(100, 0, true)
+            }.build()
             setForeground(
-                ForegroundInfo(
-                    AUTO_WALLPAPER_NOTIFICATION_ID,
-                    notificationBuilder.apply {
-                        setContentText(context.getString(R.string.changing_wallpaper))
-                        setProgress(100, 0, true)
-                    }.build(),
-                )
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    ForegroundInfo(
+                        AUTO_WALLPAPER_NOTIFICATION_ID,
+                        notification,
+                        ServiceInfo.FOREGROUND_SERVICE_TYPE_SHORT_SERVICE,
+                    )
+                } else {
+                    ForegroundInfo(
+                        AUTO_WALLPAPER_NOTIFICATION_ID,
+                        notification,
+                    )
+                }
             )
         } catch (e: Exception) {
             Log.e(TAG, "setWallpaper: ", e)
@@ -251,14 +262,23 @@ class AutoWallpaperWorker @AssistedInject constructor(
             fileName = fileName,
             progressCallback = { total, downloaded ->
                 try {
+                    val notification = notificationBuilder.apply {
+                        setContentText(context.getString(R.string.downloading_wallpaper))
+                        setProgress(total.toInt(), downloaded.toInt(), downloaded <= -1)
+                    }.build()
                     setForeground(
-                        ForegroundInfo(
-                            AUTO_WALLPAPER_NOTIFICATION_ID,
-                            notificationBuilder.apply {
-                                setContentText(context.getString(R.string.downloading_wallpaper))
-                                setProgress(total.toInt(), downloaded.toInt(), downloaded <= -1)
-                            }.build(),
-                        )
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                            ForegroundInfo(
+                                AUTO_WALLPAPER_NOTIFICATION_ID,
+                                notification,
+                                ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC,
+                            )
+                        } else {
+                            ForegroundInfo(
+                                AUTO_WALLPAPER_NOTIFICATION_ID,
+                                notification,
+                            )
+                        }
                     )
                 } catch (e: Exception) {
                     Log.e(TAG, "Error setting to foreground: ", e)

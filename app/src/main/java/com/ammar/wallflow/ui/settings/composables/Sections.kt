@@ -21,7 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -95,7 +95,7 @@ fun EditSavedSearchBottomSheetHeader(
             Text(stringResource(R.string.save))
         }
     }
-    Divider(modifier = Modifier.fillMaxWidth())
+    HorizontalDivider(modifier = Modifier.fillMaxWidth())
     OutlinedTextField(
         modifier = Modifier
             .fillMaxWidth()
@@ -672,5 +672,5 @@ private fun Header(text: String) {
 }
 
 internal fun LazyListScope.dividerItem() {
-    item { Divider(modifier = Modifier.fillMaxWidth()) }
+    item { HorizontalDivider(modifier = Modifier.fillMaxWidth()) }
 }

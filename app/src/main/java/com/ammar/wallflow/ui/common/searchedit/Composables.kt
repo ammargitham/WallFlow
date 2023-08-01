@@ -31,7 +31,6 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Divider
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -39,6 +38,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -319,7 +319,10 @@ internal fun OrderFilter(
                 FilterChip(
                     label = { Text(text = getOrderString(it)) },
                     leadingIcon = {
-                        Crossfade(selected) { isSelected ->
+                        Crossfade(
+                            targetState = selected,
+                            label = "leadingIconCrossfade",
+                        ) { isSelected ->
                             if (isSelected) {
                                 Icon(
                                     modifier = Modifier.size(16.dp),
@@ -473,7 +476,7 @@ private fun AddResolutionButton(
                     },
                     onClick = { onAdd(localResolution) },
                 )
-                Divider()
+                HorizontalDivider()
             }
             COMMON_RESOLUTIONS.entries
                 .filter { it.value !in addedResolutions }
@@ -494,7 +497,7 @@ private fun AddResolutionButton(
                             onAdd(it.value)
                         },
                     )
-                    Divider()
+                    HorizontalDivider()
                 }
             DropdownMenuItem(
                 text = { Text(text = stringResource(R.string.custom)) },
@@ -646,7 +649,7 @@ private fun RatioMenuContent(
                 )
             }
         }
-        Divider(modifier = Modifier.fillMaxWidth())
+        HorizontalDivider(modifier = Modifier.fillMaxWidth())
         RatioOptionGrid(
             modifier = Modifier.fillMaxWidth(),
             selectedRatios = selectedRatios,

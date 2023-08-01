@@ -1,7 +1,6 @@
 package com.ammar.wallflow.activities.main
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.animateValueAsState
@@ -32,19 +31,14 @@ import com.ammar.wallflow.ui.destinations.HomeScreenDestination
 import com.ammar.wallflow.ui.destinations.WallpaperScreenDestination
 import com.ammar.wallflow.ui.home.HomeScreen
 import com.ammar.wallflow.ui.wallpaper.WallpaperViewModel
-import com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.animations.defaults.RootNavGraphDefaultAnimations
-import com.ramcosta.composedestinations.animations.manualcomposablecalls.animatedComposable
-import com.ramcosta.composedestinations.animations.rememberAnimatedNavHostEngine
+import com.ramcosta.composedestinations.manualcomposablecalls.composable
 import com.ramcosta.composedestinations.navigation.dependency
+import com.ramcosta.composedestinations.rememberNavHostEngine
 import com.ramcosta.composedestinations.spec.NavHostEngine
 import com.ramcosta.composedestinations.spec.Route
 
-@OptIn(
-    ExperimentalMaterialNavigationApi::class,
-    ExperimentalAnimationApi::class,
-)
 @Composable
 fun MainNavigation(
     modifier: Modifier = Modifier,
@@ -54,7 +48,7 @@ fun MainNavigation(
     wallpaperViewModel: WallpaperViewModel,
     applyContentPadding: Boolean,
 ) {
-    val navHostEngine = rememberAnimatedNavHostEngine(
+    val navHostEngine = rememberNavHostEngine(
         rootDefaultAnimations = RootNavGraphDefaultAnimations(
             enterTransition = { materialFadeThroughIn() },
             exitTransition = { materialFadeThroughOut() }
@@ -65,6 +59,7 @@ fun MainNavigation(
         targetValue = if (applyContentPadding) contentPadding else PaddingValues(0.dp),
         typeConverter = getPaddingValuesConverter(layoutDirection),
         animationSpec = remember { tween(delayMillis = 200) },
+        label = "hostPadding",
     )
 
     Row(
@@ -120,7 +115,6 @@ fun MainNavigation(
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun Host(
     modifier: Modifier = Modifier,
@@ -145,7 +139,7 @@ private fun Host(
             dependency(wallpaperViewModel)
         }
     ) {
-        animatedComposable(HomeScreenDestination) {
+        composable(HomeScreenDestination) {
             HomeScreen(
                 // navigator = destinationsNavigator,
                 twoPaneController = twoPaneController,

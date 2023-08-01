@@ -36,6 +36,7 @@ import com.ammar.wallflow.ui.common.navigation.TwoPaneNavigation.Mode
 import com.ammar.wallflow.ui.common.navigation.rememberTwoPaneNavController
 import com.ammar.wallflow.ui.common.searchedit.SaveAsDialog
 import com.ammar.wallflow.ui.common.searchedit.SavedSearchesDialog
+import com.ammar.wallflow.ui.destinations.HomeScreenDestination
 import com.ammar.wallflow.ui.destinations.WallhavenApiKeyDialogDestination
 import com.ammar.wallflow.ui.home.HomeScreenNavArgs
 import com.ammar.wallflow.ui.navArgs
@@ -74,7 +75,7 @@ class MainActivity : ComponentActivity() {
                 BottomBarDestination.values().map { it.direction.route }
             }
             val showBackButton = remember(currentBackStackEntry, rootDestinations) {
-                if (currentDestination?.baseRoute == "home_screen") {
+                if (currentDestination is HomeScreenDestination) {
                     val navArgs: HomeScreenNavArgs? = currentBackStackEntry?.navArgs()
                     return@remember navArgs?.search != null
                 }

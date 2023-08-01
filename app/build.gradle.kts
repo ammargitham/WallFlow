@@ -25,12 +25,12 @@ kapt {
 
 android {
     namespace = "com.ammar.wallflow"
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.ammar.wallflow"
         minSdk = 23
-        targetSdk = 33
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -113,7 +113,6 @@ android {
                 val name = output.filters.find { it.filterType == ABI }?.identifier
                 val baseAbiCode = abiCodes[name]
                 if (baseAbiCode != null) {
-                    @Suppress("USELESS_ELVIS")
                     output.versionCode.set(baseAbiCode + (output.versionCode.get() ?: 0) * 100)
                 }
             }
@@ -154,7 +153,7 @@ android {
             languageVersion.set(JavaLanguageVersion.of(11))
         }
 
-        sourceSets {
+        this.sourceSets {
             debug {
                 kotlin.srcDir("build/generated/ksp/debug/kotlin")
             }
@@ -162,6 +161,10 @@ android {
                 kotlin.srcDir("build/generated/ksp/release/kotlin")
             }
         }
+    }
+
+    lint {
+        warning += "AutoboxingStateCreation"
     }
 }
 
@@ -194,9 +197,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.process)
     implementation(libs.androidx.activity.compose)
 
-    // Runtime tracing
-    debugImplementation(libs.androidx.runtime.tracing)
-
     // Hilt Dependency Injection
     implementation(libs.hilt.android)
     kapt(libs.hilt.android.compiler)
@@ -227,6 +227,8 @@ dependencies {
     implementation(libs.androidx.compose.material3.window.size.cls)
     // Tooling
     debugImplementation(libs.androidx.compose.ui.tooling)
+    // Compose Runtime tracing
+    debugImplementation(libs.androidx.compose.runtime.tracing)
     // Instrumented tests
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.test.manifest)

@@ -1,6 +1,5 @@
 package com.ammar.wallflow.ui.common.navigation
 
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
@@ -9,13 +8,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.navigation.NavHostController
 import androidx.navigation.NavOptionsBuilder
+import androidx.navigation.compose.rememberNavController
 import com.ammar.wallflow.ui.common.navigation.TwoPaneNavigation.Mode
-import com.google.accompanist.navigation.animation.rememberAnimatedNavController
 import com.ramcosta.composedestinations.navigation.navigate
 import com.ramcosta.composedestinations.spec.Direction
 
 object TwoPaneNavigation {
-    class Controller constructor(
+    class Controller(
         initialPaneMode: Mode = Mode.TWO_PANE,
         val supportsTwoPane: Boolean = true,
         val pane1NavHostController: NavHostController,
@@ -59,14 +58,13 @@ object TwoPaneNavigation {
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun rememberTwoPaneNavController(
     initialPaneMode: Mode = Mode.SINGLE_PANE,
     supportsTwoPane: Boolean = false,
 ): TwoPaneNavigation.Controller {
-    val pane1NavController = rememberAnimatedNavController()
-    val pane2NavController = rememberAnimatedNavController()
+    val pane1NavController = rememberNavController()
+    val pane2NavController = rememberNavController()
     return remember {
         TwoPaneNavigation.Controller(
             initialPaneMode = initialPaneMode,
