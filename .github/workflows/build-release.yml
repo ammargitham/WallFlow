@@ -1,0 +1,84 @@
+name: Tagged Release
+
+permissions:
+  contents: "write"
+  packages: "write"
+  pull-requests: "read"
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew clean assembleRelease -Pgithub
+
+      - uses: r0adkll/sign-android-release@v1
+        id: sign_base_app
+        with:
+          releaseDirectory: app/build/outputs/apk/base/release
+          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
+          alias: ${{ secrets.ALIAS }}
+          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.KEY_PASSWORD }}
+        env:
+          BUILD_TOOLS_VERSION: "33.0.2"
+
+      - uses: r0adkll/sign-android-release@v1
+        id: sign_plus_app
+        with:
+          releaseDirectory: app/build/outputs/apk/plus/release
+          signingKeyBase64: ${{ secrets.SIGNING_KEY }}
+          alias: ${{ secrets.ALIAS }}
+          keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
+          keyPassword: ${{ secrets.KEY_PASSWORD }}
+
+      - name: Install mmv
+        run: |
+          sudo apt-get update
+          sudo apt-get install mmv
+
+      - name: Delete unsigned apks
+        run: |
+          cd ${GITHUB_WORKSPACE}/app/build/outputs/apk/base/release
+          rm *-unsigned-aligned.apk
+          cd ${GITHUB_WORKSPACE}/app/build/outputs/apk/plus/release
+          rm *-unsigned-aligned.apk
+
+      - name: Rename signed apks
+        run: |
+          cd ${GITHUB_WORKSPACE}/app/build/outputs/apk/base/release
+          mmv '*-unsigned*.apk' '#1#2.apk'
+          cd ${GITHUB_WORKSPACE}/app/build/outputs/apk/plus/release
+          mmv '*-unsigned*.apk' '#1#2.apk'
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: signed_apks_${{ github.ref_name }}
+          path: app/build/outputs/apk/*/release/*-signed.apk
+
+      - name: Create Draft Release
+        uses: marvinpinto/action-automatic-releases@latest
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "${{ github.ref_name }}"
+          prerelease: false
+          draft: true
+          files: app/build/outputs/apk/*/release/*-signed.apk

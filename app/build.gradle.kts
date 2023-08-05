@@ -3,7 +3,10 @@
 import java.util.Properties
 
 val localProperties = Properties().apply {
-    load(rootProject.file("local.properties").reader())
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        load(localPropertiesFile.reader())
+    }
 }
 
 val abiCodes = mapOf("x86" to 1, "x86_64" to 2, "armeabi-v7a" to 3, "arm64-v8a" to 4)
@@ -35,7 +38,7 @@ android {
         minSdk = 23
         targetSdk = 33
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.0.0"
 
         val abi = getAbi()
         ndk {
@@ -59,13 +62,15 @@ android {
     }
 
     signingConfigs {
-        create("release") {
-            storeFile = file(localProperties.getProperty("release.jks.file", ""))
-            storePassword = localProperties.getProperty("release.jks.password", "")
-            keyAlias = localProperties.getProperty("release.jks.key.alias", "")
-            keyPassword = localProperties.getProperty("release.jks.key.password", "")
-            enableV3Signing = true
-            enableV4Signing = true
+        if (!hasProperty("github") && !hasProperty("fdroid")) {
+            create("release") {
+                storeFile = file(localProperties.getProperty("release.jks.file", ""))
+                storePassword = localProperties.getProperty("release.jks.password", "")
+                keyAlias = localProperties.getProperty("release.jks.key.alias", "")
+                keyPassword = localProperties.getProperty("release.jks.key.password", "")
+                enableV3Signing = true
+                enableV4Signing = true
+            }
         }
     }
 
@@ -83,7 +88,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            if (!hasProperty("fdroid")) {
+            if (!hasProperty("github") && !hasProperty("fdroid")) {
                 signingConfig = signingConfigs.getByName("release")
             }
         }
@@ -99,6 +104,26 @@ android {
             dimension = "feature"
             applicationIdSuffix = ".plus"
             versionNameSuffix = "-plus"
+        }
+    }
+
+    splits {
+        // Configures multiple APKs based on ABI.
+        abi {
+            // Enables building multiple APKs per ABI.
+            isEnable = !hasProperty("fdroid")
+                    && !hasProperty("noSplits")
+                    && gradle.startParameter.taskNames.isNotEmpty()
+                    && gradle.startParameter.taskNames.any { it.contains("Release") }
+
+            // Resets the list of ABIs that Gradle should create APKs for to none.
+            reset()
+
+            // Specifies a list of ABIs that Gradle should create APKs for.
+            include("x86", "x86_64", "arm64-v8a", "armeabi-v7a")
+
+            // Specifies that we want to also generate a universal APK that includes all ABIs.
+            isUniversalApk = false
         }
     }
 
