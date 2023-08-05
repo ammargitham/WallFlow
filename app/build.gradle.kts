@@ -1,13 +1,12 @@
 @file:Suppress("UnstableApiUsage")
 
-import com.android.build.api.variant.FilterConfiguration.FilterType.ABI
 import java.util.Properties
 
 val localProperties = Properties().apply {
     load(rootProject.file("local.properties").reader())
 }
 
-val abiCodes = mapOf("x86" to 0, "x86_64" to 1, "armeabi-v7a" to 2, "arm64-v8a" to 3)
+val abiCodes = mapOf("x86" to 1, "x86_64" to 2, "armeabi-v7a" to 3, "arm64-v8a" to 4)
 
 @Suppress("DSL_SCOPE_VIOLATION") // Remove in Gradle v8.1: https://youtrack.jetbrains.com/issue/KTIJ-19369
 plugins {
@@ -23,6 +22,10 @@ kapt {
     correctErrorTypes = true
 }
 
+fun getAbi(): String? {
+    return if (hasProperty("abi")) property("abi").toString() else null
+}
+
 android {
     namespace = "com.ammar.wallflow"
     compileSdk = 33
@@ -33,6 +36,13 @@ android {
         targetSdk = 33
         versionCode = 1
         versionName = "1.0"
+
+        val abi = getAbi()
+        ndk {
+            if (abi != null) {
+                abiFilters += abi
+            }
+        }
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         // testInstrumentationRunnerArguments["useTestStorageService"] = "true"
@@ -54,6 +64,8 @@ android {
             storePassword = localProperties.getProperty("release.jks.password", "")
             keyAlias = localProperties.getProperty("release.jks.key.alias", "")
             keyPassword = localProperties.getProperty("release.jks.key.password", "")
+            enableV3Signing = true
+            enableV4Signing = true
         }
     }
 
@@ -71,7 +83,9 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
-            signingConfig = signingConfigs.getByName("release")
+            if (!hasProperty("fdroid")) {
+                signingConfig = signingConfigs.getByName("release")
+            }
         }
     }
 
@@ -88,33 +102,16 @@ android {
         }
     }
 
-    splits {
-        // Configures multiple APKs based on ABI.
-        abi {
-            // Enables building multiple APKs per ABI.
-            isEnable = gradle.startParameter.taskNames.isNotEmpty()
-                    && gradle.startParameter.taskNames[0].contains("Release")
-
-            // Resets the list of ABIs that Gradle should create APKs for to none.
-            reset()
-
-            // Specifies a list of ABIs that Gradle should create APKs for.
-            include("x86", "x86_64", "arm64-v8a", "armeabi-v7a")
-
-            // Specifies that we want to also generate a universal APK that includes all ABIs.
-            isUniversalApk = false
-        }
-    }
-
-    // applicationVariants.all(ApplicationVariantAction())
     androidComponents {
         onVariants { variant ->
             variant.outputs.forEach { output ->
-                val name = output.filters.find { it.filterType == ABI }?.identifier
-                val baseAbiCode = abiCodes[name]
-                if (baseAbiCode != null) {
-                    @Suppress("USELESS_ELVIS")
-                    output.versionCode.set(baseAbiCode + (output.versionCode.get() ?: 0) * 100)
+                val abi = getAbi()
+                if (abi != null) {
+                    val baseAbiCode = abiCodes[abi]
+                    if (baseAbiCode != null) {
+                        @Suppress("USELESS_ELVIS")
+                        output.versionCode.set(baseAbiCode + (output.versionCode.get() ?: 0) * 100)
+                    }
                 }
             }
         }
