@@ -1,5 +1,6 @@
 @file:Suppress("UnstableApiUsage")
 
+import com.android.build.api.variant.FilterConfiguration.FilterType.ABI
 import java.util.Properties
 
 val localProperties = Properties().apply {
@@ -130,7 +131,13 @@ android {
     androidComponents {
         onVariants { variant ->
             variant.outputs.forEach { output ->
-                val abi = getAbi()
+                val abi = if (hasProperty("fdroid")) {
+                    getAbi()
+                } else if (hasProperty("github")) {
+                    output.filters.find { it.filterType == ABI }?.identifier
+                } else {
+                    null
+                }
                 if (abi != null) {
                     val baseAbiCode = abiCodes[abi]
                     if (baseAbiCode != null) {
