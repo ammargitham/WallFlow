@@ -1,0 +1,1 @@
+A wallpaper app with beautiful wallpapers from wallhaven.cc with object detection feature
