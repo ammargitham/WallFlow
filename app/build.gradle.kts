@@ -1,5 +1,3 @@
-@file:Suppress("UnstableApiUsage")
-
 import com.android.build.api.variant.FilterConfiguration.FilterType.ABI
 import java.util.Properties
 
@@ -12,7 +10,6 @@ val localProperties = Properties().apply {
 
 val abiCodes = mapOf("x86" to 1, "x86_64" to 2, "armeabi-v7a" to 3, "arm64-v8a" to 4)
 
-@Suppress("DSL_SCOPE_VIOLATION") // Remove in Gradle v8.1: https://youtrack.jetbrains.com/issue/KTIJ-19369
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
@@ -141,7 +138,6 @@ android {
                 if (abi != null) {
                     val baseAbiCode = abiCodes[abi]
                     if (baseAbiCode != null) {
-                        @Suppress("USELESS_ELVIS")
                         output.versionCode.set(baseAbiCode + (output.versionCode.get() ?: 0) * 100)
                     }
                 }
