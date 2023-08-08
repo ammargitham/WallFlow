@@ -29,7 +29,7 @@ class LayoutSettingsViewModel @Inject constructor(
         localUiState.merge(
             LayoutSettingsUiState(
                 appPreferences = appPreferences,
-            )
+            ),
         )
     }.stateIn(
         scope = viewModelScope,
@@ -41,7 +41,7 @@ class LayoutSettingsViewModel @Inject constructor(
         appPreferencesRepository.updateLookAndFeelPreferences(
             uiState.value.appPreferences.lookAndFeelPreferences.copy(
                 layoutPreferences = preferences,
-            )
+            ),
         )
     }
 }

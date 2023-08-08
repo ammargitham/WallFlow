@@ -58,7 +58,7 @@ fun <T> SegmentedButtons(
     }
 
     Row(
-        modifier = modifier
+        modifier = modifier,
     ) {
         options.mapIndexed { index, option ->
             require(option.text != null || option.icon != null) {
@@ -68,7 +68,7 @@ fun <T> SegmentedButtons(
             val isChecked = option.value in value
             val currentEnabled = enabled && option.enabled
             val currentContainerColor by animateColorAsState(
-                if (isChecked) containerColorChecked else containerColor
+                if (isChecked) containerColorChecked else containerColor,
             )
 
             val optionModifier = when (index) {
@@ -118,7 +118,7 @@ fun <T> SegmentedButtons(
                     topStart = 0.dp,
                     topEnd = 0.dp,
                     bottomStart = 0.dp,
-                    bottomEnd = 0.dp
+                    bottomEnd = 0.dp,
                 )
             }
 
@@ -148,7 +148,7 @@ fun <T> SegmentedButtons(
                                 // add to values
                                 value + option.value
                             }
-                        }
+                        },
                     )
                 },
                 content = {
@@ -156,7 +156,7 @@ fun <T> SegmentedButtons(
                         Icon(
                             modifier = Modifier.size(18.dp),
                             imageVector = Icons.Outlined.Check,
-                            contentDescription = stringResource(R.string.selected)
+                            contentDescription = stringResource(R.string.selected),
                         )
                         Spacer(modifier = Modifier.requiredWidth(4.dp))
                     }
@@ -216,7 +216,7 @@ private val tempToggleOptions: List<SegmentedButtonOption<String>> = listOf(
         "Fourth",
         false,
         icon = { rememberVectorPainter(Icons.Rounded.List) },
-    )
+    ),
 )
 
 @Preview

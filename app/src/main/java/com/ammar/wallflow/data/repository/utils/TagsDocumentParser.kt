@@ -46,7 +46,7 @@ object TagsDocumentParser {
                     category = category,
                     purity = purity,
                     created_at = createdAt,
-                )
+                ),
             )
             targetList
         }

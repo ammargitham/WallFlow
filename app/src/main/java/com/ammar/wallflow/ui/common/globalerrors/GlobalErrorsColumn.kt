@@ -39,7 +39,7 @@ fun GlobalErrorsColumn(
                 errorMsg = errorMsg,
                 actionText = actionText,
                 onActionClick = onActionClick,
-                onDismissClick = { onDismiss(it) }
+                onDismissClick = { onDismiss(it) },
             )
         }
     }

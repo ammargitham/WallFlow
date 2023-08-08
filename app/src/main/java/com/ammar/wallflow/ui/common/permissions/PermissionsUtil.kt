@@ -110,6 +110,6 @@ internal fun Context.checkNotificationPermission() = NotificationManagerCompat.f
 
 internal fun Context.checkSetWallpaperPermission(): Boolean {
     val wallpaperManager = wallpaperManager
-    return wallpaperManager.isWallpaperSupported
-            && wallpaperManager.isSetWallpaperAllowedCompat
+    return wallpaperManager.isWallpaperSupported &&
+        wallpaperManager.isSetWallpaperAllowedCompat
 }

@@ -99,7 +99,7 @@ fun EditSearchModalBottomSheet(
             onDismissRequest = {
                 showMinResAddCustomResDialog = false
                 expandSheet()
-            }
+            },
         )
     }
 
@@ -110,8 +110,8 @@ fun EditSearchModalBottomSheet(
                     search.copy(
                         filters = search.filters.copy(
                             resolutions = search.filters.resolutions + it,
-                        )
-                    )
+                        ),
+                    ),
                 )
                 showResolutionsAddCustomResDialog = false
                 expandSheet()
@@ -119,7 +119,7 @@ fun EditSearchModalBottomSheet(
             onDismissRequest = {
                 showResolutionsAddCustomResDialog = false
                 expandSheet()
-            }
+            },
         )
     }
 }
@@ -191,7 +191,7 @@ fun EditSearchContent(
         )
         RatioFilter(
             ratios = search.filters.ratios,
-            onChange = { onChange(search.copy(filters = search.filters.copy(ratios = it))) }
+            onChange = { onChange(search.copy(filters = search.filters.copy(ratios = it))) },
         )
     }
 }
@@ -199,7 +199,7 @@ fun EditSearchContent(
 @Preview(device = "spec:width=1080px,height=3500px,dpi=440")
 @Preview(
     device = "spec:width=1080px,height=3500px,dpi=440",
-    uiMode = Configuration.UI_MODE_NIGHT_YES
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
 )
 @Composable
 private fun PreviewFiltersContent() {
@@ -210,8 +210,8 @@ private fun PreviewFiltersContent() {
                 search = Search(
                     filters = SearchQuery(
                         sorting = Sorting.TOPLIST,
-                    )
-                )
+                    ),
+                ),
             )
         }
     }

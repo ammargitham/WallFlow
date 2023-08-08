@@ -25,7 +25,7 @@ val SavedSearchSaver = Saver<SavedSearch, List<Any>>(
             search = Search(
                 query = it[2] as String,
                 filters = SearchQuery.fromQueryString(it[3] as String),
-            )
+            ),
         )
-    }
+    },
 )

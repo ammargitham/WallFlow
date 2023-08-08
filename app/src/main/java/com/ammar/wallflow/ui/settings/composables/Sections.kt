@@ -130,7 +130,7 @@ internal fun LazyListScope.accountSection(
     item { Header(stringResource(R.string.account)) }
     item {
         WallhavenApiKeyItem(
-            modifier = Modifier.clickable(onClick = onWallhavenApiKeyItemClick)
+            modifier = Modifier.clickable(onClick = onWallhavenApiKeyItemClick),
         )
     }
 }
@@ -204,7 +204,7 @@ internal fun LazyListScope.generalSection(
     item {
         ListItem(
             modifier = Modifier.clickable(onClick = onManageSavedSearchesClick),
-            headlineContent = { Text(text = stringResource(R.string.manager_saved_searches)) }
+            headlineContent = { Text(text = stringResource(R.string.manager_saved_searches)) },
         )
     }
 }
@@ -302,13 +302,13 @@ internal fun LazyListScope.objectDetectionSection(
             headlineContent = {
                 Text(
                     text = stringResource(R.string.tflite_delegate),
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha)
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
                 )
             },
             supportingContent = {
                 Text(
                     text = delegateString(delegate),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = alpha)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = alpha),
                 )
             },
         )
@@ -322,13 +322,13 @@ internal fun LazyListScope.objectDetectionSection(
             headlineContent = {
                 Text(
                     text = stringResource(R.string.tflite_model),
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha)
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
                 )
             },
             supportingContent = {
                 Text(
                     text = model.name,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = alpha)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = alpha),
                 )
             },
         )
@@ -387,11 +387,11 @@ internal fun LazyListScope.autoWallpaperSection(
                 is NextRun.NextRunTime -> {
                     val format = DateFormat.getBestDateTimePattern(
                         Locale.getDefault(),
-                        "yyyyy.MMMM.dd hh:mm"
+                        "yyyyy.MMMM.dd hh:mm",
                     )
                     val formatted = DateFormat.format(
                         format,
-                        nextRun.instant.toEpochMilliseconds()
+                        nextRun.instant.toEpochMilliseconds(),
                     ).toString()
                     stringResource(R.string.next_run_at, formatted)
                 }
@@ -413,7 +413,7 @@ internal fun LazyListScope.autoWallpaperSection(
                             contentDescription = stringResource(R.string.info),
                         )
                     }
-                }
+                },
             )
         }
     }
@@ -436,7 +436,9 @@ internal fun LazyListScope.autoWallpaperSection(
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = alpha),
                     )
                 }
-            } else null,
+            } else {
+                null
+            },
         )
     }
     item {
@@ -548,7 +550,7 @@ internal fun LazyListScope.autoWallpaperSection(
             ChangeNowButton(
                 autoWallpaperStatus = autoWallpaperStatus,
                 enabled = enabled,
-                onChangeNowClick = onChangeNowClick
+                onChangeNowClick = onChangeNowClick,
             )
         }
     }
@@ -639,7 +641,7 @@ private fun PreviewChangeNowButton() {
                             delay(5000)
                             status = null
                         }
-                    }
+                    },
                 )
                 ChangeNowButton(
                     autoWallpaperStatus = AutoWallpaperWorker.Companion.Status.Pending,

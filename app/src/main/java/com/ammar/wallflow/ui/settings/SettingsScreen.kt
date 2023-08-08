@@ -100,7 +100,7 @@ fun SettingsScreen(
         StoragePermissions.getPermissions(
             action = StoragePermissions.Action.READ_AND_WRITE,
             types = listOf(StoragePermissions.FileType.Image),
-            createdBy = StoragePermissions.CreatedBy.Self
+            createdBy = StoragePermissions.CreatedBy.Self,
         ).map { MultiplePermissionItem(permission = it) }
     }
 
@@ -109,7 +109,7 @@ fun SettingsScreen(
         permissions = storagePerms + MultiplePermissionItem(
             permission = Manifest.permission.POST_NOTIFICATIONS,
             minimumSdk = Build.VERSION_CODES.TIRAMISU,
-        )
+        ),
     ) { permissionStates ->
         val showRationale = permissionStates.map { it.status.shouldShowRationale }.any { it }
         if (showRationale) {
@@ -140,7 +140,7 @@ fun SettingsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .windowInsetsPadding(bottomWindowInsets)
+            .windowInsetsPadding(bottomWindowInsets),
     ) {
         TopBar(
             navController = twoPaneController.pane1NavHostController,
@@ -183,7 +183,7 @@ fun SettingsScreen(
             onAutoWallpaperChangeNowClick = viewModel::autoWallpaperChangeNow,
             onAutoWallpaperNextRunInfoClick = { viewModel.showAutoWallpaperNextRunInfoDialog(true) },
             onThemeClick = { viewModel.showThemeOptionsDialog(true) },
-            onLayoutClick = { twoPaneController.navigate(LayoutSettingsScreenDestination) }
+            onLayoutClick = { twoPaneController.navigate(LayoutSettingsScreenDestination) },
         )
     }
 
@@ -215,7 +215,7 @@ fun SettingsScreen(
                     model = null,
                     show = false,
                 )
-            }
+            },
         )
     }
 
@@ -232,11 +232,11 @@ fun SettingsScreen(
             selectedDelegate = uiState.appPreferences.objectDetectionPreferences.delegate,
             onSaveClick = {
                 viewModel.updateSubjectDetectionPrefs(
-                    uiState.appPreferences.objectDetectionPreferences.copy(delegate = it)
+                    uiState.appPreferences.objectDetectionPreferences.copy(delegate = it),
                 )
                 viewModel.showObjectDetectionDelegateOptions(false)
             },
-            onDismissRequest = { viewModel.showObjectDetectionDelegateOptions(false) }
+            onDismissRequest = { viewModel.showObjectDetectionDelegateOptions(false) },
         )
     }
 
@@ -248,7 +248,7 @@ fun SettingsScreen(
             selectable = false,
             onEditClick = { viewModel.editSavedSearch(it) },
             onDeleteClick = { viewModel.deleteSavedSearch(it) },
-            onDismissRequest = { viewModel.showSavedSearches(false) }
+            onDismissRequest = { viewModel.showSavedSearches(false) },
         )
     }
 
@@ -288,7 +288,7 @@ fun SettingsScreen(
         DeleteSavedSearchConfirmDialog(
             savedSearch = this,
             onConfirmClick = { viewModel.deleteSavedSearch(this, true) },
-            onDismissRequest = { viewModel.deleteSavedSearch(null) }
+            onDismissRequest = { viewModel.deleteSavedSearch(null) },
         )
     }
 
@@ -303,12 +303,12 @@ fun SettingsScreen(
                     prefs.copy(
                         enabled = true,
                         savedSearchId = it,
-                    )
+                    ),
                 )
                 viewModel.setTempAutoWallpaperPrefs(null)
                 viewModel.showAutoWallpaperSavedSearchesDialog(false)
             },
-            onDismissRequest = { viewModel.showAutoWallpaperSavedSearchesDialog(false) }
+            onDismissRequest = { viewModel.showAutoWallpaperSavedSearchesDialog(false) },
         )
     }
 
@@ -319,7 +319,7 @@ fun SettingsScreen(
                 viewModel.updateAutoWallpaperPrefs(
                     uiState.appPreferences.autoWallpaperPreferences.copy(
                         frequency = it,
-                    )
+                    ),
                 )
                 viewModel.showAutoWallpaperFrequencyDialog(false)
             },
@@ -334,7 +334,7 @@ fun SettingsScreen(
                 viewModel.updateAutoWallpaperPrefs(
                     uiState.appPreferences.autoWallpaperPreferences.copy(
                         constraints = it,
-                    )
+                    ),
                 )
                 viewModel.showAutoWallpaperConstraintsDialog(false)
             },
@@ -345,13 +345,13 @@ fun SettingsScreen(
     if (uiState.showPermissionRationaleDialog) {
         DownloadPermissionsRationalDialog(
             permissions = autoWallpaperPermissionsState.shouldShowRationale.keys.map { it.permission },
-            onConfirmOrDismiss = { viewModel.showPermissionRationaleDialog(false) }
+            onConfirmOrDismiss = { viewModel.showPermissionRationaleDialog(false) },
         )
     }
 
     if (uiState.showAutoWallpaperNextRunInfoDialog) {
         NextRunInfoDialog(
-            onDismissRequest = { viewModel.showAutoWallpaperNextRunInfoDialog(false) }
+            onDismissRequest = { viewModel.showAutoWallpaperNextRunInfoDialog(false) },
         )
     }
 
@@ -362,7 +362,7 @@ fun SettingsScreen(
                 viewModel.updateLookAndFeelPrefs(
                     uiState.appPreferences.lookAndFeelPreferences.copy(
                         theme = it,
-                    )
+                    ),
                 )
                 viewModel.showThemeOptionsDialog(false)
             },
@@ -398,7 +398,7 @@ fun SettingsScreenContent(
 ) {
     Box(modifier = modifier) {
         LazyColumn(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
             accountSection(onWallhavenApiKeyItemClick = onWallhavenApiKeyItemClick)
             dividerItem()
@@ -422,7 +422,7 @@ fun SettingsScreenContent(
                     model = model,
                     onEnabledChange = {
                         onObjectDetectionPrefsChange(
-                            appPreferences.objectDetectionPreferences.copy(enabled = it)
+                            appPreferences.objectDetectionPreferences.copy(enabled = it),
                         )
                     },
                     onDelegateClick = onObjectDetectionDelegateClick,
@@ -443,7 +443,7 @@ fun SettingsScreenContent(
                         onAutoWallpaperPresChange(
                             appPreferences.autoWallpaperPreferences.copy(
                                 enabled = it,
-                            )
+                            ),
                         )
                     },
                     onSavedSearchClick = onAutoWallpaperSavedSearchClick,
@@ -452,7 +452,7 @@ fun SettingsScreenContent(
                         onAutoWallpaperPresChange(
                             appPreferences.autoWallpaperPreferences.copy(
                                 useObjectDetection = it,
-                            )
+                            ),
                         )
                     },
                     onConstraintsClick = onAutoWallpaperConstraintsClick,
@@ -462,7 +462,7 @@ fun SettingsScreenContent(
                         onAutoWallpaperPresChange(
                             appPreferences.autoWallpaperPreferences.copy(
                                 showNotification = it,
-                            )
+                            ),
                         )
                     },
                 )
@@ -486,7 +486,6 @@ fun SettingsScreenContent(
             }
         }
     }
-
 }
 
 @Preview
@@ -512,7 +511,7 @@ private fun PreviewSettingsScreenContent() {
                         delay(5000)
                         autoWallpaperStatus = null
                     }
-                }
+                },
             )
         }
     }

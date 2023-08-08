@@ -95,6 +95,4 @@ abstract class NetworkBoundResource<DbEntityType, ResultType, NetworkResourceTyp
             _data.emit(Resource.Error(throwable))
         }
     }
-
-
 }

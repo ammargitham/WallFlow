@@ -31,6 +31,8 @@ import io.mockk.slot
 import io.mockk.unmockkAll
 import java.io.File
 import java.util.UUID
+import kotlin.test.assertEquals
+import kotlin.time.Duration.Companion.days
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
@@ -39,8 +41,6 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import kotlin.test.assertEquals
-import kotlin.time.Duration.Companion.days
 
 @RunWith(AndroidJUnit4::class)
 class CleanupWorkerTest {
@@ -274,7 +274,7 @@ class CleanupWorkerTest {
         val randomWallpapers2 = wallpapers2.shuffled().take(newCacheCount2).toMutableList()
         // 1 from prev cached wallpapers
         randomWallpapers2 += wallpapersDao.getByWallhavenIds(
-            query1CachedWallHavenIds.shuffled().take(1)
+            query1CachedWallHavenIds.shuffled().take(1),
         )
         createTempFiles(randomWallpapers2, clock.now())
 
@@ -343,7 +343,7 @@ class CleanupWorkerTest {
         val randomWallpapers2 = wallpapers2.shuffled().take(newCacheCount2).toMutableList()
         // 1 from prev cached wallpapers
         val updatedLastModifiedWallpaper = wallpapersDao.getByWallhavenIds(
-            query1CachedWallHavenIds.shuffled().take(1)
+            query1CachedWallHavenIds.shuffled().take(1),
         )
         randomWallpapers2 += updatedLastModifiedWallpaper
         createTempFiles(randomWallpapers2, clock.now())
@@ -439,7 +439,7 @@ class CleanupWorkerTest {
                 last_page = totalResultsCount / perPage + 1,
                 per_page = perPage,
                 total = totalResultsCount,
-            )
+            ),
         )
         val remoteMediator = WallpapersRemoteMediator(
             searchQuery,
@@ -451,7 +451,7 @@ class CleanupWorkerTest {
             listOf(),
             null,
             PagingConfig(10),
-            10
+            10,
         )
         remoteMediator.load(LoadType.REFRESH, pagingState)
     }

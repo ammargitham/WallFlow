@@ -22,7 +22,7 @@ interface SearchQueryDao {
         SELECT *
         FROM search_query
         WHERE query_string = :queryString
-        """
+        """,
     )
     suspend fun getBySearchQuery(queryString: String): SearchQueryEntity?
 

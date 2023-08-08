@@ -17,6 +17,6 @@ object IntSizeSerializer : KSerializer<IntSize> {
 
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor(
         serialName = "IntSize",
-        kind = PrimitiveKind.STRING
+        kind = PrimitiveKind.STRING,
     )
 }

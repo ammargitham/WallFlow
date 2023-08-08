@@ -40,7 +40,7 @@ object NetworkModule {
             addInterceptor(
                 HttpLoggingInterceptor().apply {
                     setLevel(HttpLoggingInterceptor.Level.BASIC)
-                }
+                },
             )
         }
     }.build()
@@ -56,7 +56,7 @@ object NetworkModule {
             client(okHttpClient)
             addConverterFactory(DocumentConverterFactory())
             addConverterFactory(
-                networkJson.asConverterFactory("application/json".toMediaType())
+                networkJson.asConverterFactory("application/json".toMediaType()),
             )
         }
             .build()

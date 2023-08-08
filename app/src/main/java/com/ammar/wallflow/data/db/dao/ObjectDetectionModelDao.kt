@@ -30,7 +30,7 @@ interface ObjectDetectionModelDao {
                 id!=:id
                 AND name=:name
         )
-        """
+        """,
     )
     suspend fun nameExistsExcludingId(id: Long, name: String): Boolean
 

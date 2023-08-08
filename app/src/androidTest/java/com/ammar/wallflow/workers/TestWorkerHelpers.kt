@@ -14,12 +14,12 @@ import androidx.work.impl.utils.taskexecutor.TaskExecutor
 import com.google.common.util.concurrent.ListenableFuture
 import java.util.UUID
 import java.util.concurrent.Executor
+import kotlin.time.Duration
 import kotlinx.datetime.Clock
 import kotlinx.datetime.DateTimeUnit
 import kotlinx.datetime.Instant
 import kotlinx.datetime.minus
 import kotlinx.datetime.plus
-import kotlin.time.Duration
 
 internal class InstantWorkTaskExecutor : TaskExecutor {
     private val synchronousExecutor: Executor = SynchronousExecutor()
@@ -41,7 +41,7 @@ class TestProgressUpdater : ProgressUpdater {
     ): ListenableFuture<Void> {
         Logger.get().info(
             TAG,
-            "Updating progress for $id ($data)"
+            "Updating progress for $id ($data)",
         )
         val future = SettableFuture.create<Void>()
         future.set(null)
@@ -61,7 +61,7 @@ class TestForegroundUpdater : ForegroundUpdater {
     ): ListenableFuture<Void> {
         Logger.get().info(
             TAG,
-            "setForegroundAsync for $id"
+            "setForegroundAsync for $id",
         )
         val future = SettableFuture.create<Void>()
         future.set(null)

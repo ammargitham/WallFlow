@@ -30,7 +30,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class WallpaperViewModel @Inject constructor(
@@ -131,8 +130,11 @@ class WallpaperViewModel @Inject constructor(
                         //     application.toast("Download failed: ${state.e?.message ?: "Unknown reason"}")
                         // }
                         onResult(
-                            if (state is DownloadStatus.Failed) null
-                            else application.getTempFileIfExists(fileName)
+                            if (state is DownloadStatus.Failed) {
+                                null
+                            } else {
+                                application.getTempFileIfExists(fileName)
+                            },
                         )
                     }
                 }

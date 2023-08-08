@@ -16,27 +16,27 @@ object NotificationChannels {
         val downloadsChannel = NotificationChannel(
             DOWNLOADS_CHANNEL_ID,
             context.getString(R.string.downloads_channel_name),
-            NotificationManager.IMPORTANCE_DEFAULT
+            NotificationManager.IMPORTANCE_DEFAULT,
         ).apply {
             description = context.getString(R.string.downloads_channel_description)
         }
         val autoWallpaperChannel = NotificationChannel(
             AUTO_WALLPAPER_CHANNEL_ID,
             context.getString(R.string.auto_wallpaper),
-            NotificationManager.IMPORTANCE_DEFAULT
+            NotificationManager.IMPORTANCE_DEFAULT,
         ).apply {
             description = context.getString(R.string.auto_wallpaper_channel_description)
         }
         val cleanupChannel = NotificationChannel(
             CLEANUP_CHANNEL_ID,
             context.getString(R.string.cleanup_channel_name),
-            NotificationManager.IMPORTANCE_LOW
+            NotificationManager.IMPORTANCE_LOW,
         ).apply {
             description = context.getString(R.string.cleanup_channel_description)
         }
         // Register the channel with the system
         val notificationManager: NotificationManager = context.getSystemService(
-            Context.NOTIFICATION_SERVICE
+            Context.NOTIFICATION_SERVICE,
         ) as NotificationManager
         notificationManager.apply {
             createNotificationChannel(downloadsChannel)

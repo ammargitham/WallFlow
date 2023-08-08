@@ -98,10 +98,10 @@ import com.google.modernstorage.permissions.StoragePermissions
 import com.ramcosta.composedestinations.annotation.DeepLink
 import com.ramcosta.composedestinations.annotation.Destination
 import java.net.SocketTimeoutException
+import kotlin.math.roundToInt
 import me.saket.telephoto.zoomable.ZoomSpec
 import me.saket.telephoto.zoomable.rememberZoomableState
 import me.saket.telephoto.zoomable.zoomable
-import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination(
@@ -110,7 +110,7 @@ import kotlin.math.roundToInt
         DeepLink(uriPattern = wallpaperScreenLocalDeepLinkUriPattern),
         DeepLink(uriPattern = wallpaperScreenExternalDeepLinkUriPattern),
         DeepLink(uriPattern = wallpaperScreenExternalShortDeepLinkUriPattern),
-    ]
+    ],
 )
 @Composable
 fun WallpaperScreen(
@@ -124,7 +124,7 @@ fun WallpaperScreen(
     val lifecycle = LocalLifecycleOwner.current.lifecycle
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val sheetColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
-        BottomSheetDefaults.Elevation
+        BottomSheetDefaults.Elevation,
     )
     // TODO: Use Color.Transparent for nav bar
     // fully transparent nav bar will require setting some extra flags,
@@ -144,7 +144,7 @@ fun WallpaperScreen(
         StoragePermissions.getPermissions(
             action = StoragePermissions.Action.READ_AND_WRITE,
             types = listOf(StoragePermissions.FileType.Image),
-            createdBy = StoragePermissions.CreatedBy.Self
+            createdBy = StoragePermissions.CreatedBy.Self,
         ).map { MultiplePermissionItem(permission = it) }
     }
 
@@ -153,7 +153,7 @@ fun WallpaperScreen(
         permissions = storagePerms + MultiplePermissionItem(
             permission = Manifest.permission.POST_NOTIFICATIONS,
             minimumSdk = Build.VERSION_CODES.TIRAMISU,
-        )
+        ),
     ) { permissionStates ->
         val showRationale = permissionStates.map { it.status.shouldShowRationale }.any { it }
         if (showRationale) {
@@ -218,7 +218,7 @@ fun WallpaperScreen(
     Box(
         modifier = Modifier
             .windowInsetsPadding(windowInsets)
-            .fillMaxSize()
+            .fillMaxSize(),
     ) {
         WallpaperScreenContent(
             wallpaper = uiState.wallpaper,
@@ -254,7 +254,7 @@ fun WallpaperScreen(
                                 SetWallpaperActivity.EXTRA_URI,
                                 context.getUriForFile(file),
                             )
-                        }
+                        },
                     )
                 }
             },
@@ -264,9 +264,9 @@ fun WallpaperScreen(
                     WallpaperScreenDestination(
                         thumbUrl = uiState.thumbUrl,
                         wallpaperId = uiState.wallpaper?.id,
-                    )
+                    ),
                 )
-            }
+            },
         )
 
         if (!isTwoPaneMode) {
@@ -291,7 +291,7 @@ fun WallpaperScreen(
                         Search(
                             query = "id:${it.id}",
                             meta = TagSearchMeta(tag = it),
-                        )
+                        ),
                     )
                     if (isTwoPaneMode) {
                         // dismiss the bottom sheet
@@ -302,9 +302,9 @@ fun WallpaperScreen(
                     uploader?.run {
                         twoPaneController.pane1NavHostController.search(
                             Search(
-                                query = "@${username}",
+                                query = "@$username",
                                 meta = UploaderSearchMeta(uploader = this),
-                            )
+                            ),
                         )
                         if (isTwoPaneMode) {
                             // dismiss the bottom sheet
@@ -312,7 +312,7 @@ fun WallpaperScreen(
                         }
                     }
                 },
-                onSourceClick = { context.openUrl(source) }
+                onSourceClick = { context.openUrl(source) },
             )
         }
     }
@@ -323,7 +323,7 @@ fun WallpaperScreen(
             onConfirmOrDismiss = {
                 viewModel.showPermissionRationaleDialog(false)
                 // notificationPermissionState.launchPermissionRequest()
-            }
+            },
         )
     }
 }
@@ -365,7 +365,7 @@ fun WallpaperScreenContent(
         value = when {
             containerAspectRatio == imageAspectRatio -> IntSize(
                 containerWidth,
-                containerHeight
+                containerHeight,
             )
             containerAspectRatio < imageAspectRatio -> IntSize(
                 containerWidth,
@@ -387,7 +387,7 @@ fun WallpaperScreenContent(
                     is SocketTimeoutException -> context.toast(context.getString(R.string.request_timed_out))
                     is NullRequestDataException -> return // Do nothing
                     else -> context.toast(
-                        throwable.message ?: context.getString(R.string.error_occurred)
+                        throwable.message ?: context.getString(R.string.error_occurred),
                     )
                 }
                 Log.e(TAG, "onError: ", throwable)
@@ -419,16 +419,16 @@ fun WallpaperScreenContent(
     val zoomableState = rememberZoomableState(
         zoomSpec = ZoomSpec(
             maxZoomFactor = 5f,
-        )
+        ),
     )
     var hasTransformed by rememberSaveable { mutableStateOf(false) }
 
     LaunchedEffect(zoomableState.contentTransformation, painter) {
         val scale = zoomableState.contentTransformation.scale
         if (
-            painter.state !is AsyncImagePainter.State.Success
-            || painter.request.data is NullRequestData
-            || scale == ScaleFactor(0f, 0f)
+            painter.state !is AsyncImagePainter.State.Success ||
+            painter.request.data is NullRequestData ||
+            scale == ScaleFactor(0f, 0f)
         ) {
             return@LaunchedEffect
         }
@@ -448,7 +448,7 @@ fun WallpaperScreenContent(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .onSizeChanged { containerIntSize = it }
+            .onSizeChanged { containerIntSize = it },
     ) {
         Crossfade(
             modifier = Modifier.fillMaxSize(),
@@ -456,9 +456,9 @@ fun WallpaperScreenContent(
         ) {
             val imageRequest = it.request
             if (
-                showFullScreenAction // means two pane mode
-                && it.state !is AsyncImagePainter.State.Loading
-                && imageRequest.data is NullRequestData
+                showFullScreenAction && // means two pane mode
+                it.state !is AsyncImagePainter.State.Loading &&
+                imageRequest.data is NullRequestData
             ) {
                 NotSelectedPlaceholder(
                     containerIntSize = containerIntSize,
@@ -482,9 +482,9 @@ fun WallpaperScreenContent(
 
         AnimatedVisibility(
             modifier = Modifier.align(Alignment.BottomCenter),
-            visible = painter.state is AsyncImagePainter.State.Success
-                    && painter.request.data == wallpaper?.path
-                    && actionsVisible,
+            visible = painter.state is AsyncImagePainter.State.Success &&
+                painter.request.data == wallpaper?.path &&
+                actionsVisible,
             enter = fadeIn(),
             exit = fadeOut(),
         ) {
@@ -532,8 +532,8 @@ private fun NotSelectedPlaceholder(
             contentDescription = stringResource(R.string.no_wallpaper_selected),
             contentScale = ContentScale.FillWidth,
             colorFilter = ColorFilter.tint(
-                MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f)
-            )
+                MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f),
+            ),
         )
         Text(
             text = stringResource(R.string.no_wallpaper_selected),

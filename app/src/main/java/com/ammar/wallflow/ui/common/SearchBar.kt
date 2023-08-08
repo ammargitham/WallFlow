@@ -24,6 +24,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.SearchBar as MaterialSearchBar
 import androidx.compose.material3.Text
 import androidx.compose.material3.minimumInteractiveComponentSize
 import androidx.compose.runtime.Composable
@@ -45,7 +46,6 @@ import androidx.compose.ui.zIndex
 import com.ammar.wallflow.R
 import com.ammar.wallflow.extensions.toDp
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
-import androidx.compose.material3.SearchBar as MaterialSearchBar
 
 object SearchBar {
     @OptIn(ExperimentalFoundationApi::class)
@@ -98,7 +98,7 @@ object SearchBar {
                                     Text(
                                         text = t,
                                         maxLines = 2,
-                                        overflow = TextOverflow.Ellipsis
+                                        overflow = TextOverflow.Ellipsis,
                                     )
                                 }
                             },
@@ -112,7 +112,7 @@ object SearchBar {
                                         contentDescription = null,
                                     )
                                 }
-                            }
+                            },
                         )
                     }
                 }
@@ -169,7 +169,7 @@ object SearchBar {
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.ArrowBack,
-                                        contentDescription = null
+                                        contentDescription = null,
                                     )
                                 }
                                 return@Crossfade
@@ -191,7 +191,7 @@ object SearchBar {
                 },
                 trailingIcon = trailingIcon,
                 enabled = enabled,
-                content = content
+                content = content,
             )
         }
     }
@@ -248,7 +248,6 @@ object SearchBar {
     // }
 }
 
-
 data class Suggestion<T>(
     val value: T,
     val headline: String,
@@ -260,7 +259,6 @@ data class Suggestion<T>(
         )
     },
 )
-
 
 fun Modifier.searchBarContainer(
     isDocked: Boolean = false,

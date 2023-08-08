@@ -44,7 +44,9 @@ fun ClearableChip(
                     contentDescription = stringResource(R.string.remove),
                 )
             }
-        } else null,
+        } else {
+            null
+        },
         interactionSource = NoRippleInteractionSource(),
     )
 }

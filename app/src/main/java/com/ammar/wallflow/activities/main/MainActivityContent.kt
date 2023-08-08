@@ -45,10 +45,10 @@ import com.ammar.wallflow.ui.common.topWindowInsets
 import com.ammar.wallflow.ui.destinations.TypedDestination
 import com.ammar.wallflow.ui.home.HomeScreenContent
 import com.ammar.wallflow.ui.theme.WallFlowTheme
+import kotlin.math.roundToInt
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.datetime.Clock
-import kotlin.math.roundToInt
 
 @Composable
 fun MainActivityContent(
@@ -98,7 +98,7 @@ fun MainActivityContent(
             contentWindowInsets = WindowInsets(left = 0),
         ) {
             Box(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
             ) {
                 Box(
                     modifier = Modifier
@@ -174,7 +174,7 @@ fun MainActivityContent(
 
 @Preview(
     showSystemUi = true,
-    device = "id:pixel_6_pro"
+    device = "id:pixel_6_pro",
 )
 @Preview(
     showSystemUi = true,
@@ -188,7 +188,7 @@ private fun PreviewMainActivityContentPixel6Pro() {
 
 @Preview(
     showSystemUi = true,
-    device = "spec:width=800dp,height=1280dp,dpi=480"
+    device = "spec:width=800dp,height=1280dp,dpi=480",
 )
 @Preview(
     showSystemUi = true,
@@ -204,7 +204,7 @@ private fun PreviewMainActivityContentCustomDpi() {
 
 @Preview(
     showSystemUi = true,
-    device = "id:desktop_large"
+    device = "id:desktop_large",
 )
 @Preview(
     showSystemUi = true,
@@ -220,7 +220,7 @@ private fun PreviewMainActivityContentDesktop() {
 
 @Preview(
     showSystemUi = true,
-    device = "id:8in Foldable"
+    device = "id:8in Foldable",
 )
 @Preview(
     showSystemUi = true,
@@ -236,7 +236,7 @@ private fun PreviewMainActivityContentFoldable() {
 
 @Preview(
     showSystemUi = true,
-    device = "id:10.1in WXGA (Tablet)"
+    device = "id:10.1in WXGA (Tablet)",
 )
 @Preview(
     showSystemUi = true,
@@ -272,8 +272,8 @@ private fun PreviewContent(
             MainActivityContent(
                 useNavRail = useNavRail,
                 globalErrors = listOf(
-                    GlobalErrorsRepository.WallHavenUnauthorisedError()
-                )
+                    GlobalErrorsRepository.WallHavenUnauthorisedError(),
+                ),
             ) {
                 val pagingItems = previewWallpaperFlow.collectAsLazyPagingItems()
                 HomeScreenContent(

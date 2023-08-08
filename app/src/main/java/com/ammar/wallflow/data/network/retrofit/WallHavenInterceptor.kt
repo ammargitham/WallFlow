@@ -38,19 +38,19 @@ class WallHavenInterceptor @Inject constructor(
             when (response.code) {
                 401 -> globalErrorsRepository.addError(
                     WallHavenUnauthorisedError(),
-                    replace = true
+                    replace = true,
                 )
 
                 429 -> globalErrorsRepository.addError(
                     WallHavenRateLimitError(),
-                    replace = true
+                    replace = true,
                 )
             }
         } else {
             // remove any network related errors
             globalErrorsRepository.removeErrorByType(
                 GlobalErrorType.WALLHAVEN_UNAUTHORISED,
-                GlobalErrorType.WALLHAVEN_RATE_LIMIT
+                GlobalErrorType.WALLHAVEN_RATE_LIMIT,
             )
         }
         return response

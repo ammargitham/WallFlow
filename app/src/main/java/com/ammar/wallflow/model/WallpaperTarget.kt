@@ -6,7 +6,7 @@ import androidx.annotation.RequiresApi
 
 enum class WallpaperTarget {
     HOME,
-    LOCKSCREEN;
+    LOCKSCREEN,
 }
 
 @RequiresApi(Build.VERSION_CODES.N)

@@ -71,7 +71,7 @@ private fun PreviewUploaderChip() {
                             small = "",
                             tiny = "",
                         ),
-                    )
+                    ),
                 )
             }
         }

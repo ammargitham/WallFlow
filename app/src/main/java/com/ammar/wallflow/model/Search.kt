@@ -45,14 +45,14 @@ fun Search.toSearchQuery(): SearchQuery {
         val tagIdString = q.removePrefix("id:")
         val tagId = tagIdString.toLongOrNull() ?: return filters
         return filters.copy(
-            tagId = tagId
+            tagId = tagId,
         )
     }
     if (q.startsWith("like:")) {
         val wallpaperId = q.removePrefix("like:")
         if (wallpaperId.isBlank()) return filters
         return filters.copy(
-            wallpaperId = wallpaperId
+            wallpaperId = wallpaperId,
         )
     }
     if (q.startsWith("@")) {
@@ -74,28 +74,32 @@ fun Search.getSupportingText(
         add(
             context.getString(
                 R.string.included_tags_supp,
-                filters.includedTags.joinToString(", ") { "#$it" }),
+                filters.includedTags.joinToString(", ") { "#$it" },
+            ),
         )
     }
     if (filters.excludedTags.isNotEmpty()) {
         add(
             context.getString(
                 R.string.excluded_tags_supp,
-                filters.excludedTags.joinToString(", ") { "#$it" }),
+                filters.excludedTags.joinToString(", ") { "#$it" },
+            ),
         )
     }
     if (filters.categories != SearchQuery.defaultCategories) {
         add(
             context.getString(
                 R.string.categories_supp,
-                filters.categories.joinToString(", ") { it.value })
+                filters.categories.joinToString(", ") { it.value },
+            ),
         )
     }
     if (filters.purity != SearchQuery.defaultPurities) {
         add(
             context.getString(
                 R.string.purities_supp,
-                filters.purity.joinToString(", ") { it.purityName })
+                filters.purity.joinToString(", ") { it.purityName },
+            ),
         )
     }
     filters.username?.run {
@@ -116,7 +120,7 @@ val SearchSaver = Saver<Search, List<String>>(
     restore = {
         Search(
             query = it[0],
-            filters = SearchQuery.fromQueryString(it[1])
+            filters = SearchQuery.fromQueryString(it[1]),
         )
-    }
+    },
 )

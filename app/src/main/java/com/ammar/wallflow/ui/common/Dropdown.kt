@@ -82,7 +82,7 @@ private fun PreviewDropdownTextInput() {
                         value = "option1",
                         text = "Option 1",
                     ),
-                )
+                ),
             )
         }
     }

@@ -17,7 +17,7 @@ inline fun <T1, T2, T3, T4, T5, T6, R> combine(
         flow3,
         flow4,
         flow5,
-        flow6
+        flow6,
     ) { args: Array<*> ->
         @Suppress("UNCHECKED_CAST")
         transform(

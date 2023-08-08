@@ -106,7 +106,7 @@ fun WallpaperStaggeredGrid(
                     isSelected = showSelection && selectedWallpaper?.id == it.id,
                     fixedHeight = gridType == GridType.FIXED_SIZE,
                     roundedCorners = roundedCorners,
-                    onClick = { onWallpaperClick(it) }
+                    onClick = { onWallpaperClick(it) },
                 )
             } ?: PlaceholderWallpaperCard()
         }

@@ -12,8 +12,8 @@ import kotlinx.datetime.Instant
         Index(
             value = ["query_string"],
             unique = true,
-        )
-    ]
+        ),
+    ],
 )
 data class SearchQueryEntity(
     @PrimaryKey(autoGenerate = true) val id: Long,

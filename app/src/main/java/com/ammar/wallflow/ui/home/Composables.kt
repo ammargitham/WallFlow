@@ -39,7 +39,6 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.datetime.Clock
 
-
 @Composable
 fun PopularTagsRow(
     modifier: Modifier = Modifier,
@@ -54,7 +53,7 @@ fun PopularTagsRow(
     ) {
         item {
             Text(
-                text = "${stringResource(R.string.popular_tags)}:"
+                text = "${stringResource(R.string.popular_tags)}:",
             )
         }
         items(tags) {
@@ -84,7 +83,7 @@ private fun PreviewPopularTagsRow() {
                         purity = Purity.SFW,
                         createdAt = Clock.System.now(),
                     )
-                }.toPersistentList()
+                }.toPersistentList(),
             )
         }
     }

@@ -110,7 +110,7 @@ private fun Modifier.drawScrollbar(
             color = color,
             alpha = alpha,
             thumbSize = thumbSize,
-            startOffset = startOffset
+            startOffset = startOffset,
         )
     }
 }
@@ -156,8 +156,12 @@ private fun Modifier.drawScrollbar(
         val totalSize = estimatedItemSize * layoutInfo.totalItemsCount
         val canvasSize = if (orientation == Orientation.Horizontal) size.width else size.height
         val thumbSize = viewportSize / totalSize * canvasSize
-        val startOffset = if (items.isEmpty()) 0f else items.first().run {
-            (estimatedItemSize * index - offset) / totalSize * canvasSize
+        val startOffset = if (items.isEmpty()) {
+            0f
+        } else {
+            items.first().run {
+                (estimatedItemSize * index - offset) / totalSize * canvasSize
+            }
         }
         drawScrollbar(
             orientation = orientation,
@@ -195,9 +199,13 @@ fun Modifier.drawVerticalScrollbar(
         val totalSize = estimatedItemSize * totalRow
         val canvasSize = size.height
         val thumbSize = viewportSize / totalSize * canvasSize
-        val startOffset = if (rowCount == 0) 0f else items.first().run {
-            val rowIndex = index / spanCount
-            (estimatedItemSize * rowIndex - offset.y) / totalSize * canvasSize
+        val startOffset = if (rowCount == 0) {
+            0f
+        } else {
+            items.first().run {
+                val rowIndex = index / spanCount
+                (estimatedItemSize * rowIndex - offset.y) / totalSize * canvasSize
+            }
         }
         drawScrollbar(
             orientation = Orientation.Vertical,
@@ -224,12 +232,12 @@ private fun DrawScope.drawScrollbar(
     val topLeft = if (orientation == Orientation.Horizontal) {
         Offset(
             if (reverseDirection) size.width - startOffset - thumbSize else startOffset,
-            if (atEnd) size.height - thicknessPx else 0f
+            if (atEnd) size.height - thicknessPx else 0f,
         )
     } else {
         Offset(
             if (atEnd) size.width - thicknessPx else 0f,
-            if (reverseDirection) size.height - startOffset - thumbSize else startOffset
+            if (reverseDirection) size.height - startOffset - thumbSize else startOffset,
         )
     }
     val size = if (orientation == Orientation.Horizontal) {
@@ -260,7 +268,7 @@ private fun Modifier.drawScrollbar(
     val scrolled = remember {
         MutableSharedFlow<Unit>(
             extraBufferCapacity = 1,
-            onBufferOverflow = BufferOverflow.DROP_OLDEST
+            onBufferOverflow = BufferOverflow.DROP_OLDEST,
         )
     }
     val nestedScrollConnection = remember(orientation, scrolled) {
@@ -289,7 +297,9 @@ private fun Modifier.drawScrollbar(
     val isLtr = LocalLayoutDirection.current == LayoutDirection.Ltr
     val reverseDirection = if (orientation == Orientation.Horizontal) {
         if (isLtr) reverseScrolling else !reverseScrolling
-    } else reverseScrolling
+    } else {
+        reverseScrolling
+    }
     val atEnd = if (orientation == Orientation.Vertical) isLtr else true
 
     val color = BarColor
@@ -326,7 +336,7 @@ internal fun ScrollbarPreview() {
                 text = "Item ${it + 1}",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(16.dp),
             )
         }
     }
@@ -338,14 +348,14 @@ internal fun LazyListScrollbarPreview() {
     val state = rememberLazyListState()
     LazyColumn(
         modifier = Modifier.drawVerticalScrollbar(state),
-        state = state
+        state = state,
     ) {
         items(50) {
             Text(
                 text = "Item ${it + 1}",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(16.dp),
             )
         }
     }
@@ -358,13 +368,13 @@ internal fun HorizontalScrollbarPreview() {
     Row(
         modifier = Modifier
             .drawHorizontalScrollbar(state)
-            .horizontalScroll(state)
+            .horizontalScroll(state),
     ) {
         repeat(50) {
             Text(
                 text = (it + 1).toString(),
                 modifier = Modifier
-                    .padding(horizontal = 8.dp, vertical = 16.dp)
+                    .padding(horizontal = 8.dp, vertical = 16.dp),
             )
         }
     }
@@ -376,13 +386,13 @@ internal fun LazyListHorizontalScrollbarPreview() {
     val state = rememberLazyListState()
     LazyRow(
         modifier = Modifier.drawHorizontalScrollbar(state),
-        state = state
+        state = state,
     ) {
         items(50) {
             Text(
                 text = (it + 1).toString(),
                 modifier = Modifier
-                    .padding(horizontal = 8.dp, vertical = 16.dp)
+                    .padding(horizontal = 8.dp, vertical = 16.dp),
             )
         }
     }

@@ -85,7 +85,7 @@ fun Context.setWallpaper(
     ) ?: return@use false
     val bitmap = decoder.decodeRegion(
         cropRect.toAndroidRectF().toRect(),
-        opts
+        opts,
     ) ?: return@use false
     return createDisplayContext(display).setWallpaper(bitmap, targets)
 }

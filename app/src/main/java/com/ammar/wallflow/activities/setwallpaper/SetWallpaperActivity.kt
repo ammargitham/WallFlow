@@ -89,7 +89,7 @@ class SetWallpaperActivity : ComponentActivity() {
                     downloadManager = downloadManager,
                     ioDispatcher = ioDispatcher,
                 )
-            }
+            },
         )
 
         lifecycleScope.launch {
@@ -119,7 +119,7 @@ class SetWallpaperActivity : ComponentActivity() {
                 navigationBarVisible = systemBarsState.navigationBarVisible,
                 navigationBarColor = systemBarsState.navigationBarColor,
                 lightStatusBars = systemBarsState.lightStatusBars,
-                lightNavigationBars = systemBarsState.lightNavigationBars
+                lightNavigationBars = systemBarsState.lightNavigationBars,
             ) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),

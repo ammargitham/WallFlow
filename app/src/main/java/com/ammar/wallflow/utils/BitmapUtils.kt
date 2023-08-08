@@ -27,7 +27,6 @@ private fun calculateInSampleSize(
     return inSampleSize
 }
 
-
 fun decodeSampledBitmapFromFile(
     filePath: String,
     reqWidth: Int,

@@ -18,6 +18,7 @@ plugins {
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
+    alias(libs.plugins.spotless)
 }
 
 kapt {
@@ -85,7 +86,7 @@ android {
             isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
             if (!hasProperty("github") && !hasProperty("fdroid")) {
                 signingConfig = signingConfigs.getByName("release")
@@ -111,9 +112,9 @@ android {
         abi {
             // Enables building multiple APKs per ABI.
             isEnable = !hasProperty("fdroid")
-                    && !hasProperty("noSplits")
-                    && gradle.startParameter.taskNames.isNotEmpty()
-                    && gradle.startParameter.taskNames.any { it.contains("Release") }
+                && !hasProperty("noSplits")
+                && gradle.startParameter.taskNames.isNotEmpty()
+                && gradle.startParameter.taskNames.any { it.contains("Release") }
 
             // Resets the list of ABIs that Gradle should create APKs for to none.
             reset()
@@ -199,23 +200,29 @@ room {
     schemaDirectory("$projectDir/schemas/")
 }
 
+spotless {
+    kotlin {
+        target("src/**/*.kt")
+        ktlint(libs.versions.ktlint.get())
+    }
+}
+
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
     kotlinOptions {
         if (project.findProperty("composeCompilerReports") == "true") {
             freeCompilerArgs += listOf(
                 "-P",
-                "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=${project.buildDir.absolutePath}/compose_compiler"
+                "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=${project.buildDir.absolutePath}/compose_compiler",
             )
         }
         if (project.findProperty("composeCompilerMetrics") == "true") {
             freeCompilerArgs += listOf(
                 "-P",
-                "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=${project.buildDir.absolutePath}/compose_compiler"
+                "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=${project.buildDir.absolutePath}/compose_compiler",
             )
         }
     }
 }
-
 
 val plusImplementation by configurations
 

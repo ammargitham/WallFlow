@@ -45,6 +45,9 @@ import io.mockk.spyk
 import io.mockk.unmockkAll
 import io.mockk.verify
 import java.util.UUID
+import kotlin.random.Random
+import kotlin.test.assertEquals
+import kotlin.time.Duration.Companion.hours
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
@@ -60,9 +63,6 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import kotlin.random.Random
-import kotlin.test.assertEquals
-import kotlin.time.Duration.Companion.hours
 
 @RunWith(AndroidJUnit4::class)
 class AutoWallpaperTest {
@@ -89,7 +89,6 @@ class AutoWallpaperTest {
         override suspend fun deleteByName(name: String) {
             throw RuntimeException()
         }
-
     }
 
     private open class TestAutoWallpaperHistoryDao : AutoWallpaperHistoryDao {
@@ -104,7 +103,6 @@ class AutoWallpaperTest {
         override suspend fun upsert(vararg autoWallpaperHistoryEntity: AutoWallpaperHistoryEntity) {
             throw RuntimeException()
         }
-
     }
 
     private open class TestObjectDetectionModelDao : ObjectDetectionModelDao {
@@ -139,7 +137,6 @@ class AutoWallpaperTest {
         override suspend fun delete(entity: ObjectDetectionModelEntity) {
             throw RuntimeException()
         }
-
     }
 
     private open class TestWallHavenNetworkDataSource : WallHavenNetworkDataSource {
@@ -157,7 +154,6 @@ class AutoWallpaperTest {
         override suspend fun popularTags(): Document? {
             throw RuntimeException()
         }
-
     }
 
     private val testOkHttpClient = object : OkHttpClient() {
@@ -187,9 +183,9 @@ class AutoWallpaperTest {
                 result,
                 `is`(
                     Result.failure(
-                        workDataOf(AutoWallpaperWorker.FAILURE_REASON to FailureReason.DISABLED.name)
-                    )
-                )
+                        workDataOf(AutoWallpaperWorker.FAILURE_REASON to FailureReason.DISABLED.name),
+                    ),
+                ),
             )
         } finally {
             testDataStore.clear()
@@ -204,7 +200,7 @@ class AutoWallpaperTest {
             appPreferencesRepository.updateAutoWallpaperPrefs(
                 AutoWallpaperPreferences(
                     enabled = true,
-                )
+                ),
             )
             val worker = getWorker(
                 dataStore = testDataStore,
@@ -215,9 +211,9 @@ class AutoWallpaperTest {
                 result,
                 `is`(
                     Result.failure(
-                        workDataOf(AutoWallpaperWorker.FAILURE_REASON to FailureReason.DISABLED.name)
-                    )
-                )
+                        workDataOf(AutoWallpaperWorker.FAILURE_REASON to FailureReason.DISABLED.name),
+                    ),
+                ),
             )
         } finally {
             testDataStore.clear()
@@ -233,7 +229,7 @@ class AutoWallpaperTest {
                 AutoWallpaperPreferences(
                     enabled = true,
                     savedSearchId = 2,
-                )
+                ),
             )
             val worker = getWorker(
                 dataStore = testDataStore,
@@ -247,9 +243,9 @@ class AutoWallpaperTest {
                 result,
                 `is`(
                     Result.failure(
-                        workDataOf(AutoWallpaperWorker.FAILURE_REASON to FailureReason.SAVED_SEARCH_NOT_SET.name)
-                    )
-                )
+                        workDataOf(AutoWallpaperWorker.FAILURE_REASON to FailureReason.SAVED_SEARCH_NOT_SET.name),
+                    ),
+                ),
             )
         } finally {
             testDataStore.clear()
@@ -267,7 +263,7 @@ class AutoWallpaperTest {
                     enabled = true,
                     savedSearchId = 1,
                     useObjectDetection = false,
-                )
+                ),
             )
             val savedSearch = SavedSearch(
                 id = 1,
@@ -275,7 +271,7 @@ class AutoWallpaperTest {
                 search = Search(
                     query = "test",
                     filters = SearchQuery(),
-                )
+                ),
             )
             val networkWallpapers = List(30) { testNetworkWallpaper }
             val wallpapers = networkWallpapers.map { it.asWallpaper() }
@@ -304,7 +300,6 @@ class AutoWallpaperTest {
                         searchQuery: SearchQuery,
                         page: Int?,
                     ): NetworkResponse<List<NetworkWallpaper>> {
-
                         return NetworkResponse(
                             data = networkWallpapers,
                             meta = NetworkMeta(
@@ -316,7 +311,7 @@ class AutoWallpaperTest {
                                     value = "",
                                 ),
                                 seed = null,
-                            )
+                            ),
                         )
                     }
                 },
@@ -331,8 +326,8 @@ class AutoWallpaperTest {
                     Result.success(
                         workDataOf(
                             AutoWallpaperWorker.SUCCESS_NEXT_WALLPAPER_ID to wallpapers.first().id,
-                        )
-                    )
+                        ),
+                    ),
                 ),
             )
             verify { worker["setWallpaper"](wallpapers.first()) }
@@ -354,7 +349,7 @@ class AutoWallpaperTest {
                 AutoWallpaperPreferences(
                     enabled = true,
                     savedSearchId = 1,
-                )
+                ),
             )
             val savedSearch = SavedSearch(
                 id = 1,
@@ -362,7 +357,7 @@ class AutoWallpaperTest {
                 search = Search(
                     query = "test",
                     filters = SearchQuery(),
-                )
+                ),
             )
             val networkWallpapers = List(30) { testNetworkWallpaper }
             val wallpapers = networkWallpapers.map { it.asWallpaper() }
@@ -399,7 +394,6 @@ class AutoWallpaperTest {
                         searchQuery: SearchQuery,
                         page: Int?,
                     ): NetworkResponse<List<NetworkWallpaper>> {
-
                         return NetworkResponse(
                             data = networkWallpapers,
                             meta = NetworkMeta(
@@ -411,7 +405,7 @@ class AutoWallpaperTest {
                                     value = "",
                                 ),
                                 seed = null,
-                            )
+                            ),
                         )
                     }
                 },
@@ -426,8 +420,8 @@ class AutoWallpaperTest {
                     Result.success(
                         workDataOf(
                             AutoWallpaperWorker.SUCCESS_NEXT_WALLPAPER_ID to wallpapers[4].id,
-                        )
-                    )
+                        ),
+                    ),
                 ),
             )
             verify { worker["setWallpaper"](wallpapers[4]) }
@@ -449,7 +443,7 @@ class AutoWallpaperTest {
                 AutoWallpaperPreferences(
                     enabled = true,
                     savedSearchId = 1,
-                )
+                ),
             )
             val savedSearch = SavedSearch(
                 id = 1,
@@ -457,7 +451,7 @@ class AutoWallpaperTest {
                 search = Search(
                     query = "test",
                     filters = SearchQuery(),
-                )
+                ),
             )
             val networkWallpapers = List(30) { testNetworkWallpaper }
             val wallpapers = networkWallpapers.map { it.asWallpaper() }
@@ -497,7 +491,6 @@ class AutoWallpaperTest {
                         searchQuery: SearchQuery,
                         page: Int?,
                     ): NetworkResponse<List<NetworkWallpaper>> {
-
                         return NetworkResponse(
                             data = networkWallpapers,
                             meta = NetworkMeta(
@@ -509,7 +502,7 @@ class AutoWallpaperTest {
                                     value = "",
                                 ),
                                 seed = null,
-                            )
+                            ),
                         )
                     }
                 },
@@ -524,8 +517,8 @@ class AutoWallpaperTest {
                     Result.success(
                         workDataOf(
                             AutoWallpaperWorker.SUCCESS_NEXT_WALLPAPER_ID to wallpapers[0].id,
-                        )
-                    )
+                        ),
+                    ),
                 ),
             )
             verify { worker["setWallpaper"](wallpapers[0]) }
@@ -607,7 +600,7 @@ class AutoWallpaperTest {
             val id = Random.nextInt().toString()
             return NetworkWallpaper(
                 id = id,
-                url = "https://example.com/wallpaper_${id}",
+                url = "https://example.com/wallpaper_$id",
                 short_url = "short test",
                 uploader = null,
                 views = Random.nextInt(),
@@ -623,7 +616,7 @@ class AutoWallpaperTest {
                 file_type = "jpg",
                 created_at = Clock.System.now(),
                 colors = emptyList(),
-                path = "wallpaper_path_${id}",
+                path = "wallpaper_path_$id",
                 thumbs = NetworkThumbs(
                     large = "test",
                     original = "test",
@@ -638,7 +631,7 @@ class AutoWallpaperTest {
                         category = "test",
                         purity = Purity.SFW.purityName,
                         created_at = Clock.System.now(),
-                    )
+                    ),
                 ),
             )
         }

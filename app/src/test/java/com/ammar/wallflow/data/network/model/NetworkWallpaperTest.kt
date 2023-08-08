@@ -3,12 +3,12 @@ package com.ammar.wallflow.data.network.model
 import com.ammar.wallflow.data.db.entity.ThumbsEntity
 import com.ammar.wallflow.data.db.entity.WallpaperEntity
 import com.ammar.wallflow.model.Purity
+import kotlin.test.assertEquals
 import kotlinx.datetime.Instant
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.junit.Test
-import kotlin.test.assertEquals
 
 class NetworkWallpaperTest {
     @Test
@@ -70,9 +70,9 @@ class NetworkWallpaperTest {
                 thumbs = NetworkThumbs(
                     large = "https://th.wallhaven.cc/lg/85/85k6eo.jpg",
                     original = "https://th.wallhaven.cc/orig/85/85k6eo.jpg",
-                    small = "https://th.wallhaven.cc/small/85/85k6eo.jpg"
+                    small = "https://th.wallhaven.cc/small/85/85k6eo.jpg",
                 ),
-                tags = null
+                tags = null,
             ),
             networkWallpaper,
         )
@@ -136,9 +136,9 @@ class NetworkWallpaperTest {
             thumbs = NetworkThumbs(
                 large = "https://th.wallhaven.cc/lg/85/85k6eo.jpg",
                 original = "https://th.wallhaven.cc/orig/85/85k6eo.jpg",
-                small = "https://th.wallhaven.cc/small/85/85k6eo.jpg"
+                small = "https://th.wallhaven.cc/small/85/85k6eo.jpg",
             ),
-            tags = null
+            tags = null,
         )
         val format = Json {
             prettyPrint = true
@@ -175,9 +175,9 @@ class NetworkWallpaperTest {
             thumbs = NetworkThumbs(
                 large = "https://th.wallhaven.cc/lg/85/85k6eo.jpg",
                 original = "https://th.wallhaven.cc/orig/85/85k6eo.jpg",
-                small = "https://th.wallhaven.cc/small/85/85k6eo.jpg"
+                small = "https://th.wallhaven.cc/small/85/85k6eo.jpg",
             ),
-            tags = null
+            tags = null,
         )
         val expected = WallpaperEntity(
             id = 0,
@@ -200,7 +200,7 @@ class NetworkWallpaperTest {
             thumbs = ThumbsEntity(
                 large = "https://th.wallhaven.cc/lg/85/85k6eo.jpg",
                 original = "https://th.wallhaven.cc/orig/85/85k6eo.jpg",
-                small = "https://th.wallhaven.cc/small/85/85k6eo.jpg"
+                small = "https://th.wallhaven.cc/small/85/85k6eo.jpg",
             ),
         )
         assertEquals(

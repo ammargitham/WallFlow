@@ -2,10 +2,10 @@ package com.ammar.wallflow.data.repository.utils
 
 import com.ammar.wallflow.data.network.model.NetworkTag
 import com.ammar.wallflow.data.repository.utils.TagsDocumentParser.parsePopularTags
+import kotlin.test.assertContentEquals
 import kotlinx.datetime.Instant
 import org.jsoup.Jsoup
 import org.junit.Test
-import kotlin.test.assertContentEquals
 
 class TagsDocumentParserTest {
     @Test
@@ -43,8 +43,8 @@ class TagsDocumentParserTest {
                     category = "Art & Design",
                     purity = "sfw",
                     created_at = Instant.parse("2017-08-23T21:06:57+00:00"),
-                )
-            )
+                ),
+            ),
         )
     }
 }

@@ -24,10 +24,12 @@ private val wifiRoamingCombinations = mapOf(
 
 fun Map<ConstraintType, Boolean>.toConstraints() = Constraints.Builder().apply {
     val constraintMap = this@toConstraints
-    val networkType = wifiRoamingCombinations[listOf(
-        constraintMap[ConstraintType.WIFI] ?: false,
-        constraintMap[ConstraintType.ROAMING] ?: false,
-    )] ?: NetworkType.CONNECTED
+    val networkType = wifiRoamingCombinations[
+        listOf(
+            constraintMap[ConstraintType.WIFI] ?: false,
+            constraintMap[ConstraintType.ROAMING] ?: false,
+        ),
+    ] ?: NetworkType.CONNECTED
     setRequiredNetworkType(networkType)
     setRequiresCharging(constraintMap[ConstraintType.CHARGING] ?: false)
     setRequiresDeviceIdle(constraintMap[ConstraintType.IDLE] ?: false)

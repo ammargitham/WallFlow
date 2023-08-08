@@ -42,7 +42,7 @@ fun OverflowMenu(
         DropdownMenu(
             modifier = menuModifier,
             expanded = showMenu,
-            onDismissRequest = { showMenu = false }
+            onDismissRequest = { showMenu = false },
         ) {
             content(closeMenu)
         }

@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
-// noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -135,7 +134,7 @@ fun HomeScreen(
             density,
             bottomBarController,
             bottomWindowInsets,
-            navigationBarsInsets
+            navigationBarsInsets,
         )
     }
     val context = LocalContext.current
@@ -164,7 +163,7 @@ fun HomeScreen(
                                 MenuItem(
                                     text = stringResource(R.string.settings),
                                     value = "settings",
-                                )
+                                ),
                             ),
                             onItemClick = {
                                 if (it.value == "settings") {
@@ -172,16 +171,18 @@ fun HomeScreen(
                                         launchSingleTop = true
                                     }
                                 }
-                            }
+                            },
                         )
                     }
-                } else null,
+                } else {
+                    null
+                },
                 search = uiState.search,
                 showQuery = !uiState.isHome,
                 onSearch = {
                     if (uiState.search == it) return@MainSearchBarState
                     twoPaneController.pane1NavHostController.search(it)
-                }
+                },
             )
         }
     }
@@ -203,7 +204,7 @@ fun HomeScreen(
             return@LaunchedEffect
         }
         twoPaneController.navigatePane2(
-            WallpaperScreenDestination(navArgs)
+            WallpaperScreenDestination(navArgs),
         )
     }
 
@@ -211,14 +212,13 @@ fun HomeScreen(
         {
             if (isTwoPaneMode) {
                 viewModel.setSelectedWallpaper(it)
-
             } else {
                 // navigate to wallpaper screen
                 twoPaneController.navigatePane1(
                     WallpaperScreenDestination(
                         wallpaperId = it.id,
                         thumbUrl = it.thumbs.original,
-                    )
+                    ),
                 )
             }
         }
@@ -230,7 +230,7 @@ fun HomeScreen(
                 Search(
                     query = "id:${it.id}",
                     meta = TagSearchMeta(it),
-                )
+                ),
             )
         }
     }
@@ -260,7 +260,7 @@ fun HomeScreen(
             showSelection = isTwoPaneMode,
             layoutPreferences = uiState.layoutPreferences,
             onWallpaperClick = onWallpaperClick,
-            onTagClick = onTagClick
+            onTagClick = onTagClick,
         )
 
         PullRefreshIndicator(
@@ -320,7 +320,7 @@ fun HomeScreen(
                 },
                 showNSFW = uiState.showNSFW,
                 onChange = { localSearch = it },
-                onDismissRequest = { viewModel.showFilters(false) }
+                onDismissRequest = { viewModel.showFilters(false) },
             )
         }
 
@@ -341,7 +341,7 @@ fun HomeScreen(
                     viewModel.updateHomeSearch(it.search)
                     viewModel.showSavedSearches(false)
                 },
-                onDismissRequest = { viewModel.showSavedSearches(false) }
+                onDismissRequest = { viewModel.showSavedSearches(false) },
             )
         }
     }
@@ -357,11 +357,17 @@ private fun getStartBottomPadding(
     val startPadding = if (bottomBarState.isRail) bottomBarState.size.width.toDp() else 0.dp
     val bottomInsetsPadding = if (bottomBarState.isRail) {
         bottomWindowInsets.getBottom(density).toDp()
-    } else 0.dp
-    val bottomNavPadding = if (bottomBarState.isRail) 0.dp else {
+    } else {
+        0.dp
+    }
+    val bottomNavPadding = if (bottomBarState.isRail) {
+        0.dp
+    } else {
         navigationBarsInsets.getBottom(density).toDp()
     }
-    val bottomBarPadding = if (bottomBarState.isRail) 0.dp else {
+    val bottomBarPadding = if (bottomBarState.isRail) {
+        0.dp
+    } else {
         bottomBarState.size.height.toDp()
     }
     val bottomPadding = bottomInsetsPadding + bottomBarPadding + bottomNavPadding

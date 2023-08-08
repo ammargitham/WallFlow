@@ -55,7 +55,7 @@ private fun PreviewNotificationPermissionRationalDialog() {
                 permissions = listOf(
                     Manifest.permission.POST_NOTIFICATIONS,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                )
+                ),
             )
         }
     }

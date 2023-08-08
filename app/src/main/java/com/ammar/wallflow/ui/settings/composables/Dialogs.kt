@@ -80,10 +80,10 @@ import com.ammar.wallflow.ui.common.nameStateSaver
 import com.ammar.wallflow.ui.common.urlStateSaver
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import com.ammar.wallflow.utils.DownloadStatus
+import kotlin.math.roundToInt
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DateTimePeriod
-import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -191,7 +191,7 @@ fun ObjectDetectionModelOptionsDialog(
             icon = {
                 Icon(
                     painter = painterResource(R.drawable.tensorflow),
-                    contentDescription = ""
+                    contentDescription = "",
                 )
             },
             title = { Text(text = stringResource(R.string.choose_a_tflite_model)) },
@@ -225,14 +225,16 @@ fun ObjectDetectionModelOptionsDialog(
 @Composable
 private fun PreviewObjectDetectionModelOptionsDialog() {
     var models by remember {
-        mutableStateOf(List(3) {
-            ObjectDetectionModelEntity(
-                id = it.toLong(),
-                name = "model_$it",
-                fileName = "file_name_$it",
-                url = "url_$it",
-            )
-        })
+        mutableStateOf(
+            List(3) {
+                ObjectDetectionModelEntity(
+                    id = it.toLong(),
+                    name = "model_$it",
+                    fileName = "file_name_$it",
+                    url = "url_$it",
+                )
+            },
+        )
     }
     WallFlowTheme {
         Surface {
@@ -246,7 +248,7 @@ private fun PreviewObjectDetectionModelOptionsDialog() {
                         fileName = "file_name_$size",
                         url = "url_$size",
                     )
-                }
+                },
             )
         }
     }
@@ -264,7 +266,7 @@ private fun ObjectDetectionModelOptionsContent(
     Column(
         modifier = modifier.scrollable(
             state = rememberScrollState(),
-            orientation = Orientation.Vertical
+            orientation = Orientation.Vertical,
         ),
     ) {
         models.map {
@@ -280,7 +282,9 @@ private fun ObjectDetectionModelOptionsContent(
                         onClick = { onOptionClick(it) },
                     )
                 },
-                trailingContent = if (it.name in INTERNAL_MODELS) null else {
+                trailingContent = if (it.name in INTERNAL_MODELS) {
+                    null
+                } else {
                     {
                         IconButton(onClick = { onOptionEditClick(it) }) {
                             Icon(
@@ -290,7 +294,7 @@ private fun ObjectDetectionModelOptionsContent(
                             )
                         }
                     }
-                }
+                },
             )
         }
         ListItem(
@@ -349,8 +353,8 @@ fun ObjectDetectionModelEditDialog(
             title = {
                 Text(
                     text = stringResource(
-                        if (model == null) R.string.add_a_tflite_model else R.string.edit_model
-                    )
+                        if (model == null) R.string.add_a_tflite_model else R.string.edit_model,
+                    ),
                 )
             },
             text = {
@@ -398,7 +402,7 @@ fun ObjectDetectionModelEditDialog(
                                     name = nameState.text.trimAll(),
                                     url = urlState.text.trimAll(),
                                     fileName = "",
-                                )
+                                ),
                             ) { saving = false }
                         },
                     ) {
@@ -420,7 +424,7 @@ private class ModelParameterProvider :
                 fileName = "file name",
                 url = "http://example.com",
             ),
-        )
+        ),
     )
 
 @Preview
@@ -447,7 +451,7 @@ private fun PreviewObjectDetectionModelEditDialog(
                         downloadStatus = null
                         onDone(null)
                     }
-                }
+                },
             )
         }
     }
@@ -482,7 +486,7 @@ fun ObjectDetectionModelEditContent(
             singleLine = true,
             label = { Text(text = stringResource(R.string.name)) },
             isError = nameState.showErrors(),
-            supportingText = { Text(text = nameState.getError() ?: "") }
+            supportingText = { Text(text = nameState.getError() ?: "") },
         )
         OutlinedTextField(
             modifier = Modifier
@@ -499,20 +503,22 @@ fun ObjectDetectionModelEditContent(
             singleLine = true,
             label = { Text(text = "URL") },
             isError = urlState.showErrors(),
-            supportingText = { Text(text = urlState.getError() ?: "") }
+            supportingText = { Text(text = urlState.getError() ?: "") },
         )
         if (downloadStatus != null) {
             val showProgress = remember(downloadStatus) {
-                (downloadStatus is DownloadStatus.Running
-                        || downloadStatus is DownloadStatus.Paused
-                        || downloadStatus is DownloadStatus.Pending)
+                (
+                    downloadStatus is DownloadStatus.Running ||
+                        downloadStatus is DownloadStatus.Paused ||
+                        downloadStatus is DownloadStatus.Pending
+                    )
             }
             val progress by animateFloatAsState(
                 when (downloadStatus) {
                     is DownloadStatus.Running -> downloadStatus.progress
                     is DownloadStatus.Paused -> downloadStatus.progress
                     else -> 0F
-                }
+                },
             )
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -578,7 +584,7 @@ private fun PreviewOObjectDetectionModelDeleteConfirmDialog() {
                     name = "model_1",
                     fileName = "file_name_1",
                     url = "url_1",
-                )
+                ),
             )
         }
     }
@@ -598,7 +604,7 @@ fun DeleteSavedSearchConfirmDialog(
                 text = stringResource(
                     R.string.delete_saved_search_dialog_title,
                     savedSearch.name,
-                )
+                ),
             )
         },
         confirmButton = {
@@ -624,7 +630,7 @@ private fun PreviewDeleteSavedSearchConfirmDialog() {
             DeleteSavedSearchConfirmDialog(
                 savedSearch = SavedSearch(
                     name = "test",
-                )
+                ),
             )
         }
     }
@@ -746,7 +752,7 @@ private fun PreviewSavedSearchOptionsDialog() {
                         name = "Saved search $it",
                         search = Search(),
                     )
-                }
+                },
             )
         }
     }
@@ -784,7 +790,7 @@ fun FrequencyDialog(
                     val text = value.filter { it.isDigit() }
                     localFrequency = DateTimePeriod(hours = text.toIntOrNull() ?: 0)
                 },
-                suffix = { Text(text = stringResource(R.string.hours)) }
+                suffix = { Text(text = stringResource(R.string.hours)) },
             )
         },
         confirmButton = {
@@ -799,7 +805,7 @@ fun FrequencyDialog(
             TextButton(onClick = onDismissRequest) {
                 Text(text = stringResource(R.string.cancel))
             }
-        }
+        },
     )
 }
 
@@ -1072,7 +1078,7 @@ private fun themeString(theme: Theme) = stringResource(
         Theme.SYSTEM -> R.string.system
         Theme.LIGHT -> R.string.light
         Theme.DARK -> R.string.dark
-    }
+    },
 )
 
 @Preview

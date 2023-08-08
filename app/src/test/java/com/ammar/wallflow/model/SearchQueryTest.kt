@@ -1,7 +1,7 @@
 package com.ammar.wallflow.model
 
-import org.junit.Test
 import kotlin.test.assertEquals
+import org.junit.Test
 
 class SearchQueryTest {
     @Test
@@ -23,7 +23,7 @@ class SearchQueryTest {
             excludedTags = setOf("e1", "e2"),
             username = "test",
             tagId = 12L,
-            wallpaperId = "xx1234xx"
+            wallpaperId = "xx1234xx",
         )
         assertEquals("+i1 +i2 -e1 -e2 @test id:12 like:xx1234xx", searchQuery.getQString())
     }

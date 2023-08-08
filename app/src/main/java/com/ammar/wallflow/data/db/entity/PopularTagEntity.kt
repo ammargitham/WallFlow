@@ -14,7 +14,7 @@ import androidx.room.Relation
         Index(
             value = ["tag_id"],
             unique = true,
-        )
+        ),
     ],
     foreignKeys = [
         ForeignKey(
@@ -23,7 +23,7 @@ import androidx.room.Relation
             childColumns = ["tag_id"],
             onDelete = ForeignKey.CASCADE,
         ),
-    ]
+    ],
 )
 data class PopularTagEntity(
     @PrimaryKey(autoGenerate = true) val id: Long,

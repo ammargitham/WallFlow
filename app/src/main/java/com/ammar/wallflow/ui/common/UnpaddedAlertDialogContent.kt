@@ -47,7 +47,7 @@ internal fun UnpaddedAlertDialogContent(
                                 top = 24.dp,
                                 bottom = 16.dp,
                             )
-                            .align(Alignment.CenterHorizontally)
+                            .align(Alignment.CenterHorizontally),
                     ) {
                         icon()
                     }
@@ -71,8 +71,8 @@ internal fun UnpaddedAlertDialogContent(
                                         Alignment.Start
                                     } else {
                                         Alignment.CenterHorizontally
-                                    }
-                                )
+                                    },
+                                ),
                         ) {
                             title()
                         }
@@ -87,7 +87,7 @@ internal fun UnpaddedAlertDialogContent(
                             Modifier
                                 .weight(weight = 1f, fill = false)
                                 .padding(bottom = 24.dp)
-                                .align(Alignment.Start)
+                                .align(Alignment.Start),
                         ) {
                             text()
                         }

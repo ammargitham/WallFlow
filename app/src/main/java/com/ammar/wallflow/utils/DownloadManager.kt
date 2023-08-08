@@ -68,7 +68,7 @@ class DownloadManager @Inject constructor() {
                     DownloadWorker.INPUT_KEY_NOTIFICATION_TITLE to notificationTitle,
                     DownloadWorker.INPUT_KEY_SCAN_FILE to scanFile,
                     *extraWorkerData,
-                )
+                ),
             )
         }.build()
         context.workManager.enqueueUniqueWork(
@@ -84,7 +84,7 @@ class DownloadManager @Inject constructor() {
         workName: String,
     ) = context.workManager.getWorkInfosForUniqueWorkFlow(workName).map {
         val info = it.firstOrNull() ?: return@map DownloadStatus.Failed(
-            IllegalArgumentException("No download request found with name $workName")
+            IllegalArgumentException("No download request found with name $workName"),
         )
         when (info.state) {
             WorkInfo.State.ENQUEUED -> DownloadStatus.Pending
@@ -93,10 +93,10 @@ class DownloadManager @Inject constructor() {
                 info.progress.getLong(DownloadWorker.PROGRESS_KEY_TOTAL, 0),
             )
             WorkInfo.State.SUCCEEDED -> DownloadStatus.Success(
-                info.outputData.getString(DownloadWorker.OUTPUT_KEY_FILE_PATH)
+                info.outputData.getString(DownloadWorker.OUTPUT_KEY_FILE_PATH),
             )
             WorkInfo.State.FAILED -> DownloadStatus.Failed(
-                DownloadException(info.outputData.getString(OUTPUT_KEY_ERROR))
+                DownloadException(info.outputData.getString(OUTPUT_KEY_ERROR)),
             )
             WorkInfo.State.BLOCKED -> DownloadStatus.Pending
             WorkInfo.State.CANCELLED -> DownloadStatus.Cancelled

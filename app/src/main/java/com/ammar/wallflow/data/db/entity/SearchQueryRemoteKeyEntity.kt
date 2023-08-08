@@ -12,7 +12,7 @@ import androidx.room.PrimaryKey
         Index(
             value = ["search_query_id"],
             unique = true,
-        )
+        ),
     ],
     foreignKeys = [
         ForeignKey(
@@ -20,8 +20,8 @@ import androidx.room.PrimaryKey
             parentColumns = ["id"],
             childColumns = ["search_query_id"],
             onDelete = ForeignKey.CASCADE,
-        )
-    ]
+        ),
+    ],
 )
 data class SearchQueryRemoteKeyEntity(
     @PrimaryKey(autoGenerate = true) val id: Long,

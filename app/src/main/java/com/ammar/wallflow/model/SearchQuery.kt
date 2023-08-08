@@ -105,7 +105,7 @@ data class SearchQuery(
                 .associate {
                     Pair(
                         it[0].urlDecoded(),
-                        if (it.size > 1) it[1].urlDecoded() else null
+                        if (it.size > 1) it[1].urlDecoded() else null,
                     )
                 }
             return SearchQuery(
@@ -190,7 +190,8 @@ enum class Category(
 ) {
     GENERAL(100, "general"),
     ANIME(10, "anime"),
-    PEOPLE(1, "people");
+    PEOPLE(1, "people"),
+    ;
 
     companion object {
         fun fromValue(value: String) = when (value) {
@@ -209,7 +210,8 @@ enum class Purity(
 ) {
     SFW("sfw", 100),
     SKETCHY("sketchy", 10),
-    NSFW("nsfw", 1);
+    NSFW("nsfw", 1),
+    ;
 
     companion object {
         fun fromName(name: String) = when (name) {
@@ -230,7 +232,8 @@ enum class Sorting(
     RELEVANCE("relevance"),
     RANDOM("random"),
     VIEWS("views"),
-    FAVORITES("favorites");
+    FAVORITES("favorites"),
+    ;
 
     companion object {
         fun fromValue(value: String) = when (value) {
@@ -248,7 +251,8 @@ enum class Order(
     val value: String,
 ) {
     DESC("desc"),
-    ASC("asc");
+    ASC("asc"),
+    ;
 
     companion object {
         fun fromValue(value: String) = if (value == "desc") DESC else ASC
@@ -264,7 +268,8 @@ enum class TopRange(
     ONE_MONTH("1M"),
     THREE_MONTHS("3M"),
     SIX_MONTHS("6M"),
-    ONE_YEAR("1y");
+    ONE_YEAR("1y"),
+    ;
 
     companion object {
         fun fromValue(value: String) = when (value) {
@@ -289,7 +294,7 @@ sealed class Ratio {
     ) : Ratio() {
         enum class Category(val categoryName: String) {
             LANDSCAPE("landscape"),
-            PORTRAIT("portrait");
+            PORTRAIT("portrait"),
         }
 
         override fun toRatioString() = this.category.categoryName
@@ -310,10 +315,10 @@ sealed class Ratio {
 
 val SearchQuerySaver = Saver<SearchQuery, String>(
     save = { it.toQueryString() },
-    restore = { SearchQuery.fromQueryString(it) }
+    restore = { SearchQuery.fromQueryString(it) },
 )
 
 val MutableStateSearchQuerySaver = Saver<MutableState<SearchQuery>, String>(
     save = { it.value.toQueryString() },
-    restore = { mutableStateOf(SearchQuery.fromQueryString(it)) }
+    restore = { mutableStateOf(SearchQuery.fromQueryString(it)) },
 )

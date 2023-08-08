@@ -5,8 +5,8 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.toSize
 import androidx.core.graphics.times
-import org.junit.Test
 import kotlin.test.assertEquals
+import org.junit.Test
 
 class HelpersTest {
     @Test

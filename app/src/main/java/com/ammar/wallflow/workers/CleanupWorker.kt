@@ -26,12 +26,12 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.io.File
 import java.util.concurrent.TimeUnit
+import kotlin.time.Duration.Companion.days
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import kotlin.time.Duration.Companion.days
 
 @HiltWorker
 class CleanupWorker @AssistedInject constructor(
@@ -63,7 +63,7 @@ class CleanupWorker @AssistedInject constructor(
         CLEANUP_NOTIFICATION_ID,
         notificationBuilder.apply {
             setProgress(0, 0, true)
-        }.build()
+        }.build(),
     )
 
     override suspend fun doWork() = try {
@@ -130,7 +130,7 @@ class CleanupWorker @AssistedInject constructor(
                 setConstraints(
                     Constraints.Builder().apply {
                         setRequiresCharging(true)
-                    }.build()
+                    }.build(),
                 )
             }.build()
             context.workManager.enqueueUniquePeriodicWork(

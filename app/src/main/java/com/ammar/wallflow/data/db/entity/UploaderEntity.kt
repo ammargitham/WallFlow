@@ -13,8 +13,8 @@ import com.ammar.wallflow.model.Uploader
         Index(
             value = ["username"],
             unique = true,
-        )
-    ]
+        ),
+    ],
 )
 data class UploaderEntity(
     @PrimaryKey(autoGenerate = true) val id: Long,

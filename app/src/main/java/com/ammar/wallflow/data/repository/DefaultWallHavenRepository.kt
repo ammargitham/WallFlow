@@ -58,7 +58,7 @@ class DefaultWallHavenRepository @Inject constructor(
     private val popularTagNetworkResource =
         object : NetworkBoundResource<List<TagEntity>, List<Tag>, List<NetworkTag>>(
             initialValue = emptyList(),
-            ioDispatcher = ioDispatcher
+            ioDispatcher = ioDispatcher,
         ) {
             override suspend fun loadFromDb(): List<TagEntity> = popularTagsDao
                 .getAllWithDetails()
@@ -69,7 +69,7 @@ class DefaultWallHavenRepository @Inject constructor(
                     true
                 } else {
                     val lastUpdated = lastUpdatedDao.getByKey(
-                        LastUpdatedCategory.POPULAR_TAGS.key
+                        LastUpdatedCategory.POPULAR_TAGS.key,
                     ) ?: return true
                     (lastUpdated.lastUpdatedOn - Clock.System.now()).absoluteValue.inWholeMinutes / 60f > 3
                 }
@@ -96,7 +96,6 @@ class DefaultWallHavenRepository @Inject constructor(
             override fun onFetchFailed(throwable: Throwable) {
                 Log.e(TAG, "onFetchFailed: ", throwable)
             }
-
         }
 
     internal suspend fun insertTags(
@@ -133,7 +132,7 @@ class DefaultWallHavenRepository @Inject constructor(
     private fun getWallpaperNetworkResource(wallpaperWallhavenId: String) =
         object : NetworkBoundResource<WallpaperWithUploaderAndTags?, Wallpaper?, NetworkWallpaper>(
             initialValue = null,
-            ioDispatcher = ioDispatcher
+            ioDispatcher = ioDispatcher,
         ) {
             override suspend fun loadFromDb() =
                 wallpapersDao.getWithUploaderAndTagsByWallhavenId(wallpaperWallhavenId)
@@ -165,11 +164,11 @@ class DefaultWallHavenRepository @Inject constructor(
                             fetchResult.asWallpaperEntity(
                                 id = wallpaperDbId,
                                 uploaderId = uploaderId,
-                            )
+                            ),
                         )
                     } else {
                         wallpaperDbId = wallpapersDao.insert(
-                            fetchResult.asWallpaperEntity(uploaderId = uploaderId)
+                            fetchResult.asWallpaperEntity(uploaderId = uploaderId),
                         ).first()
                     }
                     if (existingWallpaper != null) {
@@ -178,12 +177,14 @@ class DefaultWallHavenRepository @Inject constructor(
                     }
                     if (tagsIds != null) {
                         // insert new wallpaper tag mappings
-                        wallpapersDao.insertWallpaperTagMappings(tagsIds.map {
-                            WallpaperTagsEntity(
-                                wallpaperId = wallpaperDbId,
-                                tagId = it,
-                            )
-                        })
+                        wallpapersDao.insertWallpaperTagMappings(
+                            tagsIds.map {
+                                WallpaperTagsEntity(
+                                    wallpaperId = wallpaperDbId,
+                                    tagId = it,
+                                )
+                            },
+                        )
                     }
                 }
             }
@@ -197,7 +198,6 @@ class DefaultWallHavenRepository @Inject constructor(
             override fun onFetchFailed(throwable: Throwable) {
                 Log.e(TAG, "onFetchFailed: ", throwable)
             }
-
         }
 
     internal suspend fun insertUploader(uploader: NetworkUploader): Long {
@@ -226,7 +226,7 @@ class DefaultWallHavenRepository @Inject constructor(
         ),
         pagingSourceFactory = {
             wallpapersDao.pagingSource(queryString = searchQuery.toQueryString())
-        }
+        },
     ).flow.map {
         it.map { entity ->
             entity.asWallpaper()

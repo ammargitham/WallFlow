@@ -22,7 +22,6 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-
 @Module
 @InstallIn(SingletonComponent::class)
 class DatabaseModule {
@@ -74,7 +73,7 @@ class DatabaseModule {
         appDatabase = Room.databaseBuilder(
             context,
             AppDatabase::class.java,
-            "app"
+            "app",
         ).apply {
             if (BuildConfig.DEBUG) {
                 fallbackToDestructiveMigration()
@@ -88,7 +87,7 @@ class DatabaseModule {
                         // insert default models
                         Log.i(TAG, "onCreate: Inserting default model")
                         appDatabase.objectDetectionModelDao().upsert(
-                            ObjectDetectionModel.DEFAULT.toEntity()
+                            ObjectDetectionModel.DEFAULT.toEntity(),
                         )
                     }
                 }

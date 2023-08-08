@@ -102,7 +102,6 @@ interface MultiplePermissionsState {
     fun launchMultiplePermissionRequest()
 }
 
-
 /**
  * Creates a [MultiplePermissionsState] that is remembered across compositions.
  *
@@ -129,7 +128,7 @@ internal fun rememberMutableMultiplePermissionsState(
 
     // Remember RequestMultiplePermissions launcher and assign it to multiplePermissionsState
     val launcher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
+        ActivityResultContracts.RequestMultiplePermissions(),
     ) { permissionsResult ->
         multiplePermissionsState.updatePermissionsStatus(permissionsResult)
         onPermissionsResult(multiplePermissionsState.permissions)
@@ -175,7 +174,7 @@ private fun rememberMutablePermissionsState(
         key(permissionState.permission) {
             // Remember launcher and assign it to the permissionState
             val launcher = rememberLauncherForActivityResult(
-                ActivityResultContracts.RequestPermission()
+                ActivityResultContracts.RequestPermission(),
             ) {
                 permissionState.refreshPermissionStatus()
             }
@@ -211,7 +210,7 @@ internal class MutableMultiplePermissionsState(
 
     override val allPermissionsGranted: Boolean by derivedStateOf {
         permissions.all { it.status.isGranted } || // Up to date when the lifecycle is resumed
-                revokedPermissions.isEmpty() // Up to date when the user launches the action
+            revokedPermissions.isEmpty() // Up to date when the user launches the action
     }
 
     override val shouldShowRationale by derivedStateOf {
@@ -222,7 +221,7 @@ internal class MutableMultiplePermissionsState(
 
     override fun launchMultiplePermissionRequest() {
         launcher?.launch(
-            permissions.map { it.permission }.toTypedArray()
+            permissions.map { it.permission }.toTypedArray(),
         ) ?: throw IllegalStateException("ActivityResultLauncher cannot be null")
     }
 

@@ -23,7 +23,7 @@ class AutoWallpaperHistoryRepository @Inject constructor(
         autoWallpaperHistory: AutoWallpaperHistory,
     ) = withContext(ioDispatcher) {
         val entity = autoWallpaperHistoryDao.getByWallhavenId(
-            autoWallpaperHistory.wallhavenId
+            autoWallpaperHistory.wallhavenId,
         )?.copy(
             setOn = autoWallpaperHistory.setOn,
         ) ?: autoWallpaperHistory.toEntity()

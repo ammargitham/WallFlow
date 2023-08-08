@@ -151,8 +151,8 @@ class AppPreferencesRepository @Inject constructor(
             } catch (e: Exception) {
                 ObjectDetectionDelegate.GPU
             }
-            val enabled = objectsDetector.isEnabled
-                    && get(PreferencesKeys.ENABLE_OBJECT_DETECTION) ?: false
+            val enabled = objectsDetector.isEnabled &&
+                get(PreferencesKeys.ENABLE_OBJECT_DETECTION) ?: false
             ObjectDetectionPreferences(
                 enabled = enabled,
                 delegate = delegate,
@@ -172,7 +172,7 @@ class AppPreferencesRepository @Inject constructor(
                 frequency = parseFrequency(get(PreferencesKeys.AUTO_WALLPAPER_FREQUENCY)),
                 constraints = parseConstraints(get(PreferencesKeys.AUTO_WALLPAPER_CONSTRAINTS)),
                 workRequestId = parseWorkRequestId(
-                    get(PreferencesKeys.AUTO_WALLPAPER_WORK_REQUEST_ID)
+                    get(PreferencesKeys.AUTO_WALLPAPER_WORK_REQUEST_ID),
                 ),
                 showNotification = get(PreferencesKeys.AUTO_WALLPAPER_SHOW_NOTIFICATION) ?: false,
             )
@@ -198,8 +198,8 @@ class AppPreferencesRepository @Inject constructor(
                 gridColMinWidthPct = preferences[PreferencesKeys.LAYOUT_GRID_COL_MIN_WIDTH_PCT]
                     ?: 40,
                 roundedCorners = preferences[PreferencesKeys.LAYOUT_ROUNDED_CORNERS] ?: true,
-            )
-        )
+            ),
+        ),
     )
 
     private fun parseFrequency(freqStr: String?) = try {

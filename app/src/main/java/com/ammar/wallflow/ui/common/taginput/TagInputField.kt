@@ -60,7 +60,7 @@ fun <T> TagInputField(
     trailingIcon: @Composable (() -> Unit)? = null,
     showTagClearAction: Boolean = true,
     tagFromInputString: (String) -> T,
-    getTagString: (tag: T) -> String = { "#${it.toString()}" },
+    getTagString: (tag: T) -> String = { "#$it" },
     onAddTag: (tag: T) -> Unit = {},
     onRemoveTag: (tag: T) -> Unit = {},
 ) {
@@ -78,17 +78,17 @@ fun <T> TagInputField(
     var selectLastTag by remember { mutableStateOf(false) }
 
     Box(
-        modifier = modifier
+        modifier = modifier,
     ) {
         BasicTextField(
             modifier = Modifier
                 .onPreviewKeyEvent {
-                    if (it.key != Key.Backspace
-                        || fieldValue.isNotEmpty()
-                        || tags.isEmpty()
+                    if (it.key != Key.Backspace ||
+                        fieldValue.isNotEmpty() ||
+                        tags.isEmpty() ||
                         // ACTION_UP not called for physical keyboard
                         // hence we perform action on DOWN and ignore UP events
-                        || it.nativeKeyEvent.action == NativeKeyEvent.ACTION_UP
+                        it.nativeKeyEvent.action == NativeKeyEvent.ACTION_UP
                     ) {
                         return@onPreviewKeyEvent false
                     }
@@ -185,7 +185,7 @@ private class TagsParameterProvider : CollectionPreviewParameterProvider<Set<Str
     listOf(
         emptySet(),
         setOf("test", "test1"),
-    )
+    ),
 )
 
 @Preview

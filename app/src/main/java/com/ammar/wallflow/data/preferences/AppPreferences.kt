@@ -16,7 +16,7 @@ data class AppPreferences(
         filters = SearchQuery(
             sorting = Sorting.TOPLIST,
             topRange = TopRange.ONE_DAY,
-        )
+        ),
     ),
     val blurSketchy: Boolean = false,
     val blurNsfw: Boolean = false,
@@ -28,7 +28,7 @@ data class AppPreferences(
 enum class ObjectDetectionDelegate {
     NONE,
     NNAPI,
-    GPU;
+    GPU,
 }
 
 data class ObjectDetectionPreferences(
@@ -65,12 +65,12 @@ data class LookAndFeelPreferences(
 
 enum class GridType {
     STAGGERED,
-    FIXED_SIZE;
+    FIXED_SIZE,
 }
 
 enum class GridColType {
     ADAPTIVE,
-    FIXED;
+    FIXED,
 }
 
 const val minGridCols = 1L

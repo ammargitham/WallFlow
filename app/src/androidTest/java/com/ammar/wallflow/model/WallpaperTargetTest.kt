@@ -1,8 +1,8 @@
 package com.ammar.wallflow.model
 
 import android.app.WallpaperManager
-import org.junit.Test
 import kotlin.test.assertEquals
+import org.junit.Test
 
 class WallpaperTargetTest {
     @Test

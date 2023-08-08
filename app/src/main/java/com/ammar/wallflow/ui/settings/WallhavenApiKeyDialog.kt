@@ -43,7 +43,7 @@ fun WallhavenApiKeyDialog(
     val uiState by produceState(
         initialValue = WallhavenApiKeyUiState(),
         key1 = lifecycle,
-        key2 = viewModel
+        key2 = viewModel,
     ) {
         lifecycle.repeatOnLifecycle(state = Lifecycle.State.STARTED) {
             viewModel.uiState.collect { value = it }
@@ -75,12 +75,12 @@ fun WallhavenApiKeyDialogContent(
         tonalElevation = AlertDialogDefaults.TonalElevation,
     ) {
         Column(
-            modifier = modifier.padding(24.dp)
+            modifier = modifier.padding(24.dp),
         ) {
             Box(
                 Modifier
                     .padding(bottom = 16.dp)
-                    .align(Alignment.Start)
+                    .align(Alignment.Start),
             ) {
                 Text(
                     text = stringResource(R.string.wallhaven_api_key),
@@ -91,7 +91,7 @@ fun WallhavenApiKeyDialogContent(
                 Modifier
                     .weight(weight = 1f, fill = false)
                     .padding(bottom = 24.dp)
-                    .align(Alignment.Start)
+                    .align(Alignment.Start),
             ) {
                 OutlinedTextField(
                     value = apiKey,

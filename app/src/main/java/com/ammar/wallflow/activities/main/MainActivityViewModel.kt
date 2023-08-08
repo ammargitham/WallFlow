@@ -57,8 +57,8 @@ class MainActivityViewModel @Inject constructor(
             MainUiState(
                 searchBarSuggestions = searchHistory
                     .filter {
-                        localQuery.isBlank()
-                                || it.query.trimAll().lowercase().contains(localQuery)
+                        localQuery.isBlank() ||
+                            it.query.trimAll().lowercase().contains(localQuery)
                     }
                     .map { s ->
                         val search = s.toSearch()
@@ -72,7 +72,7 @@ class MainActivityViewModel @Inject constructor(
                 savedSearches = savedSearchEntities.map { entity -> entity.toSavedSearch() },
                 theme = appPreferences.lookAndFeelPreferences.theme,
                 searchBarShowNSFW = appPreferences.wallhavenApiKey.isNotBlank(),
-            )
+            ),
         )
     }.stateIn(
         scope = viewModelScope,
@@ -129,7 +129,7 @@ class MainActivityViewModel @Inject constructor(
             SavedSearch(
                 name = name,
                 search = search,
-            )
+            ),
         )
     }
 
@@ -146,7 +146,7 @@ data class MainUiState(
     val searchBarSearch: Search = Search(
         filters = SearchQuery(
             sorting = Sorting.RELEVANCE,
-        )
+        ),
     ),
     val searchBarSuggestions: List<Suggestion<Search>> = emptyList(),
     val showSearchBarFilters: Boolean = false,

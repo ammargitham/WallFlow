@@ -30,11 +30,11 @@ import com.ammar.wallflow.utils.decodeSampledBitmapFromFile
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.io.File
+import kotlin.math.absoluteValue
+import kotlin.random.Random
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
-import kotlin.math.absoluteValue
-import kotlin.random.Random
 
 @HiltWorker
 class DownloadWorker @AssistedInject constructor(
@@ -60,7 +60,7 @@ class DownloadWorker @AssistedInject constructor(
                     null,
                     context.getString(R.string.cancel),
                     context.workManager.createCancelPendingIntent(id),
-                ).build()
+                ).build(),
             )
         }
     }
@@ -81,13 +81,13 @@ class DownloadWorker @AssistedInject constructor(
         val url = inputData.getString(INPUT_KEY_URL)
         if (url.isNullOrBlank()) {
             return@withContext Result.failure(
-                workDataOf(OUTPUT_KEY_ERROR to "Invalid url")
+                workDataOf(OUTPUT_KEY_ERROR to "Invalid url"),
             )
         }
         val destinationDir = inputData.getString(INPUT_KEY_DESTINATION_DIR)
         if (destinationDir.isNullOrBlank()) {
             return@withContext Result.failure(
-                workDataOf(OUTPUT_KEY_ERROR to "Invalid destination dir")
+                workDataOf(OUTPUT_KEY_ERROR to "Invalid destination dir"),
             )
         }
         val inferFileNameFromResponse = inputData.getBoolean(
@@ -99,12 +99,12 @@ class DownloadWorker @AssistedInject constructor(
             fileName = inputData.getString(INPUT_KEY_DESTINATION_FILE_NAME)
             if (fileName.isNullOrBlank()) {
                 return@withContext Result.failure(
-                    workDataOf(OUTPUT_KEY_ERROR to "Invalid destination file name")
+                    workDataOf(OUTPUT_KEY_ERROR to "Invalid destination file name"),
                 )
             }
         }
         progressNotificationBuilder.setContentTitle(
-            inputData.getString(INPUT_KEY_NOTIFICATION_TITLE) ?: url.getFileNameFromUrl()
+            inputData.getString(INPUT_KEY_NOTIFICATION_TITLE) ?: url.getFileNameFromUrl(),
         )
         val wallpaperId = inputData.getString(INPUT_KEY_WALLPAPER_ID)
         try {
@@ -113,7 +113,7 @@ class DownloadWorker @AssistedInject constructor(
                     url = url,
                     dir = destinationDir,
                     fileName = fileName,
-                    wallpaperId = wallpaperId
+                    wallpaperId = wallpaperId,
                 )
             } else {
                 download(
@@ -125,7 +125,7 @@ class DownloadWorker @AssistedInject constructor(
                 )
             }
             Result.success(
-                workDataOf(OUTPUT_KEY_FILE_PATH to file.absolutePath)
+                workDataOf(OUTPUT_KEY_FILE_PATH to file.absolutePath),
             )
         } catch (e: Exception) {
             Log.e(TAG, "doWork: Error downloading $url", e)
@@ -140,10 +140,10 @@ class DownloadWorker @AssistedInject constructor(
             setContentTitle(
                 inputData.getString(INPUT_KEY_NOTIFICATION_TITLE)
                     ?: url?.getFileNameFromUrl()
-                    ?: ""
+                    ?: "",
             )
             setProgress(0, 0, true)
-        }.build()
+        }.build(),
     )
 
     private suspend fun downloadWallpaper(
@@ -178,13 +178,13 @@ class DownloadWorker @AssistedInject constructor(
             workDataOf(
                 PROGRESS_KEY_TOTAL to total,
                 PROGRESS_KEY_DOWNLOADED to downloaded,
-            )
+            ),
         )
         if (!shouldShowNotification()) return
         val notification = progressNotificationBuilder.setProgress(
             total.toInt(),
             downloaded.toInt(),
-            downloaded <= -1
+            downloaded <= -1,
         ).build()
         try {
             setForeground(
@@ -199,7 +199,7 @@ class DownloadWorker @AssistedInject constructor(
                         progressNotificationId,
                         notification,
                     )
-                }
+                },
             )
         } catch (e: Exception) {
             Log.e(TAG, "Error setting to foreground: ", e)
@@ -219,13 +219,13 @@ class DownloadWorker @AssistedInject constructor(
             setStyle(
                 NotificationCompat.BigPictureStyle()
                     .bigPicture(bitmap)
-                    .bigLargeIcon(null as Bitmap?)
+                    .bigLargeIcon(null as Bitmap?),
             )
             setContentIntent(
                 getWallpaperScreenPendingIntent(
                     context,
                     wallpaperId,
-                )
+                ),
             )
             setAutoCancel(true)
             addAction(
@@ -238,7 +238,7 @@ class DownloadWorker @AssistedInject constructor(
                         context.getShareChooserIntent(file, true),
                         PendingIntent.FLAG_IMMUTABLE,
                     ),
-                ).build()
+                ).build(),
             )
             addAction(
                 NotificationCompat.Action.Builder(
@@ -249,14 +249,14 @@ class DownloadWorker @AssistedInject constructor(
                         file,
                         successNotificationId,
                     ),
-                ).build()
+                ).build(),
             )
         }.build()
         context.notificationManager.notify(successNotificationId, notification)
     }
 
-    private fun shouldShowNotification() = !notificationType.isSilent()
-            && context.checkNotificationPermission()
+    private fun shouldShowNotification() = !notificationType.isSilent() &&
+        context.checkNotificationPermission()
 
     private fun shouldShowSuccessNotification() =
         shouldShowNotification() && notificationType == NotificationType.VISIBLE_SUCCESS
@@ -273,7 +273,7 @@ class DownloadWorker @AssistedInject constructor(
                 override fun onMediaScannerConnected() {
                     connection?.scanFile(file.absolutePath, null)
                 }
-            }
+            },
         )
         connection.connect()
     }
@@ -295,7 +295,8 @@ class DownloadWorker @AssistedInject constructor(
         enum class NotificationType(val type: Int) {
             SILENT(1),
             VISIBLE(2),
-            VISIBLE_SUCCESS(3);
+            VISIBLE_SUCCESS(3),
+            ;
 
             fun isSilent() = this == SILENT
         }

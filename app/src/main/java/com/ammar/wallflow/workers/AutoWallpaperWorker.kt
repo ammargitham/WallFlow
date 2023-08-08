@@ -99,7 +99,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
         AUTO_WALLPAPER_NOTIFICATION_ID,
         notificationBuilder.apply {
             setProgress(0, 0, true)
-        }.build()
+        }.build(),
     )
 
     override suspend fun doWork(): Result {
@@ -108,21 +108,21 @@ class AutoWallpaperWorker @AssistedInject constructor(
             ?: return Result.failure(
                 workDataOf(
                     FAILURE_REASON to FailureReason.APP_PREFS_NULL.name,
-                )
+                ),
             )
         val savedSearchId = appPreferences.autoWallpaperPreferences.savedSearchId
         if (!appPreferences.autoWallpaperPreferences.enabled) {
             return Result.failure(
                 workDataOf(
                     FAILURE_REASON to FailureReason.DISABLED.name,
-                )
+                ),
             )
         }
         val savedSearch = savedSearchRepository.getById(savedSearchId)?.toSavedSearch()
             ?: return Result.failure(
                 workDataOf(
                     FAILURE_REASON to FailureReason.SAVED_SEARCH_NOT_SET.name,
-                )
+                ),
             )
         val searchQuery = savedSearch.search.toSearchQuery()
         val (nextWallpaper, file) = setNextWallpaper(searchQuery)
@@ -130,7 +130,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
             return Result.failure(
                 workDataOf(
                     FAILURE_REASON to FailureReason.NO_WALLPAPER_FOUND.name,
-                )
+                ),
             )
         }
         if (appPreferences.autoWallpaperPreferences.showNotification) {
@@ -139,7 +139,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
         return Result.success(
             workDataOf(
                 SUCCESS_NEXT_WALLPAPER_ID to nextWallpaper.id,
-            )
+            ),
         )
     }
 
@@ -155,10 +155,12 @@ class AutoWallpaperWorker @AssistedInject constructor(
                     AutoWallpaperHistory(
                         wallhavenId = nextWallpaper.id,
                         setOn = Clock.System.now(),
-                    )
+                    ),
                 )
                 nextWallpaper to file
-            } else null to null
+            } else {
+                null to null
+            }
         } catch (e: Exception) {
             Log.e(TAG, "setNextWallpaper: ", e)
             return null to null
@@ -184,7 +186,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
                         AUTO_WALLPAPER_NOTIFICATION_ID,
                         notification,
                     )
-                }
+                },
             )
         } catch (e: Exception) {
             Log.e(TAG, "setWallpaper: ", e)
@@ -278,7 +280,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
                                 AUTO_WALLPAPER_NOTIFICATION_ID,
                                 notification,
                             )
-                        }
+                        },
                     )
                 } catch (e: Exception) {
                     Log.e(TAG, "Error setting to foreground: ", e)
@@ -308,7 +310,9 @@ class AutoWallpaperWorker @AssistedInject constructor(
     ): Wallpaper? {
         val historyIds = if (excludeHistory) {
             autoWallpaperHistoryRepository.getAll().map { it.wallhavenId }
-        } else emptyList()
+        } else {
+            emptyList()
+        }
 
         var hasMore = true
         while (hasMore) {
@@ -362,7 +366,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
         val bitmap = decodeSampledBitmapFromFile(context, file.absolutePath)
         val notification = NotificationCompat.Builder(
             context,
-            NotificationChannels.AUTO_WALLPAPER_CHANNEL_ID
+            NotificationChannels.AUTO_WALLPAPER_CHANNEL_ID,
         ).apply {
             setContentTitle(context.getString(R.string.new_wallpaper))
             setSmallIcon(R.drawable.outline_image_24)
@@ -371,20 +375,20 @@ class AutoWallpaperWorker @AssistedInject constructor(
             setStyle(
                 NotificationCompat.BigPictureStyle()
                     .bigPicture(bitmap)
-                    .bigLargeIcon(null as Bitmap?)
+                    .bigLargeIcon(null as Bitmap?),
             )
             setContentIntent(
                 getWallpaperScreenPendingIntent(
                     context,
                     wallpaper.id,
-                )
+                ),
             )
             // setAutoCancel(true)
             setAutoCancel(false)
         }.build()
         context.notificationManager.notify(
             AUTO_WALLPAPER_SUCCESS_NOTIFICATION_ID,
-            notification
+            notification,
         )
     }
 
@@ -398,7 +402,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
             APP_PREFS_NULL,
             DISABLED,
             SAVED_SEARCH_NOT_SET,
-            NO_WALLPAPER_FOUND;
+            NO_WALLPAPER_FOUND,
         }
 
         suspend fun schedule(
@@ -463,14 +467,14 @@ class AutoWallpaperWorker @AssistedInject constructor(
             workName: String,
         ) = context.workManager.getWorkInfosForUniqueWorkFlow(workName).map {
             val info = it.firstOrNull() ?: return@map Status.Failed(
-                IllegalArgumentException("No download request found with name $workName")
+                IllegalArgumentException("No download request found with name $workName"),
             )
             when (info.state) {
                 WorkInfo.State.ENQUEUED -> Status.Pending
                 WorkInfo.State.RUNNING -> Status.Running
                 WorkInfo.State.SUCCEEDED -> Status.Success
                 WorkInfo.State.FAILED -> Status.Failed(
-                    AutoWallpaperException(info.outputData.getString(FAILURE_REASON))
+                    AutoWallpaperException(info.outputData.getString(FAILURE_REASON)),
                 )
                 WorkInfo.State.BLOCKED -> Status.Pending
                 WorkInfo.State.CANCELLED -> Status.Failed(AutoWallpaperException("Work cancelled"))

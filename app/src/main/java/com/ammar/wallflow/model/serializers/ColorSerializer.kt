@@ -19,6 +19,6 @@ object ColorSerializer : KSerializer<Color> {
 
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor(
         serialName = "Color",
-        kind = PrimitiveKind.STRING
+        kind = PrimitiveKind.STRING,
     )
 }

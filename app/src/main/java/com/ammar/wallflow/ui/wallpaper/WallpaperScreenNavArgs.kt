@@ -25,7 +25,7 @@ fun getWallpaperScreenLocalDeepLink(wallpaper: Wallpaper) =
     getWallpaperScreenLocalDeepLink(wallpaper.id)
 
 fun getWallpaperScreenLocalDeepLink(wallpaperId: String) =
-    "$LOCAL_DEEPLINK_SCHEME://$wallpaperScreenLocalHost/${wallpaperId}"
+    "$LOCAL_DEEPLINK_SCHEME://$wallpaperScreenLocalHost/$wallpaperId"
 
 fun getWallpaperScreenPendingIntent(
     context: Context,

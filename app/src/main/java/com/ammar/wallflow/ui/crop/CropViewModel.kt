@@ -32,6 +32,7 @@ import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.utils.DownloadManager
 import com.ammar.wallflow.utils.DownloadManager.Companion.DownloadLocation
 import com.ammar.wallflow.utils.DownloadStatus
+import com.ammar.wallflow.utils.objectdetection.detectObjects as actualDetectObjects
 import com.ammar.wallflow.workers.DownloadWorker.Companion.NotificationType
 import com.github.materiiapps.partial.Partialize
 import com.github.materiiapps.partial.partial
@@ -49,7 +50,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import com.ammar.wallflow.utils.objectdetection.detectObjects as actualDetectObjects
 
 class CropViewModel(
     private val application: Application,
@@ -109,7 +109,7 @@ class CropViewModel(
                 theme = appPreferences.lookAndFeelPreferences.theme,
                 displays = displays,
                 selectedDisplay = displays.firstOrNull(),
-            )
+            ),
         )
     }.stateIn(
         scope = viewModelScope,
@@ -174,7 +174,7 @@ class CropViewModel(
                 preferences.copy(
                     modelId = objectDetectionModelRepository.getByName(objectDetectionModel.name)?.id
                         ?: 0,
-                )
+                ),
             )
         }
         val fileName = objectDetectionModel.fileName
@@ -252,8 +252,8 @@ class CropViewModel(
                     R.string.wallpaper_changed
                 } else {
                     R.string.failed_to_change_wallpaper
-                }
-            )
+                },
+            ),
         )
         localUiStateFlow.update { it.copy(result = partial(Result.Success(result))) }
     }

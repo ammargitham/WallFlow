@@ -15,15 +15,15 @@ import com.ammar.wallflow.data.network.model.StringNetworkMetaQuery
 import com.ammar.wallflow.data.network.retrofit.RetrofitWallHavenNetwork
 import com.ammar.wallflow.extensions.randomList
 import com.ammar.wallflow.model.SearchQuery
+import kotlin.test.assertEquals
+import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Test
 import org.junit.runner.RunWith
-import kotlin.test.assertEquals
-import kotlin.test.assertFalse
-import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
 
 // somehow Android Studio complaints @OptIn not required, but it is required
 @Suppress("UnnecessaryOptInAnnotation")
@@ -37,7 +37,7 @@ class WallpapersRemoteMediatorTest {
     private val wallHavenNetworkDataSource = RetrofitWallHavenNetwork(mockNetworkApi)
     private val mockDb = Room.inMemoryDatabaseBuilder(
         context = ApplicationProvider.getApplicationContext(),
-        klass = AppDatabase::class.java
+        klass = AppDatabase::class.java,
     ).build()
     private val wallpapersDao = mockDb.wallpapersDao()
     private val searchQueryDao = mockDb.searchQueryDao()
@@ -64,7 +64,7 @@ class WallpapersRemoteMediatorTest {
                 last_page = 10,
                 per_page = 20,
                 total = 198,
-            )
+            ),
         )
 
         val remoteMediator = WallpapersRemoteMediator(
@@ -76,7 +76,7 @@ class WallpapersRemoteMediatorTest {
             listOf(),
             null,
             PagingConfig(10),
-            10
+            10,
         )
         val result = remoteMediator.load(LoadType.REFRESH, pagingState)
         val wallpaperCount = wallpapersDao.count()
@@ -107,7 +107,7 @@ class WallpapersRemoteMediatorTest {
             listOf(),
             null,
             PagingConfig(10),
-            10
+            10,
         )
         val result = remoteMediator.load(LoadType.REFRESH, pagingState)
         assertTrue { result is MediatorResult.Success }
@@ -126,7 +126,7 @@ class WallpapersRemoteMediatorTest {
             listOf(),
             null,
             PagingConfig(10),
-            10
+            10,
         )
         val result = remoteMediator.load(LoadType.REFRESH, pagingState)
         assertTrue { result is MediatorResult.Error }
@@ -144,7 +144,7 @@ class WallpapersRemoteMediatorTest {
             listOf(),
             null,
             PagingConfig(10),
-            10
+            10,
         )
         val result = remoteMediator.load(LoadType.REFRESH, pagingState)
         assertTrue { result is MediatorResult.Success }
@@ -176,7 +176,7 @@ class WallpapersRemoteMediatorTest {
                 last_page = 10,
                 per_page = 20,
                 total = 200,
-            )
+            ),
         )
         val remoteMediator = WallpapersRemoteMediator(
             searchQuery,
@@ -187,7 +187,7 @@ class WallpapersRemoteMediatorTest {
             listOf(),
             null,
             PagingConfig(10),
-            0
+            0,
         )
         remoteMediator.load(LoadType.REFRESH, pagingState)
 
@@ -209,7 +209,7 @@ class WallpapersRemoteMediatorTest {
                 last_page = 1,
                 per_page = 20,
                 total = 1,
-            )
+            ),
         )
         remoteMediator.load(LoadType.REFRESH, pagingState)
 
@@ -234,7 +234,7 @@ class WallpapersRemoteMediatorTest {
                 last_page = 10,
                 per_page = 20,
                 total = 200,
-            )
+            ),
         )
         val remoteMediator1 = WallpapersRemoteMediator(
             searchQuery1,
@@ -245,7 +245,7 @@ class WallpapersRemoteMediatorTest {
             listOf(),
             null,
             PagingConfig(10),
-            0
+            0,
         )
         remoteMediator1.load(LoadType.REFRESH, pagingState1)
 
@@ -260,7 +260,7 @@ class WallpapersRemoteMediatorTest {
                 last_page = 1,
                 per_page = 20,
                 total = 6,
-            )
+            ),
         )
         val remoteMediator2 = WallpapersRemoteMediator(
             searchQuery2,
@@ -271,7 +271,7 @@ class WallpapersRemoteMediatorTest {
             listOf(),
             null,
             PagingConfig(10),
-            0
+            0,
         )
         remoteMediator2.load(LoadType.REFRESH, pagingState2)
 

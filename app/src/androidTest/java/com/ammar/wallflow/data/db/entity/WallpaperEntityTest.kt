@@ -6,9 +6,9 @@ import androidx.core.graphics.toColorInt
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.Thumbs
 import com.ammar.wallflow.model.Wallpaper
+import kotlin.test.assertEquals
 import kotlinx.datetime.Instant
 import org.junit.Test
-import kotlin.test.assertEquals
 
 class WallpaperEntityTest {
     @Test
@@ -34,7 +34,7 @@ class WallpaperEntityTest {
             thumbs = ThumbsEntity(
                 large = "https://th.wallhaven.cc/lg/85/85k6eo.jpg",
                 original = "https://th.wallhaven.cc/orig/85/85k6eo.jpg",
-                small = "https://th.wallhaven.cc/small/85/85k6eo.jpg"
+                small = "https://th.wallhaven.cc/small/85/85k6eo.jpg",
             ),
         )
         val expected = Wallpaper(
@@ -56,13 +56,13 @@ class WallpaperEntityTest {
                 "#999999",
                 "#cc6633",
                 "#e7d8b1",
-                "#cccccc"
+                "#cccccc",
             ).map { Color(it.toColorInt()) },
             path = "https://w.wallhaven.cc/full/85/wallhaven-85k6eo.png",
             thumbs = Thumbs(
                 large = "https://th.wallhaven.cc/lg/85/85k6eo.jpg",
                 original = "https://th.wallhaven.cc/orig/85/85k6eo.jpg",
-                small = "https://th.wallhaven.cc/small/85/85k6eo.jpg"
+                small = "https://th.wallhaven.cc/small/85/85k6eo.jpg",
             ),
             tags = null,
         )

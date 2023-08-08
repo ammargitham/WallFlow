@@ -23,7 +23,7 @@ object PreferencesKeys {
     val ENABLE_AUTO_WALLPAPER = booleanPreferencesKey("enable_auto_wallpaper")
     val AUTO_WALLPAPER_SAVED_SEARCH_ID = longPreferencesKey("auto_wallpaper_saved_search_id")
     val AUTO_WALLPAPER_USE_OBJECT_DETECTION = booleanPreferencesKey(
-        "auto_wallpaper_use_object_detection"
+        "auto_wallpaper_use_object_detection",
     )
     val AUTO_WALLPAPER_FREQUENCY = stringPreferencesKey("auto_wallpaper_frequency")
     val AUTO_WALLPAPER_CONSTRAINTS = stringPreferencesKey("auto_wallpaper_constraints")

@@ -113,7 +113,7 @@ fun WallpaperCard(
                     val radius = minOf(size.minDimension / 2f, 20.dp.toPx())
                     drawCircle(
                         color = selectionCircleColor,
-                        radius = radius
+                        radius = radius,
                     )
                     if (checkImage == null) return@drawWithContent
                     val imageSize = (radius * 1.5).roundToInt()
@@ -134,7 +134,7 @@ fun WallpaperCard(
             contentScale = ContentScale.Crop,
             onError = {
                 Log.e(TAG, "Error loading: ${wallpaper.path}", it.result.throwable)
-            }
+            },
         )
     }
 }

@@ -85,7 +85,7 @@ fun CropScreen(
             val imageSize = state.src.size.toSize() * cropScale
             getMaxCropSize(
                 resolution,
-                imageSize
+                imageSize,
             )
         }
     }
@@ -109,7 +109,7 @@ fun CropScreen(
         context.toast(
             e.localizedMessage
                 ?: e.message
-                ?: context.getString(R.string.error_detecting_objects)
+                ?: context.getString(R.string.error_detecting_objects),
         )
     }
 
@@ -172,7 +172,7 @@ fun CropScreen(
                         .padding(
                             top = topActionsSize.height.toDp() + if (uiState.displays.size > 1) 16.dp else 0.dp,
                             bottom = actionsSize.height.toDp() + 16.dp,
-                        )
+                        ),
                 ) {
                     CompositionLocalProvider(LocalCropperStyle provides cropperStyle) {
                         CropperPreview(
@@ -225,14 +225,14 @@ fun CropScreen(
             onSetClick = {
                 viewModel.setWallpaperTargets(it)
                 cropState?.done(true)
-            }
+            },
         )
 
         if (uiState.showDetections) {
             DetectionsBottomSheet(
                 detections = uiState.detectedObjects?.successOr(emptyList()) ?: emptyList(),
                 onDetectionClick = viewModel::selectDetection,
-                onDismissRequest = { viewModel.showDetections(false) }
+                onDismissRequest = { viewModel.showDetections(false) },
             )
         }
     }

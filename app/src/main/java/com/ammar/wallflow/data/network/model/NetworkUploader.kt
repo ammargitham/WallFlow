@@ -22,7 +22,7 @@ fun NetworkUploader.asUploaderEntity(id: Long = 0) = UploaderEntity(
         medium = avatar["128px"] ?: "",
         small = avatar["32px"] ?: "",
         tiny = avatar["20px"] ?: "",
-    )
+    ),
 )
 
 fun NetworkUploader.asUploader() = Uploader(
@@ -33,5 +33,5 @@ fun NetworkUploader.asUploader() = Uploader(
         medium = avatar["128px"] ?: "",
         small = avatar["32px"] ?: "",
         tiny = avatar["20px"] ?: "",
-    )
+    ),
 )

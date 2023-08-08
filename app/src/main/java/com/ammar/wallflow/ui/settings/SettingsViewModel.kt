@@ -62,7 +62,9 @@ class SettingsViewModel @Inject constructor(
         autoWallpaperNextRunFlow,
     ) { appPreferences, objectDetectionModels, localUiState, savedSearches, autoWallpaperNextRun ->
         val selectedModelId = appPreferences.objectDetectionPreferences.modelId
-        val selectedModel = if (selectedModelId == 0L) ObjectDetectionModel.DEFAULT else {
+        val selectedModel = if (selectedModelId == 0L) {
+            ObjectDetectionModel.DEFAULT
+        } else {
             objectDetectionModels
                 .find { it.id == selectedModelId }
                 ?.toModel()
@@ -79,7 +81,7 @@ class SettingsViewModel @Inject constructor(
                     appPreferences.autoWallpaperPreferences.savedSearchId == it.id
                 },
                 autoWallpaperNextRun = autoWallpaperNextRun,
-            )
+            ),
         )
     }.stateIn(
         scope = viewModelScope,
@@ -128,7 +130,9 @@ class SettingsViewModel @Inject constructor(
     ) = viewModelScope.launch {
         val existing = if (model.id != 0L) {
             objectDetectionModelRepository.getById(model.id)
-        } else null
+        } else {
+            null
+        }
         if (model.url != existing?.url) {
             downloadModel(
                 model.name,
@@ -161,7 +165,7 @@ class SettingsViewModel @Inject constructor(
                                     name = model.name,
                                     url = model.url,
                                     fileName = fileName,
-                                ) ?: model.copy(fileName = fileName)
+                                ) ?: model.copy(fileName = fileName),
                             )
                             onDone(null)
                             localUiStateFlow.update {
@@ -225,10 +229,10 @@ class SettingsViewModel @Inject constructor(
             if (objectDetectionPreferences.modelId != model.id) return@launch
             // if this model was selected, set the default model as selected
             val defaultModelId = objectDetectionModelRepository.getByName(
-                EFFICIENT_DET_LITE_0_MODEL_NAME
+                EFFICIENT_DET_LITE_0_MODEL_NAME,
             )?.id ?: 0
             appPreferencesRepository.updateObjectDetectionPrefs(
-                objectDetectionPreferences.copy(modelId = defaultModelId)
+                objectDetectionPreferences.copy(modelId = defaultModelId),
             )
         }
         // hide the confirm dialog
@@ -237,11 +241,11 @@ class SettingsViewModel @Inject constructor(
 
     fun setSelectedModel(entity: ObjectDetectionModelEntity?) = viewModelScope.launch {
         val modelId = entity?.id ?: objectDetectionModelRepository.getByName(
-            EFFICIENT_DET_LITE_0_MODEL_NAME
+            EFFICIENT_DET_LITE_0_MODEL_NAME,
         )?.id ?: 0
         val objectDetectionPreferences = uiState.value.appPreferences.objectDetectionPreferences
         appPreferencesRepository.updateObjectDetectionPrefs(
-            objectDetectionPreferences.copy(modelId = modelId)
+            objectDetectionPreferences.copy(modelId = modelId),
         )
         showObjectDetectionModelOptions(false)
     }
@@ -299,9 +303,9 @@ class SettingsViewModel @Inject constructor(
                 // only reschedule if enabled or frequency or constraints change
                 val currentPrefs = uiState.value.appPreferences.autoWallpaperPreferences
                 if (
-                    currentPrefs.enabled
-                    && currentPrefs.frequency == autoWallpaperPreferences.frequency
-                    && currentPrefs.constraints == autoWallpaperPreferences.constraints
+                    currentPrefs.enabled &&
+                    currentPrefs.frequency == autoWallpaperPreferences.frequency &&
+                    currentPrefs.constraints == autoWallpaperPreferences.constraints
                 ) {
                     return@launch
                 }
@@ -374,7 +378,7 @@ class SettingsViewModel @Inject constructor(
         }
 
     private fun getAutoWallpaperNextRun() = application.workManager.getWorkInfosForUniqueWorkFlow(
-        AutoWallpaperWorker.PERIODIC_WORK_NAME
+        AutoWallpaperWorker.PERIODIC_WORK_NAME,
     ).map {
         val info = it.firstOrNull() ?: return@map NextRun.NotScheduled
         return@map when (info.state) {

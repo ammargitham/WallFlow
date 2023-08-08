@@ -51,8 +51,8 @@ fun TopBar(
                             colors = listOf(
                                 Color.Black,
                                 Color.Transparent,
-                            )
-                        )
+                            ),
+                        ),
                     )
                 } else {
                     this

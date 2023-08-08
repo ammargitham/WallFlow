@@ -52,7 +52,7 @@ fun NetworkWallpaper.asWallpaper() = Wallpaper(
     colors = colors.map { Color(it.toColorInt()) },
     path = path,
     thumbs = thumbs.asThumbs(),
-    tags = tags?.map { it.toTag() }
+    tags = tags?.map { it.toTag() },
 )
 
 fun NetworkWallpaper.asWallpaperEntity(

@@ -27,11 +27,10 @@ fun getPaddingValuesConverter(layoutDirection: LayoutDirection) =
                 start = vector.v3.dp,
                 end = vector.v4.dp,
             )
-        }
+        },
     )
-
 
 fun getOffsetConverter() = TwoWayConverter(
     convertToVector = { offset: Offset -> AnimationVector2D(offset.x, offset.y) },
-    convertFromVector = { vector: AnimationVector2D -> Offset(vector.v1, vector.v2) }
+    convertFromVector = { vector: AnimationVector2D -> Offset(vector.v1, vector.v2) },
 )

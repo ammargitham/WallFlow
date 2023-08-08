@@ -101,7 +101,9 @@ fun WallpaperActions(
             {
                 ApplyWallpaperFAB(onClick = onApplyWallpaperClick)
             }
-        } else null,
+        } else {
+            null
+        },
     )
 }
 
@@ -122,7 +124,7 @@ private fun ApplyWallpaperFAB(
             modifier = Modifier.tooltipTrigger(),
             onClick = onClick,
             containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
-            elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation()
+            elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation(),
         ) {
             Icon(
                 painter = painterResource(R.drawable.outline_wallpaper_24),
@@ -151,7 +153,7 @@ private fun FullScreenButton(
         ) {
             Icon(
                 painter = painterResource(R.drawable.baseline_open_in_full_24),
-                contentDescription = stringResource(R.string.full_screen)
+                contentDescription = stringResource(R.string.full_screen),
             )
         }
     }
@@ -176,7 +178,7 @@ private fun InfoButton(
         ) {
             Icon(
                 imageVector = Icons.Outlined.Info,
-                contentDescription = stringResource(R.string.info)
+                contentDescription = stringResource(R.string.info),
             )
         }
     }
@@ -212,17 +214,21 @@ private fun DownloadButton(
             is DownloadStatus.Running -> downloadStatus.progress
             is DownloadStatus.Paused -> downloadStatus.progress
             else -> -1F
-        }
+        },
     )
     val clickable = remember(downloadStatus) {
-        (downloadStatus == null
-                || downloadStatus is DownloadStatus.Failed
-                || downloadStatus is DownloadStatus.Success)
+        (
+            downloadStatus == null ||
+                downloadStatus is DownloadStatus.Failed ||
+                downloadStatus is DownloadStatus.Success
+            )
     }
     val showProgress = remember(downloadStatus) {
-        (downloadStatus is DownloadStatus.Running
-                || downloadStatus is DownloadStatus.Paused
-                || downloadStatus is DownloadStatus.Pending)
+        (
+            downloadStatus is DownloadStatus.Running ||
+                downloadStatus is DownloadStatus.Paused ||
+                downloadStatus is DownloadStatus.Pending
+            )
     }
 
     val defaultContainerColor = Color.Transparent
@@ -231,7 +237,7 @@ private fun DownloadButton(
         when (downloadStatus) {
             is DownloadStatus.Failed -> errorContainerColor
             else -> defaultContainerColor
-        }
+        },
     )
 
     val icon = remember(downloadStatus) {
@@ -250,18 +256,20 @@ private fun DownloadButton(
     ) {
         IconButton(
             modifier = Modifier.tooltipTrigger(),
-            onClick = if (clickable) onClick else {
+            onClick = if (clickable) {
+                onClick
+            } else {
                 {}
             },
             colors = IconButtonDefaults.iconButtonColors(
                 containerColor = containerColor,
-                contentColor = contentColorFor(containerColor)
+                contentColor = contentColorFor(containerColor),
             ),
         ) {
             Crossfade(targetState = icon) {
                 Icon(
                     painter = painterResource(it),
-                    contentDescription = stringResource(R.string.download)
+                    contentDescription = stringResource(R.string.download),
                 )
             }
         }
@@ -285,7 +293,7 @@ private class DownloadStatusParameterProvider :
             DownloadStatus.Running(30, 50),
             DownloadStatus.Failed(),
             DownloadStatus.Success(),
-        )
+        ),
     )
 
 @Preview
@@ -406,7 +414,7 @@ private fun PreviewPropertyRow() {
         Surface {
             PropertyRow(
                 title = "Title",
-                text = "Subtitle"
+                text = "Subtitle",
             )
         }
     }
@@ -423,7 +431,7 @@ fun TagsRow(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(
             space = 8.dp,
-            alignment = Alignment.CenterHorizontally
+            alignment = Alignment.CenterHorizontally,
         ),
     ) {
         tags.map {
@@ -479,7 +487,7 @@ private fun PreviewTagsRow() {
                         purity = Purity.SFW,
                         createdAt = Clock.System.now(),
                     ),
-                )
+                ),
             )
         }
     }
@@ -536,7 +544,7 @@ private fun PreviewColorsRow() {
                     Color.Blue,
                     Color.Black,
                     Color.Cyan,
-                )
+                ),
             )
         }
     }
@@ -583,8 +591,8 @@ private fun PreviewUploaderRow() {
                         medium = "",
                         small = "",
                         tiny = "",
-                    )
-                )
+                    ),
+                ),
             )
         }
     }

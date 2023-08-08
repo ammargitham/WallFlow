@@ -15,9 +15,9 @@ class NameState(
         validator = { it.isNotBlank() && !nameExists.value },
         errorFor = {
             context.getString(
-                if (it.isBlank()) R.string.name_cannot_be_empty else R.string.name_already_used
+                if (it.isBlank()) R.string.name_cannot_be_empty else R.string.name_already_used,
             )
-        }
+        },
     ) {
     init {
         name?.let { text = it }
@@ -34,9 +34,9 @@ class UrlState(
         validator = { it.isNotBlank() && PatternsCompat.WEB_URL.matcher(it).matches() },
         errorFor = {
             context.getString(
-                if (it.isBlank()) R.string.url_cannot_be_empty else R.string.invalid_url
+                if (it.isBlank()) R.string.url_cannot_be_empty else R.string.invalid_url,
             )
-        }
+        },
     ) {
     init {
         url?.let { text = it }
@@ -59,7 +59,7 @@ class IntState(
                 allowNegative || valInt >= 0
             }
         },
-        errorFor = { errorFor(it) }
+        errorFor = { errorFor(it) },
     ) {
     init {
         value?.let { text = it.toString() }

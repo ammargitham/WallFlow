@@ -26,7 +26,7 @@ fun BottomBar(
         modifier = modifier,
         visible = state.visible,
         enter = slideInVertically(initialOffsetY = { it }),
-        exit = slideOutVertically(targetOffsetY = { it })
+        exit = slideOutVertically(targetOffsetY = { it }),
     ) {
         NavigationBar {
             BottomBarDestination.values().forEach { destination ->
@@ -36,7 +36,7 @@ fun BottomBar(
                     icon = {
                         Icon(
                             destination.icon,
-                            contentDescription = stringResource(destination.label)
+                            contentDescription = stringResource(destination.label),
                         )
                     },
                     label = { Text(stringResource(destination.label)) },

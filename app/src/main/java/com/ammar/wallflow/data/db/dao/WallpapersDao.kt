@@ -40,7 +40,7 @@ interface WallpapersDao {
                     WHERE query_string = :queryString
                 )
             )
-        """
+        """,
     )
     fun pagingSource(queryString: String): PagingSource<Int, WallpaperEntity>
 
@@ -79,7 +79,7 @@ interface WallpapersDao {
                 WHERE wallpaper_id = wallpapers.id
                 AND search_query_id <> :searchQueryId
             );
-        """
+        """,
     )
     suspend fun getAllUniqueToSearchQueryId(searchQueryId: Long): List<WallpaperEntity>
 
@@ -99,7 +99,7 @@ interface WallpapersDao {
                 WHERE wallpaper_id = wallpapers.id
                 AND search_query_id <> :searchQueryId
             );
-        """
+        """,
     )
     suspend fun deleteAllUniqueToSearchQueryId(searchQueryId: Long)
 

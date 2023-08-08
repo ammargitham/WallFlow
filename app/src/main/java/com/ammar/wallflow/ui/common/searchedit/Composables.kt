@@ -143,7 +143,7 @@ internal fun CategoriesFilter(
         )
         Spacer(modifier = Modifier.requiredHeight(8.dp))
         Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Category.values().map {
                 val selected = it in categories
@@ -155,12 +155,12 @@ internal fun CategoriesFilter(
                             Icon(
                                 modifier = Modifier.size(16.dp),
                                 imageVector = Icons.Default.Check,
-                                contentDescription = null
+                                contentDescription = null,
                             )
                         }
                     },
                     selected = selected,
-                    onClick = { onChange(if (selected && categories.size > 1) categories - it else categories + it) }
+                    onClick = { onChange(if (selected && categories.size > 1) categories - it else categories + it) },
                 )
             }
         }
@@ -177,11 +177,11 @@ internal fun PurityFilter(
     Column {
         Text(
             text = stringResource(R.string.purity),
-            style = MaterialTheme.typography.labelLarge
+            style = MaterialTheme.typography.labelLarge,
         )
         Spacer(modifier = Modifier.requiredHeight(8.dp))
         Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Purity.values().filter {
                 if (it == Purity.NSFW) showNSFW else true
@@ -200,7 +200,7 @@ internal fun PurityFilter(
                         }
                     },
                     selected = selected,
-                    onClick = { onChange(if (selected && purities.size > 1) purities - it else purities + it) }
+                    onClick = { onChange(if (selected && purities.size > 1) purities - it else purities + it) },
                 )
             }
         }
@@ -230,11 +230,11 @@ internal fun SortingFilter(
     Column {
         Text(
             text = stringResource(R.string.sorting),
-            style = MaterialTheme.typography.labelLarge
+            style = MaterialTheme.typography.labelLarge,
         )
         Spacer(modifier = Modifier.requiredHeight(8.dp))
         FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Sorting.values().map {
                 val selected = it == sorting
@@ -246,12 +246,12 @@ internal fun SortingFilter(
                             Icon(
                                 modifier = Modifier.size(16.dp),
                                 imageVector = Icons.Default.Check,
-                                contentDescription = null
+                                contentDescription = null,
                             )
                         }
                     },
                     selected = selected,
-                    onClick = { onChange(it) }
+                    onClick = { onChange(it) },
                 )
             }
         }
@@ -260,7 +260,7 @@ internal fun SortingFilter(
 
 @OptIn(
     ExperimentalLayoutApi::class,
-    ExperimentalMaterial3Api::class
+    ExperimentalMaterial3Api::class,
 )
 @Composable
 internal fun TopRangeFilter(
@@ -270,11 +270,11 @@ internal fun TopRangeFilter(
     Column {
         Text(
             text = stringResource(R.string.top_range),
-            style = MaterialTheme.typography.labelLarge
+            style = MaterialTheme.typography.labelLarge,
         )
         Spacer(modifier = Modifier.requiredHeight(8.dp))
         FlowRow(
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             TopRange.values().map {
                 val selected = it == topRange
@@ -286,12 +286,12 @@ internal fun TopRangeFilter(
                             Icon(
                                 modifier = Modifier.size(16.dp),
                                 imageVector = Icons.Default.Check,
-                                contentDescription = null
+                                contentDescription = null,
                             )
                         }
                     },
                     selected = selected,
-                    onClick = { onChange(it) }
+                    onClick = { onChange(it) },
                 )
             }
         }
@@ -307,11 +307,11 @@ internal fun OrderFilter(
     Column {
         Text(
             text = stringResource(R.string.order),
-            style = MaterialTheme.typography.labelLarge
+            style = MaterialTheme.typography.labelLarge,
         )
         Spacer(modifier = Modifier.requiredHeight(8.dp))
         Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Order.values().map {
                 val selected = it == order
@@ -327,28 +327,27 @@ internal fun OrderFilter(
                                 Icon(
                                     modifier = Modifier.size(16.dp),
                                     imageVector = Icons.Default.Check,
-                                    contentDescription = null
+                                    contentDescription = null,
                                 )
                             } else {
                                 when (it) {
                                     Order.DESC -> Icon(
                                         modifier = Modifier.size(16.dp),
                                         painter = painterResource(R.drawable.baseline_sort_descending_24),
-                                        contentDescription = null
+                                        contentDescription = null,
                                     )
 
                                     Order.ASC -> Icon(
                                         modifier = Modifier.size(16.dp),
                                         painter = painterResource(R.drawable.baseline_sort_ascending_24),
-                                        contentDescription = null
+                                        contentDescription = null,
                                     )
                                 }
                             }
                         }
-
                     },
                     selected = selected,
-                    onClick = { onChange(it) }
+                    onClick = { onChange(it) },
                 )
             }
         }
@@ -365,12 +364,12 @@ internal fun MinResolutionFilter(
     Column(modifier = modifier) {
         Text(
             text = stringResource(R.string.min_resolution),
-            style = MaterialTheme.typography.labelLarge
+            style = MaterialTheme.typography.labelLarge,
         )
         if (resolution != null) {
             ClearableChip(
                 label = { Text(resolution.toString()) },
-                onClear = { onChange(null) }
+                onClear = { onChange(null) },
             )
         } else {
             AddResolutionButton(
@@ -381,7 +380,6 @@ internal fun MinResolutionFilter(
         }
     }
 }
-
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -394,7 +392,7 @@ internal fun ResolutionsFilter(
     Column(modifier = modifier) {
         Text(
             text = stringResource(R.string.resolutions),
-            style = MaterialTheme.typography.labelLarge
+            style = MaterialTheme.typography.labelLarge,
         )
         FlowRow(
             verticalArrangement = Arrangement.Center,
@@ -410,7 +408,7 @@ internal fun ResolutionsFilter(
             resolutions.map {
                 ClearableChip(
                     label = { Text(it.toString()) },
-                    onClear = { onChange(resolutions - it) }
+                    onClear = { onChange(resolutions - it) },
                 )
             }
         }
@@ -539,7 +537,7 @@ internal fun RatioFilter(
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                 colors = ExposedDropdownMenuDefaults.textFieldColors(),
                 tagFromInputString = { Ratio.fromSize(IntSize(1, 1)) }, // dummy method
-                getTagString = { it.toRatioString().capitalize(Locale.current) }
+                getTagString = { it.toRatioString().capitalize(Locale.current) },
             )
         }
         ExposedDropdownMenu(
@@ -557,10 +555,10 @@ internal fun RatioFilter(
                             ratios - it
                         } else {
                             ratios + it
-                        }
+                        },
                     )
                     expanded = false
-                }
+                },
             )
         }
     }
@@ -606,7 +604,6 @@ private val ratioOptions = listOf(
     )
 }
 
-
 private fun getRatioGridHeaders(context: Context) = listOf(
     context.getString(R.string.wide),
     context.getString(R.string.ultrawide),
@@ -631,16 +628,16 @@ private fun RatioMenuContent(
 
             LandscapeChip(
                 selected = landscapeRatio in selectedRatios,
-                onClick = { onOptionClick(landscapeRatio) }
+                onClick = { onOptionClick(landscapeRatio) },
             )
             PortraitChip(
                 selected = portraitRatio in selectedRatios,
-                onClick = { onOptionClick(portraitRatio) }
+                onClick = { onOptionClick(portraitRatio) },
             )
         }
         Spacer(modifier = Modifier.requiredHeight(8.dp))
         Row(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
             getRatioGridHeaders(context).forEach {
                 GridHeader(
@@ -695,7 +692,7 @@ private fun RatioOptionGrid(
                                 modifier = Modifier.align(Alignment.Center),
                                 label = { Text(text = it.ratio.toRatioString()) },
                                 selected = it.ratio in selectedRatios,
-                                onClick = { onOptionClick(it.ratio) }
+                                onClick = { onOptionClick(it.ratio) },
                             )
                         }
                     }
@@ -717,7 +714,7 @@ private fun LandscapeChip(
             Icon(
                 modifier = Modifier.size(16.dp),
                 painter = painterResource(R.drawable.baseline_crop_landscape_24),
-                contentDescription = null
+                contentDescription = null,
             )
         },
         selected = selected,
@@ -737,7 +734,7 @@ private fun PortraitChip(
             Icon(
                 modifier = Modifier.size(16.dp),
                 painter = painterResource(R.drawable.baseline_crop_portrait_24),
-                contentDescription = null
+                contentDescription = null,
             )
         },
         selected = selected,
@@ -762,7 +759,7 @@ private fun getCategoryString(category: Category) = stringResource(
         Category.GENERAL -> R.string.general
         Category.ANIME -> R.string.anime
         Category.PEOPLE -> R.string.people
-    }
+    },
 )
 
 @Composable
@@ -771,7 +768,7 @@ private fun getPurityString(purity: Purity) = stringResource(
         Purity.SFW -> R.string.sfw
         Purity.SKETCHY -> R.string.sketchy
         Purity.NSFW -> R.string.nsfw
-    }
+    },
 )
 
 @Composable
@@ -783,7 +780,7 @@ private fun getSortingString(sorting: Sorting) = stringResource(
         Sorting.VIEWS -> R.string.views
         Sorting.FAVORITES -> R.string.favorites
         Sorting.TOPLIST -> R.string.top
-    }
+    },
 )
 
 @Composable
@@ -796,7 +793,7 @@ private fun getTopRangeString(topRange: TopRange) = stringResource(
         TopRange.THREE_MONTHS -> R.string.three_months
         TopRange.SIX_MONTHS -> R.string.six_months
         TopRange.ONE_YEAR -> R.string.one_year
-    }
+    },
 )
 
 @Composable
@@ -804,7 +801,7 @@ private fun getOrderString(order: Order) = stringResource(
     when (order) {
         Order.DESC -> R.string.descending
         Order.ASC -> R.string.ascending
-    }
+    },
 )
 
 @Composable
@@ -870,7 +867,6 @@ private fun PreviewSaveAsDialog() {
     }
 }
 
-
 @Composable
 fun SavedSearchesDialog(
     modifier: Modifier = Modifier,
@@ -902,7 +898,7 @@ fun SavedSearchesDialog(
                         savedSearch = it,
                         showActions = showActions,
                         onEditClick = onEditClick,
-                        onDeleteClick = onDeleteClick
+                        onDeleteClick = onDeleteClick,
                     )
                 }
             }
@@ -970,7 +966,7 @@ private class SavedSearchesDialogPreviewParameterProvider :
             Pair(emptyList(), false),
             Pair(tempSavedSearches, true),
             Pair(tempSavedSearches, false),
-        )
+        ),
     )
 
 @Preview(showSystemUi = true)
@@ -1012,12 +1008,16 @@ fun CustomResolutionDialog(
         }
     }
 
-    val widthState by rememberSaveable(stateSaver = intStateSaver {
-        getValidationError(it, R.string.width_cannot_be_blank, R.string.invalid_width)
-    }) { mutableStateOf(IntState(value = resolution?.width)) }
-    val heightState by rememberSaveable(stateSaver = intStateSaver {
-        getValidationError(it, R.string.height_cannot_be_blank, R.string.invalid_height)
-    }) { mutableStateOf(IntState(value = resolution?.height)) }
+    val widthState by rememberSaveable(
+        stateSaver = intStateSaver {
+            getValidationError(it, R.string.width_cannot_be_blank, R.string.invalid_width)
+        },
+    ) { mutableStateOf(IntState(value = resolution?.width)) }
+    val heightState by rememberSaveable(
+        stateSaver = intStateSaver {
+            getValidationError(it, R.string.height_cannot_be_blank, R.string.invalid_height)
+        },
+    ) { mutableStateOf(IntState(value = resolution?.height)) }
     val focusRequester = remember { FocusRequester() }
 
     LaunchedEffect(Unit) {

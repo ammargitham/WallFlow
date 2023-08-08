@@ -20,7 +20,7 @@ data class MainSearchBarState(
     val search: Search = Search(
         filters = SearchQuery(
             sorting = Sorting.RELEVANCE,
-        )
+        ),
     ),
     val showQuery: Boolean = true,
     val overflowIcon: @Composable (() -> Unit)? = null,

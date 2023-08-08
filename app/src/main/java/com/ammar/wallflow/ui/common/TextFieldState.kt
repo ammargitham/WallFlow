@@ -16,7 +16,6 @@ package com.ammar.wallflow.ui.common
  * limitations under the License.
  */
 
-
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.listSaver
@@ -66,5 +65,5 @@ fun textFieldStateSaver(state: TextFieldState) = listSaver<TextFieldState, Any>(
             text = it[0] as String
             isFocusedDirty = it[1] as Boolean
         }
-    }
+    },
 )

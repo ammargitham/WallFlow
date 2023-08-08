@@ -1,7 +1,7 @@
 package com.ammar.wallflow.data.db.converters
 
-import org.junit.Test
 import kotlin.test.assertEquals
+import org.junit.Test
 
 class ConvertersTest {
     @Test
@@ -10,8 +10,8 @@ class ConvertersTest {
             listOf(
                 "test1",
                 "test2",
-                "test3"
-            )
+                "test3",
+            ),
         )
         assertEquals("[\"test1\",\"test2\",\"test3\"]", json)
     }
@@ -23,7 +23,7 @@ class ConvertersTest {
             listOf(
                 "test1",
                 "test2",
-                "test3"
+                "test3",
             ),
             list,
         )

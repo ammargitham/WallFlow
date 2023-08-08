@@ -54,7 +54,7 @@ val wallpaper1 = Wallpaper(
             medium = "https://example.com/medium1",
             small = "https://example.com/small1",
             tiny = "https://example.com/tiny1",
-        )
+        ),
     ),
     views = 1000,
     favorites = 50,
@@ -73,7 +73,7 @@ val wallpaper1 = Wallpaper(
     thumbs = Thumbs(
         large = "https://example.com/wallpaper1/large",
         original = "https://example.com/wallpaper1/original",
-        small = "https://example.com/wallpaper1/small"
+        small = "https://example.com/wallpaper1/small",
     ),
     tags = listOf(
         Tag(
@@ -94,7 +94,7 @@ val wallpaper1 = Wallpaper(
             purity = Purity.SFW,
             createdAt = Clock.System.now(),
         ),
-    )
+    ),
 )
 
 val wallpaper2 = Wallpaper(
@@ -109,7 +109,7 @@ val wallpaper2 = Wallpaper(
             medium = "https://example.com/medium2",
             small = "https://example.com/small2",
             tiny = "https://example.com/tiny2",
-        )
+        ),
     ),
     views = 500,
     favorites = 20,
@@ -128,7 +128,7 @@ val wallpaper2 = Wallpaper(
     thumbs = Thumbs(
         large = "https://example.com/wallpaper2/large",
         original = "https://example.com/wallpaper2/original",
-        small = "https://example.com/wallpaper2/small"
+        small = "https://example.com/wallpaper2/small",
     ),
     tags = listOf(
         Tag(
@@ -149,5 +149,5 @@ val wallpaper2 = Wallpaper(
             purity = Purity.SFW,
             createdAt = Clock.System.now(),
         ),
-    )
+    ),
 )

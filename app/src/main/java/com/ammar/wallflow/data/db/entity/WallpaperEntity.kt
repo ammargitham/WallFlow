@@ -15,15 +15,14 @@ import com.ammar.wallflow.model.Thumbs
 import com.ammar.wallflow.model.Wallpaper
 import kotlinx.datetime.Instant
 
-
 @Entity(
     tableName = "wallpapers",
     indices = [
         Index(
             value = ["wallhaven_id"],
             unique = true,
-        )
-    ]
+        ),
+    ],
 )
 data class WallpaperEntity(
     @PrimaryKey(autoGenerate = true) val id: Long,
@@ -60,7 +59,7 @@ data class WallpaperWithUploaderAndTags(
             value = WallpaperTagsEntity::class,
             parentColumn = "wallpaper_id",
             entityColumn = "tag_id",
-        )
+        ),
     )
     val tags: List<TagEntity>?,
 )

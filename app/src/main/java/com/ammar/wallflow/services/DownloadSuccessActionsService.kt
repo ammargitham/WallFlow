@@ -12,11 +12,10 @@ import com.ammar.wallflow.extensions.TAG
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.File
 import javax.inject.Inject
+import kotlin.random.Random
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.random.Random
-
 
 @AndroidEntryPoint
 class DownloadSuccessActionsService : LifecycleService() {
@@ -28,10 +27,12 @@ class DownloadSuccessActionsService : LifecycleService() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         super.onStartCommand(intent, flags, startId)
-        if (intent == null
-            || intent.action !in setOf(Intent.ACTION_DELETE)
-            || !intent.hasExtra(EXTRA_FILE_PATH)
-        ) return START_NOT_STICKY
+        if (intent == null ||
+            intent.action !in setOf(Intent.ACTION_DELETE) ||
+            !intent.hasExtra(EXTRA_FILE_PATH)
+        ) {
+            return START_NOT_STICKY
+        }
         val filePath = intent.getStringExtra(EXTRA_FILE_PATH)
         if (filePath.isNullOrBlank()) return START_NOT_STICKY
         when (intent.action) {

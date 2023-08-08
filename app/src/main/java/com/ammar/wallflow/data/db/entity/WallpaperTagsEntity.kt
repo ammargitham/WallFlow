@@ -10,7 +10,7 @@ import androidx.room.Index
     indices = [
         Index("wallpaper_id"),
         Index("tag_id"),
-    ]
+    ],
 )
 data class WallpaperTagsEntity(
     @ColumnInfo(name = "wallpaper_id") val wallpaperId: Long,

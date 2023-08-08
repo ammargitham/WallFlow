@@ -12,8 +12,8 @@ import com.ammar.wallflow.model.ObjectDetectionModel
         Index(
             value = ["name"],
             unique = true,
-        )
-    ]
+        ),
+    ],
 )
 data class ObjectDetectionModelEntity(
     @PrimaryKey(autoGenerate = true) val id: Long,

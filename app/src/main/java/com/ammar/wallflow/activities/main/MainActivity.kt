@@ -206,7 +206,7 @@ class MainActivity : ComponentActivity() {
                         onSearchBarShowFiltersChange = viewModel::setShowSearchBarFilters,
                         onSearchBarFiltersChange = {
                             viewModel.setSearchBarSearch(
-                                uiState.searchBarSearch.copy(filters = it)
+                                uiState.searchBarSearch.copy(filters = it),
                             )
                         },
                         onDeleteSearchBarSuggestionConfirmClick = {
@@ -264,7 +264,7 @@ class MainActivity : ComponentActivity() {
                                 viewModel.showSavedSearches(false)
                                 viewModel.setSearchBarActive(false)
                             },
-                            onDismissRequest = { viewModel.showSavedSearches(false) }
+                            onDismissRequest = { viewModel.showSavedSearches(false) },
                         )
                     }
                 }

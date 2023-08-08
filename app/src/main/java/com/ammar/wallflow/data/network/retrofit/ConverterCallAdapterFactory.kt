@@ -17,16 +17,22 @@ open class ConverterCallAdapterFactory(private val converterFactory: ResponseBod
         fun convert(request: Request?, body: ResponseBody?): T
         interface Factory {
             fun responseBodyConverter(
-                type: Type?, annotations: Array<Annotation>?,
+                type: Type?,
+                annotations: Array<Annotation>?,
                 retrofit: Retrofit?,
             ): ResponseBodyConverter<*>?
         }
     }
 
     override fun get(returnType: Type, annotations: Array<Annotation>, retrofit: Retrofit): CallAdapter<*, *> {
-        @Suppress("UNCHECKED_CAST") val delegate = retrofit.nextCallAdapter(this, returnType, annotations) as CallAdapter<Any, *>
-        @Suppress("UNCHECKED_CAST") val converter = converterFactory.responseBodyConverter(
-            delegate.responseType(), annotations, retrofit
+        @Suppress("UNCHECKED_CAST")
+        val delegate = retrofit.nextCallAdapter(this, returnType, annotations) as CallAdapter<Any, *>
+
+        @Suppress("UNCHECKED_CAST")
+        val converter = converterFactory.responseBodyConverter(
+            delegate.responseType(),
+            annotations,
+            retrofit,
         ) as ResponseBodyConverter<Any>
         return object : CallAdapter<ResponseBody?, Any> {
             override fun responseType(): Type {
@@ -56,7 +62,9 @@ open class ConverterCallAdapterFactory(private val converterFactory: ResponseBod
             delegate.enqueue(object : Callback<ResponseBody?> {
                 override fun onResponse(call: Call<ResponseBody?>, response: Response<ResponseBody?>) {
                     val raw = response.raw()
-                    @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS") val converted: Response<T> = if (raw.isSuccessful) {
+
+                    @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+                    val converted: Response<T> = if (raw.isSuccessful) {
                         try {
                             Response.success(converter.convert(call.request(), response.body()), raw)
                         } catch (e: IOException) {

@@ -34,7 +34,7 @@ class TopWallpapersPageKeyedPagingSource(
                     }
                     current_page - 1
                 },
-                nextKey = response.meta?.run { current_page + 1 }
+                nextKey = response.meta?.run { current_page + 1 },
             )
         } catch (e: IOException) {
             LoadResult.Error(e)

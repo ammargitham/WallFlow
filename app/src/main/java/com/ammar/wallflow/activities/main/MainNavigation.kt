@@ -51,8 +51,8 @@ fun MainNavigation(
     val navHostEngine = rememberNavHostEngine(
         rootDefaultAnimations = RootNavGraphDefaultAnimations(
             enterTransition = { materialFadeThroughIn() },
-            exitTransition = { materialFadeThroughOut() }
-        )
+            exitTransition = { materialFadeThroughOut() },
+        ),
     )
     val layoutDirection = LocalLayoutDirection.current
     val hostPadding by animateValueAsState(
@@ -88,7 +88,7 @@ fun MainNavigation(
                 animationSpec = tween(
                     durationMillis = 200.ForIncoming,
                     delayMillis = 200.ForOutgoing,
-                    easing = LinearOutSlowInEasing
+                    easing = LinearOutSlowInEasing,
                 ),
                 initialOffsetX = { it },
             ),
@@ -96,7 +96,7 @@ fun MainNavigation(
                 animationSpec = tween(
                     durationMillis = 200.ForOutgoing,
                     delayMillis = 200.ForOutgoing / 2,
-                    easing = FastOutLinearInEasing
+                    easing = FastOutLinearInEasing,
                 ),
                 targetOffsetX = { it },
             ),
@@ -137,7 +137,7 @@ private fun Host(
             dependency(twoPaneController)
             dependency(mainActivityViewModel)
             dependency(wallpaperViewModel)
-        }
+        },
     ) {
         composable(HomeScreenDestination) {
             HomeScreen(

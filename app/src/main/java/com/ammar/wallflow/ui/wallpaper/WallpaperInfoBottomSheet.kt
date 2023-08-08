@@ -30,7 +30,6 @@ import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.wallpaper1
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WallpaperInfoBottomSheet(
@@ -109,7 +108,7 @@ fun WallpaperInfoBottomSheetContent(
                     Box(
                         modifier = Modifier
                             .alignByBaseline()
-                            .weight(3f)
+                            .weight(3f),
                     ) {
                         Text(
                             modifier = Modifier.clickable(onClick = onSourceClick),
@@ -132,7 +131,7 @@ fun WallpaperInfoBottomSheetContent(
                 Box(
                     modifier = Modifier
                         .alignByBaseline()
-                        .weight(3f)
+                        .weight(3f),
                 ) {
                     Text(
                         text = wallpaper.category.capitalise(),
@@ -149,11 +148,11 @@ fun WallpaperInfoBottomSheetContent(
             )
             PropertyRow(
                 title = stringResource(R.string.views),
-                text = wallpaper.views.toString()
+                text = wallpaper.views.toString(),
             )
             PropertyRow(
                 title = stringResource(R.string.favorites),
-                text = wallpaper.favorites.toString()
+                text = wallpaper.favorites.toString(),
             )
         }
     }

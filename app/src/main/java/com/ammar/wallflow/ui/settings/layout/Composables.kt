@@ -112,14 +112,14 @@ internal fun LayoutPreview(
     val paddingDp = 4.dp
     val paddingPx = paddingDp.toPxF()
     val cornerRadiusPx by animateFloatAsState(
-        targetValue = if (layoutPreferences.roundedCorners) paddingPx else 0f
+        targetValue = if (layoutPreferences.roundedCorners) paddingPx else 0f,
     )
     val maxDeviceHeight = screenResolution.height.toDp() / 4
     val gridWidthDp = gridSize.width.toDp()
     val adaptiveMinWidth = remember(
         layoutPreferences.gridColType,
         layoutPreferences.gridColMinWidthPct,
-        gridSize
+        gridSize,
     ) {
         if (layoutPreferences.gridColType != GridColType.ADAPTIVE) {
             return@remember 0.dp
@@ -174,14 +174,14 @@ internal fun LayoutPreview(
                                         cornerRadiusPx,
                                         cornerRadiusPx,
                                     ),
-                                )
+                                ),
                             )
                         }
                         clipPath(path = path) {
                             this@onDrawWithContent.drawContent()
                         }
                     }
-                }
+                },
         ) {
             Row {
                 LazyVerticalStaggeredGrid(
@@ -209,7 +209,7 @@ internal fun LayoutPreview(
                                     } else {
                                         it.requiredHeight(gridSize.height.toDp() / 3)
                                     }
-                                }
+                                },
                         )
                     }
                 }
@@ -239,7 +239,7 @@ internal class LayoutPreferenceProvider :
         listOf(
             false to LayoutPreferences(),
             true to LayoutPreferences(),
-        )
+        ),
     )
 
 @Preview
@@ -307,7 +307,7 @@ internal fun LazyListScope.gridTypeSection(
                         }
                     }
                 }
-            }
+            },
         )
     }
 }
@@ -379,7 +379,7 @@ internal fun LazyListScope.gridColTypeSection(
                         }
                     }
                 }
-            }
+            },
         )
     }
 }
@@ -431,7 +431,7 @@ internal fun LazyListScope.noOfColumnsSection(
                             .weight(1f)
                             .semantics {
                                 contentDescription = context.getString(
-                                    R.string.no_of_columns
+                                    R.string.no_of_columns,
                                 )
                             },
                         value = sliderPosition,
@@ -446,7 +446,7 @@ internal fun LazyListScope.noOfColumnsSection(
                         textAlign = TextAlign.Center,
                     )
                 }
-            }
+            },
         )
     }
 }
@@ -492,7 +492,7 @@ internal fun LazyListScope.adaptiveColMinWidthPctSection(
                             .weight(1f)
                             .semantics {
                                 contentDescription = context.getString(
-                                    R.string.no_of_columns
+                                    R.string.no_of_columns,
                                 )
                             },
                         value = sliderPosition,
@@ -507,7 +507,7 @@ internal fun LazyListScope.adaptiveColMinWidthPctSection(
                         textAlign = TextAlign.Center,
                     )
                 }
-            }
+            },
         )
     }
 }
@@ -524,7 +524,6 @@ private fun PreviewAdaptiveColMinWidthPctSection() {
         }
     }
 }
-
 
 internal fun LazyListScope.roundedCornersSection(
     roundedCorners: Boolean = true,

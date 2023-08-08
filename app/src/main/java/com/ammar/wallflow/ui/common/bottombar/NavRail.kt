@@ -27,7 +27,7 @@ fun NavRail(
         modifier = modifier,
         visible = state.visible,
         enter = slideInHorizontally(initialOffsetX = { -it }),
-        exit = slideOutHorizontally(targetOffsetX = { -it })
+        exit = slideOutHorizontally(targetOffsetX = { -it }),
     ) {
         NavigationRail(
             modifier = modifier,
@@ -38,7 +38,7 @@ fun NavRail(
                     icon = {
                         Icon(
                             destination.icon,
-                            contentDescription = stringResource(destination.label)
+                            contentDescription = stringResource(destination.label),
                         )
                     },
                     label = { Text(stringResource(destination.label)) },

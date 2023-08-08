@@ -53,7 +53,7 @@ fun TagChip(
                         visible = true,
                         highlight = PlaceholderHighlight.fade(),
                         shape = AssistChipDefaults.shape,
-                    )
+                    ),
             )
         }
     }
@@ -79,7 +79,7 @@ private fun PreviewTagChip() {
                         category = "",
                         purity = Purity.SFW,
                         createdAt = Clock.System.now(),
-                    )
+                    ),
                 )
                 TagChip(
                     tag = Tag(
@@ -90,7 +90,7 @@ private fun PreviewTagChip() {
                         category = "",
                         purity = Purity.SFW,
                         createdAt = Clock.System.now(),
-                    )
+                    ),
                 )
             }
         }

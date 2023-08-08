@@ -72,7 +72,9 @@ fun MainSearchBar(
     onLoadClick: () -> Unit = {},
 ) {
     val placeholder: @Composable () -> Unit = remember {
-        { Text(text = stringResource(R.string.search)) }
+        {
+            Text(text = stringResource(R.string.search))
+        }
     }
 
     AnimatedVisibility(
@@ -142,7 +144,7 @@ fun MainSearchBar(
                     exit = slideOutVertically(targetOffsetY = { -it }),
                 ) {
                     Surface(
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.fillMaxSize(),
                     ) {
                         EditSearchContent(
                             modifier = Modifier

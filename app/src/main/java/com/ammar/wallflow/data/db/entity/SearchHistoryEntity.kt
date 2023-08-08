@@ -14,8 +14,8 @@ import kotlinx.datetime.Instant
         Index(
             value = ["query"],
             unique = true,
-        )
-    ]
+        ),
+    ],
 )
 data class SearchHistoryEntity(
     @PrimaryKey(autoGenerate = true) val id: Long,

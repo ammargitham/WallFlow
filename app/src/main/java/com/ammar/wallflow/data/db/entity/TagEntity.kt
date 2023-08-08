@@ -15,8 +15,8 @@ import kotlinx.datetime.Instant
         Index(
             value = ["wallhaven_id"],
             unique = true,
-        )
-    ]
+        ),
+    ],
 )
 data class TagEntity(
     @PrimaryKey(autoGenerate = true) val id: Long,

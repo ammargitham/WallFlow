@@ -35,12 +35,14 @@ kotlinxCollectionsImmutable = "0.3.5"
 kotlinxDatetime = "0.4.0"
 kotlinxSerializationJson = "1.5.1"
 ksp = "1.9.0-1.0.12"
+ktlint = "0.50.0"
 mockk = "1.13.5"
 modernstorage = "1.0.0-alpha06"
 partial = "1.1.0"
 okhttp = "4.11.0"
 retrofit = "2.9.0"
 retrofitKotlinxSerializationJson = "1.0.0"
+spotless = "6.20.0"
 telephoto = "0.4.0"
 tflite = "0.4.3"
 tflite-gpu = "2.13.0"
@@ -125,3 +127,4 @@ kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 room = { id = "androidx.room", version.ref = "androidxRoom" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }

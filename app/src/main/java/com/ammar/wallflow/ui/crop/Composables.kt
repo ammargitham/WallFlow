@@ -87,14 +87,17 @@ internal fun Actions(
         ) {
             if (objectDetectionEnabled) {
                 val containerColor =
-                    if (detections !is Resource.Error) MaterialTheme.colorScheme.secondaryContainer
-                    else MaterialTheme.colorScheme.errorContainer
+                    if (detections !is Resource.Error) {
+                        MaterialTheme.colorScheme.secondaryContainer
+                    } else {
+                        MaterialTheme.colorScheme.errorContainer
+                    }
                 FilledTonalButton(
                     onClick = onDetectionsClick,
                     colors = ButtonDefaults.filledTonalButtonColors(
                         disabledContainerColor = containerColor.copy(
-                            alpha = 0.5f
-                        )
+                            alpha = 0.5f,
+                        ),
                     ),
                     enabled = detectionCount > 0,
                 ) {
@@ -107,7 +110,7 @@ internal fun Actions(
                             else -> pluralStringResource(
                                 R.plurals.num_detected_objects,
                                 detectionCount,
-                                detectionCount
+                                detectionCount,
                             )
                         }
                     }
@@ -150,7 +153,7 @@ private fun PreviewActions() {
     WallFlowTheme {
         Surface {
             Actions(
-                modifier = Modifier.padding(horizontal = 32.dp)
+                modifier = Modifier.padding(horizontal = 32.dp),
             )
         }
     }
@@ -244,7 +247,7 @@ internal fun DetectionsBottomSheetContent(
         items(detections) {
             DetectionsItem(
                 detection = it,
-                onClick = { onDetectionClick(it) }
+                onClick = { onDetectionClick(it) },
             )
         }
     }
@@ -264,7 +267,9 @@ internal fun DetectionsItem(
         },
         supportingContent = if (category != null) {
             { Text(text = stringResource(R.string.confidence_score, category.score)) }
-        } else null,
+        } else {
+            null
+        },
         leadingContent = {
             AsyncImage(
                 modifier = Modifier
@@ -274,7 +279,7 @@ internal fun DetectionsItem(
                 contentDescription = "",
                 contentScale = ContentScale.Fit,
             )
-        }
+        },
     )
 }
 
@@ -288,7 +293,7 @@ private fun PreviewDetectionItem() {
                 detection = DetectionWithBitmap(
                     Detection.EMPTY,
                     Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888),
-                )
+                ),
             )
         }
     }
@@ -306,7 +311,7 @@ internal fun DisplayButton(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .wrapContentSize(Alignment.TopStart)
+            .wrapContentSize(Alignment.TopStart),
     ) {
         FilledTonalButton(
             modifier = modifier,
@@ -314,7 +319,7 @@ internal fun DisplayButton(
                 start = 16.dp,
                 top = 8.dp,
                 end = 16.dp,
-                bottom = 8.dp
+                bottom = 8.dp,
             ),
             onClick = { expanded = true },
         ) {

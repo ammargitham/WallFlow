@@ -24,7 +24,6 @@ import java.nio.charset.StandardCharsets
 import java.util.BitSet
 import java.util.Objects
 
-
 /**
  * Representation of the Content-Disposition type and parameters as defined in RFC 6266.
  *
@@ -362,10 +361,16 @@ class ContentDisposition private constructor(
 
         private fun tokenize(headerValue: String): List<String> {
             var index = headerValue.indexOf(';')
-            val type = (if (index >= 0) headerValue.substring(
-                0,
-                index
-            ) else headerValue).trim { it <= ' ' }
+            val type = (
+                if (index >= 0) {
+                    headerValue.substring(
+                        0,
+                        index,
+                    )
+                } else {
+                    headerValue
+                }
+                ).trim { it <= ' ' }
             require(type.isNotEmpty()) { "Content-Disposition header must not be empty" }
             val parts: MutableList<String> = ArrayList()
             parts.add(type)
@@ -418,14 +423,14 @@ class ContentDisposition private constructor(
                     } else if (b == '%'.code.toByte() && index < value.size - 2) {
                         val array = charArrayOf(
                             Char(value[index + 1].toUShort()),
-                            Char(value[index + 2].toUShort())
+                            Char(value[index + 2].toUShort()),
                         )
                         try {
                             it.write(String(array).toInt(16))
                         } catch (ex: NumberFormatException) {
                             throw IllegalArgumentException(
                                 INVALID_HEADER_FIELD_PARAMETER_FORMAT,
-                                ex
+                                ex,
                             )
                         }
                         index += 3
@@ -436,24 +441,24 @@ class ContentDisposition private constructor(
                 copyToString(it, charset)
             }
 
-        private fun isRFC5987AttrChar(c: Byte) = c >= '0'.code.toByte()
-                && c <= '9'.code.toByte()
-                || c >= 'a'.code.toByte()
-                && c <= 'z'.code.toByte()
-                || c >= 'A'.code.toByte()
-                && c <= 'Z'.code.toByte()
-                || c == '!'.code.toByte()
-                || c == '#'.code.toByte()
-                || c == '$'.code.toByte()
-                || c == '&'.code.toByte()
-                || c == '+'.code.toByte()
-                || c == '-'.code.toByte()
-                || c == '.'.code.toByte()
-                || c == '^'.code.toByte()
-                || c == '_'.code.toByte()
-                || c == '`'.code.toByte()
-                || c == '|'.code.toByte()
-                || c == '~'.code.toByte()
+        private fun isRFC5987AttrChar(c: Byte) = c >= '0'.code.toByte() &&
+            c <= '9'.code.toByte() ||
+            c >= 'a'.code.toByte() &&
+            c <= 'z'.code.toByte() ||
+            c >= 'A'.code.toByte() &&
+            c <= 'Z'.code.toByte() ||
+            c == '!'.code.toByte() ||
+            c == '#'.code.toByte() ||
+            c == '$'.code.toByte() ||
+            c == '&'.code.toByte() ||
+            c == '+'.code.toByte() ||
+            c == '-'.code.toByte() ||
+            c == '.'.code.toByte() ||
+            c == '^'.code.toByte() ||
+            c == '_'.code.toByte() ||
+            c == '`'.code.toByte() ||
+            c == '|'.code.toByte() ||
+            c == '~'.code.toByte()
 
         /**
          * Decode the given header field param as described in RFC 2047.

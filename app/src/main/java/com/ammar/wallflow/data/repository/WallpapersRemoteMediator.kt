@@ -46,7 +46,6 @@ class WallpapersRemoteMediator(
         }
     }
 
-
     override suspend fun load(
         loadType: LoadType,
         state: PagingState<Int, WallpaperEntity>,
@@ -74,7 +73,7 @@ class WallpapersRemoteMediator(
                         id = 0,
                         queryString = searchQuery.toQueryString(),
                         lastUpdatedOn = now,
-                    )
+                    ),
                 ).first()
 
                 if (loadType == LoadType.REFRESH) {
@@ -110,7 +109,7 @@ class WallpapersRemoteMediator(
                             searchQueryId = searchQueryId,
                             wallpaperId = it.id,
                         )
-                    }
+                    },
                 )
             }
 

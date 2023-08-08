@@ -61,7 +61,7 @@ fun LayoutSettingsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .windowInsetsPadding(bottomWindowInsets)
+            .windowInsetsPadding(bottomWindowInsets),
     ) {
         TopBar(
             navController = twoPaneController.pane1NavHostController,
@@ -115,7 +115,7 @@ fun LayoutSettingsScreenContent(
                 gridType = layoutPreferences.gridType,
                 onGridTypeChange = {
                     onLayoutPreferencesChange(
-                        layoutPreferences.copy(gridType = it)
+                        layoutPreferences.copy(gridType = it),
                     )
                 },
             )
@@ -123,7 +123,7 @@ fun LayoutSettingsScreenContent(
                 gridColType = layoutPreferences.gridColType,
                 onGridColTypeChange = {
                     onLayoutPreferencesChange(
-                        layoutPreferences.copy(gridColType = it)
+                        layoutPreferences.copy(gridColType = it),
                     )
                 },
             )
@@ -133,16 +133,16 @@ fun LayoutSettingsScreenContent(
                     sliderPadding = sliderPadding,
                     onMinWidthPctChange = {
                         onLayoutPreferencesChange(
-                            layoutPreferences.copy(gridColMinWidthPct = it)
+                            layoutPreferences.copy(gridColMinWidthPct = it),
                         )
-                    }
+                    },
                 )
                 GridColType.FIXED -> noOfColumnsSection(
                     noOfColumns = layoutPreferences.gridColCount,
                     sliderPadding = sliderPadding,
                     onNoOfColumnsChange = {
                         onLayoutPreferencesChange(
-                            layoutPreferences.copy(gridColCount = it)
+                            layoutPreferences.copy(gridColCount = it),
                         )
                     },
                 )
@@ -151,7 +151,7 @@ fun LayoutSettingsScreenContent(
                 roundedCorners = layoutPreferences.roundedCorners,
                 onRoundedCornersChange = {
                     onLayoutPreferencesChange(
-                        layoutPreferences.copy(roundedCorners = it)
+                        layoutPreferences.copy(roundedCorners = it),
                     )
                 },
             )
@@ -172,7 +172,7 @@ private fun PreviewLayoutSettingsScreenContent(
             LayoutSettingsScreenContent(
                 supportsTwoPane = twoPaneLayoutPreferences.first,
                 layoutPreferences = tempLayoutPreferences,
-                onLayoutPreferencesChange = { tempLayoutPreferences = it }
+                onLayoutPreferencesChange = { tempLayoutPreferences = it },
             )
         }
     }

@@ -13,8 +13,8 @@ import com.ammar.wallflow.model.SearchQuery
         Index(
             value = ["name"],
             unique = true,
-        )
-    ]
+        ),
+    ],
 )
 data class SavedSearchEntity(
     @PrimaryKey(autoGenerate = true) val id: Long,
@@ -29,5 +29,5 @@ fun SavedSearchEntity.toSavedSearch() = SavedSearch(
     search = Search(
         query = query,
         filters = SearchQuery.fromQueryString(filters),
-    )
+    ),
 )

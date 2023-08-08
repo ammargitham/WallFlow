@@ -60,7 +60,7 @@ class HomeViewModel @Inject constructor(
 ) : ViewModel() {
     private val savedStateSearchFlow: Flow<Search?> = savedStateHandle.getStateFlow<ByteArray?>(
         "search",
-        null
+        null,
     ).mapLatest {
         it?.run {
             DefaultKtxSerializableNavTypeSerializer(Search.serializer()).fromByteArray(it)
@@ -92,17 +92,23 @@ class HomeViewModel @Inject constructor(
     ) { search, tags, appPreferences, local, wallpapersLoading, savedSearchEntities ->
         local.merge(
             HomeUiState(
-                tags = (if (tags is Resource.Loading) List(3) {
-                    Tag(
-                        id = it + 1L,
-                        name = "Loading...", // no need for string resource as "Loading..." won't be visible
-                        alias = emptyList(),
-                        categoryId = 0,
-                        category = "",
-                        purity = Purity.SFW,
-                        createdAt = Clock.System.now(),
-                    )
-                } else tags.successOr(emptyList())).toImmutableList(),
+                tags = (
+                    if (tags is Resource.Loading) {
+                        List(3) {
+                            Tag(
+                                id = it + 1L,
+                                name = "Loading...", // no need for string resource as "Loading..." won't be visible
+                                alias = emptyList(),
+                                categoryId = 0,
+                                category = "",
+                                purity = Purity.SFW,
+                                createdAt = Clock.System.now(),
+                            )
+                        }
+                    } else {
+                        tags.successOr(emptyList())
+                    }
+                    ).toImmutableList(),
                 areTagsLoading = tags is Resource.Loading,
                 search = search,
                 wallpapersLoading = wallpapersLoading,
@@ -112,7 +118,7 @@ class HomeViewModel @Inject constructor(
                 isHome = search == appPreferences.homeSearch,
                 savedSearches = savedSearchEntities.map { entity -> entity.toSavedSearch() },
                 layoutPreferences = appPreferences.lookAndFeelPreferences.layoutPreferences,
-            )
+            ),
         )
     }.stateIn(
         scope = viewModelScope,
@@ -151,7 +157,7 @@ class HomeViewModel @Inject constructor(
             SavedSearch(
                 name = name,
                 search = search,
-            )
+            ),
         )
     }
 
@@ -169,7 +175,7 @@ data class HomeUiState(
         filters = SearchQuery(
             sorting = Sorting.TOPLIST,
             topRange = TopRange.ONE_DAY,
-        )
+        ),
     ),
     val showFilters: Boolean = false,
     val wallpapersLoading: Boolean = false,

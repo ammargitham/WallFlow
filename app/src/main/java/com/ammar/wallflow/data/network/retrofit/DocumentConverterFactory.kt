@@ -8,7 +8,6 @@ import org.jsoup.nodes.Document
 import retrofit2.Converter
 import retrofit2.Retrofit
 
-
 class DocumentConverterFactory : Converter.Factory() {
     override fun responseBodyConverter(
         type: Type,

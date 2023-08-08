@@ -11,5 +11,5 @@ internal fun delegateString(delegate: ObjectDetectionDelegate) = stringResource(
         ObjectDetectionDelegate.NONE -> R.string.cpu
         ObjectDetectionDelegate.NNAPI -> R.string.nnapi
         ObjectDetectionDelegate.GPU -> R.string.gpu
-    }
+    },
 )
