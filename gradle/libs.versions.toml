@@ -13,7 +13,7 @@ androidxHilt = "1.0.0"
 androidxLifecycle = "2.6.1"
 androidxNavigation = "2.6.0"
 androidxPaging = "3.2.0"
-androidxRoom = "2.6.0-alpha01"
+androidxRoom = "2.6.0-alpha02"
 androidxTest = "1.5.0"
 androidxTestExt = "1.1.5"
 androidxTestRunner = "1.5.2"
@@ -119,8 +119,9 @@ tflite-task-vision = { module = "org.tensorflow:tensorflow-lite-task-vision", ve
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
+hilt-gradle = { id = "com.google.dagger.hilt.android", version.ref = "daggerHilt" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-hilt-gradle = { id = "com.google.dagger.hilt.android", version.ref = "daggerHilt" }
+room = { id = "androidx.room", version.ref = "androidxRoom" }

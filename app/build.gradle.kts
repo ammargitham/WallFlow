@@ -12,11 +12,12 @@ val abiCodes = mapOf("x86" to 1, "x86_64" to 2, "armeabi-v7a" to 3, "arm64-v8a" 
 
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.hilt.gradle)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.kotlinx.serialization)
-    alias(libs.plugins.hilt.gradle)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.room)
 }
 
 kapt {
@@ -54,7 +55,7 @@ android {
 
         // Enable room auto-migrations
         ksp {
-            arg("room.schemaLocation", "$projectDir/schemas")
+            // arg("room.schemaLocation", "$projectDir/schemas")
             arg("room.generateKotlin", "true")
         }
     }
@@ -192,6 +193,10 @@ android {
     lint {
         warning += "AutoboxingStateCreation"
     }
+}
+
+room {
+    schemaDirectory("$projectDir/schemas/")
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
