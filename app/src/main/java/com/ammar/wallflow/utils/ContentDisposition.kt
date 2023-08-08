@@ -501,7 +501,7 @@ class ContentDisposition private constructor(
          * @return the encoded header field param
          * @see [RFC 2047](https://tools.ietf.org/html/rfc2047)
          */
-        private fun encodeQuotedPrintableFilename(filename: String, charset: Charset): String {
+        internal fun encodeQuotedPrintableFilename(filename: String, charset: Charset): String {
             val source = filename.toByteArray(charset)
             val sb = StringBuilder(source.size shl 1)
             sb.append("=?")
@@ -530,7 +530,7 @@ class ContentDisposition private constructor(
             return PRINTABLE[b]
         }
 
-        private fun encodeQuotedPairs(filename: String): String {
+        internal fun encodeQuotedPairs(filename: String): String {
             if (filename.indexOf('"') == -1 && filename.indexOf('\\') == -1) {
                 return filename
             }
@@ -574,7 +574,7 @@ class ContentDisposition private constructor(
          * @return the encoded header field param
          * @see [RFC 5987](https://tools.ietf.org/html/rfc5987)
          */
-        private fun encodeRfc5987Filename(input: String, charset: Charset): String {
+        internal fun encodeRfc5987Filename(input: String, charset: Charset): String {
             require(StandardCharsets.US_ASCII != charset) {
                 "ASCII does not require encoding"
             }
