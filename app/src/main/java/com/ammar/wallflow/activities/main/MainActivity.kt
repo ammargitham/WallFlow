@@ -13,9 +13,15 @@ import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -98,6 +104,21 @@ class MainActivity : ComponentActivity() {
                 }
             }
             val statusBarSemiTransparentColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)
+            var searchBarHeightPx by remember { mutableFloatStateOf(0f) }
+            var searchBarOffsetHeightPx by remember { mutableFloatStateOf(0f) }
+            val nestedScrollConnection = remember {
+                object : NestedScrollConnection {
+                    override fun onPreScroll(
+                        available: Offset,
+                        source: NestedScrollSource,
+                    ): Offset {
+                        val delta = available.y
+                        val newOffset = searchBarOffsetHeightPx + delta
+                        searchBarOffsetHeightPx = newOffset.coerceIn(-searchBarHeightPx, 0f)
+                        return Offset.Zero
+                    }
+                }
+            }
 
             LaunchedEffect(searchBarControllerState.search) {
                 viewModel.setSearchBarSearch(searchBarControllerState.search)
@@ -130,6 +151,7 @@ class MainActivity : ComponentActivity() {
                         // useNavRail = useNavRail,
                         useDockedSearchBar = isTwoPaneMode,
                         globalErrors = uiState.globalErrors,
+                        searchBarOffsetHeightPx = searchBarOffsetHeightPx,
                         searchBarVisible = searchBarControllerState.visible,
                         searchBarActive = uiState.searchBarActive,
                         searchBarSearch = uiState.searchBarSearch,
@@ -140,6 +162,7 @@ class MainActivity : ComponentActivity() {
                         searchBarOverflowIcon = searchBarControllerState.overflowIcon,
                         searchBarShowNSFW = uiState.searchBarShowNSFW,
                         searchBarShowQuery = searchBarControllerState.showQuery,
+                        onSearchBarSizeChanged = { searchBarHeightPx = it.height.toFloat() },
                         onSearchBarQueryChange = viewModel::onSearchBarQueryChange,
                         onBackClick = { pane1NavController.navigateUp() },
                         onSearchBarSearch = {
@@ -214,6 +237,7 @@ class MainActivity : ComponentActivity() {
                         onSearchBarLoadClick = viewModel::showSavedSearches,
                     ) {
                         MainNavigation(
+                            modifier = Modifier.nestedScroll(nestedScrollConnection),
                             twoPaneController = twoPaneController,
                             contentPadding = it,
                             mainActivityViewModel = viewModel,

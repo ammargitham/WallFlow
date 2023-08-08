@@ -131,7 +131,9 @@ object SearchBar {
                 .searchBarContainer(isDocked = useDocked),
         ) {
             SwitchableSearchBar(
-                modifier = Modifier.searchBar(isDocked = useDocked),
+                modifier = Modifier
+                    .searchBar(isDocked = useDocked)
+                    .padding(bottom = 8.dp),
                 useDocked = useDocked,
                 query = query,
                 onQueryChange = onQueryChange,
@@ -150,7 +152,10 @@ object SearchBar {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Crossfade(localActive || onBackClick != null) {
+                        Crossfade(
+                            targetState = localActive || onBackClick != null,
+                            label = "leadingIcon",
+                        ) {
                             if (it) {
                                 IconButton(
                                     onClick = {
@@ -238,9 +243,9 @@ object SearchBar {
         }
     }
 
-    object Defaults {
-        val height = 72.dp
-    }
+    // object Defaults {
+    //     val height = 72.dp
+    // }
 }
 
 

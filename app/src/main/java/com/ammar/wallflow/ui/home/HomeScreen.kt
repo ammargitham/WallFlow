@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
+// noinspection UsingMaterialAndMaterial3Libraries
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
@@ -63,7 +64,6 @@ import com.ammar.wallflow.model.wallpaper1
 import com.ammar.wallflow.model.wallpaper2
 import com.ammar.wallflow.ui.appCurrentDestinationAsState
 import com.ammar.wallflow.ui.common.LocalSystemBarsController
-import com.ammar.wallflow.ui.common.SearchBar
 import com.ammar.wallflow.ui.common.WallpaperStaggeredGrid
 import com.ammar.wallflow.ui.common.bottomWindowInsets
 import com.ammar.wallflow.ui.common.bottombar.BottomBarController
@@ -241,7 +241,6 @@ fun HomeScreen(
         modifier = modifier
             .fillMaxSize()
             .windowInsetsPadding(topWindowInsets)
-            .padding(top = SearchBar.Defaults.height)
             .pullRefresh(state = refreshState),
     ) {
         HomeScreenContent(

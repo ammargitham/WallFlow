@@ -113,7 +113,10 @@ fun MainSearchBar(
             onSuggestionDeleteRequest = onSuggestionDeleteRequest,
             onActiveChange = onActiveChange,
             trailingIcon = {
-                Crossfade(active) {
+                Crossfade(
+                    targetState = active,
+                    label = "trailingIcon",
+                ) {
                     if (it) {
                         Row {
                             SearchBarFiltersToggle(
