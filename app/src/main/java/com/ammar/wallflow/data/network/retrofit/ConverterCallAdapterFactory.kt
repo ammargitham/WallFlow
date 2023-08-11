@@ -11,7 +11,9 @@ import retrofit2.Callback
 import retrofit2.Response
 import retrofit2.Retrofit
 
-open class ConverterCallAdapterFactory(private val converterFactory: ResponseBodyConverter.Factory) : CallAdapter.Factory() {
+open class ConverterCallAdapterFactory(
+    private val converterFactory: ResponseBodyConverter.Factory,
+) : CallAdapter.Factory() {
     interface ResponseBodyConverter<T> {
         @Throws(IOException::class)
         fun convert(request: Request?, body: ResponseBody?): T
@@ -24,9 +26,17 @@ open class ConverterCallAdapterFactory(private val converterFactory: ResponseBod
         }
     }
 
-    override fun get(returnType: Type, annotations: Array<Annotation>, retrofit: Retrofit): CallAdapter<*, *> {
+    override fun get(
+        returnType: Type,
+        annotations: Array<Annotation>,
+        retrofit: Retrofit,
+    ): CallAdapter<*, *> {
         @Suppress("UNCHECKED_CAST")
-        val delegate = retrofit.nextCallAdapter(this, returnType, annotations) as CallAdapter<Any, *>
+        val delegate = retrofit.nextCallAdapter(
+            this,
+            returnType,
+            annotations,
+        ) as CallAdapter<Any, *>
 
         @Suppress("UNCHECKED_CAST")
         val converter = converterFactory.responseBodyConverter(
@@ -45,7 +55,10 @@ open class ConverterCallAdapterFactory(private val converterFactory: ResponseBod
         }
     }
 
-    private class ConverterCall<T>(private val delegate: Call<ResponseBody?>, val converter: ResponseBodyConverter<T>) :
+    private class ConverterCall<T>(
+        private val delegate: Call<ResponseBody?>,
+        val converter: ResponseBodyConverter<T>,
+    ) :
         Call<T> {
         @Throws(IOException::class)
         override fun execute(): Response<T> {
@@ -59,28 +72,36 @@ open class ConverterCallAdapterFactory(private val converterFactory: ResponseBod
         }
 
         override fun enqueue(callback: Callback<T>) {
-            delegate.enqueue(object : Callback<ResponseBody?> {
-                override fun onResponse(call: Call<ResponseBody?>, response: Response<ResponseBody?>) {
-                    val raw = response.raw()
+            delegate.enqueue(
+                object : Callback<ResponseBody?> {
+                    override fun onResponse(
+                        call: Call<ResponseBody?>,
+                        response: Response<ResponseBody?>,
+                    ) {
+                        val raw = response.raw()
 
-                    @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
-                    val converted: Response<T> = if (raw.isSuccessful) {
-                        try {
-                            Response.success(converter.convert(call.request(), response.body()), raw)
-                        } catch (e: IOException) {
-                            callback.onFailure(this@ConverterCall, e)
-                            return
+                        @Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
+                        val converted: Response<T> = if (raw.isSuccessful) {
+                            try {
+                                Response.success(
+                                    converter.convert(call.request(), response.body()),
+                                    raw,
+                                )
+                            } catch (e: IOException) {
+                                callback.onFailure(this@ConverterCall, e)
+                                return
+                            }
+                        } else {
+                            Response.error(raw.body, raw)
                         }
-                    } else {
-                        Response.error(raw.body, raw)
+                        callback.onResponse(this@ConverterCall, converted)
                     }
-                    callback.onResponse(this@ConverterCall, converted)
-                }
 
-                override fun onFailure(call: Call<ResponseBody?>, t: Throwable) {
-                    callback.onFailure(this@ConverterCall, t)
-                }
-            })
+                    override fun onFailure(call: Call<ResponseBody?>, t: Throwable) {
+                        callback.onFailure(this@ConverterCall, t)
+                    }
+                },
+            )
         }
 
         override fun isExecuted(): Boolean {

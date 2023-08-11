@@ -159,7 +159,11 @@ class CropViewModel(
         if (!enabled || uri == null || modelDownloadStatus is DownloadStatus.Running) {
             return
         }
-        localUiStateFlow.update { it.copy(detectedObjects = partial(Resource.Loading(emptyList()))) }
+        localUiStateFlow.update {
+            it.copy(
+                detectedObjects = partial(Resource.Loading(emptyList())),
+            )
+        }
         if (modelFile != null) {
             // file was downloaded, trigger objectDetection directly
             detectObjects(uri, modelFile, preferences)
@@ -172,7 +176,8 @@ class CropViewModel(
             // update preferences if no model is currently set
             appPreferencesRepository.updateObjectDetectionPrefs(
                 preferences.copy(
-                    modelId = objectDetectionModelRepository.getByName(objectDetectionModel.name)?.id
+                    modelId = objectDetectionModelRepository.getByName(objectDetectionModel.name)
+                        ?.id
                         ?: 0,
                 ),
             )

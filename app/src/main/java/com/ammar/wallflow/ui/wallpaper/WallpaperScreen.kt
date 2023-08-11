@@ -384,7 +384,9 @@ fun WallpaperScreenContent(
             override fun onError(request: ImageRequest, result: ErrorResult) {
                 val throwable = result.throwable
                 when (throwable) {
-                    is SocketTimeoutException -> context.toast(context.getString(R.string.request_timed_out))
+                    is SocketTimeoutException -> context.toast(
+                        context.getString(R.string.request_timed_out),
+                    )
                     is NullRequestDataException -> return // Do nothing
                     else -> context.toast(
                         throwable.message ?: context.getString(R.string.error_occurred),
@@ -453,6 +455,7 @@ fun WallpaperScreenContent(
         Crossfade(
             modifier = Modifier.fillMaxSize(),
             targetState = painter,
+            label = "wallpaper",
         ) {
             val imageRequest = it.request
             if (

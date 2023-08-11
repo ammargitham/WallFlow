@@ -78,20 +78,22 @@ class DatabaseModule {
             if (BuildConfig.DEBUG) {
                 fallbackToDestructiveMigration()
             }
-            addCallback(object : RoomDatabase.Callback() {
-                override fun onCreate(db: SupportSQLiteDatabase) {
-                    val handler = CoroutineExceptionHandler { _, e ->
-                        Log.e(TAG, "onCreate: ", e)
+            addCallback(
+                object : RoomDatabase.Callback() {
+                    override fun onCreate(db: SupportSQLiteDatabase) {
+                        val handler = CoroutineExceptionHandler { _, e ->
+                            Log.e(TAG, "onCreate: ", e)
+                        }
+                        CoroutineScope(ioDispatcher).launch(handler) {
+                            // insert default models
+                            Log.i(TAG, "onCreate: Inserting default model")
+                            appDatabase.objectDetectionModelDao().upsert(
+                                ObjectDetectionModel.DEFAULT.toEntity(),
+                            )
+                        }
                     }
-                    CoroutineScope(ioDispatcher).launch(handler) {
-                        // insert default models
-                        Log.i(TAG, "onCreate: Inserting default model")
-                        appDatabase.objectDetectionModelDao().upsert(
-                            ObjectDetectionModel.DEFAULT.toEntity(),
-                        )
-                    }
-                }
-            })
+                },
+            )
         }.build()
         return appDatabase
     }

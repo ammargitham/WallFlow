@@ -39,7 +39,9 @@ import com.ammar.wallflow.model.SavedSearch
 import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.SearchQuery
 import com.ammar.wallflow.model.toEntity
+import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.FAILURE_REASON
 import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.FailureReason
+import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.FailureReason.SAVED_SEARCH_NOT_SET
 import io.mockk.every
 import io.mockk.spyk
 import io.mockk.unmockkAll
@@ -147,7 +149,9 @@ class AutoWallpaperTest {
             throw RuntimeException()
         }
 
-        override suspend fun wallpaper(wallpaperWallhavenId: String): NetworkResponse<NetworkWallpaper> {
+        override suspend fun wallpaper(
+            wallpaperWallhavenId: String,
+        ): NetworkResponse<NetworkWallpaper> {
             throw RuntimeException()
         }
 
@@ -183,7 +187,7 @@ class AutoWallpaperTest {
                 result,
                 `is`(
                     Result.failure(
-                        workDataOf(AutoWallpaperWorker.FAILURE_REASON to FailureReason.DISABLED.name),
+                        workDataOf(FAILURE_REASON to FailureReason.DISABLED.name),
                     ),
                 ),
             )
@@ -211,7 +215,7 @@ class AutoWallpaperTest {
                 result,
                 `is`(
                     Result.failure(
-                        workDataOf(AutoWallpaperWorker.FAILURE_REASON to FailureReason.DISABLED.name),
+                        workDataOf(FAILURE_REASON to FailureReason.DISABLED.name),
                     ),
                 ),
             )
@@ -243,7 +247,7 @@ class AutoWallpaperTest {
                 result,
                 `is`(
                     Result.failure(
-                        workDataOf(AutoWallpaperWorker.FAILURE_REASON to FailureReason.SAVED_SEARCH_NOT_SET.name),
+                        workDataOf(FAILURE_REASON to SAVED_SEARCH_NOT_SET.name),
                     ),
                 ),
             )
@@ -284,7 +288,9 @@ class AutoWallpaperTest {
                     it.wallhavenId == wallhavenId
                 }
 
-                override suspend fun upsert(vararg autoWallpaperHistoryEntity: AutoWallpaperHistoryEntity) {
+                override suspend fun upsert(
+                    vararg autoWallpaperHistoryEntity: AutoWallpaperHistoryEntity,
+                ) {
                     history = history + autoWallpaperHistoryEntity
                 }
             }
@@ -378,7 +384,9 @@ class AutoWallpaperTest {
                     it.wallhavenId == wallhavenId
                 }
 
-                override suspend fun upsert(vararg autoWallpaperHistoryEntity: AutoWallpaperHistoryEntity) {
+                override suspend fun upsert(
+                    vararg autoWallpaperHistoryEntity: AutoWallpaperHistoryEntity,
+                ) {
                     history = history + autoWallpaperHistoryEntity
                 }
             }
@@ -472,7 +480,9 @@ class AutoWallpaperTest {
                     it.wallhavenId == wallhavenId
                 }
 
-                override suspend fun upsert(vararg autoWallpaperHistoryEntity: AutoWallpaperHistoryEntity) {
+                override suspend fun upsert(
+                    vararg autoWallpaperHistoryEntity: AutoWallpaperHistoryEntity,
+                ) {
                     val existingIds = history.map { it.id }
                     history = history + autoWallpaperHistoryEntity.filter {
                         it.id !in existingIds

@@ -227,7 +227,11 @@ val Context.wallpaperManager: WallpaperManager
     get() = WallpaperManager.getInstance(this)
 
 val WallpaperManager.isSetWallpaperAllowedCompat
-    get() = (if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) this.isSetWallpaperAllowed else true)
+    get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        this.isSetWallpaperAllowed
+    } else {
+        true
+    }
 
 fun Context.findActivity(): Activity {
     var context = this

@@ -155,7 +155,10 @@ fun CropScreen(
             .fillMaxSize()
             .background(Color.Black),
     ) {
-        Crossfade(targetState = cropState to uiState.result) {
+        Crossfade(
+            targetState = cropState to uiState.result,
+            label = "crop",
+        ) {
             val (innerCropState, innerResult) = it
             if (innerResult is Result.Pending) {
                 Image(
@@ -170,7 +173,11 @@ fun CropScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(
-                            top = topActionsSize.height.toDp() + if (uiState.displays.size > 1) 16.dp else 0.dp,
+                            top = topActionsSize.height.toDp() + if (uiState.displays.size > 1) {
+                                16.dp
+                            } else {
+                                0.dp
+                            },
                             bottom = actionsSize.height.toDp() + 16.dp,
                         ),
                 ) {

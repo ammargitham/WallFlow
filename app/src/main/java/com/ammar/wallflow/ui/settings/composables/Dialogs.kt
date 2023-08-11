@@ -406,7 +406,11 @@ fun ObjectDetectionModelEditDialog(
                             ) { saving = false }
                         },
                     ) {
-                        Text(text = stringResource(if (model == null) R.string.add else R.string.save))
+                        Text(
+                            text = stringResource(
+                                if (model == null) R.string.add else R.string.save,
+                            ),
+                        )
                     }
                 }
             },
@@ -704,7 +708,9 @@ private fun SavedSearchOptionsDialogContent(
                 supportingContent = {
                     Text(
                         text = stringResource(R.string.no_saved_searches_desc),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = DISABLED_ALPHA),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                            alpha = DISABLED_ALPHA,
+                        ),
                     )
                 },
             )
@@ -861,7 +867,8 @@ fun ConstraintOptionsDialog(
 @Composable
 private fun ConstraintOptionsDialogContent(
     modifier: Modifier = Modifier,
-    constraintTypeMap: Map<ConstraintType, Boolean> = defaultAutoWallpaperConstraints.toConstraintTypeMap(),
+    constraintTypeMap: Map<ConstraintType, Boolean> = defaultAutoWallpaperConstraints
+        .toConstraintTypeMap(),
     onChange: (Map<ConstraintType, Boolean>) -> Unit = {},
 ) {
     val wifiChecked = constraintTypeMap[ConstraintType.WIFI] ?: false
@@ -875,9 +882,11 @@ private fun ConstraintOptionsDialogContent(
     ) {
         ListItem(
             modifier = Modifier
-                .clickable(onClick = {
-                    onChange(constraintTypeMap + (ConstraintType.WIFI to !wifiChecked))
-                })
+                .clickable(
+                    onClick = {
+                        onChange(constraintTypeMap + (ConstraintType.WIFI to !wifiChecked))
+                    },
+                )
                 .padding(horizontal = 8.dp),
             headlineContent = { Text(text = stringResource(R.string.on_wifi)) },
             supportingContent = { Text(text = stringResource(R.string.on_wifi_desc)) },
@@ -930,10 +939,12 @@ private fun ConstraintOptionsDialogContent(
         )
         ListItem(
             modifier = Modifier
-                .clickable(onClick = {
-                    val current = constraintTypeMap[ConstraintType.CHARGING] ?: false
-                    onChange(constraintTypeMap + (ConstraintType.CHARGING to !current))
-                })
+                .clickable(
+                    onClick = {
+                        val current = constraintTypeMap[ConstraintType.CHARGING] ?: false
+                        onChange(constraintTypeMap + (ConstraintType.CHARGING to !current))
+                    },
+                )
                 .padding(horizontal = 8.dp),
             headlineContent = { Text(text = stringResource(R.string.charging)) },
             supportingContent = { Text(text = stringResource(R.string.charging_desc)) },
@@ -949,10 +960,12 @@ private fun ConstraintOptionsDialogContent(
         )
         ListItem(
             modifier = Modifier
-                .clickable(onClick = {
-                    val current = constraintTypeMap[ConstraintType.IDLE] ?: false
-                    onChange(constraintTypeMap + (ConstraintType.IDLE to !current))
-                })
+                .clickable(
+                    onClick = {
+                        val current = constraintTypeMap[ConstraintType.IDLE] ?: false
+                        onChange(constraintTypeMap + (ConstraintType.IDLE to !current))
+                    },
+                )
                 .padding(horizontal = 8.dp),
             headlineContent = { Text(text = stringResource(R.string.idle)) },
             supportingContent = { Text(text = stringResource(R.string.idle_desc)) },

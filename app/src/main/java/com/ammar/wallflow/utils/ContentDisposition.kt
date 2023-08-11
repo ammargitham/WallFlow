@@ -86,7 +86,10 @@ class ContentDisposition private constructor(
         if (this === other) return true
         if (other == null || javaClass != other.javaClass) return false
         val that = other as ContentDisposition
-        return type == that.type && name == that.name && filename == that.filename && charset == that.charset
+        return type == that.type &&
+            name == that.name &&
+            filename == that.filename &&
+            charset == that.charset
     }
 
     override fun hashCode(): Int {
@@ -195,8 +198,10 @@ class ContentDisposition private constructor(
     companion object {
         private val BASE64_ENCODED_PATTERN =
             "=\\?([0-9a-zA-Z-_]+)\\?B\\?([+/0-9a-zA-Z]+=*)\\?=".toPattern()
+
+        // Printable ASCII other than "?" or SPACE
         private val QUOTED_PRINTABLE_ENCODED_PATTERN =
-            "=\\?([0-9a-zA-Z-_]+)\\?Q\\?([!->@-~]+)\\?=".toPattern() // Printable ASCII other than "?" or SPACE
+            "=\\?([0-9a-zA-Z-_]+)\\?Q\\?([!->@-~]+)\\?=".toPattern()
         private const val INVALID_HEADER_FIELD_PARAMETER_FORMAT =
             "Invalid header field parameter format (as defined in RFC 5987)"
         private val PRINTABLE = BitSet(256)
@@ -310,7 +315,9 @@ class ContentDisposition private constructor(
             val filename = when {
                 idx1 != -1 && idx2 != -1 -> {
                     charset = Charset.forName(value.substring(0, idx1).trimAll())
-                    require(StandardCharsets.UTF_8 == charset || StandardCharsets.ISO_8859_1 == charset) {
+                    require(
+                        StandardCharsets.UTF_8 == charset || StandardCharsets.ISO_8859_1 == charset,
+                    ) {
                         "Charset must be UTF-8 or ISO-8859-1"
                     }
                     decodeRfc5987Filename(value.substring(idx2 + 1), charset)

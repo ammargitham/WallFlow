@@ -160,7 +160,15 @@ internal fun CategoriesFilter(
                         }
                     },
                     selected = selected,
-                    onClick = { onChange(if (selected && categories.size > 1) categories - it else categories + it) },
+                    onClick = {
+                        onChange(
+                            if (selected && categories.size > 1) {
+                                categories - it
+                            } else {
+                                categories + it
+                            },
+                        )
+                    },
                 )
             }
         }
@@ -200,7 +208,11 @@ internal fun PurityFilter(
                         }
                     },
                     selected = selected,
-                    onClick = { onChange(if (selected && purities.size > 1) purities - it else purities + it) },
+                    onClick = {
+                        onChange(
+                            if (selected && purities.size > 1) purities - it else purities + it,
+                        )
+                    },
                 )
             }
         }
@@ -333,13 +345,17 @@ internal fun OrderFilter(
                                 when (it) {
                                     Order.DESC -> Icon(
                                         modifier = Modifier.size(16.dp),
-                                        painter = painterResource(R.drawable.baseline_sort_descending_24),
+                                        painter = painterResource(
+                                            R.drawable.baseline_sort_descending_24,
+                                        ),
                                         contentDescription = null,
                                     )
 
                                     Order.ASC -> Icon(
                                         modifier = Modifier.size(16.dp),
-                                        painter = painterResource(R.drawable.baseline_sort_ascending_24),
+                                        painter = painterResource(
+                                            R.drawable.baseline_sort_ascending_24,
+                                        ),
                                         contentDescription = null,
                                     )
                                 }
@@ -973,7 +989,8 @@ private class SavedSearchesDialogPreviewParameterProvider :
 @Preview(showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun PreviewSavedSearchesDialog(
-    @PreviewParameter(SavedSearchesDialogPreviewParameterProvider::class) parameters: Pair<List<SavedSearch>, Boolean>,
+    @PreviewParameter(SavedSearchesDialogPreviewParameterProvider::class) parameters:
+    Pair<List<SavedSearch>, Boolean>,
 ) {
     WallFlowTheme {
         SavedSearchesDialog(

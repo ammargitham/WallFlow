@@ -76,7 +76,11 @@ fun TopBar(
             title = title,
             scrollBehavior = scrollBehavior,
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = if (gradientBg) Color.Transparent else MaterialTheme.colorScheme.surface,
+                containerColor = if (gradientBg) {
+                    Color.Transparent
+                } else {
+                    MaterialTheme.colorScheme.surface
+                },
             ),
             actions = actions,
         )

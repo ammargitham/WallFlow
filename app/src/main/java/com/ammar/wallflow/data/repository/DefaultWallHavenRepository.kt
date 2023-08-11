@@ -71,7 +71,8 @@ class DefaultWallHavenRepository @Inject constructor(
                     val lastUpdated = lastUpdatedDao.getByKey(
                         LastUpdatedCategory.POPULAR_TAGS.key,
                     ) ?: return true
-                    (lastUpdated.lastUpdatedOn - Clock.System.now()).absoluteValue.inWholeMinutes / 60f > 3
+                    val duration = lastUpdated.lastUpdatedOn - Clock.System.now()
+                    duration.absoluteValue.inWholeMinutes / 60f > 3
                 }
             }
 

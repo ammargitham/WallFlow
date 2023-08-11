@@ -177,11 +177,23 @@ fun SettingsScreen(
                 }
                 viewModel.updateAutoWallpaperPrefs(it)
             },
-            onAutoWallpaperSavedSearchClick = { viewModel.showAutoWallpaperSavedSearchesDialog(true) },
+            onAutoWallpaperSavedSearchClick = {
+                viewModel.showAutoWallpaperSavedSearchesDialog(
+                    true,
+                )
+            },
             onAutoWallpaperFrequencyClick = { viewModel.showAutoWallpaperFrequencyDialog(true) },
-            onAutoWallpaperConstraintsClick = { viewModel.showAutoWallpaperConstraintsDialog(true) },
+            onAutoWallpaperConstraintsClick = {
+                viewModel.showAutoWallpaperConstraintsDialog(
+                    true,
+                )
+            },
             onAutoWallpaperChangeNowClick = viewModel::autoWallpaperChangeNow,
-            onAutoWallpaperNextRunInfoClick = { viewModel.showAutoWallpaperNextRunInfoDialog(true) },
+            onAutoWallpaperNextRunInfoClick = {
+                viewModel.showAutoWallpaperNextRunInfoDialog(
+                    true,
+                )
+            },
             onThemeClick = { viewModel.showThemeOptionsDialog(true) },
             onLayoutClick = { twoPaneController.navigate(LayoutSettingsScreenDestination) },
         )
@@ -344,7 +356,9 @@ fun SettingsScreen(
 
     if (uiState.showPermissionRationaleDialog) {
         DownloadPermissionsRationalDialog(
-            permissions = autoWallpaperPermissionsState.shouldShowRationale.keys.map { it.permission },
+            permissions = autoWallpaperPermissionsState.shouldShowRationale.keys.map {
+                it.permission
+            },
             onConfirmOrDismiss = { viewModel.showPermissionRationaleDialog(false) },
         )
     }
