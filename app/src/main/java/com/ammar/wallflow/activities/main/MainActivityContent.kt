@@ -1,6 +1,7 @@
 package com.ammar.wallflow.activities.main
 
 import android.content.res.Configuration
+import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -14,8 +15,10 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -89,7 +92,27 @@ fun MainActivityContent(
     onSearchBarLoadClick: () -> Unit = {},
     content: @Composable (contentPadding: PaddingValues) -> Unit,
 ) {
+    var prevSearchBarVisible by remember { mutableStateOf(searchBarVisible) }
     var searchBarHeightPx by remember { mutableIntStateOf(0) }
+    val animatedSearchBarHeight = remember { Animatable(searchBarHeightPx.toFloat()) }
+    val animatedSearchBarOffsetHeight = remember { Animatable(searchBarOffsetHeightPx) }
+
+    LaunchedEffect(searchBarVisible, searchBarHeightPx, searchBarOffsetHeightPx) {
+        // handle search bar offset when transitioning screens
+        if (searchBarVisible) {
+            if (!prevSearchBarVisible) {
+                animatedSearchBarHeight.animateTo(searchBarHeightPx.toFloat())
+                animatedSearchBarOffsetHeight.animateTo(searchBarOffsetHeightPx)
+            } else {
+                animatedSearchBarHeight.snapTo(searchBarHeightPx.toFloat())
+                animatedSearchBarOffsetHeight.snapTo(searchBarOffsetHeightPx)
+            }
+        } else {
+            animatedSearchBarHeight.animateTo(0f)
+            animatedSearchBarOffsetHeight.animateTo(0f)
+        }
+        prevSearchBarVisible = searchBarVisible
+    }
 
     Column(
         modifier = modifier,
@@ -102,8 +125,17 @@ fun MainActivityContent(
             ) {
                 Box(
                     modifier = Modifier
-                        .padding(top = searchBarHeightPx.toDp())
-                        .offset { IntOffset(x = 0, y = searchBarOffsetHeightPx.roundToInt()) },
+                        .padding(
+                            top = animatedSearchBarHeight.value
+                                .roundToInt()
+                                .toDp(),
+                        )
+                        .offset {
+                            IntOffset(
+                                x = 0,
+                                y = animatedSearchBarOffsetHeight.value.roundToInt(),
+                            )
+                        },
                 ) {
                     content(it)
                 }
