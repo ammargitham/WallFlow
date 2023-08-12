@@ -163,7 +163,8 @@ fun LayoutSettingsScreenContent(
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun PreviewLayoutSettingsScreenContent(
-    @PreviewParameter(LayoutPreferenceProvider::class) twoPaneLayoutPreferences: Pair<Boolean, LayoutPreferences>,
+    @PreviewParameter(LayoutPreferenceProvider::class) twoPaneLayoutPreferences:
+    Pair<Boolean, LayoutPreferences>,
 ) {
     var tempLayoutPreferences by remember { mutableStateOf(twoPaneLayoutPreferences.second) }
 

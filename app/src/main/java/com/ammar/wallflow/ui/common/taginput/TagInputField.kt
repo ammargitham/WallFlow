@@ -116,7 +116,9 @@ fun <T> TagInputField(
             },
             readOnly = readOnly,
             textStyle = mergedStyle,
-            cursorBrush = SolidColor(if (selectLastTag) Color.Transparent else MaterialTheme.colorScheme.primary),
+            cursorBrush = SolidColor(
+                if (selectLastTag) Color.Transparent else MaterialTheme.colorScheme.primary,
+            ),
             interactionSource = interactionSource,
             decorationBox = { innerTextField ->
                 OutlinedTextFieldDefaults.DecorationBox(

@@ -191,7 +191,9 @@ internal fun LayoutPreview(
                     contentPadding = PaddingValues(paddingDp),
                     columns = when (layoutPreferences.gridColType) {
                         GridColType.ADAPTIVE -> StaggeredGridCells.Adaptive(adaptiveMinWidth)
-                        GridColType.FIXED -> StaggeredGridCells.Fixed(layoutPreferences.gridColCount)
+                        GridColType.FIXED -> StaggeredGridCells.Fixed(
+                            layoutPreferences.gridColCount,
+                        )
                     },
                     verticalItemSpacing = 4.dp,
                     horizontalArrangement = Arrangement.spacedBy(paddingDp),
@@ -246,7 +248,8 @@ internal class LayoutPreferenceProvider :
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun PreviewLayoutPreview(
-    @PreviewParameter(LayoutPreferenceProvider::class) twoPaneLayoutPreferences: Pair<Boolean, LayoutPreferences>,
+    @PreviewParameter(LayoutPreferenceProvider::class) twoPaneLayoutPreferences:
+    Pair<Boolean, LayoutPreferences>,
 ) {
     WallFlowTheme {
         Surface {
@@ -287,7 +290,11 @@ internal fun LazyListScope.gridTypeSection(
                             readOnly = true,
                             value = options[gridType] ?: "",
                             onValueChange = {},
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(
+                                    expanded = expanded,
+                                )
+                            },
                             colors = ExposedDropdownMenuDefaults.textFieldColors(),
                         )
                     }
@@ -359,7 +366,11 @@ internal fun LazyListScope.gridColTypeSection(
                             readOnly = true,
                             value = options[gridColType] ?: "",
                             onValueChange = {},
-                            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(
+                                    expanded = expanded,
+                                )
+                            },
                             colors = ExposedDropdownMenuDefaults.textFieldColors(),
                         )
                     }

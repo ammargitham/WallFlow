@@ -102,8 +102,12 @@ internal fun Actions(
                     enabled = detectionCount > 0,
                 ) {
                     val text = when {
-                        modelDownloadStatus is DownloadStatus.Running -> stringResource(R.string.downloading_model)
-                        detections is Resource.Error -> stringResource(R.string.error_detecting_objects)
+                        modelDownloadStatus is DownloadStatus.Running -> stringResource(
+                            R.string.downloading_model,
+                        )
+                        detections is Resource.Error -> stringResource(
+                            R.string.error_detecting_objects,
+                        )
                         else -> when (detectionCount) {
                             -1 -> stringResource(R.string.detecting)
                             0 -> stringResource(R.string.zero_detected_objects)

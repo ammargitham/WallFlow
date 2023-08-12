@@ -86,8 +86,14 @@ fun WallFlowTheme(
             ?: throw Exception("Not in an activity - unable to get Window reference")
 
         val systemBarColor = colorScheme.surface
-        val animatedStatusBarColor by animateColorAsState(statusBarColor.takeOrElse { systemBarColor })
-        val animatedNavigationBarColor by animateColorAsState(navigationBarColor.takeOrElse { systemBarColor })
+        val animatedStatusBarColor by animateColorAsState(
+            statusBarColor.takeOrElse { systemBarColor },
+            label = "statusBarColor",
+        )
+        val animatedNavigationBarColor by animateColorAsState(
+            navigationBarColor.takeOrElse { systemBarColor },
+            label = "navigationBarColor",
+        )
 
         LaunchedEffect(
             animatedStatusBarColor,

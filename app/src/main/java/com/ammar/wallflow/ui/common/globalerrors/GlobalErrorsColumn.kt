@@ -23,7 +23,9 @@ fun GlobalErrorsColumn(
         items(globalErrors) {
             val errorMsg = when (it) {
                 is WallHavenUnauthorisedError -> stringResource(R.string.invalid_api_key_provided)
-                is WallHavenRateLimitError -> stringResource(R.string.rate_limited_please_try_again_after_some_time)
+                is WallHavenRateLimitError -> stringResource(
+                    R.string.rate_limited_please_try_again_after_some_time,
+                )
                 else -> stringResource(R.string.error)
             }
             val actionText = when (it) {

@@ -22,7 +22,9 @@ interface WallpapersDao {
 
     @Transaction
     @Query("SELECT * FROM wallpapers WHERE wallhaven_id = :wallhavenId")
-    suspend fun getWithUploaderAndTagsByWallhavenId(wallhavenId: String): WallpaperWithUploaderAndTags?
+    suspend fun getWithUploaderAndTagsByWallhavenId(
+        wallhavenId: String,
+    ): WallpaperWithUploaderAndTags?
 
     @Query("SELECT * FROM wallpapers WHERE wallhaven_id IN (:wallhavenIds)")
     suspend fun getByWallhavenIds(wallhavenIds: List<String>): List<WallpaperEntity>

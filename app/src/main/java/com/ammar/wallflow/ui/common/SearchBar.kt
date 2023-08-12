@@ -108,7 +108,9 @@ object SearchBar {
                                     onClick = { onSuggestionInsert(it) },
                                 ) {
                                     Icon(
-                                        painter = painterResource(R.drawable.baseline_north_west_24),
+                                        painter = painterResource(
+                                            R.drawable.baseline_north_west_24,
+                                        ),
                                         contentDescription = null,
                                     )
                                 }
