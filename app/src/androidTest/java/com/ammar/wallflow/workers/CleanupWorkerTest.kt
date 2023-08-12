@@ -62,7 +62,7 @@ class CleanupWorkerTest {
         tempDir = File(actualTempDir, "test")
         tempDir.mkdirs()
 
-        mockkStatic("com.ammar.havenwalls.extensions.Context_extKt")
+        mockkStatic("com.ammar.wallflow.extensions.Context_extKt")
 
         // make sure every call to ctx.tempDir() gets the test temp dir
         every { context.getTempDir() } returns tempDir
