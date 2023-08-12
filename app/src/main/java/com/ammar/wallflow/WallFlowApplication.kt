@@ -6,6 +6,9 @@ import androidx.hilt.work.HiltWorkerFactory
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.work.Configuration
+import coil.ImageLoader
+import coil.ImageLoaderFactory
+import com.ammar.wallflow.data.network.coil.WallhavenFallbackInterceptor
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.utils.NotificationChannels
@@ -16,9 +19,10 @@ import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
 
 @HiltAndroidApp
-class WallFlowApplication : Application(), Configuration.Provider {
+class WallFlowApplication : Application(), Configuration.Provider, ImageLoaderFactory {
     @Inject
     lateinit var workerFactory: HiltWorkerFactory
 
@@ -28,6 +32,9 @@ class WallFlowApplication : Application(), Configuration.Provider {
     @Inject
     @IoDispatcher
     lateinit var ioDispatcher: CoroutineDispatcher
+
+    @Inject
+    lateinit var okHttpClient: OkHttpClient
 
     init {
         if (BuildConfig.DEBUG) {
@@ -83,4 +90,11 @@ class WallFlowApplication : Application(), Configuration.Provider {
             }
         }
     }
+
+    override fun newImageLoader() = ImageLoader.Builder(this)
+        .okHttpClient(okHttpClient)
+        .components {
+            add(WallhavenFallbackInterceptor())
+        }
+        .build()
 }

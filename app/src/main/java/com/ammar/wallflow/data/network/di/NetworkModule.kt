@@ -50,20 +50,20 @@ object NetworkModule {
     fun providesWallhavenNetworkApi(
         networkJson: Json,
         okHttpClient: OkHttpClient,
-    ): WallHavenNetworkApi =
-        Retrofit.Builder().apply {
-            baseUrl(WALLHAVEN_BASE_URL)
-            client(okHttpClient)
-            addConverterFactory(DocumentConverterFactory())
-            addConverterFactory(
-                networkJson.asConverterFactory("application/json".toMediaType()),
-            )
-        }
-            .build()
-            .create(WallHavenNetworkApi::class.java)
+    ): WallHavenNetworkApi = Retrofit.Builder().apply {
+        baseUrl(WALLHAVEN_BASE_URL)
+        client(okHttpClient)
+        addConverterFactory(DocumentConverterFactory())
+        addConverterFactory(
+            networkJson.asConverterFactory("application/json".toMediaType()),
+        )
+    }
+        .build()
+        .create(WallHavenNetworkApi::class.java)
 
     @Provides
     @Singleton
-    fun providesWallHavenNetworkDataSource(wallHavenNetworkApi: WallHavenNetworkApi): WallHavenNetworkDataSource =
-        RetrofitWallHavenNetwork(wallHavenNetworkApi)
+    fun providesWallHavenNetworkDataSource(
+        wallHavenNetworkApi: WallHavenNetworkApi,
+    ): WallHavenNetworkDataSource = RetrofitWallHavenNetwork(wallHavenNetworkApi)
 }

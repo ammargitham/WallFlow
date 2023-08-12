@@ -67,6 +67,11 @@ fun WallpaperCard(
         ImageRequest.Builder(context).apply {
             data(wallpaper.thumbs.original)
             crossfade(true)
+            parameters(
+                Parameters.Builder().apply {
+                    set("fallback_url", wallpaper.path)
+                }.build(),
+            )
         }.build()
     }
     val transition = updateTransition(isSelected, label = "selection state")
@@ -130,6 +135,8 @@ fun WallpaperCard(
                 },
             model = request,
             placeholder = ColorPainter(wallpaper.colors.firstOrNull() ?: Color.White),
+            fallback = ColorPainter(wallpaper.colors.firstOrNull() ?: Color.White),
+            error = ColorPainter(wallpaper.colors.firstOrNull() ?: Color.White),
             contentDescription = stringResource(R.string.wallpaper),
             contentScale = ContentScale.Crop,
             onError = {
