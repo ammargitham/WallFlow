@@ -53,6 +53,7 @@ import com.ammar.wallflow.data.preferences.LayoutPreferences
 import com.ammar.wallflow.extensions.findActivity
 import com.ammar.wallflow.extensions.rememberLazyStaggeredGridState
 import com.ammar.wallflow.extensions.search
+import com.ammar.wallflow.model.Favorite
 import com.ammar.wallflow.model.MenuItem
 import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.SearchSaver
@@ -122,10 +123,11 @@ fun HomeScreen(
     val bottomBarController = LocalBottomBarController.current
     val systemBarsController = LocalSystemBarsController.current
     val density = LocalDensity.current
+    val context = LocalContext.current
     val bottomWindowInsets = bottomWindowInsets
     val navigationBarsInsets = WindowInsets.navigationBars
-    val (startPadding, bottomPadding) = remember(
-        bottomBarController.state,
+    val bottomPadding = remember(
+        bottomBarController.state.value,
         density,
         bottomWindowInsets.getBottom(density),
         navigationBarsInsets.getBottom(density),
@@ -137,10 +139,10 @@ fun HomeScreen(
             navigationBarsInsets,
         )
     }
-    val context = LocalContext.current
     val windowSizeClass = calculateWindowSizeClass(context.findActivity())
     val isExpanded = windowSizeClass.widthSizeClass >= WindowWidthSizeClass.Expanded
-    val currentPane2Destination by twoPaneController.pane2NavHostController.appCurrentDestinationAsState()
+    val currentPane2Destination by twoPaneController.pane2NavHostController
+        .appCurrentDestinationAsState()
     val isTwoPaneMode = twoPaneController.paneMode.value == Mode.TWO_PANE
 
     LaunchedEffect(refreshing) {
@@ -247,25 +249,26 @@ fun HomeScreen(
             modifier = Modifier.fillMaxSize(),
             gridState = gridState,
             contentPadding = PaddingValues(
-                start = startPadding + 8.dp,
+                start = 8.dp,
                 end = 8.dp,
                 bottom = bottomPadding + 8.dp,
             ),
             tags = if (uiState.isHome) uiState.tags else persistentListOf(),
             isTagsLoading = uiState.areTagsLoading,
             wallpapers = wallpapers,
+            favorites = uiState.favorites,
             blurSketchy = uiState.blurSketchy,
             blurNsfw = uiState.blurNsfw,
             selectedWallpaper = uiState.selectedWallpaper,
             showSelection = isTwoPaneMode,
             layoutPreferences = uiState.layoutPreferences,
             onWallpaperClick = onWallpaperClick,
+            onWallpaperFavoriteClick = viewModel::toggleFavorite,
             onTagClick = onTagClick,
         )
 
         PullRefreshIndicator(
             modifier = Modifier.align(Alignment.TopCenter),
-            // refreshing = uiState.wallpapersLoading,
             refreshing = false,
             state = refreshState,
         )
@@ -352,15 +355,14 @@ private fun getStartBottomPadding(
     bottomBarController: BottomBarController,
     bottomWindowInsets: WindowInsets,
     navigationBarsInsets: WindowInsets,
-): Pair<Dp, Dp> = with(density) {
+): Dp = with(density) {
     val bottomBarState by bottomBarController.state
-    val startPadding = if (bottomBarState.isRail) bottomBarState.size.width.toDp() else 0.dp
     val bottomInsetsPadding = if (bottomBarState.isRail) {
         bottomWindowInsets.getBottom(density).toDp()
     } else {
         0.dp
     }
-    val bottomNavPadding = if (bottomBarState.isRail) {
+    val bottomNavPadding = if (bottomBarState.isRail || bottomBarState.visible) {
         0.dp
     } else {
         navigationBarsInsets.getBottom(density).toDp()
@@ -370,8 +372,7 @@ private fun getStartBottomPadding(
     } else {
         bottomBarState.size.height.toDp()
     }
-    val bottomPadding = bottomInsetsPadding + bottomBarPadding + bottomNavPadding
-    Pair(startPadding, bottomPadding)
+    return bottomInsetsPadding + bottomBarPadding + bottomNavPadding
 }
 
 @Composable
@@ -382,12 +383,14 @@ internal fun HomeScreenContent(
     tags: ImmutableList<Tag> = persistentListOf(),
     isTagsLoading: Boolean = false,
     wallpapers: LazyPagingItems<Wallpaper>,
+    favorites: ImmutableList<Favorite> = persistentListOf(),
     blurSketchy: Boolean = false,
     blurNsfw: Boolean = false,
     selectedWallpaper: Wallpaper? = null,
     showSelection: Boolean = false,
     layoutPreferences: LayoutPreferences = LayoutPreferences(),
     onWallpaperClick: (wallpaper: Wallpaper) -> Unit = {},
+    onWallpaperFavoriteClick: (wallpaper: Wallpaper) -> Unit = {},
     onTagClick: (tag: Tag) -> Unit = {},
 ) {
     WallpaperStaggeredGrid(
@@ -395,6 +398,7 @@ internal fun HomeScreenContent(
         state = gridState,
         contentPadding = contentPadding,
         wallpapers = wallpapers,
+        favorites = favorites,
         blurSketchy = blurSketchy,
         blurNsfw = blurNsfw,
         header = {
@@ -416,6 +420,7 @@ internal fun HomeScreenContent(
         gridColMinWidthPct = layoutPreferences.gridColMinWidthPct,
         roundedCorners = layoutPreferences.roundedCorners,
         onWallpaperClick = onWallpaperClick,
+        onWallpaperFavoriteClick = onWallpaperFavoriteClick,
     )
 }
 

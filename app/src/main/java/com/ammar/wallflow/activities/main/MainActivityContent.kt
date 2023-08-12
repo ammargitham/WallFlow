@@ -3,7 +3,6 @@ package com.ammar.wallflow.activities.main
 import android.content.res.Configuration
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -33,6 +32,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.ammar.wallflow.data.repository.GlobalErrorsRepository
 import com.ammar.wallflow.data.repository.GlobalErrorsRepository.GlobalError
 import com.ammar.wallflow.extensions.toDp
+import com.ammar.wallflow.extensions.toPx
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.SearchQuery
@@ -61,6 +61,7 @@ fun MainActivityContent(
     useNavRail: Boolean = false,
     useDockedSearchBar: Boolean = false,
     globalErrors: List<GlobalError> = emptyList(),
+    bottomBarSize: IntSize = IntSize.Zero,
     searchBarOffsetHeightPx: Float = 0f,
     searchBarVisible: Boolean = true,
     searchBarActive: Boolean = false,
@@ -114,91 +115,89 @@ fun MainActivityContent(
         prevSearchBarVisible = searchBarVisible
     }
 
-    Column(
+    Scaffold(
         modifier = modifier,
+        contentWindowInsets = WindowInsets(left = 0),
     ) {
-        Scaffold(
-            contentWindowInsets = WindowInsets(left = 0),
+        Box(
+            modifier = Modifier.fillMaxSize(),
         ) {
+            val topPadding = animatedSearchBarHeight.value + animatedSearchBarOffsetHeight.value
             Box(
-                modifier = Modifier.fillMaxSize(),
+                modifier = Modifier
+                    .padding(
+                        top = topPadding
+                            .coerceAtLeast(0f)
+                            .roundToInt()
+                            .toDp(),
+                        start = if (useNavRail) bottomBarSize.width.toDp() else 0.dp,
+                    ),
             ) {
-                Box(
-                    modifier = Modifier
-                        .padding(
-                            top = animatedSearchBarHeight.value
-                                .roundToInt()
-                                .toDp(),
-                        )
-                        .offset {
-                            IntOffset(
-                                x = 0,
-                                y = animatedSearchBarOffsetHeight.value.roundToInt(),
-                            )
-                        },
-                ) {
-                    content(it)
-                }
-                MainSearchBar(
+                content(it)
+            }
+            MainSearchBar(
+                modifier = Modifier
+                    .windowInsetsPadding(topWindowInsets)
+                    .onSizeChanged {
+                        searchBarHeightPx = it.height
+                        onSearchBarSizeChanged(it)
+                    }
+                    .offset { IntOffset(x = 0, y = searchBarOffsetHeightPx.roundToInt()) },
+                useDocked = useDockedSearchBar,
+                visible = searchBarVisible,
+                active = searchBarActive,
+                search = searchBarSearch,
+                query = searchBarQuery,
+                suggestions = searchBarSuggestions,
+                showFilters = showSearchBarFilters,
+                deleteSuggestion = searchBarDeleteSuggestion,
+                overflowIcon = searchBarOverflowIcon,
+                showNSFW = searchBarShowNSFW,
+                showQuery = searchBarShowQuery,
+                onQueryChange = onSearchBarQueryChange,
+                onBackClick = if (showBackButton) onBackClick else null,
+                onSearch = onSearchBarSearch,
+                onSuggestionClick = onSearchBarSuggestionClick,
+                onSuggestionInsert = onSearchBarSuggestionInsert,
+                onSuggestionDeleteRequest = onSearchBarSuggestionDeleteRequest,
+                onActiveChange = onSearchBarActiveChange,
+                onShowFiltersChange = onSearchBarShowFiltersChange,
+                onFiltersChange = onSearchBarFiltersChange,
+                onDeleteSuggestionConfirmClick = onDeleteSearchBarSuggestionConfirmClick,
+                onDeleteSuggestionDismissRequest = onDeleteSearchBarSuggestionDismissRequest,
+                onSaveAsClick = onSearchBarSaveAsClick,
+                onLoadClick = onSearchBarLoadClick,
+            )
+            if (globalErrors.isNotEmpty()) {
+                GlobalErrorsColumn(
                     modifier = Modifier
                         .windowInsetsPadding(topWindowInsets)
-                        .onSizeChanged {
-                            searchBarHeightPx = it.height
-                            onSearchBarSizeChanged(it)
-                        }
-                        .offset { IntOffset(x = 0, y = searchBarOffsetHeightPx.roundToInt()) },
-                    useDocked = useDockedSearchBar,
-                    visible = searchBarVisible,
-                    active = searchBarActive,
-                    search = searchBarSearch,
-                    query = searchBarQuery,
-                    suggestions = searchBarSuggestions,
-                    showFilters = showSearchBarFilters,
-                    deleteSuggestion = searchBarDeleteSuggestion,
-                    overflowIcon = searchBarOverflowIcon,
-                    showNSFW = searchBarShowNSFW,
-                    showQuery = searchBarShowQuery,
-                    onQueryChange = onSearchBarQueryChange,
-                    onBackClick = if (showBackButton) onBackClick else null,
-                    onSearch = onSearchBarSearch,
-                    onSuggestionClick = onSearchBarSuggestionClick,
-                    onSuggestionInsert = onSearchBarSuggestionInsert,
-                    onSuggestionDeleteRequest = onSearchBarSuggestionDeleteRequest,
-                    onActiveChange = onSearchBarActiveChange,
-                    onShowFiltersChange = onSearchBarShowFiltersChange,
-                    onFiltersChange = onSearchBarFiltersChange,
-                    onDeleteSuggestionConfirmClick = onDeleteSearchBarSuggestionConfirmClick,
-                    onDeleteSuggestionDismissRequest = onDeleteSearchBarSuggestionDismissRequest,
-                    onSaveAsClick = onSearchBarSaveAsClick,
-                    onLoadClick = onSearchBarLoadClick,
+                        .padding(
+                            start = if (useNavRail) bottomBarSize.width.toDp() else 0.dp,
+                        ),
+                    globalErrors = globalErrors,
+                    onFixWallHavenApiKeyClick = onFixWallHavenApiKeyClick,
+                    onDismiss = onDismissGlobalError,
                 )
-                if (globalErrors.isNotEmpty()) {
-                    GlobalErrorsColumn(
-                        modifier = Modifier.windowInsetsPadding(topWindowInsets),
-                        globalErrors = globalErrors,
-                        onFixWallHavenApiKeyClick = onFixWallHavenApiKeyClick,
-                        onDismiss = onDismissGlobalError,
-                    )
-                }
-                if (useNavRail) {
-                    NavRail(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .align(Alignment.TopStart)
-                            .onSizeChanged(onBottomBarSizeChanged),
-                        currentDestination = currentDestination,
-                        onItemClick = onBottomBarItemClick,
-                    )
-                } else {
-                    BottomBar(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .align(Alignment.BottomCenter)
-                            .onSizeChanged(onBottomBarSizeChanged),
-                        currentDestination = currentDestination,
-                        onItemClick = onBottomBarItemClick,
-                    )
-                }
+            }
+            if (useNavRail) {
+                NavRail(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .align(Alignment.TopStart)
+                        .onSizeChanged(onBottomBarSizeChanged),
+                    currentDestination = currentDestination,
+                    onItemClick = onBottomBarItemClick,
+                )
+            } else {
+                BottomBar(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter)
+                        .onSizeChanged(onBottomBarSizeChanged),
+                    currentDestination = currentDestination,
+                    onItemClick = onBottomBarItemClick,
+                )
             }
         }
     }
@@ -306,6 +305,11 @@ private fun PreviewContent(
                 globalErrors = listOf(
                     GlobalErrorsRepository.WallHavenUnauthorisedError(),
                 ),
+                bottomBarSize = if (useNavRail) {
+                    IntSize(80.dp.toPx(), 120)
+                } else {
+                    IntSize.Zero
+                },
             ) {
                 val pagingItems = previewWallpaperFlow.collectAsLazyPagingItems()
                 HomeScreenContent(

@@ -62,6 +62,9 @@ class DatabaseModule {
     fun providesAutoWallpaperHistoryDao(appDatabase: AppDatabase) =
         appDatabase.autoWallpaperHistoryDao()
 
+    @Provides
+    fun providesFavoritesDao(appDatabase: AppDatabase) = appDatabase.favoriteDao()
+
     lateinit var appDatabase: AppDatabase
 
     @Provides

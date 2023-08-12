@@ -26,8 +26,12 @@ import androidx.paging.compose.itemKey
 import com.ammar.wallflow.data.preferences.GridColType
 import com.ammar.wallflow.data.preferences.GridType
 import com.ammar.wallflow.extensions.toDp
+import com.ammar.wallflow.model.Favorite
 import com.ammar.wallflow.model.Purity
+import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.model.Wallpaper
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun WallpaperStaggeredGrid(
@@ -45,7 +49,9 @@ fun WallpaperStaggeredGrid(
     gridColCount: Int = 2,
     gridColMinWidthPct: Int = 40,
     roundedCorners: Boolean = true,
+    favorites: ImmutableList<Favorite> = persistentListOf(),
     onWallpaperClick: (wallpaper: Wallpaper) -> Unit = {},
+    onWallpaperFavoriteClick: (wallpaper: Wallpaper) -> Unit = {},
 ) {
     val isRefreshing = wallpapers.loadState.refresh == LoadState.Loading
     var gridSize by remember { mutableStateOf(IntSize.Zero) }
@@ -104,9 +110,13 @@ fun WallpaperStaggeredGrid(
                         Purity.NSFW -> blurNsfw
                     },
                     isSelected = showSelection && selectedWallpaper?.id == it.id,
+                    isFavorite = favorites.find { f ->
+                        f.sourceId == it.id && f.source == Source.WALLHAVEN
+                    } != null,
                     fixedHeight = gridType == GridType.FIXED_SIZE,
                     roundedCorners = roundedCorners,
                     onClick = { onWallpaperClick(it) },
+                    onFavoriteClick = { onWallpaperFavoriteClick(it) },
                 )
             } ?: PlaceholderWallpaperCard()
         }

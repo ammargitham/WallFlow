@@ -12,6 +12,7 @@ import androidx.work.Data
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import com.ammar.wallflow.data.db.database.AppDatabase
+import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.WallpaperEntity
 import com.ammar.wallflow.data.network.model.NetworkMeta
 import com.ammar.wallflow.data.network.model.NetworkWallpaper
@@ -25,6 +26,7 @@ import com.ammar.wallflow.extensions.getFileNameFromUrl
 import com.ammar.wallflow.extensions.getTempDir
 import com.ammar.wallflow.extensions.getTempFile
 import com.ammar.wallflow.model.SearchQuery
+import com.ammar.wallflow.model.Source
 import io.mockk.every
 import io.mockk.mockkStatic
 import io.mockk.slot
@@ -417,6 +419,60 @@ class CleanupWorkerTest {
         val worker = getWorker(clock = clock)
         worker.doWork()
         // everything should be deleted
+        assertEquals(0, tempDir.listFiles()?.size)
+    }
+
+    @Test
+    fun testCleanupWorker1QueriesWithFavoriteWalls() = runTest(testDispatcher) {
+        val searchQueryDao = db.searchQueryDao()
+        val wallpapersDao = db.wallpapersDao()
+        val favoriteDao = db.favoriteDao()
+
+        val clock = TestClock(Clock.System.now())
+        val query1 = "test1"
+        val query1NewCount = 20
+        val mockNetworkWallpapers1 = MockFactory.generateNetworkWallpapers(query1NewCount)
+        simulateSearch(clock, query1, mockNetworkWallpapers = mockNetworkWallpapers1)
+        assertEquals(query1NewCount, wallpapersDao.count())
+        assertEquals(1, searchQueryDao.count())
+
+        // we cache 5 wallpapers from mockNetworkWallpapers1
+        val cachedCount1 = 5
+        val wallHavenIds1 = mockNetworkWallpapers1.map { it.id }
+        val wallpapers1 = wallpapersDao.getByWallhavenIds(wallHavenIds1)
+        val randomWallpapers1 = wallpapers1.shuffled().take(cachedCount1)
+        createTempFiles(randomWallpapers1, clock.now())
+
+        assertEquals(cachedCount1, tempDir.listFiles()?.size)
+
+        // We favorite 2 random wallpapers from non-cached wallpapers
+        val query1CachedWallHavenIds = randomWallpapers1.map { it.wallhavenId }
+        val favoriteEntities = mockNetworkWallpapers1.filter {
+            it.id !in query1CachedWallHavenIds
+        }.take(2).map {
+            FavoriteEntity(
+                id = 0,
+                sourceId = it.id,
+                source = Source.WALLHAVEN,
+                favoritedOn = clock.now(),
+            )
+        }
+        favoriteDao.insertAll(favoriteEntities)
+
+        // forward time by 8 days
+        clock.plus(8.days)
+
+        // worker should not delete everything
+        val worker = getWorker(clock = clock)
+        worker.doWork()
+        assertEquals(2, wallpapersDao.count())
+
+        val remainingWallpapers = wallpapersDao.getAll()
+        assertEquals(
+            remainingWallpapers.map { it.wallhavenId }.sorted(),
+            favoriteEntities.map { it.sourceId }.sorted(),
+        )
+        assertEquals(0, searchQueryDao.count())
         assertEquals(0, tempDir.listFiles()?.size)
     }
 

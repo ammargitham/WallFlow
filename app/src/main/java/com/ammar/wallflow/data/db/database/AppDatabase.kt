@@ -5,6 +5,7 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.ammar.wallflow.data.db.converters.Converters
 import com.ammar.wallflow.data.db.dao.AutoWallpaperHistoryDao
+import com.ammar.wallflow.data.db.dao.FavoriteDao
 import com.ammar.wallflow.data.db.dao.LastUpdatedDao
 import com.ammar.wallflow.data.db.dao.ObjectDetectionModelDao
 import com.ammar.wallflow.data.db.dao.PopularTagsDao
@@ -17,6 +18,7 @@ import com.ammar.wallflow.data.db.dao.TagsDao
 import com.ammar.wallflow.data.db.dao.UploadersDao
 import com.ammar.wallflow.data.db.dao.WallpapersDao
 import com.ammar.wallflow.data.db.entity.AutoWallpaperHistoryEntity
+import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.LastUpdatedEntity
 import com.ammar.wallflow.data.db.entity.ObjectDetectionModelEntity
 import com.ammar.wallflow.data.db.entity.PopularTagEntity
@@ -45,8 +47,9 @@ import com.ammar.wallflow.data.db.entity.WallpaperTagsEntity
         ObjectDetectionModelEntity::class,
         SavedSearchEntity::class,
         AutoWallpaperHistoryEntity::class,
+        FavoriteEntity::class,
     ],
-    version = 1,
+    version = 2,
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
@@ -62,4 +65,5 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun objectDetectionModelDao(): ObjectDetectionModelDao
     abstract fun savedSearchDao(): SavedSearchDao
     abstract fun autoWallpaperHistoryDao(): AutoWallpaperHistoryDao
+    abstract fun favoriteDao(): FavoriteDao
 }

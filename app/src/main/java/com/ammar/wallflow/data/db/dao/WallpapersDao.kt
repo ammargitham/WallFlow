@@ -78,6 +78,12 @@ interface WallpapersDao {
                 FROM search_query_wallpapers
                 WHERE wallpaper_id = wallpapers.id
                 AND search_query_id <> :searchQueryId
+            )
+            AND NOT EXISTS (
+                SELECT 1
+                FROM favorites
+                WHERE source_id = wallpapers.wallhaven_id
+                AND source = 'WALLHAVEN'
             );
         """,
     )
@@ -98,6 +104,12 @@ interface WallpapersDao {
                 FROM search_query_wallpapers
                 WHERE wallpaper_id = wallpapers.id
                 AND search_query_id <> :searchQueryId
+            )
+            AND NOT EXISTS (
+                SELECT 1
+                FROM favorites
+                WHERE source_id = wallpapers.wallhaven_id
+                AND source = 'WALLHAVEN'
             );
         """,
     )

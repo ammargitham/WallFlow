@@ -63,7 +63,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val windowSizeClass = calculateWindowSizeClass(this)
-            // val useNavRail = windowSizeClass.widthSizeClass > WindowWidthSizeClass.Compact
+            val useNavRail = windowSizeClass.widthSizeClass > WindowWidthSizeClass.Compact
             val isExpanded = windowSizeClass.widthSizeClass >= WindowWidthSizeClass.Expanded
 
             twoPaneController = rememberTwoPaneNavController(
@@ -124,9 +124,9 @@ class MainActivity : ComponentActivity() {
                 viewModel.setSearchBarSearch(searchBarControllerState.search)
             }
 
-            // LaunchedEffect(useNavRail) {
-            //     bottomBarController.update { it.copy(isRail = useNavRail) }
-            // }
+            LaunchedEffect(useNavRail) {
+                bottomBarController.update { it.copy(isRail = useNavRail) }
+            }
 
             WallFlowTheme(
                 darkTheme = when (uiState.theme) {
@@ -148,9 +148,10 @@ class MainActivity : ComponentActivity() {
                     MainActivityContent(
                         currentDestination = currentDestination,
                         showBackButton = showBackButton,
-                        // useNavRail = useNavRail,
+                        useNavRail = useNavRail,
                         useDockedSearchBar = isTwoPaneMode,
                         globalErrors = uiState.globalErrors,
+                        bottomBarSize = bottomBarController.state.value.size,
                         searchBarOffsetHeightPx = searchBarOffsetHeightPx,
                         searchBarVisible = searchBarControllerState.visible,
                         searchBarActive = uiState.searchBarActive,
@@ -196,7 +197,11 @@ class MainActivity : ComponentActivity() {
                             if (!isTwoPaneMode) {
                                 systemBarsController.update {
                                     it.copy(
-                                        statusBarColor = if (active) statusBarSemiTransparentColor else Color.Unspecified,
+                                        statusBarColor = if (active) {
+                                            statusBarSemiTransparentColor
+                                        } else {
+                                            Color.Unspecified
+                                        },
                                     )
                                 }
                                 bottomBarController.update { it.copy(visible = !active) }

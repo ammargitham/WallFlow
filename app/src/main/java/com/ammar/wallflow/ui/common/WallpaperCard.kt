@@ -5,17 +5,25 @@ import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
@@ -27,6 +35,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
@@ -36,6 +45,7 @@ import androidx.core.content.res.ResourcesCompat
 import androidx.core.graphics.drawable.toBitmap
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
+import coil.request.Parameters
 import com.ammar.wallflow.R
 import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.extensions.aspectRatio
@@ -57,7 +67,9 @@ fun WallpaperCard(
     fixedHeight: Boolean = false,
     roundedCorners: Boolean = true,
     isSelected: Boolean = false,
+    isFavorite: Boolean = false,
     onClick: () -> Unit = {},
+    onFavoriteClick: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val request = remember(
@@ -95,13 +107,15 @@ fun WallpaperCard(
         )?.toBitmap()?.asImageBitmap()
     }
 
-    Column(
+    Box(
         modifier = modifier
             .let {
                 if (fixedHeight) {
                     it.height(200.dp)
                 } else {
-                    it.aspectRatio(wallpaper.resolution.aspectRatio)
+                    it
+                        .aspectRatio(wallpaper.resolution.aspectRatio)
+                        .heightIn(min = 60.dp)
                 }
             }
             .clip(if (roundedCorners) CardDefaults.shape else RectangleShape)
@@ -140,9 +154,34 @@ fun WallpaperCard(
             contentDescription = stringResource(R.string.wallpaper),
             contentScale = ContentScale.Crop,
             onError = {
-                Log.e(TAG, "Error loading: ${wallpaper.path}", it.result.throwable)
+                Log.e(TAG, "Error loading: ${wallpaper.thumbs.original}", it.result.throwable)
             },
         )
+        FilledIconButton(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(
+                    bottom = 4.dp,
+                    end = 4.dp,
+                ),
+            colors = IconButtonDefaults.filledIconButtonColors(
+                containerColor = Color.Black.copy(alpha = 0.5f),
+                contentColor = if (isFavorite) Color.Red else Color.White,
+            ),
+            onClick = onFavoriteClick,
+        ) {
+            Icon(
+                modifier = Modifier.size(24.dp),
+                painter = painterResource(
+                    if (isFavorite) {
+                        R.drawable.baseline_favorite_24
+                    } else {
+                        R.drawable.outline_favorite_border_24
+                    },
+                ),
+                contentDescription = stringResource(R.string.favorite),
+            )
+        }
     }
 }
 

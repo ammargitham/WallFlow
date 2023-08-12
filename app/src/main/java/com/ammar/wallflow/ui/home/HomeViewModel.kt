@@ -5,18 +5,22 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
+import com.ammar.wallflow.data.db.entity.toFavorite
 import com.ammar.wallflow.data.db.entity.toSavedSearch
 import com.ammar.wallflow.data.preferences.LayoutPreferences
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
+import com.ammar.wallflow.data.repository.FavoritesRepository
 import com.ammar.wallflow.data.repository.SavedSearchRepository
 import com.ammar.wallflow.data.repository.WallHavenRepository
 import com.ammar.wallflow.data.repository.utils.Resource
 import com.ammar.wallflow.data.repository.utils.successOr
+import com.ammar.wallflow.model.Favorite
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.SavedSearch
 import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.SearchQuery
 import com.ammar.wallflow.model.Sorting
+import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.model.Tag
 import com.ammar.wallflow.model.TopRange
 import com.ammar.wallflow.model.Wallpaper
@@ -56,6 +60,7 @@ class HomeViewModel @Inject constructor(
     private val wallHavenRepository: WallHavenRepository,
     private val appPreferencesRepository: AppPreferencesRepository,
     private val savedSearchRepository: SavedSearchRepository,
+    private val favoritesRepository: FavoritesRepository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val savedStateSearchFlow: Flow<Search?> = savedStateHandle.getStateFlow<ByteArray?>(
@@ -66,7 +71,6 @@ class HomeViewModel @Inject constructor(
             DefaultKtxSerializableNavTypeSerializer(Search.serializer()).fromByteArray(it)
         }
     }
-    private val initialUiState = HomeUiState()
     private val popularTags = wallHavenRepository.popularTags()
     private val localUiState = MutableStateFlow(HomeUiStatePartial())
     private val searchFlow = combine(
@@ -89,24 +93,25 @@ class HomeViewModel @Inject constructor(
         localUiState,
         debouncedWallpapersLoadingFlow,
         savedSearchRepository.getAll(),
-    ) { search, tags, appPreferences, local, wallpapersLoading, savedSearchEntities ->
+        favoritesRepository.observeAll(),
+    ) {
+            search,
+            tags,
+            appPreferences,
+            local,
+            wallpapersLoading,
+            savedSearchEntities,
+            favorites,
+        ->
         local.merge(
             HomeUiState(
                 tags = (
                     if (tags is Resource.Loading) {
-                        List(3) {
-                            Tag(
-                                id = it + 1L,
-                                name = "Loading...", // no need for string resource as "Loading..." won't be visible
-                                alias = emptyList(),
-                                categoryId = 0,
-                                category = "",
-                                purity = Purity.SFW,
-                                createdAt = Clock.System.now(),
-                            )
-                        }
+                        tempTags
                     } else {
-                        tags.successOr(emptyList())
+                        tags.successOr(
+                            emptyList(),
+                        )
                     }
                     ).toImmutableList(),
                 areTagsLoading = tags is Resource.Loading,
@@ -118,12 +123,13 @@ class HomeViewModel @Inject constructor(
                 isHome = search == appPreferences.homeSearch,
                 savedSearches = savedSearchEntities.map { entity -> entity.toSavedSearch() },
                 layoutPreferences = appPreferences.lookAndFeelPreferences.layoutPreferences,
+                favorites = favorites.map { it.toFavorite() }.toImmutableList(),
             ),
         )
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.WhileSubscribed(5000),
-        initialValue = initialUiState,
+        initialValue = HomeUiState(),
     )
 
     fun refresh() {
@@ -164,6 +170,25 @@ class HomeViewModel @Inject constructor(
     fun showSavedSearches(show: Boolean = true) = localUiState.update {
         it.copy(showSavedSearchesDialog = partial(show))
     }
+
+    fun toggleFavorite(wallpaper: Wallpaper) = viewModelScope.launch {
+        favoritesRepository.toggleFavorite(
+            sourceId = wallpaper.id,
+            source = Source.WALLHAVEN,
+        )
+    }
+}
+
+private val tempTags = List(3) {
+    Tag(
+        id = it + 1L,
+        name = "Loading...", // no need for string resource as "Loading..." won't be visible
+        alias = emptyList(),
+        categoryId = 0,
+        category = "",
+        purity = Purity.SFW,
+        createdAt = Clock.System.now(),
+    )
 }
 
 @Stable
@@ -188,4 +213,5 @@ data class HomeUiState(
     val showSavedSearchesDialog: Boolean = false,
     val savedSearches: List<SavedSearch> = emptyList(),
     val layoutPreferences: LayoutPreferences = LayoutPreferences(),
+    val favorites: ImmutableList<Favorite> = persistentListOf(),
 )

@@ -29,11 +29,9 @@ import com.ammar.wallflow.ui.common.navigation.TwoPaneNavigation
 import com.ammar.wallflow.ui.common.navigation.TwoPaneNavigation.Mode
 import com.ammar.wallflow.ui.destinations.HomeScreenDestination
 import com.ammar.wallflow.ui.destinations.WallpaperScreenDestination
-import com.ammar.wallflow.ui.home.HomeScreen
 import com.ammar.wallflow.ui.wallpaper.WallpaperViewModel
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.animations.defaults.RootNavGraphDefaultAnimations
-import com.ramcosta.composedestinations.manualcomposablecalls.composable
 import com.ramcosta.composedestinations.navigation.dependency
 import com.ramcosta.composedestinations.rememberNavHostEngine
 import com.ramcosta.composedestinations.spec.NavHostEngine
@@ -138,13 +136,5 @@ private fun Host(
             dependency(mainActivityViewModel)
             dependency(wallpaperViewModel)
         },
-    ) {
-        composable(HomeScreenDestination) {
-            HomeScreen(
-                // navigator = destinationsNavigator,
-                twoPaneController = twoPaneController,
-                wallpaperViewModel = wallpaperViewModel,
-            )
-        }
-    }
+    )
 }
