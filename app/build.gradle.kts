@@ -173,6 +173,7 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
             merges += "META-INF/LICENSE.md"
             merges += "META-INF/LICENSE-notice.md"
+            merges += "META-INF/versions/9/previous-compilation-data.bin"
         }
     }
 
