@@ -152,7 +152,7 @@ fun HomeScreen(
                     null
                 },
                 search = uiState.search,
-                showQuery = !uiState.isHome,
+                // showQuery = !uiState.isHome,
                 onSearch = { search ->
                     if (uiState.search == search) return@copy
                     navController.search(search)
