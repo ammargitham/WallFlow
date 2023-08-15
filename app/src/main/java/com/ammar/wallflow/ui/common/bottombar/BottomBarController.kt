@@ -24,11 +24,7 @@ class DefaultBottomBarController(initialState: BottomBarState) : BottomBarContro
 
     override fun update(fn: (prevState: BottomBarState) -> BottomBarState) {
         val newState = fn(state.value)
-        _state.value = _state.value.copy(
-            visible = newState.visible,
-            size = newState.size,
-            isRail = newState.isRail,
-        )
+        _state.value = newState
     }
 }
 

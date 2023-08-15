@@ -10,11 +10,6 @@ import com.ammar.wallflow.activities.main.MainActivity
 import com.ammar.wallflow.model.Wallpaper
 import kotlin.random.Random
 
-data class WallpaperScreenNavArgs(
-    val thumbUrl: String? = null,
-    val wallpaperId: String? = null,
-)
-
 const val wallpaperScreenLocalHost = "w"
 const val wallpaperScreenLocalDeepLinkUriPattern =
     "$LOCAL_DEEPLINK_SCHEME://$wallpaperScreenLocalHost/{wallpaperId}"

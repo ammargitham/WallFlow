@@ -16,7 +16,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -33,12 +32,14 @@ import com.ammar.wallflow.data.repository.GlobalErrorsRepository
 import com.ammar.wallflow.data.repository.GlobalErrorsRepository.GlobalError
 import com.ammar.wallflow.extensions.toDp
 import com.ammar.wallflow.extensions.toPx
+import com.ammar.wallflow.extensions.toPxF
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.SearchQuery
 import com.ammar.wallflow.model.Tag
 import com.ammar.wallflow.model.wallpaper1
 import com.ammar.wallflow.model.wallpaper2
+import com.ammar.wallflow.ui.common.SearchBar
 import com.ammar.wallflow.ui.common.Suggestion
 import com.ammar.wallflow.ui.common.bottombar.BottomBar
 import com.ammar.wallflow.ui.common.bottombar.NavRail
@@ -61,6 +62,7 @@ fun MainActivityContent(
     useNavRail: Boolean = false,
     useDockedSearchBar: Boolean = false,
     globalErrors: List<GlobalError> = emptyList(),
+    bottomBarVisible: Boolean = true,
     bottomBarSize: IntSize = IntSize.Zero,
     searchBarOffsetHeightPx: Float = 0f,
     searchBarVisible: Boolean = true,
@@ -78,7 +80,6 @@ fun MainActivityContent(
     onDismissGlobalError: (error: GlobalError) -> Unit = {},
     onBottomBarSizeChanged: (size: IntSize) -> Unit = {},
     onBottomBarItemClick: (destination: TypedDestination<*>) -> Unit = {},
-    onSearchBarSizeChanged: (IntSize) -> Unit = {},
     onSearchBarActiveChange: (active: Boolean) -> Unit = {},
     onSearchBarQueryChange: (String) -> Unit = {},
     onSearchBarSearch: (query: String) -> Unit = {},
@@ -94,18 +95,18 @@ fun MainActivityContent(
     content: @Composable (contentPadding: PaddingValues) -> Unit,
 ) {
     var prevSearchBarVisible by remember { mutableStateOf(searchBarVisible) }
-    var searchBarHeightPx by remember { mutableIntStateOf(0) }
-    val animatedSearchBarHeight = remember { Animatable(searchBarHeightPx.toFloat()) }
+    val searchBarHeightPx = SearchBar.Defaults.height.toPxF()
+    val animatedSearchBarHeight = remember { Animatable(searchBarHeightPx) }
     val animatedSearchBarOffsetHeight = remember { Animatable(searchBarOffsetHeightPx) }
 
     LaunchedEffect(searchBarVisible, searchBarHeightPx, searchBarOffsetHeightPx) {
         // handle search bar offset when transitioning screens
         if (searchBarVisible) {
             if (!prevSearchBarVisible) {
-                animatedSearchBarHeight.animateTo(searchBarHeightPx.toFloat())
+                animatedSearchBarHeight.animateTo(searchBarHeightPx)
                 animatedSearchBarOffsetHeight.animateTo(searchBarOffsetHeightPx)
             } else {
-                animatedSearchBarHeight.snapTo(searchBarHeightPx.toFloat())
+                animatedSearchBarHeight.snapTo(searchBarHeightPx)
                 animatedSearchBarOffsetHeight.snapTo(searchBarOffsetHeightPx)
             }
         } else {
@@ -130,7 +131,11 @@ fun MainActivityContent(
                             .coerceAtLeast(0f)
                             .roundToInt()
                             .toDp(),
-                        start = if (useNavRail) bottomBarSize.width.toDp() else 0.dp,
+                        start = if (useNavRail && bottomBarVisible) {
+                            bottomBarSize.width.toDp()
+                        } else {
+                            0.dp
+                        },
                     ),
             ) {
                 content(it)
@@ -138,10 +143,6 @@ fun MainActivityContent(
             MainSearchBar(
                 modifier = Modifier
                     .windowInsetsPadding(topWindowInsets)
-                    .onSizeChanged {
-                        searchBarHeightPx = it.height
-                        onSearchBarSizeChanged(it)
-                    }
                     .offset { IntOffset(x = 0, y = searchBarOffsetHeightPx.roundToInt()) },
                 useDocked = useDockedSearchBar,
                 visible = searchBarVisible,

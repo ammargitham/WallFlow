@@ -1,31 +1,21 @@
 package com.ammar.wallflow.ui.home
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
-import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
-import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
-import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -36,62 +26,50 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import androidx.paging.LoadState
-import androidx.paging.PagingData
-import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.ammar.wallflow.R
-import com.ammar.wallflow.data.preferences.LayoutPreferences
-import com.ammar.wallflow.extensions.findActivity
+import com.ammar.wallflow.activities.setwallpaper.SetWallpaperActivity
+import com.ammar.wallflow.extensions.getFileNameFromUrl
+import com.ammar.wallflow.extensions.getUriForFile
+import com.ammar.wallflow.extensions.parseMimeType
 import com.ammar.wallflow.extensions.rememberLazyStaggeredGridState
 import com.ammar.wallflow.extensions.search
-import com.ammar.wallflow.model.Favorite
+import com.ammar.wallflow.extensions.share
 import com.ammar.wallflow.model.MenuItem
 import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.SearchSaver
 import com.ammar.wallflow.model.Tag
 import com.ammar.wallflow.model.TagSearchMeta
 import com.ammar.wallflow.model.Wallpaper
-import com.ammar.wallflow.model.wallpaper1
-import com.ammar.wallflow.model.wallpaper2
-import com.ammar.wallflow.ui.appCurrentDestinationAsState
-import com.ammar.wallflow.ui.common.LocalSystemBarsController
-import com.ammar.wallflow.ui.common.WallpaperStaggeredGrid
+import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.bottomWindowInsets
 import com.ammar.wallflow.ui.common.bottombar.BottomBarController
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
 import com.ammar.wallflow.ui.common.mainsearch.LocalMainSearchBarController
-import com.ammar.wallflow.ui.common.mainsearch.MainSearchBarState
-import com.ammar.wallflow.ui.common.navigation.TwoPaneNavigation
-import com.ammar.wallflow.ui.common.navigation.TwoPaneNavigation.Mode
 import com.ammar.wallflow.ui.common.searchedit.EditSearchModalBottomSheet
 import com.ammar.wallflow.ui.common.searchedit.SaveAsDialog
 import com.ammar.wallflow.ui.common.searchedit.SavedSearchesDialog
 import com.ammar.wallflow.ui.common.topWindowInsets
 import com.ammar.wallflow.ui.destinations.SettingsScreenDestination
 import com.ammar.wallflow.ui.destinations.WallpaperScreenDestination
-import com.ammar.wallflow.ui.theme.WallFlowTheme
-import com.ammar.wallflow.ui.wallpaper.WallpaperScreenNavArgs
-import com.ammar.wallflow.ui.wallpaper.WallpaperViewModel
+import com.ammar.wallflow.ui.wallpaperviewer.WallpaperViewerViewModel
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.RootNavGraph
-import kotlinx.collections.immutable.ImmutableList
+import com.ramcosta.composedestinations.navigation.navigate
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 
 @OptIn(
     ExperimentalMaterialApi::class,
     ExperimentalMaterial3Api::class,
-    ExperimentalMaterial3WindowSizeClassApi::class,
 )
 @RootNavGraph(start = true)
 @Destination(
@@ -100,19 +78,16 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeScreen(
     modifier: Modifier = Modifier,
-    twoPaneController: TwoPaneNavigation.Controller,
-    wallpaperViewModel: WallpaperViewModel,
+    navController: NavController,
     viewModel: HomeViewModel = hiltViewModel(),
+    viewerViewModel: WallpaperViewerViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val viewerUiState by viewerViewModel.uiState.collectAsStateWithLifecycle()
     val wallpapers = viewModel.wallpapers.collectAsLazyPagingItems()
     val gridState = wallpapers.rememberLazyStaggeredGridState()
     val refreshing = wallpapers.loadState.refresh == LoadState.Loading
-    val expandedFab by remember(gridState.firstVisibleItemIndex) {
-        derivedStateOf { gridState.firstVisibleItemIndex == 0 }
-    }
     val refreshState = rememberPullRefreshState(
-        // refreshing = uiState.wallpapersLoading,
         refreshing = false,
         onRefresh = {
             wallpapers.refresh()
@@ -121,7 +96,7 @@ fun HomeScreen(
     )
     val searchBarController = LocalMainSearchBarController.current
     val bottomBarController = LocalBottomBarController.current
-    val systemBarsController = LocalSystemBarsController.current
+    val systemController = LocalSystemController.current
     val density = LocalDensity.current
     val context = LocalContext.current
     val bottomWindowInsets = bottomWindowInsets
@@ -139,24 +114,20 @@ fun HomeScreen(
             navigationBarsInsets,
         )
     }
-    val windowSizeClass = calculateWindowSizeClass(context.findActivity())
-    val isExpanded = windowSizeClass.widthSizeClass >= WindowWidthSizeClass.Expanded
-    val currentPane2Destination by twoPaneController.pane2NavHostController
-        .appCurrentDestinationAsState()
-    val isTwoPaneMode = twoPaneController.paneMode.value == Mode.TWO_PANE
+    val systemState by systemController.state
 
     LaunchedEffect(refreshing) {
         viewModel.setWallpapersLoading(refreshing)
     }
 
     LaunchedEffect(Unit) {
-        systemBarsController.reset()
+        systemController.resetBarsState()
         bottomBarController.update { it.copy(visible = true) }
     }
 
     LaunchedEffect(uiState.search, uiState.isHome) {
         searchBarController.update {
-            MainSearchBarState(
+            it.copy(
                 visible = true,
                 overflowIcon = if (uiState.isHome) {
                     {
@@ -167,9 +138,9 @@ fun HomeScreen(
                                     value = "settings",
                                 ),
                             ),
-                            onItemClick = {
-                                if (it.value == "settings") {
-                                    twoPaneController.navigate(SettingsScreenDestination) {
+                            onItemClick = { item ->
+                                if (item.value == "settings") {
+                                    navController.navigate(SettingsScreenDestination) {
                                         launchSingleTop = true
                                     }
                                 }
@@ -181,42 +152,22 @@ fun HomeScreen(
                 },
                 search = uiState.search,
                 showQuery = !uiState.isHome,
-                onSearch = {
-                    if (uiState.search == it) return@MainSearchBarState
-                    twoPaneController.pane1NavHostController.search(it)
+                onSearch = { search ->
+                    if (uiState.search == search) return@copy
+                    navController.search(search)
                 },
             )
         }
     }
 
-    LaunchedEffect(uiState.selectedWallpaper) {
-        val navArgs = WallpaperScreenNavArgs(
-            wallpaperId = uiState.selectedWallpaper?.id,
-            thumbUrl = uiState.selectedWallpaper?.thumbs?.original,
-        )
-        if (!isExpanded) {
-            return@LaunchedEffect
-        }
-        twoPaneController.setPaneMode(Mode.TWO_PANE)
-        if (currentPane2Destination is WallpaperScreenDestination) {
-            wallpaperViewModel.setWallpaperId(
-                wallpaperId = navArgs.wallpaperId,
-                thumbUrl = navArgs.thumbUrl,
-            )
-            return@LaunchedEffect
-        }
-        twoPaneController.navigatePane2(
-            WallpaperScreenDestination(navArgs),
-        )
-    }
-
-    val onWallpaperClick: (wallpaper: Wallpaper) -> Unit = remember(isTwoPaneMode) {
+    val onWallpaperClick: (wallpaper: Wallpaper) -> Unit = remember(systemState.isExpanded) {
         {
-            if (isTwoPaneMode) {
+            if (systemState.isExpanded) {
                 viewModel.setSelectedWallpaper(it)
+                viewerViewModel.setWallpaperId(it.id, it.thumbs.original)
             } else {
                 // navigate to wallpaper screen
-                twoPaneController.navigatePane1(
+                navController.navigate(
                     WallpaperScreenDestination(
                         wallpaperId = it.id,
                         thumbUrl = it.thumbs.original,
@@ -228,7 +179,7 @@ fun HomeScreen(
 
     val onTagClick: (tag: Tag) -> Unit = remember {
         {
-            twoPaneController.pane1NavHostController.search(
+            navController.search(
                 Search(
                     query = "id:${it.id}",
                     meta = TagSearchMeta(it),
@@ -247,6 +198,7 @@ fun HomeScreen(
     ) {
         HomeScreenContent(
             modifier = Modifier.fillMaxSize(),
+            isExpanded = systemState.isExpanded,
             gridState = gridState,
             contentPadding = PaddingValues(
                 start = 8.dp,
@@ -260,11 +212,61 @@ fun HomeScreen(
             blurSketchy = uiState.blurSketchy,
             blurNsfw = uiState.blurNsfw,
             selectedWallpaper = uiState.selectedWallpaper,
-            showSelection = isTwoPaneMode,
             layoutPreferences = uiState.layoutPreferences,
+            showFAB = uiState.isHome,
+            fullWallpaper = viewerUiState.wallpaper,
+            fullWallpaperActionsVisible = viewerUiState.actionsVisible,
+            fullWallpaperDownloadStatus = viewerUiState.downloadStatus,
+            fullWallpaperLoading = viewerUiState.loading,
+            showFullWallpaperInfo = viewerUiState.showInfo,
             onWallpaperClick = onWallpaperClick,
             onWallpaperFavoriteClick = viewModel::toggleFavorite,
             onTagClick = onTagClick,
+            onFABClick = onFilterFABClick,
+            onFullWallpaperTransform = viewerViewModel::onWallpaperTransform,
+            onFullWallpaperTap = viewerViewModel::onWallpaperTap,
+            onFullWallpaperInfoClick = viewerViewModel::showInfo,
+            onFullWallpaperInfoDismiss = { viewerViewModel.showInfo(false) },
+            onFullWallpaperShareLinkClick = {
+                viewerUiState.wallpaper?.run { context.share(url) }
+            },
+            onFullWallpaperShareImageClick = {
+                val wallpaper = viewerUiState.wallpaper ?: return@HomeScreenContent
+                viewerViewModel.downloadForSharing {
+                    if (it == null) return@downloadForSharing
+                    context.share(
+                        uri = context.getUriForFile(it),
+                        type = wallpaper.fileType.ifBlank { parseMimeType(wallpaper.path) },
+                        title = wallpaper.path.getFileNameFromUrl(),
+                        grantTempPermission = true,
+                    )
+                }
+            },
+            onFullWallpaperApplyWallpaperClick = {
+                viewerViewModel.downloadForSharing {
+                    val file = it ?: return@downloadForSharing
+                    context.startActivity(
+                        Intent().apply {
+                            setClass(context, SetWallpaperActivity::class.java)
+                            putExtra(
+                                SetWallpaperActivity.EXTRA_URI,
+                                context.getUriForFile(file),
+                            )
+                        },
+                    )
+                }
+            },
+            onFullWallpaperFullScreenClick = {
+                viewerUiState.wallpaper?.run {
+                    navController.navigate(
+                        WallpaperScreenDestination(
+                            thumbUrl = thumbs.original,
+                            wallpaperId = id,
+                        ),
+                    )
+                }
+            },
+            onFullWallpaperDownloadPermissionsGranted = viewerViewModel::download,
         )
 
         PullRefreshIndicator(
@@ -272,23 +274,6 @@ fun HomeScreen(
             refreshing = false,
             state = refreshState,
         )
-
-        if (uiState.isHome) {
-            ExtendedFloatingActionButton(
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .offset(x = (-16).dp, y = (-16).dp - bottomPadding),
-                onClick = onFilterFABClick,
-                expanded = expandedFab,
-                icon = {
-                    Icon(
-                        painter = painterResource(R.drawable.baseline_filter_alt_24),
-                        contentDescription = stringResource(R.string.filters),
-                    )
-                },
-                text = { Text(text = stringResource(R.string.filters)) },
-            )
-        }
 
         if (uiState.showFilters) {
             val state = rememberModalBottomSheetState()
@@ -373,73 +358,4 @@ private fun getStartBottomPadding(
         bottomBarState.size.height.toDp()
     }
     return bottomInsetsPadding + bottomBarPadding + bottomNavPadding
-}
-
-@Composable
-internal fun HomeScreenContent(
-    modifier: Modifier = Modifier,
-    gridState: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
-    contentPadding: PaddingValues = PaddingValues(8.dp),
-    tags: ImmutableList<Tag> = persistentListOf(),
-    isTagsLoading: Boolean = false,
-    wallpapers: LazyPagingItems<Wallpaper>,
-    favorites: ImmutableList<Favorite> = persistentListOf(),
-    blurSketchy: Boolean = false,
-    blurNsfw: Boolean = false,
-    selectedWallpaper: Wallpaper? = null,
-    showSelection: Boolean = false,
-    layoutPreferences: LayoutPreferences = LayoutPreferences(),
-    onWallpaperClick: (wallpaper: Wallpaper) -> Unit = {},
-    onWallpaperFavoriteClick: (wallpaper: Wallpaper) -> Unit = {},
-    onTagClick: (tag: Tag) -> Unit = {},
-) {
-    WallpaperStaggeredGrid(
-        modifier = modifier,
-        state = gridState,
-        contentPadding = contentPadding,
-        wallpapers = wallpapers,
-        favorites = favorites,
-        blurSketchy = blurSketchy,
-        blurNsfw = blurNsfw,
-        header = {
-            if (tags.isNotEmpty()) {
-                item(span = StaggeredGridItemSpan.FullLine) {
-                    PopularTagsRow(
-                        tags = tags,
-                        loading = isTagsLoading,
-                        onTagClick = onTagClick,
-                    )
-                }
-            }
-        },
-        selectedWallpaper = selectedWallpaper,
-        showSelection = showSelection,
-        gridType = layoutPreferences.gridType,
-        gridColType = layoutPreferences.gridColType,
-        gridColCount = layoutPreferences.gridColCount,
-        gridColMinWidthPct = layoutPreferences.gridColMinWidthPct,
-        roundedCorners = layoutPreferences.roundedCorners,
-        onWallpaperClick = onWallpaperClick,
-        onWallpaperFavoriteClick = onWallpaperFavoriteClick,
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun DefaultPreview() {
-    WallFlowTheme {
-        val wallpapers = flowOf(PagingData.from(listOf(wallpaper1, wallpaper2)))
-        val pagingItems = wallpapers.collectAsLazyPagingItems()
-        HomeScreenContent(tags = persistentListOf(), wallpapers = pagingItems)
-    }
-}
-
-@Preview(showBackground = true, widthDp = 480)
-@Composable
-private fun PortraitPreview() {
-    WallFlowTheme {
-        val wallpapers = flowOf(PagingData.from(listOf(wallpaper1, wallpaper2)))
-        val pagingItems = wallpapers.collectAsLazyPagingItems()
-        HomeScreenContent(tags = persistentListOf(), wallpapers = pagingItems)
-    }
 }

@@ -27,16 +27,15 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.preferences.GridColType
 import com.ammar.wallflow.data.preferences.LayoutPreferences
+import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.TopBar
 import com.ammar.wallflow.ui.common.bottomWindowInsets
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
 import com.ammar.wallflow.ui.common.mainsearch.LocalMainSearchBarController
-import com.ammar.wallflow.ui.common.mainsearch.MainSearchBarState
-import com.ammar.wallflow.ui.common.navigation.TwoPaneNavigation
-import com.ammar.wallflow.ui.common.navigation.TwoPaneNavigation.Mode
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import com.ramcosta.composedestinations.annotation.Destination
 
@@ -44,17 +43,16 @@ import com.ramcosta.composedestinations.annotation.Destination
 @Destination
 @Composable
 fun LayoutSettingsScreen(
-    twoPaneController: TwoPaneNavigation.Controller,
+    navController: NavController,
     viewModel: LayoutSettingsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val searchBarController = LocalMainSearchBarController.current
     val bottomBarController = LocalBottomBarController.current
-    val supportsTwoPane = twoPaneController.supportsTwoPane
+    val systemController = LocalSystemController.current
 
     LaunchedEffect(Unit) {
-        twoPaneController.setPaneMode(Mode.SINGLE_PANE) // hide pane 2
-        searchBarController.update { MainSearchBarState(visible = false) }
+        searchBarController.update { it.copy(visible = false) }
         bottomBarController.update { it.copy(visible = false) }
     }
 
@@ -64,7 +62,7 @@ fun LayoutSettingsScreen(
             .windowInsetsPadding(bottomWindowInsets),
     ) {
         TopBar(
-            navController = twoPaneController.pane1NavHostController,
+            navController = navController,
             title = {
                 Text(
                     text = stringResource(R.string.layout),
@@ -74,7 +72,7 @@ fun LayoutSettingsScreen(
             showBackButton = true,
         )
         LayoutSettingsScreenContent(
-            supportsTwoPane = supportsTwoPane,
+            supportsTwoPane = systemController.state.value.isExpanded,
             layoutPreferences = uiState.appPreferences.lookAndFeelPreferences.layoutPreferences,
             onLayoutPreferencesChange = viewModel::updatePreferences,
         )

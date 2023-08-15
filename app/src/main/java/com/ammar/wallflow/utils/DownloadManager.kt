@@ -1,21 +1,27 @@
 package com.ammar.wallflow.utils
 
+import android.app.Application
 import android.content.Context
+import android.util.Log
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkInfo
 import androidx.work.workDataOf
+import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.extensions.getFileNameFromUrl
 import com.ammar.wallflow.extensions.getMLModelsDir
 import com.ammar.wallflow.extensions.getTempDir
+import com.ammar.wallflow.extensions.getTempFileIfExists
 import com.ammar.wallflow.extensions.workManager
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.workers.DownloadWorker
 import com.ammar.wallflow.workers.DownloadWorker.Companion.NotificationType
 import com.ammar.wallflow.workers.DownloadWorker.Companion.OUTPUT_KEY_ERROR
+import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.map
 
 @Singleton
@@ -103,6 +109,45 @@ class DownloadManager @Inject constructor() {
         }
     }
 
+    suspend fun downloadWallpaperAsync(
+        context: Application,
+        wallpaper: Wallpaper,
+        onLoadingChange: (loading: Boolean) -> Unit = {},
+        onResult: (file: File?) -> Unit,
+    ) {
+        try {
+            onLoadingChange(true)
+            val fileName = wallpaper.path.getFileNameFromUrl()
+            val fileIfExists = context.getTempFileIfExists(fileName)
+            if (fileIfExists != null) {
+                onLoadingChange(false)
+                onResult(fileIfExists)
+                return
+            }
+            val workName = requestDownload(
+                context = context,
+                wallpaper = wallpaper,
+                downloadLocation = DownloadLocation.APP_TEMP,
+                notificationType = NotificationType.SILENT,
+            )
+            getProgress(context, workName).collectLatest { state ->
+                if (!state.isSuccessOrFail()) return@collectLatest
+                onLoadingChange(false)
+                onResult(
+                    if (state is DownloadStatus.Failed) {
+                        null
+                    } else {
+                        context.getTempFileIfExists(fileName)
+                    },
+                )
+            }
+        } catch (e: Exception) {
+            Log.e(TAG, "shareImage: ", e)
+            onLoadingChange(false)
+            onResult(null)
+        }
+    }
+
     companion object {
         // fun getWorkName(wallpaper: Wallpaper) = getWorkName(wallpaper.path.getFileNameFromUrl())
         // fun getWorkName(fileName: String) = "download_$fileName"
@@ -134,8 +179,8 @@ sealed class DownloadStatus {
 
     data class Success(val filePath: String? = null) : DownloadStatus()
     data class Failed(val e: Throwable? = null) : DownloadStatus()
-    object Pending : DownloadStatus()
-    object Cancelled : DownloadStatus()
+    data object Pending : DownloadStatus()
+    data object Cancelled : DownloadStatus()
 
     fun isSuccessOrFail() = this is Success || this is Failed
 

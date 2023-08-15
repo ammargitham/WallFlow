@@ -292,8 +292,8 @@ dependencies {
     implementation(libs.coil.compose)
 
     // Accompanist
+    implementation(libs.accompanist.adaptive)
     implementation(libs.accompanist.placeholder.material)
-    // implementation(libs.accompanist.permission)
 
     // jsoup
     implementation(libs.jsoup)

@@ -1,6 +1,6 @@
 [versions]
-accompanist = "0.31.5-beta"
-androidGradlePlugin = "8.2.0-alpha15"
+accompanist = "0.33.0-alpha"
+androidGradlePlugin = "8.2.0-alpha16"
 androidxActivity = "1.7.2"
 androidxComposeCompiler = "1.5.1"
 androidxComposeMaterial = "1.4.3"
@@ -49,6 +49,7 @@ tflite-gpu = "2.13.0"
 zoomables = "1.4.0"
 
 [libraries]
+accompanist-adaptive = { module = "com.google.accompanist:accompanist-adaptive", version.ref = "accompanist" }
 accompanist-permission = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
 accompanist-placeholder-material = { module = "com.google.accompanist:accompanist-placeholder-material", version.ref = "accompanist" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidxCore" }

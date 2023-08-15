@@ -41,7 +41,7 @@ import com.ammar.wallflow.extensions.aspectRatio
 import com.ammar.wallflow.extensions.getScreenResolution
 import com.ammar.wallflow.extensions.toDp
 import com.ammar.wallflow.extensions.toast
-import com.ammar.wallflow.ui.common.LocalSystemBarsController
+import com.ammar.wallflow.ui.common.LocalSystemController
 import com.mr0xf00.easycrop.CropperStyle
 import com.mr0xf00.easycrop.LocalCropperStyle
 import com.mr0xf00.easycrop.ui.CropperPreview
@@ -52,7 +52,7 @@ fun CropScreen(
     viewModel: CropViewModel,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val systemBarsController = LocalSystemBarsController.current
+    val systemController = LocalSystemController.current
     val overlayColor = Color.Black.copy(alpha = 0.5f)
     val systemBarColor = Color.Black.copy(alpha = 0.75f)
     val cropperStyle = remember {
@@ -93,7 +93,7 @@ fun CropScreen(
     var topActionsSize by remember { mutableStateOf(IntSize.Zero) }
 
     LaunchedEffect(Unit) {
-        systemBarsController.update {
+        systemController.update {
             it.copy(
                 statusBarColor = systemBarColor,
                 navigationBarColor = systemBarColor,

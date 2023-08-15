@@ -1,8 +1,11 @@
 package com.ammar.wallflow.ui.common.permissions
 
+import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Stable
@@ -15,6 +18,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.ammar.wallflow.extensions.isSetWallpaperAllowedCompat
 import com.ammar.wallflow.extensions.wallpaperManager
+import com.google.modernstorage.permissions.StoragePermissions
 
 @Stable
 sealed interface PermissionStatus {
@@ -112,4 +116,39 @@ internal fun Context.checkSetWallpaperPermission(): Boolean {
     val wallpaperManager = wallpaperManager
     return wallpaperManager.isWallpaperSupported &&
         wallpaperManager.isSetWallpaperAllowedCompat
+}
+
+@SuppressLint("InlinedApi")
+@Composable
+fun rememberDownloadPermissionsState(
+    onShowRationale: () -> Unit = {},
+    onGranted: () -> Unit = {},
+): MultiplePermissionsState {
+    val storagePerms = remember {
+        StoragePermissions.getPermissions(
+            action = StoragePermissions.Action.READ_AND_WRITE,
+            types = listOf(StoragePermissions.FileType.Image),
+            createdBy = StoragePermissions.CreatedBy.Self,
+        ).map { MultiplePermissionItem(permission = it) }
+    }
+
+    return rememberMultiplePermissionsState(
+        permissions = storagePerms + MultiplePermissionItem(
+            permission = Manifest.permission.POST_NOTIFICATIONS,
+            minimumSdk = Build.VERSION_CODES.TIRAMISU,
+        ),
+    ) { permissionStates ->
+        val shouldShowRationale = permissionStates.map { it.status.shouldShowRationale }.any { it }
+        if (shouldShowRationale) {
+            onShowRationale()
+            return@rememberMultiplePermissionsState
+        }
+        // check if storage permissions are granted (notification permission is optional)
+        val storagePermStrings = storagePerms.map { it.permission }
+        val allGranted = permissionStates
+            .filter { it.permission in storagePermStrings }
+            .all { it.status.isGranted }
+        if (!allGranted) return@rememberMultiplePermissionsState
+        onGranted()
+    }
 }

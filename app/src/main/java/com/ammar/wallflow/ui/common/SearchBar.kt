@@ -245,9 +245,9 @@ object SearchBar {
         }
     }
 
-    // object Defaults {
-    //     val height = 72.dp
-    // }
+    object Defaults {
+        val height = 72.dp
+    }
 }
 
 data class Suggestion<T>(

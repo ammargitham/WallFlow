@@ -22,24 +22,26 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
+import androidx.navigation.compose.rememberNavController
 import com.ammar.wallflow.data.preferences.Theme
+import com.ammar.wallflow.extensions.toPxF
 import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.TagSearchMeta
 import com.ammar.wallflow.model.UploaderSearchMeta
 import com.ammar.wallflow.ui.appCurrentDestinationAsState
-import com.ammar.wallflow.ui.common.LocalSystemBarsController
+import com.ammar.wallflow.ui.common.LocalSystemController
+import com.ammar.wallflow.ui.common.SearchBar
 import com.ammar.wallflow.ui.common.bottombar.BottomBarDestination
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
 import com.ammar.wallflow.ui.common.mainsearch.LocalMainSearchBarController
 import com.ammar.wallflow.ui.common.mainsearch.MainSearchBarState
-import com.ammar.wallflow.ui.common.navigation.TwoPaneNavigation
-import com.ammar.wallflow.ui.common.navigation.TwoPaneNavigation.Mode
-import com.ammar.wallflow.ui.common.navigation.rememberTwoPaneNavController
 import com.ammar.wallflow.ui.common.searchedit.SaveAsDialog
 import com.ammar.wallflow.ui.common.searchedit.SavedSearchesDialog
 import com.ammar.wallflow.ui.destinations.HomeScreenDestination
@@ -47,14 +49,11 @@ import com.ammar.wallflow.ui.destinations.WallhavenApiKeyDialogDestination
 import com.ammar.wallflow.ui.home.HomeScreenNavArgs
 import com.ammar.wallflow.ui.navArgs
 import com.ammar.wallflow.ui.theme.WallFlowTheme
-import com.ammar.wallflow.ui.wallpaper.WallpaperViewModel
 import com.ramcosta.composedestinations.navigation.navigate
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
-    private lateinit var twoPaneController: TwoPaneNavigation.Controller
 
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,17 +65,11 @@ class MainActivity : ComponentActivity() {
             val useNavRail = windowSizeClass.widthSizeClass > WindowWidthSizeClass.Compact
             val isExpanded = windowSizeClass.widthSizeClass >= WindowWidthSizeClass.Expanded
 
-            twoPaneController = rememberTwoPaneNavController(
-                initialPaneMode = if (isExpanded) Mode.TWO_PANE else Mode.SINGLE_PANE,
-                supportsTwoPane = isExpanded,
-            )
-            val pane1NavController = twoPaneController.pane1NavHostController
-            val isTwoPaneMode = twoPaneController.paneMode.value == Mode.TWO_PANE
+            val navController = rememberNavController()
             val viewModel: MainActivityViewModel = hiltViewModel()
-            val wallpaperViewModel: WallpaperViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-            val currentDestination by pane1NavController.appCurrentDestinationAsState()
-            val currentBackStackEntry by pane1NavController.currentBackStackEntryAsState()
+            val currentDestination by navController.appCurrentDestinationAsState()
+            val currentBackStackEntry by navController.currentBackStackEntryAsState()
             val rootDestinations = remember {
                 BottomBarDestination.values().map { it.direction.route }
             }
@@ -87,8 +80,8 @@ class MainActivity : ComponentActivity() {
                 }
                 currentDestination?.route !in rootDestinations
             }
-            val systemBarsController = LocalSystemBarsController.current
-            val systemBarsState by systemBarsController.state
+            val systemController = LocalSystemController.current
+            val systemState by systemController.state
             val bottomBarController = LocalBottomBarController.current
             val searchBarController = LocalMainSearchBarController.current
             val searchBarControllerState by searchBarController.state
@@ -104,7 +97,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
             val statusBarSemiTransparentColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)
-            var searchBarHeightPx by remember { mutableFloatStateOf(0f) }
+            val searchBarHeightPx = SearchBar.Defaults.height.toPxF()
             var searchBarOffsetHeightPx by remember { mutableFloatStateOf(0f) }
             val nestedScrollConnection = remember {
                 object : NestedScrollConnection {
@@ -128,29 +121,36 @@ class MainActivity : ComponentActivity() {
                 bottomBarController.update { it.copy(isRail = useNavRail) }
             }
 
+            LaunchedEffect(isExpanded) {
+                systemController.update { it.copy(isExpanded = isExpanded) }
+            }
+
             WallFlowTheme(
                 darkTheme = when (uiState.theme) {
                     Theme.SYSTEM -> isSystemInDarkTheme()
                     Theme.LIGHT -> false
                     Theme.DARK -> true
                 },
-                statusBarVisible = systemBarsState.statusBarVisible,
-                statusBarColor = systemBarsState.statusBarColor,
-                navigationBarVisible = systemBarsState.navigationBarVisible,
-                navigationBarColor = systemBarsState.navigationBarColor,
-                lightStatusBars = systemBarsState.lightStatusBars,
-                lightNavigationBars = systemBarsState.lightNavigationBars,
+                statusBarVisible = systemState.statusBarVisible,
+                statusBarColor = systemState.statusBarColor,
+                navigationBarVisible = systemState.navigationBarVisible,
+                navigationBarColor = systemState.navigationBarColor,
+                lightStatusBars = systemState.lightStatusBars,
+                lightNavigationBars = systemState.lightNavigationBars,
             ) {
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .onSizeChanged { size -> systemController.update { it.copy(size = size) } },
                     color = MaterialTheme.colorScheme.background,
                 ) {
                     MainActivityContent(
                         currentDestination = currentDestination,
                         showBackButton = showBackButton,
                         useNavRail = useNavRail,
-                        useDockedSearchBar = isTwoPaneMode,
+                        useDockedSearchBar = isExpanded,
                         globalErrors = uiState.globalErrors,
+                        bottomBarVisible = bottomBarController.state.value.visible,
                         bottomBarSize = bottomBarController.state.value.size,
                         searchBarOffsetHeightPx = searchBarOffsetHeightPx,
                         searchBarVisible = searchBarControllerState.visible,
@@ -163,9 +163,8 @@ class MainActivity : ComponentActivity() {
                         searchBarOverflowIcon = searchBarControllerState.overflowIcon,
                         searchBarShowNSFW = uiState.searchBarShowNSFW,
                         searchBarShowQuery = searchBarControllerState.showQuery,
-                        onSearchBarSizeChanged = { searchBarHeightPx = it.height.toFloat() },
                         onSearchBarQueryChange = viewModel::onSearchBarQueryChange,
-                        onBackClick = { pane1NavController.navigateUp() },
+                        onBackClick = { navController.navigateUp() },
                         onSearchBarSearch = {
                             if (it.isBlank()) {
                                 return@MainActivityContent
@@ -194,8 +193,8 @@ class MainActivity : ComponentActivity() {
                         onSearchBarActiveChange = { active ->
                             viewModel.setSearchBarActive(active)
                             viewModel.setShowSearchBarFilters(false)
-                            if (!isTwoPaneMode) {
-                                systemBarsController.update {
+                            if (!isExpanded) {
+                                systemController.update {
                                     it.copy(
                                         statusBarColor = if (active) {
                                             statusBarSemiTransparentColor
@@ -221,15 +220,19 @@ class MainActivity : ComponentActivity() {
                             viewModel.setShowSearchBarSuggestionDeleteRequest(null)
                         },
                         onFixWallHavenApiKeyClick = {
-                            pane1NavController.navigate(WallhavenApiKeyDialogDestination)
+                            navController.navigate(WallhavenApiKeyDialogDestination)
                         },
                         onDismissGlobalError = viewModel::dismissGlobalError,
                         onBottomBarSizeChanged = { size ->
                             bottomBarController.update { it.copy(size = size) }
                         },
                         onBottomBarItemClick = {
-                            pane1NavController.navigate(it.route) {
+                            navController.navigate(it.route) {
+                                popUpTo(navController.graph.findStartDestination().id) {
+                                    saveState = true
+                                }
                                 launchSingleTop = true
+                                restoreState = true
                             }
                         },
                         onSearchBarSaveAsClick = {
@@ -243,11 +246,9 @@ class MainActivity : ComponentActivity() {
                     ) {
                         MainNavigation(
                             modifier = Modifier.nestedScroll(nestedScrollConnection),
-                            twoPaneController = twoPaneController,
+                            navController = navController,
                             contentPadding = it,
-                            mainActivityViewModel = viewModel,
-                            wallpaperViewModel = wallpaperViewModel,
-                            applyContentPadding = uiState.applyScaffoldPadding,
+                            applyContentPadding = systemState.applyScaffoldPadding,
                         )
                     }
 

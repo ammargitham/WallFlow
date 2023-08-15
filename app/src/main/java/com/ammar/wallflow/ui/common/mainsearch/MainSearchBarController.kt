@@ -34,14 +34,7 @@ class DefaultMainSearchBarController(initialState: MainSearchBarState) : MainSea
 
     override fun update(fn: (prevState: MainSearchBarState) -> MainSearchBarState) {
         val newState = fn(state.value)
-        _state.value = _state.value.copy(
-            visible = newState.visible,
-            search = newState.search,
-            showQuery = newState.showQuery,
-            onActiveChange = newState.onActiveChange,
-            overflowIcon = newState.overflowIcon,
-            onSearch = newState.onSearch,
-        )
+        _state.value = newState
     }
 }
 

@@ -32,9 +32,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-/**
- * This view model is shared across destinations to perform some top level actions
- */
 @HiltViewModel
 class MainActivityViewModel @Inject constructor(
     private val application: Application,
@@ -79,10 +76,6 @@ class MainActivityViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = MainUiState(),
     )
-
-    fun applyScaffoldPadding(apply: Boolean) = localUiState.update {
-        it.copy(applyScaffoldPadding = partial(apply))
-    }
 
     fun dismissGlobalError(error: GlobalError) = globalErrorsRepository.removeError(error)
 
@@ -140,7 +133,6 @@ class MainActivityViewModel @Inject constructor(
 
 @Partialize
 data class MainUiState(
-    val applyScaffoldPadding: Boolean = true,
     val globalErrors: List<GlobalError> = emptyList(),
     val searchBarActive: Boolean = false,
     val searchBarSearch: Search = Search(

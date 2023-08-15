@@ -30,7 +30,7 @@ import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.ObjectDetectionModelRepository
 import com.ammar.wallflow.extensions.getParcelExtra
 import com.ammar.wallflow.extensions.toast
-import com.ammar.wallflow.ui.common.LocalSystemBarsController
+import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.crop.CropScreen
 import com.ammar.wallflow.ui.crop.CropViewModel
 import com.ammar.wallflow.ui.crop.Result
@@ -105,8 +105,8 @@ class SetWallpaperActivity : ComponentActivity() {
 
         setContent {
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-            val systemBarsController = LocalSystemBarsController.current
-            val systemBarsState by systemBarsController.state
+            val systemController = LocalSystemController.current
+            val systemState by systemController.state
 
             WallFlowTheme(
                 darkTheme = when (uiState.theme) {
@@ -114,12 +114,12 @@ class SetWallpaperActivity : ComponentActivity() {
                     Theme.LIGHT -> false
                     Theme.DARK -> true
                 },
-                statusBarVisible = systemBarsState.statusBarVisible,
-                statusBarColor = systemBarsState.statusBarColor,
-                navigationBarVisible = systemBarsState.navigationBarVisible,
-                navigationBarColor = systemBarsState.navigationBarColor,
-                lightStatusBars = systemBarsState.lightStatusBars,
-                lightNavigationBars = systemBarsState.lightNavigationBars,
+                statusBarVisible = systemState.statusBarVisible,
+                statusBarColor = systemState.statusBarColor,
+                navigationBarVisible = systemState.navigationBarVisible,
+                navigationBarColor = systemState.navigationBarColor,
+                lightStatusBars = systemState.lightStatusBars,
+                lightNavigationBars = systemState.lightNavigationBars,
             ) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),

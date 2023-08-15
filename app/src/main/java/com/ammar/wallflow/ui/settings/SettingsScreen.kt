@@ -35,6 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.preferences.AppPreferences
 import com.ammar.wallflow.data.preferences.AutoWallpaperPreferences
@@ -46,9 +47,6 @@ import com.ammar.wallflow.ui.common.TopBar
 import com.ammar.wallflow.ui.common.bottomWindowInsets
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
 import com.ammar.wallflow.ui.common.mainsearch.LocalMainSearchBarController
-import com.ammar.wallflow.ui.common.mainsearch.MainSearchBarState
-import com.ammar.wallflow.ui.common.navigation.TwoPaneNavigation
-import com.ammar.wallflow.ui.common.navigation.TwoPaneNavigation.Mode
 import com.ammar.wallflow.ui.common.permissions.DownloadPermissionsRationalDialog
 import com.ammar.wallflow.ui.common.permissions.MultiplePermissionItem
 import com.ammar.wallflow.ui.common.permissions.checkSetWallpaperPermission
@@ -81,6 +79,7 @@ import com.ammar.wallflow.utils.objectdetection.objectsDetector
 import com.ammar.wallflow.workers.AutoWallpaperWorker
 import com.google.modernstorage.permissions.StoragePermissions
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.navigate
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -88,7 +87,7 @@ import kotlinx.coroutines.launch
 @Destination
 @Composable
 fun SettingsScreen(
-    twoPaneController: TwoPaneNavigation.Controller,
+    navController: NavController,
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -132,8 +131,7 @@ fun SettingsScreen(
     }
 
     LaunchedEffect(Unit) {
-        twoPaneController.setPaneMode(Mode.SINGLE_PANE) // hide pane 2
-        searchBarController.update { MainSearchBarState(visible = false) }
+        searchBarController.update { it.copy(visible = false) }
         bottomBarController.update { it.copy(visible = false) }
     }
 
@@ -143,7 +141,7 @@ fun SettingsScreen(
             .windowInsetsPadding(bottomWindowInsets),
     ) {
         TopBar(
-            navController = twoPaneController.pane1NavHostController,
+            navController = navController,
             title = {
                 Text(
                     text = stringResource(R.string.settings),
@@ -162,7 +160,7 @@ fun SettingsScreen(
             onBlurSketchyCheckChange = viewModel::setBlurSketchy,
             onBlurNsfwCheckChange = viewModel::setBlurNsfw,
             onWallhavenApiKeyItemClick = {
-                twoPaneController.navigate(WallhavenApiKeyDialogDestination)
+                navController.navigate(WallhavenApiKeyDialogDestination)
             },
             onObjectDetectionPrefsChange = viewModel::updateSubjectDetectionPrefs,
             onObjectDetectionDelegateClick = { viewModel.showObjectDetectionDelegateOptions(true) },
@@ -195,7 +193,7 @@ fun SettingsScreen(
                 )
             },
             onThemeClick = { viewModel.showThemeOptionsDialog(true) },
-            onLayoutClick = { twoPaneController.navigate(LayoutSettingsScreenDestination) },
+            onLayoutClick = { navController.navigate(LayoutSettingsScreenDestination) },
         )
     }
 
