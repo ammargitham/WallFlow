@@ -188,7 +188,7 @@ private fun FavoritesScreenContent(
             modifier = modifier,
             first = {
                 WallpaperStaggeredGrid(
-                    modifier = modifier,
+                    modifier = Modifier.fillMaxSize(),
                     state = gridState,
                     contentPadding = contentPadding,
                     wallpapers = wallpapers,

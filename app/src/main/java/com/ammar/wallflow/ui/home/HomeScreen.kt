@@ -50,6 +50,7 @@ import com.ammar.wallflow.model.Tag
 import com.ammar.wallflow.model.TagSearchMeta
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.ui.common.LocalSystemController
+import com.ammar.wallflow.ui.common.SearchBar
 import com.ammar.wallflow.ui.common.bottomWindowInsets
 import com.ammar.wallflow.ui.common.bottombar.BottomBarController
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
@@ -203,6 +204,7 @@ fun HomeScreen(
             contentPadding = PaddingValues(
                 start = 8.dp,
                 end = 8.dp,
+                top = SearchBar.Defaults.height,
                 bottom = bottomPadding + 8.dp,
             ),
             tags = if (uiState.isHome) uiState.tags else persistentListOf(),

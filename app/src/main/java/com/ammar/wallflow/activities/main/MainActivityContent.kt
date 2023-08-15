@@ -1,7 +1,6 @@
 package com.ammar.wallflow.activities.main
 
 import android.content.res.Configuration
-import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
@@ -14,11 +13,6 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
@@ -32,14 +26,12 @@ import com.ammar.wallflow.data.repository.GlobalErrorsRepository
 import com.ammar.wallflow.data.repository.GlobalErrorsRepository.GlobalError
 import com.ammar.wallflow.extensions.toDp
 import com.ammar.wallflow.extensions.toPx
-import com.ammar.wallflow.extensions.toPxF
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.SearchQuery
 import com.ammar.wallflow.model.Tag
 import com.ammar.wallflow.model.wallpaper1
 import com.ammar.wallflow.model.wallpaper2
-import com.ammar.wallflow.ui.common.SearchBar
 import com.ammar.wallflow.ui.common.Suggestion
 import com.ammar.wallflow.ui.common.bottombar.BottomBar
 import com.ammar.wallflow.ui.common.bottombar.NavRail
@@ -94,28 +86,6 @@ fun MainActivityContent(
     onSearchBarLoadClick: () -> Unit = {},
     content: @Composable (contentPadding: PaddingValues) -> Unit,
 ) {
-    var prevSearchBarVisible by remember { mutableStateOf(searchBarVisible) }
-    val searchBarHeightPx = SearchBar.Defaults.height.toPxF()
-    val animatedSearchBarHeight = remember { Animatable(searchBarHeightPx) }
-    val animatedSearchBarOffsetHeight = remember { Animatable(searchBarOffsetHeightPx) }
-
-    LaunchedEffect(searchBarVisible, searchBarHeightPx, searchBarOffsetHeightPx) {
-        // handle search bar offset when transitioning screens
-        if (searchBarVisible) {
-            if (!prevSearchBarVisible) {
-                animatedSearchBarHeight.animateTo(searchBarHeightPx)
-                animatedSearchBarOffsetHeight.animateTo(searchBarOffsetHeightPx)
-            } else {
-                animatedSearchBarHeight.snapTo(searchBarHeightPx)
-                animatedSearchBarOffsetHeight.snapTo(searchBarOffsetHeightPx)
-            }
-        } else {
-            animatedSearchBarHeight.animateTo(0f)
-            animatedSearchBarOffsetHeight.animateTo(0f)
-        }
-        prevSearchBarVisible = searchBarVisible
-    }
-
     Scaffold(
         modifier = modifier,
         contentWindowInsets = WindowInsets(left = 0),
@@ -123,14 +93,9 @@ fun MainActivityContent(
         Box(
             modifier = Modifier.fillMaxSize(),
         ) {
-            val topPadding = animatedSearchBarHeight.value + animatedSearchBarOffsetHeight.value
             Box(
                 modifier = Modifier
                     .padding(
-                        top = topPadding
-                            .coerceAtLeast(0f)
-                            .roundToInt()
-                            .toDp(),
                         start = if (useNavRail && bottomBarVisible) {
                             bottomBarSize.width.toDp()
                         } else {

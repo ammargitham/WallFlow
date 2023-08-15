@@ -3,6 +3,7 @@ package com.ammar.wallflow.ui.home
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
@@ -80,6 +81,7 @@ internal fun HomeScreenContent(
             modifier = modifier,
             first = {
                 Feed(
+                    modifier = Modifier.fillMaxSize(),
                     gridState = gridState,
                     contentPadding = contentPadding,
                     wallpapers = wallpapers,
