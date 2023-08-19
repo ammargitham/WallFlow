@@ -30,6 +30,7 @@ import com.ammar.wallflow.R
 import com.ammar.wallflow.data.preferences.LayoutPreferences
 import com.ammar.wallflow.model.Favorite
 import com.ammar.wallflow.model.Tag
+import com.ammar.wallflow.model.Uploader
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.wallpaper1
 import com.ammar.wallflow.model.wallpaper2
@@ -74,6 +75,7 @@ internal fun HomeScreenContent(
     onFullWallpaperShareImageClick: () -> Unit = {},
     onFullWallpaperApplyWallpaperClick: () -> Unit = {},
     onFullWallpaperFullScreenClick: () -> Unit = {},
+    onFullWallpaperUploaderClick: (Uploader) -> Unit = {},
     onFullWallpaperDownloadPermissionsGranted: () -> Unit = {},
 ) {
     if (isExpanded) {
@@ -118,6 +120,8 @@ internal fun HomeScreenContent(
                     onApplyWallpaperClick = onFullWallpaperApplyWallpaperClick,
                     onFullScreenClick = onFullWallpaperFullScreenClick,
                     onDownloadPermissionsGranted = onFullWallpaperDownloadPermissionsGranted,
+                    onUploaderClick = onFullWallpaperUploaderClick,
+                    onTagClick = onTagClick,
                 )
             },
         )

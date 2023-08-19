@@ -14,10 +14,9 @@ import com.ammar.wallflow.data.repository.SearchHistoryRepository
 import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.model.SavedSearch
 import com.ammar.wallflow.model.Search
-import com.ammar.wallflow.model.SearchQuery
-import com.ammar.wallflow.model.Sorting
 import com.ammar.wallflow.model.getSupportingText
 import com.ammar.wallflow.ui.common.Suggestion
+import com.ammar.wallflow.ui.common.mainsearch.MainSearchBar
 import com.github.materiiapps.partial.Partialize
 import com.github.materiiapps.partial.getOrElse
 import com.github.materiiapps.partial.getOrNull
@@ -104,7 +103,7 @@ class MainActivityViewModel @Inject constructor(
     }
 
     fun onSearchBarQueryChange(query: String) = localUiState.update {
-        val currentSearch = it.searchBarSearch.getOrElse { Search() }
+        val currentSearch = it.searchBarSearch.getOrElse { MainSearchBar.Defaults.search }
         it.copy(searchBarSearch = partial(currentSearch.copy(query = query)))
     }
 
@@ -135,11 +134,7 @@ class MainActivityViewModel @Inject constructor(
 data class MainUiState(
     val globalErrors: List<GlobalError> = emptyList(),
     val searchBarActive: Boolean = false,
-    val searchBarSearch: Search = Search(
-        filters = SearchQuery(
-            sorting = Sorting.RELEVANCE,
-        ),
-    ),
+    val searchBarSearch: Search = MainSearchBar.Defaults.search,
     val searchBarSuggestions: List<Suggestion<Search>> = emptyList(),
     val showSearchBarFilters: Boolean = false,
     val searchBarDeleteSuggestion: Search? = null,

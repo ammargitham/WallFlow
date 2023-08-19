@@ -154,20 +154,24 @@ fun WallpaperScreen(
                 }
             },
             onTagClick = {
-                navController.search(
-                    Search(
-                        query = "id:${it.id}",
-                        meta = TagSearchMeta(tag = it),
-                    ),
+                val search = Search(
+                    query = "id:${it.id}",
+                    meta = TagSearchMeta(tag = it),
                 )
+                if (searchBarController.state.value.search == search) {
+                    return@WallpaperViewer
+                }
+                navController.search(search)
             },
             onUploaderClick = {
-                navController.search(
-                    Search(
-                        query = "@${it.username}",
-                        meta = UploaderSearchMeta(uploader = it),
-                    ),
+                val search = Search(
+                    query = "@${it.username}",
+                    meta = UploaderSearchMeta(uploader = it),
                 )
+                if (searchBarController.state.value.search == search) {
+                    return@WallpaperViewer
+                }
+                navController.search(search)
             },
             onDownloadPermissionsGranted = viewerViewModel::download,
         )

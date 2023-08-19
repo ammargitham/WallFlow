@@ -48,6 +48,7 @@ import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.SearchSaver
 import com.ammar.wallflow.model.Tag
 import com.ammar.wallflow.model.TagSearchMeta
+import com.ammar.wallflow.model.UploaderSearchMeta
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.SearchBar
@@ -55,6 +56,7 @@ import com.ammar.wallflow.ui.common.bottomWindowInsets
 import com.ammar.wallflow.ui.common.bottombar.BottomBarController
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
 import com.ammar.wallflow.ui.common.mainsearch.LocalMainSearchBarController
+import com.ammar.wallflow.ui.common.mainsearch.MainSearchBar
 import com.ammar.wallflow.ui.common.searchedit.EditSearchModalBottomSheet
 import com.ammar.wallflow.ui.common.searchedit.SaveAsDialog
 import com.ammar.wallflow.ui.common.searchedit.SavedSearchesDialog
@@ -126,7 +128,7 @@ fun HomeScreen(
         bottomBarController.update { it.copy(visible = true) }
     }
 
-    LaunchedEffect(uiState.search, uiState.isHome) {
+    LaunchedEffect(uiState.mainSearch, uiState.isHome) {
         searchBarController.update {
             it.copy(
                 visible = true,
@@ -151,12 +153,7 @@ fun HomeScreen(
                 } else {
                     null
                 },
-                search = uiState.search,
-                // showQuery = !uiState.isHome,
-                onSearch = { search ->
-                    if (uiState.search == search) return@copy
-                    navController.search(search)
-                },
+                search = uiState.mainSearch ?: MainSearchBar.Defaults.search,
             )
         }
     }
@@ -179,13 +176,15 @@ fun HomeScreen(
     }
 
     val onTagClick: (tag: Tag) -> Unit = remember {
-        {
-            navController.search(
-                Search(
-                    query = "id:${it.id}",
-                    meta = TagSearchMeta(it),
-                ),
+        fn@{
+            val search = Search(
+                query = "id:${it.id}",
+                meta = TagSearchMeta(it),
             )
+            if (searchBarController.state.value.search == search) {
+                return@fn
+            }
+            navController.search(search)
         }
     }
 
@@ -268,6 +267,16 @@ fun HomeScreen(
                     )
                 }
             },
+            onFullWallpaperUploaderClick = {
+                val search = Search(
+                    query = "@${it.username}",
+                    meta = UploaderSearchMeta(uploader = it),
+                )
+                if (searchBarController.state.value.search == search) {
+                    return@HomeScreenContent
+                }
+                navController.search(search)
+            },
             onFullWallpaperDownloadPermissionsGranted = viewerViewModel::download,
         )
 
@@ -281,9 +290,9 @@ fun HomeScreen(
             val state = rememberModalBottomSheetState()
             val scope = rememberCoroutineScope()
             var localSearch by rememberSaveable(
-                uiState.search,
+                uiState.homeSearch,
                 stateSaver = SearchSaver,
-            ) { mutableStateOf(uiState.search) }
+            ) { mutableStateOf(uiState.homeSearch) }
 
             EditSearchModalBottomSheet(
                 state = state,
@@ -295,7 +304,7 @@ fun HomeScreen(
                             end = 22.dp,
                             bottom = 16.dp,
                         ),
-                        saveEnabled = localSearch != uiState.search,
+                        saveEnabled = localSearch != uiState.homeSearch,
                         onSaveClick = {
                             viewModel.updateHomeSearch(localSearch)
                             scope.launch { state.hide() }.invokeOnCompletion {

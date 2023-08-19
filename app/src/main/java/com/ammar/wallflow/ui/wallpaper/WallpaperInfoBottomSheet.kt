@@ -16,6 +16,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -29,6 +30,7 @@ import com.ammar.wallflow.model.Tag
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.wallpaper1
 import com.ammar.wallflow.ui.theme.WallFlowTheme
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,9 +43,19 @@ fun WallpaperInfoBottomSheet(
     onUploaderClick: () -> Unit = {},
     onSourceClick: () -> Unit = {},
 ) {
+    val coroutineScope = rememberCoroutineScope()
     val bottomSheetState = rememberModalBottomSheetState(
         skipPartiallyExpanded = true,
     )
+
+    fun dismissSheet() {
+        coroutineScope.launch { bottomSheetState.hide() }.invokeOnCompletion {
+            if (!bottomSheetState.isVisible) {
+                onDismissRequest()
+            }
+        }
+    }
+
 
     ModalBottomSheet(
         modifier = modifier,
@@ -59,12 +71,22 @@ fun WallpaperInfoBottomSheet(
                 )
                 .heightIn(min = 100.dp),
             wallpaper = wallpaper,
-            onTagClick = onTagClick,
-            onUploaderClick = onUploaderClick,
-            onSourceClick = onSourceClick,
+            onTagClick = {
+                onTagClick(it)
+                dismissSheet()
+            },
+            onUploaderClick = {
+                onUploaderClick()
+                dismissSheet()
+            },
+            onSourceClick = {
+                onSourceClick()
+                dismissSheet()
+            },
         )
     }
 }
+
 
 @Composable
 fun WallpaperInfoBottomSheetContent(

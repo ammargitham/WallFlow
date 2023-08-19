@@ -27,9 +27,11 @@ import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavGraph.Companion.findStartDestination
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.ammar.wallflow.data.preferences.Theme
+import com.ammar.wallflow.extensions.search
 import com.ammar.wallflow.extensions.toPxF
 import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.model.Search
@@ -41,7 +43,7 @@ import com.ammar.wallflow.ui.common.SearchBar
 import com.ammar.wallflow.ui.common.bottombar.BottomBarDestination
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
 import com.ammar.wallflow.ui.common.mainsearch.LocalMainSearchBarController
-import com.ammar.wallflow.ui.common.mainsearch.MainSearchBarState
+import com.ammar.wallflow.ui.common.mainsearch.MainSearchBarController
 import com.ammar.wallflow.ui.common.searchedit.SaveAsDialog
 import com.ammar.wallflow.ui.common.searchedit.SavedSearchesDialog
 import com.ammar.wallflow.ui.destinations.HomeScreenDestination
@@ -181,10 +183,20 @@ class MainActivity : ComponentActivity() {
                                     filters = uiState.searchBarSearch.filters,
                                 )
                             }
-                            doSearch(viewModel, searchBarControllerState, search)
+                            doSearch(
+                                viewModel = viewModel,
+                                navController = navController,
+                                searchBarController = searchBarController,
+                                search = search,
+                            )
                         },
                         onSearchBarSuggestionClick = {
-                            doSearch(viewModel, searchBarControllerState, it.value)
+                            doSearch(
+                                viewModel = viewModel,
+                                navController = navController,
+                                searchBarController = searchBarController,
+                                search = it.value,
+                            )
                         },
                         onSearchBarSuggestionInsert = { viewModel.setSearchBarSearch(it.value) },
                         onSearchBarSuggestionDeleteRequest = {
@@ -266,7 +278,12 @@ class MainActivity : ComponentActivity() {
                         SavedSearchesDialog(
                             savedSearches = uiState.savedSearches,
                             onSelect = {
-                                doSearch(viewModel, searchBarControllerState, it.search)
+                                doSearch(
+                                    viewModel = viewModel,
+                                    navController = navController,
+                                    searchBarController = searchBarController,
+                                    search = it.search,
+                                )
                                 viewModel.showSavedSearches(false)
                                 viewModel.setSearchBarActive(false)
                             },
@@ -280,10 +297,14 @@ class MainActivity : ComponentActivity() {
 
     private fun doSearch(
         viewModel: MainActivityViewModel,
-        searchBarControllerState: MainSearchBarState,
+        navController: NavHostController,
+        searchBarController: MainSearchBarController,
         search: Search,
     ) {
+        if (searchBarController.state.value.search == search) {
+            return
+        }
         viewModel.onSearch(search)
-        searchBarControllerState.onSearch(search)
+        navController.search(search)
     }
 }

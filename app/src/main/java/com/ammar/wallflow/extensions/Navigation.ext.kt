@@ -6,13 +6,13 @@ import com.ammar.wallflow.ui.destinations.HomeScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.navigate
 
-fun NavController.search(search: Search) {
-    this.navigate(HomeScreenDestination(search = search))
-}
+fun NavController.search(search: Search) = this.navigate(
+    HomeScreenDestination(search = search),
+)
 
-fun DestinationsNavigator.search(search: Search) {
-    this.navigate(HomeScreenDestination(search = search))
-}
+fun DestinationsNavigator.search(search: Search) = this.navigate(
+    HomeScreenDestination(search = search),
+)
 
 // const val KEY_DEEP_LINK_INTENT = "android-support-nav:controller:deepLinkIntent"
 

@@ -25,7 +25,7 @@ import com.ammar.wallflow.model.Tag
 import com.ammar.wallflow.model.TopRange
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.toSearchQuery
-import com.ammar.wallflow.ui.navargs.ktxserializable.DefaultKtxSerializableNavTypeSerializer
+import com.ammar.wallflow.ui.navArgs
 import com.ammar.wallflow.utils.combine
 import com.github.materiiapps.partial.Partialize
 import com.github.materiiapps.partial.partial
@@ -36,10 +36,8 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
@@ -48,12 +46,10 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
-import kotlinx.serialization.ExperimentalSerializationApi
 
 @OptIn(
     ExperimentalCoroutinesApi::class,
     FlowPreview::class,
-    ExperimentalSerializationApi::class,
 )
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -63,31 +59,27 @@ class HomeViewModel @Inject constructor(
     private val favoritesRepository: FavoritesRepository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
-    private val savedStateSearchFlow: Flow<Search?> = savedStateHandle.getStateFlow<ByteArray?>(
-        "search",
-        null,
-    ).mapLatest {
-        it?.run {
-            DefaultKtxSerializableNavTypeSerializer(Search.serializer()).fromByteArray(it)
-        }
-    }
+    private val mainSearch = savedStateHandle.navArgs<HomeScreenNavArgs>().search
     private val popularTags = wallHavenRepository.popularTags()
     private val localUiState = MutableStateFlow(HomeUiStatePartial())
-    private val searchFlow = combine(
-        appPreferencesRepository.appPreferencesFlow,
-        savedStateSearchFlow,
-    ) { preferences, search -> search ?: preferences.homeSearch }
+
+    private val homeSearchFlow = appPreferencesRepository.appPreferencesFlow.mapLatest {
+        it.homeSearch
+    }.distinctUntilChanged()
     private val wallpapersLoadingFlow = MutableStateFlow(false)
     private val debouncedWallpapersLoadingFlow = wallpapersLoadingFlow
         .debounce { if (it) 1000 else 0 }
         .distinctUntilChanged()
 
-    val wallpapers = searchFlow.flatMapLatest {
-        wallHavenRepository.wallpapersPager(it.toSearchQuery())
+    val wallpapers = if (mainSearch != null) {
+        wallHavenRepository.wallpapersPager(mainSearch.toSearchQuery())
+    } else {
+        homeSearchFlow.flatMapLatest {
+            wallHavenRepository.wallpapersPager(it.toSearchQuery())
+        }
     }.cachedIn(viewModelScope)
 
     val uiState = combine(
-        searchFlow,
         popularTags,
         appPreferencesRepository.appPreferencesFlow,
         localUiState,
@@ -95,7 +87,6 @@ class HomeViewModel @Inject constructor(
         savedSearchRepository.getAll(),
         favoritesRepository.observeAll(),
     ) {
-            search,
             tags,
             appPreferences,
             local,
@@ -115,12 +106,12 @@ class HomeViewModel @Inject constructor(
                     }
                     ).toImmutableList(),
                 areTagsLoading = tags is Resource.Loading,
-                search = search,
+                mainSearch = mainSearch,
+                homeSearch = appPreferences.homeSearch,
                 wallpapersLoading = wallpapersLoading,
                 blurSketchy = appPreferences.blurSketchy,
                 blurNsfw = appPreferences.blurNsfw,
                 showNSFW = appPreferences.wallhavenApiKey.isNotBlank(),
-                isHome = search == appPreferences.homeSearch,
                 savedSearches = savedSearchEntities.map { entity -> entity.toSavedSearch() },
                 layoutPreferences = appPreferences.lookAndFeelPreferences.layoutPreferences,
                 favorites = favorites.map { it.toFavorite() }.toImmutableList(),
@@ -196,7 +187,8 @@ private val tempTags = List(3) {
 data class HomeUiState(
     val tags: ImmutableList<Tag> = persistentListOf(),
     val areTagsLoading: Boolean = true,
-    val search: Search = Search(
+    val mainSearch: Search? = null,
+    val homeSearch: Search = Search(
         filters = SearchQuery(
             sorting = Sorting.TOPLIST,
             topRange = TopRange.ONE_DAY,
@@ -208,10 +200,11 @@ data class HomeUiState(
     val blurNsfw: Boolean = false,
     val showNSFW: Boolean = false,
     val selectedWallpaper: Wallpaper? = null,
-    val isHome: Boolean = false,
     val saveSearchAsSearch: Search? = null,
     val showSavedSearchesDialog: Boolean = false,
     val savedSearches: List<SavedSearch> = emptyList(),
     val layoutPreferences: LayoutPreferences = LayoutPreferences(),
     val favorites: ImmutableList<Favorite> = persistentListOf(),
-)
+) {
+    val isHome = mainSearch == null
+}

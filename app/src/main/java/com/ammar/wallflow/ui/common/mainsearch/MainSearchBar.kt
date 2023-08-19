@@ -32,6 +32,7 @@ import com.ammar.wallflow.R
 import com.ammar.wallflow.model.MenuItem
 import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.SearchQuery
+import com.ammar.wallflow.model.Sorting
 import com.ammar.wallflow.model.TagSearchMeta
 import com.ammar.wallflow.model.UploaderSearchMeta
 import com.ammar.wallflow.ui.common.OverflowMenu
@@ -43,140 +44,150 @@ import com.ammar.wallflow.ui.common.searchedit.EditSearchContent
 import com.ammar.wallflow.ui.home.SearchBarFiltersToggle
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 
-@Composable
-fun MainSearchBar(
-    modifier: Modifier = Modifier,
-    useDocked: Boolean = false,
-    visible: Boolean = true,
-    active: Boolean = false,
-    search: Search = Search(),
-    query: String = "",
-    suggestions: List<Suggestion<Search>> = emptyList(),
-    showFilters: Boolean = false,
-    deleteSuggestion: Search? = null,
-    overflowIcon: @Composable (() -> Unit)? = null,
-    showNSFW: Boolean = false,
-    showQuery: Boolean = true,
-    onQueryChange: (String) -> Unit = {},
-    onBackClick: (() -> Unit)? = null,
-    onSearch: (query: String) -> Unit = {},
-    onSuggestionClick: (suggestion: Suggestion<Search>) -> Unit = {},
-    onSuggestionInsert: (suggestion: Suggestion<Search>) -> Unit = {},
-    onSuggestionDeleteRequest: (suggestion: Suggestion<Search>) -> Unit = {},
-    onActiveChange: (active: Boolean) -> Unit = {},
-    onShowFiltersChange: (show: Boolean) -> Unit = {},
-    onFiltersChange: (searchQuery: SearchQuery) -> Unit = {},
-    onDeleteSuggestionConfirmClick: () -> Unit = {},
-    onDeleteSuggestionDismissRequest: () -> Unit = {},
-    onSaveAsClick: () -> Unit = {},
-    onLoadClick: () -> Unit = {},
-) {
-    val placeholder: @Composable () -> Unit = remember {
-        {
-            Text(text = stringResource(R.string.search))
+object MainSearchBar {
+    @Composable
+    operator fun invoke(
+        modifier: Modifier = Modifier,
+        useDocked: Boolean = false,
+        visible: Boolean = true,
+        active: Boolean = false,
+        search: Search = Defaults.search,
+        query: String = "",
+        suggestions: List<Suggestion<Search>> = emptyList(),
+        showFilters: Boolean = false,
+        deleteSuggestion: Search? = null,
+        overflowIcon: @Composable (() -> Unit)? = null,
+        showNSFW: Boolean = false,
+        showQuery: Boolean = true,
+        onQueryChange: (String) -> Unit = {},
+        onBackClick: (() -> Unit)? = null,
+        onSearch: (query: String) -> Unit = {},
+        onSuggestionClick: (suggestion: Suggestion<Search>) -> Unit = {},
+        onSuggestionInsert: (suggestion: Suggestion<Search>) -> Unit = {},
+        onSuggestionDeleteRequest: (suggestion: Suggestion<Search>) -> Unit = {},
+        onActiveChange: (active: Boolean) -> Unit = {},
+        onShowFiltersChange: (show: Boolean) -> Unit = {},
+        onFiltersChange: (searchQuery: SearchQuery) -> Unit = {},
+        onDeleteSuggestionConfirmClick: () -> Unit = {},
+        onDeleteSuggestionDismissRequest: () -> Unit = {},
+        onSaveAsClick: () -> Unit = {},
+        onLoadClick: () -> Unit = {},
+    ) {
+        val placeholder: @Composable () -> Unit = remember {
+            {
+                Text(text = stringResource(R.string.search))
+            }
+        }
+
+        AnimatedVisibility(
+            modifier = modifier,
+            visible = visible,
+            enter = fadeIn(),
+            exit = fadeOut(),
+        ) {
+            SearchBar(
+                active = active,
+                useDocked = useDocked,
+                placeholder = when {
+                    active -> placeholder
+                    else -> when (search.meta) {
+                        is TagSearchMeta, is UploaderSearchMeta -> null
+                        else -> placeholder
+                    }
+                },
+                query = if (showQuery) query else "",
+                suggestions = suggestions,
+                extraLeadingContent = when {
+                    active -> null
+                    else -> when (search.meta) {
+                        is TagSearchMeta -> {
+                            { TagChip(tag = search.meta.tag) }
+                        }
+                        is UploaderSearchMeta -> {
+                            { UploaderChip(uploader = search.meta.uploader) }
+                        }
+                        else -> null
+                    }
+                },
+                onQueryChange = onQueryChange,
+                onBackClick = onBackClick,
+                onSearch = onSearch,
+                onSuggestionClick = onSuggestionClick,
+                onSuggestionInsert = onSuggestionInsert,
+                onSuggestionDeleteRequest = onSuggestionDeleteRequest,
+                onActiveChange = onActiveChange,
+                trailingIcon = {
+                    Crossfade(
+                        targetState = active,
+                        label = "trailingIcon",
+                    ) {
+                        if (it) {
+                            Row {
+                                SearchBarFiltersToggle(
+                                    checked = showFilters,
+                                    onCheckedChange = onShowFiltersChange,
+                                )
+                                ActiveOverflowIcon(
+                                    query = query,
+                                    onSaveAsClick = onSaveAsClick,
+                                    onLoadClick = onLoadClick,
+                                )
+                            }
+                            return@Crossfade
+                        }
+                        overflowIcon?.invoke()
+                    }
+                },
+                extraContent = {
+                    AnimatedVisibility(
+                        modifier = Modifier.clipToBounds(),
+                        visible = showFilters,
+                        enter = slideInVertically(initialOffsetY = { -it }),
+                        exit = slideOutVertically(targetOffsetY = { -it }),
+                    ) {
+                        Surface(
+                            modifier = Modifier.fillMaxSize(),
+                        ) {
+                            EditSearchContent(
+                                modifier = Modifier
+                                    .verticalScroll(rememberScrollState())
+                                    .windowInsetsPadding(WindowInsets.ime)
+                                    .padding(16.dp),
+                                showQueryField = false,
+                                search = search,
+                                showNSFW = showNSFW,
+                                onChange = { onFiltersChange(it.filters) },
+                            )
+                        }
+                    }
+                },
+            )
+        }
+
+        deleteSuggestion?.run {
+            AlertDialog(
+                title = { Text(text = this.query) },
+                text = { Text(text = stringResource(R.string.delete_suggestion_dialog_text)) },
+                confirmButton = {
+                    TextButton(onClick = onDeleteSuggestionConfirmClick) {
+                        Text(text = stringResource(R.string.confirm))
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = onDeleteSuggestionDismissRequest) {
+                        Text(text = stringResource(R.string.cancel))
+                    }
+                },
+                onDismissRequest = onDeleteSuggestionDismissRequest,
+            )
         }
     }
 
-    AnimatedVisibility(
-        modifier = modifier,
-        visible = visible,
-        enter = fadeIn(),
-        exit = fadeOut(),
-    ) {
-        SearchBar(
-            active = active,
-            useDocked = useDocked,
-            placeholder = when {
-                active -> placeholder
-                else -> when (search.meta) {
-                    is TagSearchMeta, is UploaderSearchMeta -> null
-                    else -> placeholder
-                }
-            },
-            query = if (showQuery) query else "",
-            suggestions = suggestions,
-            extraLeadingContent = when {
-                active -> null
-                else -> when (search.meta) {
-                    is TagSearchMeta -> {
-                        { TagChip(tag = search.meta.tag) }
-                    }
-                    is UploaderSearchMeta -> {
-                        { UploaderChip(uploader = search.meta.uploader) }
-                    }
-                    else -> null
-                }
-            },
-            onQueryChange = onQueryChange,
-            onBackClick = onBackClick,
-            onSearch = onSearch,
-            onSuggestionClick = onSuggestionClick,
-            onSuggestionInsert = onSuggestionInsert,
-            onSuggestionDeleteRequest = onSuggestionDeleteRequest,
-            onActiveChange = onActiveChange,
-            trailingIcon = {
-                Crossfade(
-                    targetState = active,
-                    label = "trailingIcon",
-                ) {
-                    if (it) {
-                        Row {
-                            SearchBarFiltersToggle(
-                                checked = showFilters,
-                                onCheckedChange = onShowFiltersChange,
-                            )
-                            ActiveOverflowIcon(
-                                query = query,
-                                onSaveAsClick = onSaveAsClick,
-                                onLoadClick = onLoadClick,
-                            )
-                        }
-                        return@Crossfade
-                    }
-                    overflowIcon?.invoke()
-                }
-            },
-            extraContent = {
-                AnimatedVisibility(
-                    modifier = Modifier.clipToBounds(),
-                    visible = showFilters,
-                    enter = slideInVertically(initialOffsetY = { -it }),
-                    exit = slideOutVertically(targetOffsetY = { -it }),
-                ) {
-                    Surface(
-                        modifier = Modifier.fillMaxSize(),
-                    ) {
-                        EditSearchContent(
-                            modifier = Modifier
-                                .verticalScroll(rememberScrollState())
-                                .windowInsetsPadding(WindowInsets.ime)
-                                .padding(16.dp),
-                            showQueryField = false,
-                            search = search,
-                            showNSFW = showNSFW,
-                            onChange = { onFiltersChange(it.filters) },
-                        )
-                    }
-                }
-            },
-        )
-    }
-
-    deleteSuggestion?.run {
-        AlertDialog(
-            title = { Text(text = this.query) },
-            text = { Text(text = stringResource(R.string.delete_suggestion_dialog_text)) },
-            confirmButton = {
-                TextButton(onClick = onDeleteSuggestionConfirmClick) {
-                    Text(text = stringResource(R.string.confirm))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = onDeleteSuggestionDismissRequest) {
-                    Text(text = stringResource(R.string.cancel))
-                }
-            },
-            onDismissRequest = onDeleteSuggestionDismissRequest,
+    object Defaults {
+        val search = Search(
+            filters = SearchQuery(
+                sorting = Sorting.RELEVANCE,
+            ),
         )
     }
 }

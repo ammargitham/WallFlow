@@ -24,8 +24,14 @@ import com.ammar.wallflow.data.preferences.LayoutPreferences
 import com.ammar.wallflow.extensions.getFileNameFromUrl
 import com.ammar.wallflow.extensions.getUriForFile
 import com.ammar.wallflow.extensions.parseMimeType
+import com.ammar.wallflow.extensions.search
 import com.ammar.wallflow.extensions.share
 import com.ammar.wallflow.model.Favorite
+import com.ammar.wallflow.model.Search
+import com.ammar.wallflow.model.Tag
+import com.ammar.wallflow.model.TagSearchMeta
+import com.ammar.wallflow.model.Uploader
+import com.ammar.wallflow.model.UploaderSearchMeta
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.ui.common.BottomBarAwareHorizontalTwoPane
 import com.ammar.wallflow.ui.common.LocalSystemController
@@ -56,13 +62,13 @@ fun FavoritesScreen(
     val context = LocalContext.current
     val systemController = LocalSystemController.current
     val bottomBarController = LocalBottomBarController.current
-    val searchBarsController = LocalMainSearchBarController.current
+    val searchBarController = LocalMainSearchBarController.current
     val systemState by systemController.state
 
     LaunchedEffect(Unit) {
         systemController.resetBarsState()
         bottomBarController.update { it.copy(visible = true) }
-        searchBarsController.update { it.copy(visible = false) }
+        searchBarController.update { it.copy(visible = false) }
     }
 
     val onWallpaperClick: (wallpaper: Wallpaper) -> Unit = remember(systemState.isExpanded) {
@@ -148,6 +154,26 @@ fun FavoritesScreen(
                     )
                 }
             },
+            onFullWallpaperTagClick = {
+                val search = Search(
+                    query = "id:${it.id}",
+                    meta = TagSearchMeta(it),
+                )
+                if (searchBarController.state.value.search == search) {
+                    return@FavoritesScreenContent
+                }
+                navController.search(search)
+            },
+            onFullWallpaperUploaderClick = {
+                val search = Search(
+                    query = "@${it.username}",
+                    meta = UploaderSearchMeta(uploader = it),
+                )
+                if (searchBarController.state.value.search == search) {
+                    return@FavoritesScreenContent
+                }
+                navController.search(search)
+            },
             onFullWallpaperDownloadPermissionsGranted = viewerViewModel::download,
         )
     }
@@ -181,6 +207,8 @@ private fun FavoritesScreenContent(
     onFullWallpaperShareImageClick: () -> Unit = {},
     onFullWallpaperApplyWallpaperClick: () -> Unit = {},
     onFullWallpaperFullScreenClick: () -> Unit = {},
+    onFullWallpaperTagClick: (Tag) -> Unit = {},
+    onFullWallpaperUploaderClick: (Uploader) -> Unit = {},
     onFullWallpaperDownloadPermissionsGranted: () -> Unit = {},
 ) {
     if (isExpanded) {
@@ -223,6 +251,8 @@ private fun FavoritesScreenContent(
                     onShareImageClick = onFullWallpaperShareImageClick,
                     onApplyWallpaperClick = onFullWallpaperApplyWallpaperClick,
                     onFullScreenClick = onFullWallpaperFullScreenClick,
+                    onTagClick = onFullWallpaperTagClick,
+                    onUploaderClick = onFullWallpaperUploaderClick,
                     onDownloadPermissionsGranted = onFullWallpaperDownloadPermissionsGranted,
                 )
             },
