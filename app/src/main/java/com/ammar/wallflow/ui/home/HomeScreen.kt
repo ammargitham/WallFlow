@@ -24,6 +24,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -80,8 +81,9 @@ import kotlinx.coroutines.launch
 )
 @Composable
 fun HomeScreen(
-    modifier: Modifier = Modifier,
     navController: NavController,
+    nestedScrollConnection: NestedScrollConnection,
+    modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
     viewerViewModel: WallpaperViewerViewModel = hiltViewModel(),
 ) {
@@ -198,6 +200,7 @@ fun HomeScreen(
     ) {
         HomeScreenContent(
             modifier = Modifier.fillMaxSize(),
+            nestedScrollConnection = nestedScrollConnection,
             isExpanded = systemState.isExpanded,
             gridState = gridState,
             contentPadding = PaddingValues(

@@ -19,6 +19,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,6 +48,7 @@ import kotlinx.coroutines.flow.flowOf
 @Composable
 internal fun HomeScreenContent(
     wallpapers: LazyPagingItems<Wallpaper>,
+    nestedScrollConnection: NestedScrollConnection,
     modifier: Modifier = Modifier,
     gridState: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
     contentPadding: PaddingValues = PaddingValues(8.dp),
@@ -83,7 +86,9 @@ internal fun HomeScreenContent(
             modifier = modifier,
             first = {
                 Feed(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .nestedScroll(nestedScrollConnection),
                     gridState = gridState,
                     contentPadding = contentPadding,
                     wallpapers = wallpapers,
@@ -127,7 +132,7 @@ internal fun HomeScreenContent(
         )
     } else {
         Feed(
-            modifier = modifier,
+            modifier = modifier.nestedScroll(nestedScrollConnection),
             gridState = gridState,
             contentPadding = contentPadding,
             wallpapers = wallpapers,
@@ -232,7 +237,14 @@ private fun DefaultPreview() {
         Surface {
             val wallpapers = flowOf(PagingData.from(listOf(wallpaper1, wallpaper2)))
             val pagingItems = wallpapers.collectAsLazyPagingItems()
-            HomeScreenContent(tags = persistentListOf(), wallpapers = pagingItems)
+            val nestedScrollConnection = remember {
+                object : NestedScrollConnection {}
+            }
+            HomeScreenContent(
+                tags = persistentListOf(),
+                wallpapers = pagingItems,
+                nestedScrollConnection = nestedScrollConnection,
+            )
         }
     }
 }

@@ -13,8 +13,10 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
@@ -278,10 +280,14 @@ private fun PreviewContent(
                 },
             ) {
                 val pagingItems = previewWallpaperFlow.collectAsLazyPagingItems()
+                val nestedScrollConnection = remember {
+                    object : NestedScrollConnection {}
+                }
                 HomeScreenContent(
                     modifier = Modifier.windowInsetsPadding(topWindowInsets),
                     tags = previewTags,
                     wallpapers = pagingItems,
+                    nestedScrollConnection = nestedScrollConnection,
                     contentPadding = PaddingValues(
                         start = 8.dp,
                         end = 8.dp,

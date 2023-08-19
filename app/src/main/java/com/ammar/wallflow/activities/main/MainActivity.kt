@@ -21,7 +21,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -257,10 +256,10 @@ class MainActivity : ComponentActivity() {
                         onSearchBarLoadClick = viewModel::showSavedSearches,
                     ) {
                         MainNavigation(
-                            modifier = Modifier.nestedScroll(nestedScrollConnection),
                             navController = navController,
                             contentPadding = it,
                             applyContentPadding = systemState.applyScaffoldPadding,
+                            nestedScrollConnection = nestedScrollConnection,
                         )
                     }
 
