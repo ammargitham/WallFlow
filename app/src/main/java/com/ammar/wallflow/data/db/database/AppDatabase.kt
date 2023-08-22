@@ -49,7 +49,7 @@ import com.ammar.wallflow.data.db.entity.WallpaperTagsEntity
         AutoWallpaperHistoryEntity::class,
         FavoriteEntity::class,
     ],
-    version = 2,
+    version = 3,
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {

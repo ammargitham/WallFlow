@@ -2,6 +2,7 @@ package com.ammar.wallflow.ui.settings.composables
 
 import android.content.res.Configuration
 import android.os.Build
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
@@ -36,6 +37,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,13 +55,15 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
+import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider as CPPP
 import androidx.compose.ui.unit.dp
 import androidx.work.Constraints
 import com.ammar.wallflow.DISABLED_ALPHA
 import com.ammar.wallflow.INTERNAL_MODELS
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.db.entity.ObjectDetectionModelEntity
+import com.ammar.wallflow.data.preferences.AutoWallpaperPreferences
+import com.ammar.wallflow.data.preferences.MutableStateAutoWallpaperPreferencesSaver
 import com.ammar.wallflow.data.preferences.ObjectDetectionDelegate
 import com.ammar.wallflow.data.preferences.Theme
 import com.ammar.wallflow.data.preferences.defaultAutoWallpaperConstraints
@@ -71,6 +75,8 @@ import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.model.ConstraintType
 import com.ammar.wallflow.model.SavedSearch
 import com.ammar.wallflow.model.Search
+import com.ammar.wallflow.ui.common.Dropdown
+import com.ammar.wallflow.ui.common.DropdownOption
 import com.ammar.wallflow.ui.common.NameState
 import com.ammar.wallflow.ui.common.ProgressIndicator
 import com.ammar.wallflow.ui.common.TextFieldState
@@ -418,18 +424,17 @@ fun ObjectDetectionModelEditDialog(
     }
 }
 
-private class ModelParameterProvider :
-    CollectionPreviewParameterProvider<ObjectDetectionModelEntity?>(
-        listOf(
-            null,
-            ObjectDetectionModelEntity(
-                id = 1L,
-                name = "model name",
-                fileName = "file name",
-                url = "http://example.com",
-            ),
+private class ModelParameterProvider : CPPP<ObjectDetectionModelEntity?>(
+    listOf(
+        null,
+        ObjectDetectionModelEntity(
+            id = 1L,
+            name = "model name",
+            fileName = "file name",
+            url = "http://example.com",
         ),
-    )
+    ),
+)
 
 @Preview
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
@@ -523,6 +528,7 @@ fun ObjectDetectionModelEditContent(
                     is DownloadStatus.Paused -> downloadStatus.progress
                     else -> 0F
                 },
+                label = "progress",
             )
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -625,8 +631,8 @@ fun DeleteSavedSearchConfirmDialog(
     )
 }
 
-@Preview(showSystemUi = true)
-@Preview(showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun PreviewDeleteSavedSearchConfirmDialog() {
     WallFlowTheme {
@@ -642,27 +648,51 @@ private fun PreviewDeleteSavedSearchConfirmDialog() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SavedSearchOptionsDialog(
+fun AutoWallpaperSourceOptionsDialog(
     modifier: Modifier = Modifier,
+    autoWallpaperPreferences: AutoWallpaperPreferences = AutoWallpaperPreferences(),
     savedSearches: List<SavedSearch> = emptyList(),
-    selectedSavedSearchId: Long? = null,
-    onSaveClick: (Long) -> Unit = {},
+    onSaveClick: (AutoWallpaperPreferences) -> Unit = {},
     onDismissRequest: () -> Unit = {},
 ) {
-    var localSelectedSavedSearchId by remember(selectedSavedSearchId) {
-        mutableStateOf(selectedSavedSearchId)
+    var localPrefs by rememberSaveable(
+        autoWallpaperPreferences,
+        saver = MutableStateAutoWallpaperPreferencesSaver,
+    ) {
+        mutableStateOf(autoWallpaperPreferences)
     }
+    val saveEnabled by remember {
+        derivedStateOf {
+            // if both saved search and favorites is disabled
+            if (!localPrefs.savedSearchEnabled && !localPrefs.favoritesEnabled) {
+                return@derivedStateOf false
+            }
+            // if saved search is enabled and saved search id is not set
+            !(localPrefs.savedSearchEnabled && localPrefs.savedSearchId <= 0)
+        }
+    }
+
     AlertDialog(
         modifier = modifier,
         onDismissRequest = onDismissRequest,
     ) {
         UnpaddedAlertDialogContent(
-            title = { Text(text = stringResource(R.string.choose_saved_search)) },
+            title = { Text(text = stringResource(R.string.sources)) },
             text = {
-                SavedSearchOptionsDialogContent(
+                AutoWallpaperSourceOptionsDialogContent(
+                    savedSearchEnabled = localPrefs.savedSearchEnabled,
+                    favoritesEnabled = localPrefs.favoritesEnabled,
                     savedSearches = savedSearches,
-                    selectedSavedSearchId = localSelectedSavedSearchId,
-                    onOptionClick = { localSelectedSavedSearchId = it },
+                    selectedSavedSearchId = localPrefs.savedSearchId,
+                    onChangeSavedSearchEnabled = {
+                        localPrefs = localPrefs.copy(savedSearchEnabled = it)
+                    },
+                    onChangeFavoritesEnabled = {
+                        localPrefs = localPrefs.copy(favoritesEnabled = it)
+                    },
+                    onSavedSearchIdChange = {
+                        localPrefs = localPrefs.copy(savedSearchId = it)
+                    },
                 )
             },
             buttons = {
@@ -673,10 +703,8 @@ fun SavedSearchOptionsDialog(
                         Text(text = stringResource(R.string.cancel))
                     }
                     TextButton(
-                        enabled = localSelectedSavedSearchId.run {
-                            this != null && this > 0
-                        },
-                        onClick = { onSaveClick(localSelectedSavedSearchId ?: return@TextButton) },
+                        onClick = { onSaveClick(localPrefs) },
+                        enabled = saveEnabled,
                     ) {
                         Text(text = stringResource(R.string.save))
                     }
@@ -687,78 +715,103 @@ fun SavedSearchOptionsDialog(
 }
 
 @Composable
-private fun SavedSearchOptionsDialogContent(
+private fun AutoWallpaperSourceOptionsDialogContent(
     modifier: Modifier = Modifier,
+    savedSearchEnabled: Boolean = false,
+    favoritesEnabled: Boolean = false,
     savedSearches: List<SavedSearch> = emptyList(),
     selectedSavedSearchId: Long? = null,
-    onOptionClick: (Long) -> Unit = {},
+    onChangeSavedSearchEnabled: (Boolean) -> Unit = {},
+    onChangeFavoritesEnabled: (Boolean) -> Unit = {},
+    onSavedSearchIdChange: (Long) -> Unit = {},
 ) {
     Column(
         modifier = modifier,
     ) {
-        if (savedSearches.isEmpty()) {
-            ListItem(
-                modifier = Modifier.padding(horizontal = 8.dp),
-                headlineContent = {
-                    Text(
-                        text = stringResource(R.string.no_saved_searches),
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = DISABLED_ALPHA),
-                    )
-                },
-                supportingContent = {
-                    Text(
-                        text = stringResource(R.string.no_saved_searches_desc),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
-                            alpha = DISABLED_ALPHA,
-                        ),
-                    )
-                },
-            )
-        } else {
-            savedSearches.map {
-                ListItem(
-                    modifier = Modifier
-                        .clickable(onClick = { onOptionClick(it.id) })
-                        .padding(horizontal = 8.dp),
-                    headlineContent = { Text(text = it.name) },
-                    leadingContent = {
-                        RadioButton(
-                            modifier = Modifier.size(24.dp),
-                            selected = selectedSavedSearchId == it.id,
-                            onClick = { onOptionClick(it.id) },
-                        )
-                    },
+        ListItem(
+            modifier = Modifier
+                .clickable { onChangeSavedSearchEnabled(!savedSearchEnabled) }
+                .padding(horizontal = 8.dp),
+            headlineContent = { Text(text = stringResource(R.string.saved_search)) },
+            leadingContent = {
+                Checkbox(
+                    modifier = Modifier.size(24.dp),
+                    checked = savedSearchEnabled,
+                    onCheckedChange = onChangeSavedSearchEnabled,
                 )
-            }
-        }
-    }
-}
-
-@Preview
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun PreviewSavedSearchOptionsDialogEmpty() {
-    WallFlowTheme {
-        Surface {
-            SavedSearchOptionsDialog()
-        }
-    }
-}
-
-@Preview
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun PreviewSavedSearchOptionsDialog() {
-    WallFlowTheme {
-        Surface {
-            SavedSearchOptionsDialog(
-                savedSearches = List(3) {
-                    SavedSearch(
-                        id = it.toLong(),
-                        name = "Saved search $it",
-                        search = Search(),
+            },
+        )
+        AnimatedVisibility(visible = savedSearchEnabled) {
+            Dropdown(
+                modifier = Modifier
+                    .padding(
+                        start = 64.dp,
+                        end = 24.dp,
+                    )
+                    .fillMaxWidth(),
+                placeholder = { Text(text = stringResource(R.string.saved_search)) },
+                emptyOptionsMessage = stringResource(R.string.no_saved_searches),
+                options = savedSearches.mapTo(mutableSetOf()) {
+                    DropdownOption(
+                        value = it.id,
+                        text = it.name,
                     )
                 },
+                initialSelectedOption = selectedSavedSearchId,
+                onChange = onSavedSearchIdChange,
+            )
+        }
+        ListItem(
+            modifier = Modifier
+                .clickable { onChangeFavoritesEnabled(!favoritesEnabled) }
+                .padding(horizontal = 8.dp),
+            headlineContent = { Text(text = stringResource(R.string.favorites)) },
+            leadingContent = {
+                Checkbox(
+                    modifier = Modifier.size(24.dp),
+                    checked = favoritesEnabled,
+                    onCheckedChange = onChangeFavoritesEnabled,
+                )
+            },
+        )
+    }
+}
+
+private data class AutoWallSrcOptsDialogParameters(
+    val savedSearches: List<SavedSearch> = emptyList(),
+    val prefs: AutoWallpaperPreferences = AutoWallpaperPreferences(),
+)
+
+private class AutoWallSrcOptsDialogPP : CPPP<AutoWallSrcOptsDialogParameters>(
+    listOf(
+        AutoWallSrcOptsDialogParameters(),
+        AutoWallSrcOptsDialogParameters(
+            prefs = AutoWallpaperPreferences(
+                savedSearchId = 1,
+                savedSearchEnabled = true,
+            ),
+            savedSearches = List(3) {
+                SavedSearch(
+                    id = it.toLong(),
+                    name = "Saved search $it",
+                    search = Search(),
+                )
+            },
+        ),
+    ),
+)
+
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun PreviewAutoWallpaperSourceOptionsDialog(
+    @PreviewParameter(AutoWallSrcOptsDialogPP::class) parameters: AutoWallSrcOptsDialogParameters,
+) {
+    WallFlowTheme {
+        Surface {
+            AutoWallpaperSourceOptionsDialog(
+                autoWallpaperPreferences = parameters.prefs,
+                savedSearches = parameters.savedSearches,
             )
         }
     }

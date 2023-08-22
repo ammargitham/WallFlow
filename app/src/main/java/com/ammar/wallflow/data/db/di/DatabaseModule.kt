@@ -8,6 +8,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.ammar.wallflow.BuildConfig
 import com.ammar.wallflow.IoDispatcher
 import com.ammar.wallflow.data.db.database.AppDatabase
+import com.ammar.wallflow.data.db.di.ManualMigrations.MIGRATION_1_2
 import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.model.ObjectDetectionModel
 import com.ammar.wallflow.model.toEntity
@@ -81,6 +82,9 @@ class DatabaseModule {
             if (BuildConfig.DEBUG) {
                 fallbackToDestructiveMigration()
             }
+            addMigrations(
+                MIGRATION_1_2,
+            )
             addCallback(
                 object : RoomDatabase.Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {

@@ -216,6 +216,10 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="uploader">Uploader</string>
     <string name="colors">Colors</string>
     <string name="favorite">Favorite</string>
+    <string name="sources">Sources</string>
+    <string name="wallhaven_cc">wallhaven.cc</string>
+    <string name="saved_search">Saved search</string>
+    <string name="no_options">No options</string>
     <plurals name="every_x_hrs">
         <item quantity="one">Every %d hour</item>
         <item quantity="other">Every %d hours</item>

@@ -15,11 +15,13 @@ import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.ammar.wallflow.data.db.dao.AutoWallpaperHistoryDao
+import com.ammar.wallflow.data.db.dao.FavoriteDao
 import com.ammar.wallflow.data.db.dao.ObjectDetectionModelDao
 import com.ammar.wallflow.data.db.dao.SavedSearchDao
+import com.ammar.wallflow.data.db.dao.WallpapersDao
 import com.ammar.wallflow.data.db.entity.AutoWallpaperHistoryEntity
-import com.ammar.wallflow.data.db.entity.ObjectDetectionModelEntity
-import com.ammar.wallflow.data.db.entity.SavedSearchEntity
+import com.ammar.wallflow.data.db.entity.FavoriteEntity
+import com.ammar.wallflow.data.db.entity.asWallpaper
 import com.ammar.wallflow.data.network.WallHavenNetworkDataSource
 import com.ammar.wallflow.data.network.model.NetworkMeta
 import com.ammar.wallflow.data.network.model.NetworkResponse
@@ -28,9 +30,11 @@ import com.ammar.wallflow.data.network.model.NetworkThumbs
 import com.ammar.wallflow.data.network.model.NetworkWallpaper
 import com.ammar.wallflow.data.network.model.StringNetworkMetaQuery
 import com.ammar.wallflow.data.network.model.asWallpaper
+import com.ammar.wallflow.data.network.model.asWallpaperEntity
 import com.ammar.wallflow.data.preferences.AutoWallpaperPreferences
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.AutoWallpaperHistoryRepository
+import com.ammar.wallflow.data.repository.FavoritesRepository
 import com.ammar.wallflow.data.repository.ObjectDetectionModelRepository
 import com.ammar.wallflow.data.repository.SavedSearchRepository
 import com.ammar.wallflow.extensions.getTempFile
@@ -38,10 +42,13 @@ import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.SavedSearch
 import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.SearchQuery
+import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.model.toEntity
 import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.FAILURE_REASON
 import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.FailureReason
 import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.FailureReason.SAVED_SEARCH_NOT_SET
+import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.SUCCESS_NEXT_WALLPAPER_ID
+import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.SourceChoice
 import io.mockk.every
 import io.mockk.spyk
 import io.mockk.unmockkAll
@@ -50,17 +57,12 @@ import java.util.UUID
 import kotlin.random.Random
 import kotlin.test.assertEquals
 import kotlin.time.Duration.Companion.hours
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Clock
-import okhttp3.Call
-import okhttp3.OkHttpClient
-import okhttp3.Request
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.MatcherAssert.assertThat
-import org.jsoup.nodes.Document
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -70,102 +72,6 @@ import org.junit.runner.RunWith
 class AutoWallpaperTest {
     private lateinit var context: Context
     private val testDispatcher = StandardTestDispatcher()
-
-    private open class TestSavedSearchDao : SavedSearchDao {
-        override fun getAll(): Flow<List<SavedSearchEntity>> {
-            throw RuntimeException()
-        }
-
-        override suspend fun getById(id: Long): SavedSearchEntity? {
-            throw RuntimeException()
-        }
-
-        override suspend fun getByName(name: String): SavedSearchEntity? {
-            throw RuntimeException()
-        }
-
-        override suspend fun upsert(savedSearchDao: SavedSearchEntity) {
-            throw RuntimeException()
-        }
-
-        override suspend fun deleteByName(name: String) {
-            throw RuntimeException()
-        }
-    }
-
-    private open class TestAutoWallpaperHistoryDao : AutoWallpaperHistoryDao {
-        override suspend fun getAll(): List<AutoWallpaperHistoryEntity> {
-            throw RuntimeException()
-        }
-
-        override suspend fun getByWallhavenId(wallhavenId: String): AutoWallpaperHistoryEntity? {
-            throw RuntimeException()
-        }
-
-        override suspend fun upsert(vararg autoWallpaperHistoryEntity: AutoWallpaperHistoryEntity) {
-            throw RuntimeException()
-        }
-    }
-
-    private open class TestObjectDetectionModelDao : ObjectDetectionModelDao {
-        override fun getAll(): Flow<List<ObjectDetectionModelEntity>> {
-            throw RuntimeException()
-        }
-
-        override suspend fun getById(id: Long): ObjectDetectionModelEntity? {
-            throw RuntimeException()
-        }
-
-        override suspend fun getByName(name: String): ObjectDetectionModelEntity? {
-            throw RuntimeException()
-        }
-
-        override suspend fun nameExists(name: String): Boolean {
-            throw RuntimeException()
-        }
-
-        override suspend fun nameExistsExcludingId(id: Long, name: String): Boolean {
-            throw RuntimeException()
-        }
-
-        override suspend fun upsert(vararg objectDetectionModelEntity: ObjectDetectionModelEntity) {
-            throw RuntimeException()
-        }
-
-        override suspend fun deleteByName(name: String) {
-            throw RuntimeException()
-        }
-
-        override suspend fun delete(entity: ObjectDetectionModelEntity) {
-            throw RuntimeException()
-        }
-    }
-
-    private open class TestWallHavenNetworkDataSource : WallHavenNetworkDataSource {
-        override suspend fun search(
-            searchQuery: SearchQuery,
-            page: Int?,
-        ): NetworkResponse<List<NetworkWallpaper>> {
-            throw RuntimeException()
-        }
-
-        override suspend fun wallpaper(
-            wallpaperWallhavenId: String,
-        ): NetworkResponse<NetworkWallpaper> {
-            throw RuntimeException()
-        }
-
-        override suspend fun popularTags(): Document? {
-            throw RuntimeException()
-        }
-    }
-
-    private val testOkHttpClient = object : OkHttpClient() {
-        override fun newCall(request: Request): Call {
-            // Overriding to throw error if download requested
-            throw IllegalStateException("Test called okhttp client!")
-        }
-    }
 
     @Before
     fun setUp() {
@@ -232,13 +138,14 @@ class AutoWallpaperTest {
             appPreferencesRepository.updateAutoWallpaperPrefs(
                 AutoWallpaperPreferences(
                     enabled = true,
+                    savedSearchEnabled = true,
                     savedSearchId = 2,
                 ),
             )
             val worker = getWorker(
                 dataStore = testDataStore,
                 appPreferencesRepository = appPreferencesRepository,
-                savedSearchDao = object : TestSavedSearchDao() {
+                savedSearchDao = object : FakeSavedSearchDao() {
                     override suspend fun getById(id: Long) = null
                 },
             )
@@ -265,6 +172,7 @@ class AutoWallpaperTest {
             appPreferencesRepository.updateAutoWallpaperPrefs(
                 AutoWallpaperPreferences(
                     enabled = true,
+                    savedSearchEnabled = true,
                     savedSearchId = 1,
                     useObjectDetection = false,
                 ),
@@ -279,14 +187,17 @@ class AutoWallpaperTest {
             )
             val networkWallpapers = List(30) { testNetworkWallpaper }
             val wallpapers = networkWallpapers.map { it.asWallpaper() }
-            val autoWallpaperHistoryDao = object : TestAutoWallpaperHistoryDao() {
+            val autoWallpaperHistoryDao = object : FakeAutoWallpaperHistoryDao() {
                 private var history = emptyList<AutoWallpaperHistoryEntity>()
 
                 override suspend fun getAll() = history
 
-                override suspend fun getByWallhavenId(wallhavenId: String) = history.find {
-                    it.wallhavenId == wallhavenId
-                }
+                override suspend fun getAllBySource(source: Source) = history
+
+                override suspend fun getBySourceId(
+                    sourceId: String,
+                    source: Source,
+                ) = history.find { it.sourceId == sourceId }
 
                 override suspend fun upsert(
                     vararg autoWallpaperHistoryEntity: AutoWallpaperHistoryEntity,
@@ -297,11 +208,11 @@ class AutoWallpaperTest {
             val worker = getWorker(
                 dataStore = testDataStore,
                 appPreferencesRepository = appPreferencesRepository,
-                savedSearchDao = object : TestSavedSearchDao() {
+                savedSearchDao = object : FakeSavedSearchDao() {
                     override suspend fun getById(id: Long) = savedSearch.toEntity(1)
                 },
                 autoWallpaperHistoryDao = autoWallpaperHistoryDao,
-                wallHavenNetwork = object : TestWallHavenNetworkDataSource() {
+                wallHavenNetwork = object : FakeWallHavenNetworkDataSource() {
                     override suspend fun search(
                         searchQuery: SearchQuery,
                         page: Int?,
@@ -331,7 +242,7 @@ class AutoWallpaperTest {
                 `is`(
                     Result.success(
                         workDataOf(
-                            AutoWallpaperWorker.SUCCESS_NEXT_WALLPAPER_ID to wallpapers.first().id,
+                            SUCCESS_NEXT_WALLPAPER_ID to wallpapers.first().id,
                         ),
                     ),
                 ),
@@ -354,6 +265,7 @@ class AutoWallpaperTest {
             appPreferencesRepository.updateAutoWallpaperPrefs(
                 AutoWallpaperPreferences(
                     enabled = true,
+                    savedSearchEnabled = true,
                     savedSearchId = 1,
                 ),
             )
@@ -369,20 +281,25 @@ class AutoWallpaperTest {
             val wallpapers = networkWallpapers.map { it.asWallpaper() }
             val historyWalls = wallpapers.take(4)
             val setOn = Clock.System.now()
-            val autoWallpaperHistoryDao = object : TestAutoWallpaperHistoryDao() {
+            val autoWallpaperHistoryDao = object : FakeAutoWallpaperHistoryDao() {
                 private var history = historyWalls.mapIndexed { i, wallpaper ->
                     AutoWallpaperHistoryEntity(
                         id = i.toLong(),
-                        wallhavenId = wallpaper.id,
+                        sourceId = wallpaper.id,
+                        source = Source.WALLHAVEN,
+                        sourceChoice = SourceChoice.SAVED_SEARCH,
                         setOn = setOn + i.hours,
                     )
                 }
 
                 override suspend fun getAll() = history
 
-                override suspend fun getByWallhavenId(wallhavenId: String) = history.find {
-                    it.wallhavenId == wallhavenId
-                }
+                override suspend fun getAllBySource(source: Source) = history
+
+                override suspend fun getBySourceId(
+                    sourceId: String,
+                    source: Source,
+                ) = history.find { it.sourceId == sourceId }
 
                 override suspend fun upsert(
                     vararg autoWallpaperHistoryEntity: AutoWallpaperHistoryEntity,
@@ -393,11 +310,11 @@ class AutoWallpaperTest {
             val worker = getWorker(
                 dataStore = testDataStore,
                 appPreferencesRepository = appPreferencesRepository,
-                savedSearchDao = object : TestSavedSearchDao() {
+                savedSearchDao = object : FakeSavedSearchDao() {
                     override suspend fun getById(id: Long) = savedSearch.toEntity(1)
                 },
                 autoWallpaperHistoryDao = autoWallpaperHistoryDao,
-                wallHavenNetwork = object : TestWallHavenNetworkDataSource() {
+                wallHavenNetwork = object : FakeWallHavenNetworkDataSource() {
                     override suspend fun search(
                         searchQuery: SearchQuery,
                         page: Int?,
@@ -427,7 +344,7 @@ class AutoWallpaperTest {
                 `is`(
                     Result.success(
                         workDataOf(
-                            AutoWallpaperWorker.SUCCESS_NEXT_WALLPAPER_ID to wallpapers[4].id,
+                            SUCCESS_NEXT_WALLPAPER_ID to wallpapers[4].id,
                         ),
                     ),
                 ),
@@ -450,6 +367,7 @@ class AutoWallpaperTest {
             appPreferencesRepository.updateAutoWallpaperPrefs(
                 AutoWallpaperPreferences(
                     enabled = true,
+                    savedSearchEnabled = true,
                     savedSearchId = 1,
                 ),
             )
@@ -465,20 +383,25 @@ class AutoWallpaperTest {
             val wallpapers = networkWallpapers.map { it.asWallpaper() }
             val historyWalls = wallpapers.map { it }
             val setOn = Clock.System.now()
-            val autoWallpaperHistoryDao = object : TestAutoWallpaperHistoryDao() {
+            val autoWallpaperHistoryDao = object : FakeAutoWallpaperHistoryDao() {
                 private var history = historyWalls.mapIndexed { i, wallpaper ->
                     AutoWallpaperHistoryEntity(
                         id = i.toLong(),
-                        wallhavenId = wallpaper.id,
+                        sourceId = wallpaper.id,
+                        source = Source.WALLHAVEN,
+                        sourceChoice = SourceChoice.SAVED_SEARCH,
                         setOn = setOn + i.hours,
                     )
                 }
 
                 override suspend fun getAll() = history
 
-                override suspend fun getByWallhavenId(wallhavenId: String) = history.find {
-                    it.wallhavenId == wallhavenId
-                }
+                override suspend fun getAllBySource(source: Source) = history
+
+                override suspend fun getBySourceId(
+                    sourceId: String,
+                    source: Source,
+                ) = history.find { it.sourceId == sourceId }
 
                 override suspend fun upsert(
                     vararg autoWallpaperHistoryEntity: AutoWallpaperHistoryEntity,
@@ -492,11 +415,11 @@ class AutoWallpaperTest {
             val worker = getWorker(
                 dataStore = testDataStore,
                 appPreferencesRepository = appPreferencesRepository,
-                savedSearchDao = object : TestSavedSearchDao() {
+                savedSearchDao = object : FakeSavedSearchDao() {
                     override suspend fun getById(id: Long) = savedSearch.toEntity(1)
                 },
                 autoWallpaperHistoryDao = autoWallpaperHistoryDao,
-                wallHavenNetwork = object : TestWallHavenNetworkDataSource() {
+                wallHavenNetwork = object : FakeWallHavenNetworkDataSource() {
                     override suspend fun search(
                         searchQuery: SearchQuery,
                         page: Int?,
@@ -526,7 +449,7 @@ class AutoWallpaperTest {
                 `is`(
                     Result.success(
                         workDataOf(
-                            AutoWallpaperWorker.SUCCESS_NEXT_WALLPAPER_ID to wallpapers[0].id,
+                            SUCCESS_NEXT_WALLPAPER_ID to wallpapers[0].id,
                         ),
                     ),
                 ),
@@ -540,13 +463,130 @@ class AutoWallpaperTest {
         }
     }
 
+    @Test
+    fun testAutoWallpaperWorkerNoFavoriteWallpaper() = runTest(testDispatcher) {
+        val testDataStore = dataStore()
+        try {
+            val appPreferencesRepository = testDataStore.appPreferencesRepository
+            appPreferencesRepository.updateAutoWallpaperPrefs(
+                AutoWallpaperPreferences(
+                    enabled = true,
+                    savedSearchEnabled = false,
+                    favoritesEnabled = true,
+                    savedSearchId = 1,
+                    useObjectDetection = false,
+                ),
+            )
+            val worker = getWorker(
+                dataStore = testDataStore,
+                appPreferencesRepository = appPreferencesRepository,
+                favoriteDao = object : FakeFavoriteDao() {
+                    override suspend fun getRandom() = null
+                },
+            )
+
+            val result = worker.doWork()
+            assertThat(
+                result,
+                `is`(
+                    Result.failure(
+                        workDataOf(
+                            FAILURE_REASON to FailureReason.NO_WALLPAPER_FOUND.name,
+                        ),
+                    ),
+                ),
+            )
+        } finally {
+            testDataStore.clear()
+        }
+    }
+
+    @Test
+    fun testAutoWallpaperWorkerSetsFavoriteWallpaper() = runTest(testDispatcher) {
+        val testDataStore = dataStore()
+        val tempFile = createTempFile(context, "tmp")
+        try {
+            val appPreferencesRepository = testDataStore.appPreferencesRepository
+            appPreferencesRepository.updateAutoWallpaperPrefs(
+                AutoWallpaperPreferences(
+                    enabled = true,
+                    savedSearchEnabled = false,
+                    favoritesEnabled = true,
+                    savedSearchId = 1,
+                    useObjectDetection = false,
+                ),
+            )
+            val wallpaperEntity = testNetworkWallpaper.asWallpaperEntity()
+            val autoWallpaperHistoryDao = object : FakeAutoWallpaperHistoryDao() {
+                private var history = emptyList<AutoWallpaperHistoryEntity>()
+
+                override suspend fun getAll() = history
+
+                override suspend fun getAllBySource(source: Source) = history
+
+                override suspend fun getBySourceId(
+                    sourceId: String,
+                    source: Source,
+                ) = history.find { it.sourceId == sourceId }
+
+                override suspend fun upsert(
+                    vararg autoWallpaperHistoryEntity: AutoWallpaperHistoryEntity,
+                ) {
+                    history = autoWallpaperHistoryEntity.toList()
+                }
+            }
+            val worker = getWorker(
+                dataStore = testDataStore,
+                appPreferencesRepository = appPreferencesRepository,
+                autoWallpaperHistoryDao = autoWallpaperHistoryDao,
+                favoriteDao = object : FakeFavoriteDao() {
+                    override suspend fun getRandom() = FavoriteEntity(
+                        id = 1,
+                        sourceId = "1",
+                        source = Source.WALLHAVEN,
+                        favoritedOn = Clock.System.now(),
+                    )
+                },
+                wallpapersDao = object : FakeWallpapersDao() {
+                    override suspend fun getByWallhavenId(wallhavenId: String) = wallpaperEntity
+                },
+            )
+
+            every {
+                worker["setWallpaper"](
+                    wallpaperEntity.asWallpaper(),
+                )
+            } returns (true to tempFile)
+
+            val result = worker.doWork()
+            assertThat(
+                result,
+                `is`(
+                    Result.success(
+                        workDataOf(
+                            SUCCESS_NEXT_WALLPAPER_ID to wallpaperEntity.wallhavenId,
+                        ),
+                    ),
+                ),
+            )
+            verify { worker["setWallpaper"](wallpaperEntity.asWallpaper()) }
+            val updatedHistory = autoWallpaperHistoryDao.getAll()
+            assertEquals(1, updatedHistory.count())
+        } finally {
+            testDataStore.clear()
+            tempFile.delete()
+        }
+    }
+
     private fun getWorker(
         dataStore: DataStore<Preferences>,
         appPreferencesRepository: AppPreferencesRepository = dataStore.appPreferencesRepository,
-        savedSearchDao: SavedSearchDao = TestSavedSearchDao(),
-        autoWallpaperHistoryDao: AutoWallpaperHistoryDao = TestAutoWallpaperHistoryDao(),
-        objectDetectionModelDao: ObjectDetectionModelDao = TestObjectDetectionModelDao(),
-        wallHavenNetwork: WallHavenNetworkDataSource = TestWallHavenNetworkDataSource(),
+        savedSearchDao: SavedSearchDao = FakeSavedSearchDao(),
+        autoWallpaperHistoryDao: AutoWallpaperHistoryDao = FakeAutoWallpaperHistoryDao(),
+        objectDetectionModelDao: ObjectDetectionModelDao = FakeObjectDetectionModelDao(),
+        wallHavenNetwork: WallHavenNetworkDataSource = FakeWallHavenNetworkDataSource(),
+        favoriteDao: FavoriteDao = FakeFavoriteDao(),
+        wallpapersDao: WallpapersDao = FakeWallpapersDao(),
     ): AutoWallpaperWorker {
         val workTaskExecutor = InstantWorkTaskExecutor()
         return AutoWallpaperWorker(
@@ -564,7 +604,7 @@ class AutoWallpaperTest {
                 TestProgressUpdater(),
                 TestForegroundUpdater(),
             ),
-            okHttpClient = testOkHttpClient,
+            okHttpClient = fakeOkHttpClient,
             appPreferencesRepository = appPreferencesRepository,
             savedSearchRepository = SavedSearchRepository(
                 savedSearchDao = savedSearchDao,
@@ -579,6 +619,11 @@ class AutoWallpaperTest {
                 ioDispatcher = testDispatcher,
             ),
             wallHavenNetwork = wallHavenNetwork,
+            favoritesRepository = FavoritesRepository(
+                favoriteDao = favoriteDao,
+                wallpapersDao = wallpapersDao,
+                ioDispatcher = testDispatcher,
+            ),
         ).run {
             spyk(this, recordPrivateCalls = true)
         }

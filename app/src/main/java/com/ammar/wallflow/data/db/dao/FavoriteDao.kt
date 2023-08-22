@@ -31,6 +31,9 @@ interface FavoriteDao {
         source: Source,
     ): FavoriteEntity?
 
+    @Query("SELECT * FROM favorites ORDER BY RANDOM() LIMIT 1")
+    suspend fun getRandom(): FavoriteEntity?
+
     @Insert
     suspend fun insertAll(favoriteEntities: Collection<FavoriteEntity>)
 

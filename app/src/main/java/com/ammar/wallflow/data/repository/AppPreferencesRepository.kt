@@ -94,6 +94,8 @@ class AppPreferencesRepository @Inject constructor(
             dataStore.edit {
                 with(autoWallpaperPreferences) {
                     it[PreferencesKeys.ENABLE_AUTO_WALLPAPER] = enabled
+                    it[PreferencesKeys.AUTO_WALLPAPER_SAVED_SEARCH_ENABLED] = savedSearchEnabled
+                    it[PreferencesKeys.AUTO_WALLPAPER_FAVORITES_ENABLED] = favoritesEnabled
                     it[PreferencesKeys.AUTO_WALLPAPER_SAVED_SEARCH_ID] = savedSearchId
                     it[PreferencesKeys.AUTO_WALLPAPER_USE_OBJECT_DETECTION] = useObjectDetection
                     it[PreferencesKeys.AUTO_WALLPAPER_FREQUENCY] = frequency.toString()
@@ -161,11 +163,19 @@ class AppPreferencesRepository @Inject constructor(
         },
         autoWallpaperPreferences = with(preferences) {
             val savedSearchId = get(PreferencesKeys.AUTO_WALLPAPER_SAVED_SEARCH_ID) ?: 0
+            val savedSearchEnabled = (
+                get(PreferencesKeys.AUTO_WALLPAPER_SAVED_SEARCH_ENABLED)
+                    ?: (savedSearchId > 0)
+                )
+            val favoritesEnabled = get(PreferencesKeys.AUTO_WALLPAPER_FAVORITES_ENABLED) ?: false
             AutoWallpaperPreferences(
                 enabled = when {
-                    savedSearchId <= 0 -> false
+                    !savedSearchEnabled && !favoritesEnabled -> false
+                    savedSearchEnabled && savedSearchId <= 0 -> false
                     else -> get(PreferencesKeys.ENABLE_AUTO_WALLPAPER) ?: false
                 },
+                savedSearchEnabled = savedSearchEnabled,
+                favoritesEnabled = favoritesEnabled,
                 savedSearchId = savedSearchId,
                 useObjectDetection = get(PreferencesKeys.AUTO_WALLPAPER_USE_OBJECT_DETECTION)
                     ?: true,

@@ -56,7 +56,6 @@ fun WallpaperInfoBottomSheet(
         }
     }
 
-
     ModalBottomSheet(
         modifier = modifier,
         onDismissRequest = onDismissRequest,
@@ -86,7 +85,6 @@ fun WallpaperInfoBottomSheet(
         )
     }
 }
-
 
 @Composable
 fun WallpaperInfoBottomSheetContent(

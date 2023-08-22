@@ -80,4 +80,14 @@ class FavoritesRepository @Inject constructor(
             ),
         )
     }
+
+    suspend fun getRandom() = withContext(ioDispatcher) {
+        val entity = favoriteDao.getRandom() ?: return@withContext null
+        when (entity.source) {
+            Source.WALLHAVEN -> {
+                val wallpaperEntity = wallpapersDao.getByWallhavenId(entity.sourceId)
+                wallpaperEntity?.asWallpaper()
+            }
+        }
+    }
 }

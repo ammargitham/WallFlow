@@ -1,14 +1,30 @@
+@file:UseSerializers(
+    DateTimePeriodSerializer::class,
+    ConstraintsSerializer::class,
+    UUIDSerializer::class,
+)
+
 package com.ammar.wallflow.data.preferences
 
 import androidx.annotation.IntRange
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.Saver
 import androidx.work.Constraints
 import androidx.work.NetworkType
 import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.SearchQuery
 import com.ammar.wallflow.model.Sorting
 import com.ammar.wallflow.model.TopRange
+import com.ammar.wallflow.model.serializers.ConstraintsSerializer
+import com.ammar.wallflow.model.serializers.DateTimePeriodSerializer
+import com.ammar.wallflow.model.serializers.UUIDSerializer
 import java.util.UUID
 import kotlinx.datetime.DateTimePeriod
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.UseSerializers
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 data class AppPreferences(
     val wallhavenApiKey: String = "",
@@ -42,8 +58,11 @@ internal val defaultAutoWallpaperConstraints = Constraints.Builder().apply {
     setRequiredNetworkType(NetworkType.CONNECTED)
 }.build()
 
+@Serializable
 data class AutoWallpaperPreferences(
     val enabled: Boolean = false,
+    val savedSearchEnabled: Boolean = false,
+    val favoritesEnabled: Boolean = false,
     val savedSearchId: Long = 0,
     val useObjectDetection: Boolean = true,
     val frequency: DateTimePeriod = defaultAutoWallpaperFreq,
@@ -51,6 +70,16 @@ data class AutoWallpaperPreferences(
     val showNotification: Boolean = false,
     val workRequestId: UUID? = null,
 )
+
+val MutableStateAutoWallpaperPreferencesSaver =
+    Saver<MutableState<AutoWallpaperPreferences>, String>(
+        save = {
+            Json.encodeToString<AutoWallpaperPreferences>(it.value)
+        },
+        restore = {
+            mutableStateOf(Json.decodeFromString<AutoWallpaperPreferences>(it))
+        },
+    )
 
 enum class Theme {
     SYSTEM,

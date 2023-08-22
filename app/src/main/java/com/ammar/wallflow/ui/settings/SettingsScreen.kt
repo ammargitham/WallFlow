@@ -2,6 +2,7 @@ package com.ammar.wallflow.ui.settings
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
@@ -57,6 +58,7 @@ import com.ammar.wallflow.ui.common.searchedit.EditSearchModalBottomSheet
 import com.ammar.wallflow.ui.common.searchedit.SavedSearchesDialog
 import com.ammar.wallflow.ui.destinations.LayoutSettingsScreenDestination
 import com.ammar.wallflow.ui.destinations.WallhavenApiKeyDialogDestination
+import com.ammar.wallflow.ui.settings.composables.AutoWallpaperSourceOptionsDialog
 import com.ammar.wallflow.ui.settings.composables.ConstraintOptionsDialog
 import com.ammar.wallflow.ui.settings.composables.DeleteSavedSearchConfirmDialog
 import com.ammar.wallflow.ui.settings.composables.EditSavedSearchBottomSheetHeader
@@ -66,7 +68,6 @@ import com.ammar.wallflow.ui.settings.composables.ObjectDetectionDelegateOptions
 import com.ammar.wallflow.ui.settings.composables.ObjectDetectionModelDeleteConfirmDialog
 import com.ammar.wallflow.ui.settings.composables.ObjectDetectionModelEditDialog
 import com.ammar.wallflow.ui.settings.composables.ObjectDetectionModelOptionsDialog
-import com.ammar.wallflow.ui.settings.composables.SavedSearchOptionsDialog
 import com.ammar.wallflow.ui.settings.composables.ThemeOptionsDialog
 import com.ammar.wallflow.ui.settings.composables.accountSection
 import com.ammar.wallflow.ui.settings.composables.autoWallpaperSection
@@ -175,22 +176,14 @@ fun SettingsScreen(
                 }
                 viewModel.updateAutoWallpaperPrefs(it)
             },
-            onAutoWallpaperSavedSearchClick = {
-                viewModel.showAutoWallpaperSavedSearchesDialog(
-                    true,
-                )
-            },
+            onAutoWallpaperSourcesClick = { viewModel.showAutoWallpaperSourcesDialog(true) },
             onAutoWallpaperFrequencyClick = { viewModel.showAutoWallpaperFrequencyDialog(true) },
             onAutoWallpaperConstraintsClick = {
-                viewModel.showAutoWallpaperConstraintsDialog(
-                    true,
-                )
+                viewModel.showAutoWallpaperConstraintsDialog(true)
             },
             onAutoWallpaperChangeNowClick = viewModel::autoWallpaperChangeNow,
             onAutoWallpaperNextRunInfoClick = {
-                viewModel.showAutoWallpaperNextRunInfoDialog(
-                    true,
-                )
+                viewModel.showAutoWallpaperNextRunInfoDialog(true)
             },
             onThemeClick = { viewModel.showThemeOptionsDialog(true) },
             onLayoutClick = { navController.navigate(LayoutSettingsScreenDestination) },
@@ -302,23 +295,17 @@ fun SettingsScreen(
         )
     }
 
-    if (uiState.showAutoWallpaperSavedSearchesDialog) {
-        SavedSearchOptionsDialog(
+    if (uiState.showAutoWallpaperSourcesDialog) {
+        AutoWallpaperSourceOptionsDialog(
             savedSearches = uiState.savedSearches,
-            selectedSavedSearchId = uiState.appPreferences.autoWallpaperPreferences.savedSearchId,
+            autoWallpaperPreferences = uiState.tempAutoWallpaperPreferences
+                ?: uiState.appPreferences.autoWallpaperPreferences,
             onSaveClick = {
-                val prefs = uiState.tempAutoWallpaperPreferences
-                    ?: uiState.appPreferences.autoWallpaperPreferences
-                viewModel.updateAutoWallpaperPrefs(
-                    prefs.copy(
-                        enabled = true,
-                        savedSearchId = it,
-                    ),
-                )
+                viewModel.updateAutoWallpaperPrefs(it)
                 viewModel.setTempAutoWallpaperPrefs(null)
-                viewModel.showAutoWallpaperSavedSearchesDialog(false)
+                viewModel.showAutoWallpaperSourcesDialog(false)
             },
-            onDismissRequest = { viewModel.showAutoWallpaperSavedSearchesDialog(false) },
+            onDismissRequest = { viewModel.showAutoWallpaperSourcesDialog(false) },
         )
     }
 
@@ -400,7 +387,7 @@ fun SettingsScreenContent(
     onObjectDetectionModelClick: () -> Unit = {},
     onManageSavedSearchesClick: () -> Unit = {},
     onAutoWallpaperPresChange: (AutoWallpaperPreferences) -> Unit = {},
-    onAutoWallpaperSavedSearchClick: () -> Unit = {},
+    onAutoWallpaperSourcesClick: () -> Unit = {},
     onAutoWallpaperFrequencyClick: () -> Unit = {},
     onAutoWallpaperConstraintsClick: () -> Unit = {},
     onAutoWallpaperChangeNowClick: () -> Unit = {},
@@ -408,6 +395,8 @@ fun SettingsScreenContent(
     onThemeClick: () -> Unit = {},
     onLayoutClick: () -> Unit = {},
 ) {
+    val context = LocalContext.current
+
     Box(modifier = modifier) {
         LazyColumn(
             modifier = Modifier.fillMaxWidth(),
@@ -445,7 +434,16 @@ fun SettingsScreenContent(
             if (hasSetWallpaperPermission) {
                 autoWallpaperSection(
                     enabled = appPreferences.autoWallpaperPreferences.enabled,
-                    savedSearchName = autoWallpaperSavedSearch?.name,
+                    sourcesSummary = getSourcesSummary(
+                        context = context,
+                        savedSearch = autoWallpaperSavedSearch,
+                        savedSearchEnabled = appPreferences
+                            .autoWallpaperPreferences
+                            .savedSearchEnabled,
+                        favoritesEnabled = appPreferences
+                            .autoWallpaperPreferences
+                            .favoritesEnabled,
+                    ),
                     useObjectDetection = appPreferences.autoWallpaperPreferences.useObjectDetection,
                     nextRun = autoWallpaperNextRun,
                     frequency = appPreferences.autoWallpaperPreferences.frequency,
@@ -458,7 +456,7 @@ fun SettingsScreenContent(
                             ),
                         )
                     },
-                    onSavedSearchClick = onAutoWallpaperSavedSearchClick,
+                    onSourcesClick = onAutoWallpaperSourcesClick,
                     onFrequencyClick = onAutoWallpaperFrequencyClick,
                     onUseObjectDetectionChange = {
                         onAutoWallpaperPresChange(
@@ -499,6 +497,20 @@ fun SettingsScreenContent(
         }
     }
 }
+
+private fun getSourcesSummary(
+    context: Context,
+    savedSearch: SavedSearch?,
+    savedSearchEnabled: Boolean,
+    favoritesEnabled: Boolean,
+) = mutableListOf<String>().apply {
+    if (savedSearchEnabled) {
+        add("${context.getString(R.string.saved_search)} (${savedSearch?.name ?: ""})")
+    }
+    if (favoritesEnabled) {
+        add(context.getString(R.string.favorites))
+    }
+}.joinToString(", ")
 
 @Preview
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)

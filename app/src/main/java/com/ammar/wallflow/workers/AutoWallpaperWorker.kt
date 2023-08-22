@@ -27,8 +27,10 @@ import com.ammar.wallflow.data.db.entity.toSavedSearch
 import com.ammar.wallflow.data.network.WallHavenNetworkDataSource
 import com.ammar.wallflow.data.network.model.asWallpaper
 import com.ammar.wallflow.data.preferences.AppPreferences
+import com.ammar.wallflow.data.preferences.AutoWallpaperPreferences
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.AutoWallpaperHistoryRepository
+import com.ammar.wallflow.data.repository.FavoritesRepository
 import com.ammar.wallflow.data.repository.ObjectDetectionModelRepository
 import com.ammar.wallflow.data.repository.SavedSearchRepository
 import com.ammar.wallflow.extensions.TAG
@@ -46,6 +48,7 @@ import com.ammar.wallflow.extensions.workManager
 import com.ammar.wallflow.model.AutoWallpaperHistory
 import com.ammar.wallflow.model.ObjectDetectionModel
 import com.ammar.wallflow.model.SearchQuery
+import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.toSearchQuery
 import com.ammar.wallflow.ui.common.permissions.checkNotificationPermission
@@ -77,11 +80,13 @@ class AutoWallpaperWorker @AssistedInject constructor(
     private val autoWallpaperHistoryRepository: AutoWallpaperHistoryRepository,
     private val objectDetectionModelRepository: ObjectDetectionModelRepository,
     private val wallHavenNetwork: WallHavenNetworkDataSource,
+    private val favoritesRepository: FavoritesRepository,
 ) : CoroutineWorker(
     context,
     params,
 ) {
     private lateinit var appPreferences: AppPreferences
+    private lateinit var autoWallpaperPreferences: AutoWallpaperPreferences
     private val notificationBuilder by lazy {
         NotificationCompat.Builder(context, NotificationChannels.AUTO_WALLPAPER_CHANNEL_ID).apply {
             setContentTitle(context.getString(R.string.auto_wallpaper))
@@ -94,6 +99,17 @@ class AutoWallpaperWorker @AssistedInject constructor(
     }
     private var prevPageNum: Int? = null
     private var cachedWallpapers = mutableListOf<Wallpaper>()
+    private val sourceChoices: Set<SourceChoice>
+        get() {
+            return mutableSetOf<SourceChoice>().apply {
+                if (autoWallpaperPreferences.savedSearchEnabled) {
+                    add(SourceChoice.SAVED_SEARCH)
+                }
+                if (autoWallpaperPreferences.favoritesEnabled) {
+                    add(SourceChoice.FAVORITES)
+                }
+            }.toSet()
+        }
 
     override suspend fun getForegroundInfo() = ForegroundInfo(
         AUTO_WALLPAPER_NOTIFICATION_ID,
@@ -110,22 +126,34 @@ class AutoWallpaperWorker @AssistedInject constructor(
                     FAILURE_REASON to FailureReason.APP_PREFS_NULL.name,
                 ),
             )
-        val savedSearchId = appPreferences.autoWallpaperPreferences.savedSearchId
-        if (!appPreferences.autoWallpaperPreferences.enabled) {
+        autoWallpaperPreferences = appPreferences.autoWallpaperPreferences
+        if (!autoWallpaperPreferences.enabled) {
             return Result.failure(
                 workDataOf(
                     FAILURE_REASON to FailureReason.DISABLED.name,
                 ),
             )
         }
-        val savedSearch = savedSearchRepository.getById(savedSearchId)?.toSavedSearch()
-            ?: return Result.failure(
+        if (
+            !autoWallpaperPreferences.savedSearchEnabled &&
+            !autoWallpaperPreferences.favoritesEnabled
+        ) {
+            return Result.failure(
+                workDataOf(
+                    FAILURE_REASON to FailureReason.NO_SOURCES_ENABLED.name,
+                ),
+            )
+        }
+        // check if saved search id is valid
+        if (autoWallpaperPreferences.savedSearchEnabled) {
+            val savedSearchId = autoWallpaperPreferences.savedSearchId
+            savedSearchRepository.getById(savedSearchId) ?: return Result.failure(
                 workDataOf(
                     FAILURE_REASON to FailureReason.SAVED_SEARCH_NOT_SET.name,
                 ),
             )
-        val searchQuery = savedSearch.search.toSearchQuery()
-        val (nextWallpaper, file) = setNextWallpaper(searchQuery)
+        }
+        val (nextWallpaper, file) = setNextWallpaper()
         if (nextWallpaper == null || file == null) {
             return Result.failure(
                 workDataOf(
@@ -133,7 +161,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
                 ),
             )
         }
-        if (appPreferences.autoWallpaperPreferences.showNotification) {
+        if (autoWallpaperPreferences.showNotification) {
             showSuccessNotification(nextWallpaper, file)
         }
         return Result.success(
@@ -143,17 +171,30 @@ class AutoWallpaperWorker @AssistedInject constructor(
         )
     }
 
-    private suspend fun setNextWallpaper(searchQuery: SearchQuery): Pair<Wallpaper?, File?> {
-        // get a fresh wallpaper, ignoring the history initially
-        val nextWallpaper = getNextWallpaper(searchQuery)
-            ?: getNextWallpaper(searchQuery, false)
-            ?: return null to null
+    private suspend fun setNextWallpaper(): Pair<Wallpaper?, File?> {
+        val sourceChoice = getNextSourceChoice()
+        val nextWallpaper: Wallpaper = when (sourceChoice) {
+            SourceChoice.SAVED_SEARCH -> {
+                val savedSearchId = autoWallpaperPreferences.savedSearchId
+                val savedSearch = savedSearchRepository.getById(savedSearchId)
+                val savedSearchQuery = savedSearch?.toSavedSearch()?.search?.toSearchQuery()
+                    ?: return null to null
+                // get a fresh wallpaper, ignoring the history initially
+                getNextWallpaper(savedSearchQuery)
+                    ?: getNextWallpaper(savedSearchQuery, false)
+                    ?: return null to null
+            }
+            SourceChoice.FAVORITES -> getNextFavoriteWallpaper()
+                ?: return null to null
+        }
         return try {
             val (applied, file) = setWallpaper(nextWallpaper)
             if (applied) {
                 autoWallpaperHistoryRepository.addOrUpdateHistory(
                     AutoWallpaperHistory(
-                        wallhavenId = nextWallpaper.id,
+                        sourceId = nextWallpaper.id,
+                        source = Source.WALLHAVEN,
+                        sourceChoice = sourceChoice,
                         setOn = Clock.System.now(),
                     ),
                 )
@@ -166,6 +207,8 @@ class AutoWallpaperWorker @AssistedInject constructor(
             return null to null
         }
     }
+
+    private fun getNextSourceChoice() = sourceChoices.random()
 
     private suspend fun setWallpaper(nextWallpaper: Wallpaper): Pair<Boolean, File?> {
         val wallpaperFile = safeDownloadWallpaper(nextWallpaper) ?: return false to null
@@ -309,7 +352,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
         excludeHistory: Boolean = true,
     ): Wallpaper? {
         val historyIds = if (excludeHistory) {
-            autoWallpaperHistoryRepository.getAll().map { it.wallhavenId }
+            autoWallpaperHistoryRepository.getAllBySource(Source.WALLHAVEN).map { it.sourceId }
         } else {
             emptyList()
         }
@@ -346,6 +389,8 @@ class AutoWallpaperWorker @AssistedInject constructor(
         }
         return null
     }
+
+    private suspend fun getNextFavoriteWallpaper() = favoritesRepository.getRandom()
 
     private suspend fun loadWallpapers(
         searchQuery: SearchQuery,
@@ -401,6 +446,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
         enum class FailureReason {
             APP_PREFS_NULL,
             DISABLED,
+            NO_SOURCES_ENABLED,
             SAVED_SEARCH_NOT_SET,
             NO_WALLPAPER_FOUND,
         }
@@ -481,12 +527,17 @@ class AutoWallpaperWorker @AssistedInject constructor(
             }
         }
 
+        enum class SourceChoice {
+            SAVED_SEARCH,
+            FAVORITES,
+        }
+
         class AutoWallpaperException(message: String? = null) : Exception(message ?: "")
 
         sealed class Status {
-            object Running : Status()
-            object Pending : Status()
-            object Success : Status()
+            data object Running : Status()
+            data object Pending : Status()
+            data object Success : Status()
             data class Failed(val e: Throwable? = null) : Status()
 
             fun isSuccessOrFail() = this is Success || this is Failed

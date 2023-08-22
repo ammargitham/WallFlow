@@ -350,14 +350,14 @@ private fun PreviewSubjectDetectionSection() {
 
 internal fun LazyListScope.autoWallpaperSection(
     enabled: Boolean = false,
-    savedSearchName: String? = null,
+    sourcesSummary: String? = null,
     useObjectDetection: Boolean = true,
     frequency: DateTimePeriod = defaultAutoWallpaperFreq,
     nextRun: NextRun = NextRun.NotScheduled,
     showNotification: Boolean = false,
     autoWallpaperStatus: AutoWallpaperWorker.Companion.Status? = null,
     onEnabledChange: (Boolean) -> Unit = {},
-    onSavedSearchClick: () -> Unit = {},
+    onSourcesClick: () -> Unit = {},
     onFrequencyClick: () -> Unit = {},
     onUseObjectDetectionChange: (Boolean) -> Unit = {},
     onConstraintsClick: () -> Unit = {},
@@ -421,18 +421,18 @@ internal fun LazyListScope.autoWallpaperSection(
         ListItem(
             modifier = Modifier.clickable(
                 enabled = enabled,
-                onClick = onSavedSearchClick,
+                onClick = onSourcesClick,
             ),
             headlineContent = {
                 Text(
-                    text = stringResource(R.string.search_to_use),
+                    text = stringResource(R.string.sources),
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
                 )
             },
-            supportingContent = if (savedSearchName?.isNotBlank() == true) {
+            supportingContent = if (sourcesSummary?.isNotBlank() == true) {
                 {
                     Text(
-                        text = savedSearchName,
+                        text = sourcesSummary,
                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = alpha),
                     )
                 }
@@ -600,6 +600,7 @@ private fun ChangeNowButton(
         },
         typeConverter = getPaddingValuesConverter(layoutDirection),
         animationSpec = remember { tween(delayMillis = 200) },
+        label = "contentPadding",
     )
     OutlinedButton(
         enabled = if (!enabled) {

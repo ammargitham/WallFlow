@@ -288,11 +288,14 @@ class SettingsViewModel @Inject constructor(
     }
 
     fun updateAutoWallpaperPrefs(autoWallpaperPreferences: AutoWallpaperPreferences) {
-        if (autoWallpaperPreferences.enabled && autoWallpaperPreferences.savedSearchId <= 0) {
+        if (autoWallpaperPreferences.enabled &&
+            !autoWallpaperPreferences.savedSearchEnabled &&
+            !autoWallpaperPreferences.favoritesEnabled
+        ) {
             localUiStateFlow.update {
                 it.copy(
                     tempAutoWallpaperPreferences = partial(autoWallpaperPreferences),
-                    showAutoWallpaperSavedSearchesDialog = partial(true),
+                    showAutoWallpaperSourcesDialog = partial(true),
                 )
             }
             return
@@ -326,8 +329,8 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    fun showAutoWallpaperSavedSearchesDialog(show: Boolean) = localUiStateFlow.update {
-        it.copy(showAutoWallpaperSavedSearchesDialog = partial(show))
+    fun showAutoWallpaperSourcesDialog(show: Boolean) = localUiStateFlow.update {
+        it.copy(showAutoWallpaperSourcesDialog = partial(show))
     }
 
     fun showAutoWallpaperFrequencyDialog(show: Boolean) = localUiStateFlow.update {
@@ -407,7 +410,7 @@ data class SettingsUiState(
     val editSavedSearch: SavedSearch? = null,
     val deleteSavedSearch: SavedSearch? = null,
     val autoWallpaperSavedSearch: SavedSearch? = null,
-    val showAutoWallpaperSavedSearchesDialog: Boolean = false,
+    val showAutoWallpaperSourcesDialog: Boolean = false,
     val showAutoWallpaperFrequencyDialog: Boolean = false,
     val showAutoWallpaperConstraintsDialog: Boolean = false,
     val showPermissionRationaleDialog: Boolean = false,
@@ -419,8 +422,8 @@ data class SettingsUiState(
 )
 
 sealed class NextRun {
-    object NotScheduled : NextRun()
-    object Running : NextRun()
+    data object NotScheduled : NextRun()
+    data object Running : NextRun()
 
     @Stable
     data class NextRunTime(val instant: Instant) : NextRun()

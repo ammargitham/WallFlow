@@ -1,8 +1,8 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 2,
-    "identityHash": "765342351ae4088aec4b501c7e488f4d",
+    "version": 3,
+    "identityHash": "6fcfb78746466eafc5bdb6780b5aad91",
     "entities": [
       {
         "tableName": "last_updated",
@@ -714,7 +714,7 @@
       },
       {
         "tableName": "auto_wallpaper_history",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `source_id` TEXT NOT NULL, `source` TEXT NOT NULL, `set_on` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `source_id` TEXT NOT NULL, `source` TEXT NOT NULL, `source_choice` TEXT NOT NULL DEFAULT 'SAVED_SEARCH', `set_on` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -733,6 +733,13 @@
             "columnName": "source",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "sourceChoice",
+            "columnName": "source_choice",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'SAVED_SEARCH'"
           },
           {
             "fieldPath": "setOn",
@@ -813,7 +820,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '765342351ae4088aec4b501c7e488f4d')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6fcfb78746466eafc5bdb6780b5aad91')"
     ]
   }
 }
