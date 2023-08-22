@@ -1,5 +1,6 @@
 package com.ammar.wallflow.data.db.database
 
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
@@ -50,6 +51,9 @@ import com.ammar.wallflow.data.db.entity.WallpaperTagsEntity
         FavoriteEntity::class,
     ],
     version = 3,
+    autoMigrations = [
+        AutoMigration(from = 2, to = 3),
+    ],
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
