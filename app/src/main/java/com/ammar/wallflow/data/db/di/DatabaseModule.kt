@@ -5,7 +5,6 @@ import android.util.Log
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.ammar.wallflow.BuildConfig
 import com.ammar.wallflow.IoDispatcher
 import com.ammar.wallflow.data.db.database.AppDatabase
 import com.ammar.wallflow.data.db.di.ManualMigrations.MIGRATION_1_2
@@ -79,9 +78,6 @@ class DatabaseModule {
             AppDatabase::class.java,
             "app",
         ).apply {
-            if (BuildConfig.DEBUG) {
-                fallbackToDestructiveMigration()
-            }
             addMigrations(
                 MIGRATION_1_2,
             )
