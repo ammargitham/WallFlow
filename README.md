@@ -8,6 +8,9 @@
     <a href="https://f-droid.org/packages/com.ammar.wallflow/">
       <img src="https://img.shields.io/f-droid/v/com.ammar.wallflow?style=for-the-badge&logo=fdroid&logoColor=%23b1eb0b&label=f-droid&labelColor=%23217ad3&color=%23217ad3" alt="F-Droid">
     </a>
+    <a href="https://github.com/ammargitham/WallFlow/actions/workflows/codeql.yml">
+      <img src="https://img.shields.io/github/actions/workflow/status/ammargitham/wallflow/codeql.yml?style=for-the-badge&label=CodeQL" alt="CodeQL" title="CodeQL">
+    </a>
   </div>
   <br/>
   <p>
