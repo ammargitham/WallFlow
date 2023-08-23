@@ -1,13 +1,17 @@
-A wallpaper app with beautiful wallpapers from wallhaven.cc (more sources to be added in the future). Designed with Material Design 3 and supports wide screen devices like tablets.
+Beautiful wallpapers from wallhaven.cc (more sources to be added in the future). Designed with Material Design 3 and supports wide screen devices like tablets.
 
 Features
 
 * Multi-pane layout for tablets and other wide screen devices
 * Auto wallpaper changer
 * Save searches and use them for auto wallpaper changer
+* Mark wallpapers as favorite and use them in auto wallpaper
 * Search history
 * Supports all filters provided by wallhaven.cc
 * Search results caching to reduce api calls
 * Options to tweak the wallpaper grid layout
 * Dynamic theme (Material You)
 * Supports multi-display environments (eg. when connected to external monitors)
+
+Anti-Features explained:
+- Non Free Network Service: The app relies on wallhaven.cc for wallpapers.

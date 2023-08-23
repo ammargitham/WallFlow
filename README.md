@@ -1,29 +1,46 @@
 <div align="center">
-  <img width="200" height="200" src="./.github/readme-images/icon.svg" alt="WallFlow" title="WallFlow">
+  <img width="200" height="200" src=".github/assets/icon.svg" alt="WallFlow" title="WallFlow">
   <h1>WallFlow</h1>
+  <div align="center">
+    <a href="https://github.com/ammargitham/WallFlow/releases/latest">
+      <img src="https://img.shields.io/github/v/release/ammargitham/wallflow.svg?style=for-the-badge&logo=GitHub&labelColor=black&label=Github&color=black" alt="Github">
+    </a>
+    <a href="https://f-droid.org/packages/com.ammar.wallflow/">
+      <img src="https://img.shields.io/f-droid/v/com.ammar.wallflow?style=for-the-badge&logo=fdroid&logoColor=%23b1eb0b&label=f-droid&labelColor=%23217ad3&color=%23217ad3" alt="F-Droid">
+    </a>
+  </div>
+  <br/>
   <p>
   A wallpaper app for Android with beautiful wallpapers from <a href="https://wallhaven.cc/">wallhaven.cc</a> (more sources to be added in the future). Designed with <a href="https://m3.material.io/">Material Design 3</a> and supports wide screen devices like tablets.
   </p>
 </div>
-
-[![PR's Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=flat)](http://makeapullrequest.com)
-
+<br/>
 <div align="center">
-  <img alt="devices" title="devices" src="./.github/readme-images/devices.png" width="500">
+  <img alt="devices" title="Devices" src=".github/assets/devices.png" width="500">
 </div>
+
+## Downloads
+
+[<img height="80" alt="Get it on GitHub" title="Get it on GitHub" src="./.github/assets/get-it-on-github.png" />](https://github.com/ammargitham/WallFlow/releases/latest)
+
+|                                                                                      Regular                                                                                       |    Plus     |
+|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:-----------:|
+| [<img height="80" alt="Get it on GitHub" title="Get it on GitHub" src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" />](https://f-droid.org/packages/com.ammar.wallflow/) | Coming Soon |
+
+\*[_What's the difference between Regular and Plus?_](#note)
 
 ## Screenshots
 
 <div align="center">
-  
-  | <img src="./.github/readme-images/phoneScreenshots/1.png" alt="Home Filters" width="150"> | <img src="./.github/readme-images/phoneScreenshots/2_dark.png" alt="Home Filters" width="150"> | <img src="./.github/readme-images/phoneScreenshots/3.png" alt="Wallpaper Info" width="150"> | <img src="./.github/readme-images/phoneScreenshots/4.png" alt="Search History" width="150"> |
-  | :---------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------: |
-  | <b>Home</b>                                                                               | <b>Filters</b>                                                                                 | <b>Wallpaper Info</b>                                                                       | <b>Search History</b>                                                                       |
 
-  | <img src="./.github/readme-images/phoneScreenshots/5.png" alt="Crop and Set Wallpaper" width="150"> | <img src="./.github/readme-images/phoneScreenshots/6.png" alt="Settings 1" width="150"><img src="./.github/readme-images/phoneScreenshots/7.png" alt="Settings 2" width="150"> |
-  | :-------------------------------------------------------------------------------------------------: | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-  | <b>Crop and Set Wallpaper</b>                                                                       | <b>Settings</b>                                                                                                                                                                |
-  
+| <img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" alt="Home" width="150"> | <img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/2_dark.png" alt="Filters" width="150"> | <img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" alt="Wallpaper Info" width="150"> | <img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/4.png" alt="Search History" width="150"> |
+|:--------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------:|
+|                                            <b>Home</b>                                             |                                               <b>Filters</b>                                               |                                            <b>Wallpaper Info</b>                                             |                                            <b>Search History</b>                                             |
+
+| <img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/5.png" alt="Crop and Set Wallpaper" width="150"> | <img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/6.png" alt="Settings 1" width="150">&nbsp;<img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/7.png" alt="Settings 2" width="150"> |
+|:--------------------------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+|                                            <b>Crop and Set Wallpaper</b>                                             |                                                                                                    <b>Settings</b>                                                                                                     |
+
 </div>
 
 ## Features
@@ -41,15 +58,17 @@
 - Supports multi-display environments (eg. when connected to external monitors)
 
 ### Note
+
 Two versions are provided (both free and open-source)
+
 - Regular version without the Object detection feature (smaller apk size).
 - Plus version with the Object detection feature. (Since Tensorflow adds around 8MB native libs to the apk size).
 
 **All other features are same in both versions.**
 
-
 ## Roadmap
-- [ ] Favorites
+
+- [x] Favorites
 - [ ] Local wallpapers
 - [ ] Auto wallpaper using combination of local wallpapers, favorites and saved search
 - [ ] Add more sources
@@ -59,6 +78,7 @@ Two versions are provided (both free and open-source)
 - [ ] Support Windows using [Kotlin multiplatform](https://kotlinlang.org/docs/multiplatform.html).
 
 ## Built using
+
 - [Jetpack Compose](https://developer.android.com/jetpack/compose/)
 - [Material Design 3 components for Compose](https://developer.android.com/jetpack/compose/designsystems/material3)
 - [Compose Destinations](https://composedestinations.rafaelcosta.xyz/)
@@ -75,10 +95,12 @@ Two versions are provided (both free and open-source)
 - [Tensorflow Lite](https://www.tensorflow.org/lite/)
 - [Cloudy](https://github.com/skydoves/Cloudy/)
 - [partial-kt](https://github.com/MateriiApps/partial-kt/)
+- [Ktlint](https://pinterest.github.io/ktlint/) using [Spotless](https://github.com/diffplug/spotless) plugin
 - [Mockk](https://mockk.io/)
 - Some more AndroidX libraries. Please see the [build.gradle](./app/build.gradle.kts) file.
 
 ## License
+
 ```
 WallFlow
 Copyright (C) 2023  Ammar Githam
