@@ -14,9 +14,23 @@ name: "CodeQL"
 on:
   push:
     branches: [ "main" ]
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.png'
+      - '**/*.svg'
+      - .github/assets
+      - .github/workflows
+      - fastlane
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ "main" ]
+    paths-ignore:
+      - '**/*.md'
+      - '**/*.png'
+      - '**/*.svg'
+      - .github/assets
+      - .github/workflows
+      - fastlane
   schedule:
     - cron: '17 13 * * 0'
 
