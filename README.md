@@ -50,7 +50,9 @@
 
 - Multi-pane layout for tablets and other wide screen devices
 - Auto wallpaper changer
-- Save searches and use them for auto wallpaper changer
+- Save searches
+- Favorite wallpapers
+- Use saved searches and favorites for auto wallpaper changer
 - Search history
 - Supports all filters provided by wallhaven.cc
 - [Optional] Smart wallpaper cropping using on-device object detection powered by [Tensorflow Lite](https://www.tensorflow.org/lite/). ([See note below](#note))
@@ -71,7 +73,6 @@ Two versions are provided (both free and open-source)
 
 ## Roadmap
 
-- [x] Favorites
 - [ ] Local wallpapers
 - [ ] Auto wallpaper using combination of local wallpapers, favorites and saved search
 - [ ] Add more sources

@@ -1,0 +1,9 @@
+What's Changed:
+- Add ability to favorite a wallpaper
+- Favorites as an auto wallpaper source
+- Add bottom navigation for phones and navigation rail for widescreen devices
+- Scroll top search bar on scrolling feed
+- Fix Home filter search query visible in top search bar
+- Update Kotlin to 1.9
+- Update targetSdk to 34
+- Refactored to use Accompanist's TwoPane for widescreen devices

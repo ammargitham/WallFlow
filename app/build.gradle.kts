@@ -25,8 +25,10 @@ kapt {
     correctErrorTypes = true
 }
 
-fun getAbi(): String? {
-    return if (hasProperty("abi")) property("abi").toString() else null
+fun getAbi() = if (hasProperty("abi")) {
+    property("abi").toString()
+} else {
+    null
 }
 
 android {
@@ -37,8 +39,8 @@ android {
         applicationId = "com.ammar.wallflow"
         minSdk = 23
         targetSdk = 34
-        versionCode = 2
-        versionName = "1.0.1"
+        versionCode = 3
+        versionName = "1.1.0"
 
         val abi = getAbi()
         ndk {
@@ -54,9 +56,7 @@ android {
             useSupportLibrary = true
         }
 
-        // Enable room auto-migrations
         ksp {
-            // arg("room.schemaLocation", "$projectDir/schemas")
             arg("room.generateKotlin", "true")
         }
     }
