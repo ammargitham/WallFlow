@@ -36,7 +36,6 @@ import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.TagSearchMeta
 import com.ammar.wallflow.model.UploaderSearchMeta
-import com.ammar.wallflow.ui.appCurrentDestinationAsState
 import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.SearchBar
 import com.ammar.wallflow.ui.common.bottombar.BottomBarDestination
@@ -45,10 +44,11 @@ import com.ammar.wallflow.ui.common.mainsearch.LocalMainSearchBarController
 import com.ammar.wallflow.ui.common.mainsearch.MainSearchBarController
 import com.ammar.wallflow.ui.common.searchedit.SaveAsDialog
 import com.ammar.wallflow.ui.common.searchedit.SavedSearchesDialog
-import com.ammar.wallflow.ui.destinations.HomeScreenDestination
-import com.ammar.wallflow.ui.destinations.WallhavenApiKeyDialogDestination
-import com.ammar.wallflow.ui.home.HomeScreenNavArgs
-import com.ammar.wallflow.ui.navArgs
+import com.ammar.wallflow.ui.screens.appCurrentDestinationAsState
+import com.ammar.wallflow.ui.screens.destinations.HomeScreenDestination
+import com.ammar.wallflow.ui.screens.destinations.WallhavenApiKeyDialogDestination
+import com.ammar.wallflow.ui.screens.home.HomeScreenNavArgs
+import com.ammar.wallflow.ui.screens.navArgs
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import com.ramcosta.composedestinations.navigation.navigate
 import dagger.hilt.android.AndroidEntryPoint

@@ -40,8 +40,8 @@ import com.ammar.wallflow.ui.common.bottombar.NavRail
 import com.ammar.wallflow.ui.common.globalerrors.GlobalErrorsColumn
 import com.ammar.wallflow.ui.common.mainsearch.MainSearchBar
 import com.ammar.wallflow.ui.common.topWindowInsets
-import com.ammar.wallflow.ui.destinations.TypedDestination
-import com.ammar.wallflow.ui.home.HomeScreenContent
+import com.ammar.wallflow.ui.screens.destinations.TypedDestination
+import com.ammar.wallflow.ui.screens.home.HomeScreenContent
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import kotlin.math.roundToInt
 import kotlinx.collections.immutable.toPersistentList

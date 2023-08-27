@@ -13,11 +13,11 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ammar.wallflow.ui.NavGraphs
 import com.ammar.wallflow.ui.animations.materialFadeThroughIn
 import com.ammar.wallflow.ui.animations.materialFadeThroughOut
 import com.ammar.wallflow.ui.common.getPaddingValuesConverter
-import com.ammar.wallflow.ui.destinations.HomeScreenDestination
+import com.ammar.wallflow.ui.screens.NavGraphs
+import com.ammar.wallflow.ui.screens.destinations.HomeScreenDestination
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.animations.defaults.RootNavGraphDefaultAnimations
 import com.ramcosta.composedestinations.navigation.dependency

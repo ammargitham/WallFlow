@@ -6,9 +6,9 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.ammar.wallflow.R
-import com.ammar.wallflow.ui.destinations.FavoritesScreenDestination
-import com.ammar.wallflow.ui.destinations.HomeScreenDestination
-import com.ammar.wallflow.ui.destinations.TypedDestination
+import com.ammar.wallflow.ui.screens.destinations.FavoritesScreenDestination
+import com.ammar.wallflow.ui.screens.destinations.HomeScreenDestination
+import com.ammar.wallflow.ui.screens.destinations.TypedDestination
 
 @Suppress("unused")
 enum class BottomBarDestination(

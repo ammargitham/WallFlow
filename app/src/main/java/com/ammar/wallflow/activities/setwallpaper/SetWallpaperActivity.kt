@@ -31,9 +31,9 @@ import com.ammar.wallflow.data.repository.ObjectDetectionModelRepository
 import com.ammar.wallflow.extensions.getParcelExtra
 import com.ammar.wallflow.extensions.toast
 import com.ammar.wallflow.ui.common.LocalSystemController
-import com.ammar.wallflow.ui.crop.CropScreen
-import com.ammar.wallflow.ui.crop.CropViewModel
-import com.ammar.wallflow.ui.crop.Result
+import com.ammar.wallflow.ui.screens.crop.CropScreen
+import com.ammar.wallflow.ui.screens.crop.CropViewModel
+import com.ammar.wallflow.ui.screens.crop.Result
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import com.ammar.wallflow.utils.DownloadManager
 import dagger.hilt.android.AndroidEntryPoint

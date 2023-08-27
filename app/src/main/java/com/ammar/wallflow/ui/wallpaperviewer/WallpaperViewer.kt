@@ -57,8 +57,8 @@ import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.ui.common.bottomWindowInsets
 import com.ammar.wallflow.ui.common.permissions.DownloadPermissionsRationalDialog
 import com.ammar.wallflow.ui.common.permissions.rememberDownloadPermissionsState
-import com.ammar.wallflow.ui.wallpaper.WallpaperActions
-import com.ammar.wallflow.ui.wallpaper.WallpaperInfoBottomSheet
+import com.ammar.wallflow.ui.screens.wallpaper.WallpaperActions
+import com.ammar.wallflow.ui.screens.wallpaper.WallpaperInfoBottomSheet
 import com.ammar.wallflow.utils.DownloadStatus
 import java.net.SocketTimeoutException
 import kotlin.math.roundToInt

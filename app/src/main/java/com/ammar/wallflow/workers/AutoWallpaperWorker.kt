@@ -52,9 +52,9 @@ import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.toSearchQuery
 import com.ammar.wallflow.ui.common.permissions.checkNotificationPermission
-import com.ammar.wallflow.ui.crop.getCropRect
-import com.ammar.wallflow.ui.crop.getMaxCropSize
-import com.ammar.wallflow.ui.wallpaper.getWallpaperScreenPendingIntent
+import com.ammar.wallflow.ui.screens.crop.getCropRect
+import com.ammar.wallflow.ui.screens.crop.getMaxCropSize
+import com.ammar.wallflow.ui.screens.wallpaper.getWallpaperScreenPendingIntent
 import com.ammar.wallflow.utils.NotificationChannels
 import com.ammar.wallflow.utils.NotificationIds.AUTO_WALLPAPER_NOTIFICATION_ID
 import com.ammar.wallflow.utils.NotificationIds.AUTO_WALLPAPER_SUCCESS_NOTIFICATION_ID

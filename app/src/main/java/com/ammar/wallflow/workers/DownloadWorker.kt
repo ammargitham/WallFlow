@@ -24,7 +24,7 @@ import com.ammar.wallflow.extensions.notificationManager
 import com.ammar.wallflow.extensions.workManager
 import com.ammar.wallflow.services.DownloadSuccessActionsService
 import com.ammar.wallflow.ui.common.permissions.checkNotificationPermission
-import com.ammar.wallflow.ui.wallpaper.getWallpaperScreenPendingIntent
+import com.ammar.wallflow.ui.screens.wallpaper.getWallpaperScreenPendingIntent
 import com.ammar.wallflow.utils.NotificationChannels.DOWNLOADS_CHANNEL_ID
 import com.ammar.wallflow.utils.decodeSampledBitmapFromFile
 import dagger.assisted.Assisted

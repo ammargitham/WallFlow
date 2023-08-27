@@ -11,7 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import com.ammar.wallflow.ui.destinations.TypedDestination
+import com.ammar.wallflow.ui.screens.destinations.TypedDestination
 
 @Composable
 fun BottomBar(
