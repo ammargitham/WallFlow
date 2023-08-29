@@ -371,6 +371,10 @@ class SettingsViewModel @Inject constructor(
         it.copy(showAutoWallpaperNextRunInfoDialog = partial(show))
     }
 
+    fun showAutoWallpaperSetToDialog(show: Boolean) = localUiStateFlow.update {
+        it.copy(showAutoWallpaperSetToDialog = partial(show))
+    }
+
     fun showThemeOptionsDialog(show: Boolean) = localUiStateFlow.update {
         it.copy(showThemeOptionsDialog = partial(show))
     }
@@ -419,6 +423,7 @@ data class SettingsUiState(
     val showAutoWallpaperNextRunInfoDialog: Boolean = false,
     val autoWallpaperStatus: AutoWallpaperWorker.Companion.Status? = null,
     val showThemeOptionsDialog: Boolean = false,
+    val showAutoWallpaperSetToDialog: Boolean = false,
 )
 
 sealed class NextRun {

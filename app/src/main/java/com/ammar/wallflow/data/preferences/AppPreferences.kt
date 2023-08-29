@@ -16,6 +16,7 @@ import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.SearchQuery
 import com.ammar.wallflow.model.Sorting
 import com.ammar.wallflow.model.TopRange
+import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.model.serializers.ConstraintsSerializer
 import com.ammar.wallflow.model.serializers.DateTimePeriodSerializer
 import com.ammar.wallflow.model.serializers.UUIDSerializer
@@ -69,6 +70,7 @@ data class AutoWallpaperPreferences(
     val constraints: Constraints = defaultAutoWallpaperConstraints,
     val showNotification: Boolean = false,
     val workRequestId: UUID? = null,
+    val targets: Set<WallpaperTarget> = setOf(WallpaperTarget.HOME, WallpaperTarget.LOCKSCREEN),
 )
 
 val MutableStateAutoWallpaperPreferencesSaver =

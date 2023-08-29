@@ -25,6 +25,7 @@ import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.SearchQuery
 import com.ammar.wallflow.model.Sorting
 import com.ammar.wallflow.model.TopRange
+import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.model.serializers.constraintTypeMapSerializer
 import com.ammar.wallflow.utils.objectdetection.objectsDetector
 import java.io.IOException
@@ -104,6 +105,9 @@ class AppPreferencesRepository @Inject constructor(
                         constraints.toConstraintTypeMap(),
                     )
                     it[PreferencesKeys.AUTO_WALLPAPER_SHOW_NOTIFICATION] = showNotification
+                    it[PreferencesKeys.AUTO_WALLPAPER_TARGETS] = targets.map {
+                        it.name
+                    }.toSet()
                 }
             }
         }
@@ -185,6 +189,16 @@ class AppPreferencesRepository @Inject constructor(
                     get(PreferencesKeys.AUTO_WALLPAPER_WORK_REQUEST_ID),
                 ),
                 showNotification = get(PreferencesKeys.AUTO_WALLPAPER_SHOW_NOTIFICATION) ?: false,
+                targets = get(PreferencesKeys.AUTO_WALLPAPER_TARGETS)?.map {
+                    try {
+                        WallpaperTarget.valueOf(it)
+                    } catch (e: Exception) {
+                        WallpaperTarget.HOME
+                    }
+                }?.toSortedSet() ?: setOf(
+                    WallpaperTarget.HOME,
+                    WallpaperTarget.LOCKSCREEN,
+                ),
             )
         },
         lookAndFeelPreferences = LookAndFeelPreferences(

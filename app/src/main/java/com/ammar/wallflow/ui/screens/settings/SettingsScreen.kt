@@ -58,6 +58,7 @@ import com.ammar.wallflow.ui.common.searchedit.EditSearchModalBottomSheet
 import com.ammar.wallflow.ui.common.searchedit.SavedSearchesDialog
 import com.ammar.wallflow.ui.screens.destinations.LayoutSettingsScreenDestination
 import com.ammar.wallflow.ui.screens.destinations.WallhavenApiKeyDialogDestination
+import com.ammar.wallflow.ui.screens.settings.composables.AutoWallpaperSetToDialog
 import com.ammar.wallflow.ui.screens.settings.composables.AutoWallpaperSourceOptionsDialog
 import com.ammar.wallflow.ui.screens.settings.composables.ConstraintOptionsDialog
 import com.ammar.wallflow.ui.screens.settings.composables.DeleteSavedSearchConfirmDialog
@@ -184,6 +185,9 @@ fun SettingsScreen(
             onAutoWallpaperChangeNowClick = viewModel::autoWallpaperChangeNow,
             onAutoWallpaperNextRunInfoClick = {
                 viewModel.showAutoWallpaperNextRunInfoDialog(true)
+            },
+            onAutoWallpaperSetToClick = {
+                viewModel.showAutoWallpaperSetToDialog(true)
             },
             onThemeClick = { viewModel.showThemeOptionsDialog(true) },
             onLayoutClick = { navController.navigate(LayoutSettingsScreenDestination) },
@@ -368,6 +372,19 @@ fun SettingsScreen(
             onDismissRequest = { viewModel.showThemeOptionsDialog(false) },
         )
     }
+
+    if (uiState.showAutoWallpaperSetToDialog) {
+        AutoWallpaperSetToDialog(
+            selectedTargets = uiState.appPreferences.autoWallpaperPreferences.targets,
+            onSaveClick = {
+                viewModel.updateAutoWallpaperPrefs(
+                    uiState.appPreferences.autoWallpaperPreferences.copy(targets = it),
+                )
+                viewModel.showAutoWallpaperSetToDialog(false)
+            },
+            onDismissRequest = { viewModel.showAutoWallpaperSetToDialog(false) },
+        )
+    }
 }
 
 @Composable
@@ -392,6 +409,7 @@ fun SettingsScreenContent(
     onAutoWallpaperConstraintsClick: () -> Unit = {},
     onAutoWallpaperChangeNowClick: () -> Unit = {},
     onAutoWallpaperNextRunInfoClick: () -> Unit = {},
+    onAutoWallpaperSetToClick: () -> Unit = {},
     onThemeClick: () -> Unit = {},
     onLayoutClick: () -> Unit = {},
 ) {
@@ -449,6 +467,7 @@ fun SettingsScreenContent(
                     frequency = appPreferences.autoWallpaperPreferences.frequency,
                     showNotification = appPreferences.autoWallpaperPreferences.showNotification,
                     autoWallpaperStatus = autoWallpaperStatus,
+                    targets = appPreferences.autoWallpaperPreferences.targets,
                     onEnabledChange = {
                         onAutoWallpaperPresChange(
                             appPreferences.autoWallpaperPreferences.copy(
@@ -475,6 +494,7 @@ fun SettingsScreenContent(
                             ),
                         )
                     },
+                    onSetToClick = onAutoWallpaperSetToClick,
                 )
             }
         }

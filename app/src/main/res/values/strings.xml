@@ -220,6 +220,7 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="wallhaven_cc">wallhaven.cc</string>
     <string name="saved_search">Saved search</string>
     <string name="no_options">No options</string>
+    <string name="set_to">Set to</string>
     <plurals name="every_x_hrs">
         <item quantity="one">Every %d hour</item>
         <item quantity="other">Every %d hours</item>

@@ -254,7 +254,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
             cropScale = 1f,
         )
         val display = context.displayManager.getDisplay(Display.DEFAULT_DISPLAY)
-        val applied = context.setWallpaper(display, uri, rect)
+        val applied = context.setWallpaper(display, uri, rect, autoWallpaperPreferences.targets)
         if (!applied) {
             return false to null
         }

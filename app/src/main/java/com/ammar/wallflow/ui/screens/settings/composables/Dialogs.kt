@@ -1,5 +1,6 @@
 package com.ammar.wallflow.ui.screens.settings.composables
 
+import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider as CPPP
 import android.content.res.Configuration
 import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
@@ -55,7 +56,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider as CPPP
 import androidx.compose.ui.unit.dp
 import androidx.work.Constraints
 import com.ammar.wallflow.DISABLED_ALPHA
@@ -75,6 +75,7 @@ import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.model.ConstraintType
 import com.ammar.wallflow.model.SavedSearch
 import com.ammar.wallflow.model.Search
+import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.ui.common.Dropdown
 import com.ammar.wallflow.ui.common.DropdownOption
 import com.ammar.wallflow.ui.common.NameState
@@ -137,7 +138,7 @@ private fun ObjectDetectionDelegateOptionsContent(
     onOptionClick: (delegate: ObjectDetectionDelegate) -> Unit = {},
 ) {
     Column(modifier = modifier) {
-        ObjectDetectionDelegate.values()
+        ObjectDetectionDelegate.entries
             .filter {
                 if (it != ObjectDetectionDelegate.NNAPI) {
                     true
@@ -1120,7 +1121,7 @@ private fun ThemeOptionsContent(
     onOptionClick: (Theme) -> Unit = {},
 ) {
     Column(modifier = modifier) {
-        Theme.values().map {
+        Theme.entries.map {
             ListItem(
                 modifier = Modifier
                     .clickable(onClick = { onOptionClick(it) })
@@ -1154,6 +1155,99 @@ private fun PreviewThemeOptionsDialog() {
     WallFlowTheme {
         Surface {
             ThemeOptionsDialog()
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AutoWallpaperSetToDialog(
+    modifier: Modifier = Modifier,
+    selectedTargets: Set<WallpaperTarget> = setOf(WallpaperTarget.HOME, WallpaperTarget.LOCKSCREEN),
+    onSaveClick: (Set<WallpaperTarget>) -> Unit = {},
+    onDismissRequest: () -> Unit = {},
+) {
+    var localSelectedTargets by remember(selectedTargets) {
+        mutableStateOf(selectedTargets)
+    }
+
+    fun toggleTarget(target: WallpaperTarget) {
+        localSelectedTargets = if (target in localSelectedTargets) {
+            localSelectedTargets - target
+        } else {
+            localSelectedTargets + target
+        }
+    }
+
+    fun addOrRemoveTarget(target: WallpaperTarget, add: Boolean = false) {
+        localSelectedTargets = if (add) {
+            localSelectedTargets + target
+        } else {
+            localSelectedTargets - target
+        }
+    }
+
+    AlertDialog(
+        modifier = modifier,
+        onDismissRequest = onDismissRequest,
+    ) {
+        UnpaddedAlertDialogContent(
+            title = { Text(text = stringResource(R.string.set_to)) },
+            text = {
+                Column {
+                    ListItem(
+                        modifier = Modifier
+                            .clickable { toggleTarget(WallpaperTarget.HOME) }
+                            .padding(horizontal = 8.dp),
+                        headlineContent = { Text(text = stringResource(R.string.home_screen)) },
+                        leadingContent = {
+                            Checkbox(
+                                modifier = Modifier.size(24.dp),
+                                checked = WallpaperTarget.HOME in localSelectedTargets,
+                                onCheckedChange = { addOrRemoveTarget(WallpaperTarget.HOME, it) },
+                            )
+                        },
+                    )
+                    ListItem(
+                        modifier = Modifier
+                            .clickable { toggleTarget(WallpaperTarget.LOCKSCREEN) }
+                            .padding(horizontal = 8.dp),
+                        headlineContent = { Text(text = stringResource(R.string.lock_screen)) },
+                        leadingContent = {
+                            Checkbox(
+                                modifier = Modifier.size(24.dp),
+                                checked = WallpaperTarget.LOCKSCREEN in localSelectedTargets,
+                                onCheckedChange = {
+                                    addOrRemoveTarget(WallpaperTarget.LOCKSCREEN, it)
+                                },
+                            )
+                        },
+                    )
+                }
+            },
+            buttons = {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    TextButton(onClick = onDismissRequest) {
+                        Text(text = stringResource(R.string.cancel))
+                    }
+                    TextButton(onClick = { onSaveClick(localSelectedTargets) }) {
+                        Text(text = stringResource(R.string.save))
+                    }
+                }
+            },
+        )
+    }
+}
+
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun PreviewAutoWallpaperSetToDialog() {
+    WallFlowTheme {
+        Surface {
+            AutoWallpaperSetToDialog()
         }
     }
 }

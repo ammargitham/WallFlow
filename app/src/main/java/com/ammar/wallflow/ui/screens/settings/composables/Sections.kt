@@ -1,6 +1,7 @@
 package com.ammar.wallflow.ui.screens.settings.composables
 
 import android.content.res.Configuration
+import android.os.Build
 import android.text.format.DateFormat
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateValueAsState
@@ -52,6 +53,7 @@ import com.ammar.wallflow.R
 import com.ammar.wallflow.data.preferences.ObjectDetectionDelegate
 import com.ammar.wallflow.data.preferences.defaultAutoWallpaperFreq
 import com.ammar.wallflow.model.ObjectDetectionModel
+import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.ui.common.ProgressIndicator
 import com.ammar.wallflow.ui.common.getPaddingValuesConverter
 import com.ammar.wallflow.ui.screens.settings.NextRun
@@ -356,6 +358,7 @@ internal fun LazyListScope.autoWallpaperSection(
     nextRun: NextRun = NextRun.NotScheduled,
     showNotification: Boolean = false,
     autoWallpaperStatus: AutoWallpaperWorker.Companion.Status? = null,
+    targets: Set<WallpaperTarget> = setOf(WallpaperTarget.HOME, WallpaperTarget.LOCKSCREEN),
     onEnabledChange: (Boolean) -> Unit = {},
     onSourcesClick: () -> Unit = {},
     onFrequencyClick: () -> Unit = {},
@@ -364,6 +367,7 @@ internal fun LazyListScope.autoWallpaperSection(
     onChangeNowClick: () -> Unit = {},
     onNextRunInfoClick: () -> Unit = {},
     onShowNotificationChange: (Boolean) -> Unit = {},
+    onSetToClick: () -> Unit = {},
 ) {
     val alpha = if (enabled) 1f else DISABLED_ALPHA
 
@@ -440,6 +444,33 @@ internal fun LazyListScope.autoWallpaperSection(
                 null
             },
         )
+    }
+    // Below N, there is no api to set wallpaper target
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        item {
+            ListItem(
+                modifier = Modifier.clickable(
+                    enabled = enabled,
+                    onClick = onSetToClick,
+                ),
+                headlineContent = {
+                    Text(
+                        text = stringResource(R.string.set_to),
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
+                    )
+                },
+                supportingContent = if (targets.isNotEmpty()) {
+                    {
+                        Text(
+                            text = getTargetsSummary(targets),
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = alpha),
+                        )
+                    }
+                } else {
+                    null
+                },
+            )
+        }
     }
     item {
         ListItem(
