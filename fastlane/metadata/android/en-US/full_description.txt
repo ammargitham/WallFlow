@@ -4,8 +4,9 @@ Features
 
 * Multi-pane layout for tablets and other wide screen devices
 * Auto wallpaper changer
-* Save searches and use them for auto wallpaper changer
-* Mark wallpapers as favorite and use them in auto wallpaper
+* Save searches
+* Mark wallpapers as favorite
+* Use saved searches and favorites in auto wallpaper
 * Search history
 * Supports all filters provided by wallhaven.cc
 * Search results caching to reduce api calls
