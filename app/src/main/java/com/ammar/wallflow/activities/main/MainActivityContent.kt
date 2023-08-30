@@ -22,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavDestination
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.ammar.wallflow.data.repository.GlobalErrorsRepository
@@ -40,7 +41,7 @@ import com.ammar.wallflow.ui.common.bottombar.NavRail
 import com.ammar.wallflow.ui.common.globalerrors.GlobalErrorsColumn
 import com.ammar.wallflow.ui.common.mainsearch.MainSearchBar
 import com.ammar.wallflow.ui.common.topWindowInsets
-import com.ammar.wallflow.ui.screens.destinations.TypedDestination
+import com.ammar.wallflow.ui.screens.NavGraph
 import com.ammar.wallflow.ui.screens.home.HomeScreenContent
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import kotlin.math.roundToInt
@@ -51,7 +52,7 @@ import kotlinx.datetime.Clock
 @Composable
 fun MainActivityContent(
     modifier: Modifier = Modifier,
-    currentDestination: TypedDestination<*>? = null,
+    currentDestination: NavDestination? = null,
     showBackButton: Boolean = false,
     useNavRail: Boolean = false,
     useDockedSearchBar: Boolean = false,
@@ -73,7 +74,7 @@ fun MainActivityContent(
     onFixWallHavenApiKeyClick: () -> Unit = {},
     onDismissGlobalError: (error: GlobalError) -> Unit = {},
     onBottomBarSizeChanged: (size: IntSize) -> Unit = {},
-    onBottomBarItemClick: (destination: TypedDestination<*>) -> Unit = {},
+    onBottomBarItemClick: (destination: NavGraph) -> Unit = {},
     onSearchBarActiveChange: (active: Boolean) -> Unit = {},
     onSearchBarQueryChange: (String) -> Unit = {},
     onSearchBarSearch: (query: String) -> Unit = {},

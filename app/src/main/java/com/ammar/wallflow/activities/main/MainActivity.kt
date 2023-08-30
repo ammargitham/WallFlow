@@ -44,13 +44,13 @@ import com.ammar.wallflow.ui.common.mainsearch.LocalMainSearchBarController
 import com.ammar.wallflow.ui.common.mainsearch.MainSearchBarController
 import com.ammar.wallflow.ui.common.searchedit.SaveAsDialog
 import com.ammar.wallflow.ui.common.searchedit.SavedSearchesDialog
-import com.ammar.wallflow.ui.screens.appCurrentDestinationAsState
 import com.ammar.wallflow.ui.screens.destinations.HomeScreenDestination
 import com.ammar.wallflow.ui.screens.destinations.WallhavenApiKeyDialogDestination
 import com.ammar.wallflow.ui.screens.home.HomeScreenNavArgs
 import com.ammar.wallflow.ui.screens.navArgs
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import com.ramcosta.composedestinations.navigation.navigate
+import com.ramcosta.composedestinations.utils.startDestination
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -69,17 +69,18 @@ class MainActivity : ComponentActivity() {
             val navController = rememberNavController()
             val viewModel: MainActivityViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-            val currentDestination by navController.appCurrentDestinationAsState()
             val currentBackStackEntry by navController.currentBackStackEntryAsState()
-            val rootDestinations = remember {
-                BottomBarDestination.values().map { it.direction.route }
-            }
-            val showBackButton = remember(currentBackStackEntry, rootDestinations) {
-                if (currentDestination is HomeScreenDestination) {
+            val currentDestination = currentBackStackEntry?.destination
+            val rootNavGraphs = remember { BottomBarDestination.entries.map { it.graph } }
+            val showBackButton = remember(currentBackStackEntry, rootNavGraphs) {
+                if (currentDestination == null) {
+                    return@remember false
+                }
+                if (currentDestination.route == HomeScreenDestination.route) {
                     val navArgs: HomeScreenNavArgs? = currentBackStackEntry?.navArgs()
                     return@remember navArgs?.search != null
                 }
-                currentDestination?.route !in rootDestinations
+                rootNavGraphs.none { it.startDestination.route == currentDestination.route }
             }
             val systemController = LocalSystemController.current
             val systemState by systemController.state
@@ -238,7 +239,7 @@ class MainActivity : ComponentActivity() {
                             bottomBarController.update { it.copy(size = size) }
                         },
                         onBottomBarItemClick = {
-                            navController.navigate(it.route) {
+                            navController.navigate(it) {
                                 popUpTo(navController.graph.findStartDestination().id) {
                                     saveState = true
                                 }

@@ -16,14 +16,11 @@ import androidx.navigation.NavHostController
 import com.ammar.wallflow.ui.animations.materialFadeThroughIn
 import com.ammar.wallflow.ui.animations.materialFadeThroughOut
 import com.ammar.wallflow.ui.common.getPaddingValuesConverter
-import com.ammar.wallflow.ui.screens.NavGraphs
-import com.ammar.wallflow.ui.screens.destinations.HomeScreenDestination
+import com.ammar.wallflow.ui.navigation.NavGraphs
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.animations.defaults.RootNavGraphDefaultAnimations
 import com.ramcosta.composedestinations.navigation.dependency
 import com.ramcosta.composedestinations.rememberNavHostEngine
-import com.ramcosta.composedestinations.spec.NavHostEngine
-import com.ramcosta.composedestinations.spec.Route
 
 @Composable
 fun MainNavigation(
@@ -47,31 +44,13 @@ fun MainNavigation(
         label = "hostPadding",
     )
 
-    Host(
+    DestinationsNavHost(
         modifier = modifier
             .fillMaxSize()
             .padding(hostPadding),
-        navHostEngine = navHostEngine,
-        startRoute = HomeScreenDestination,
-        navController = navController,
-        nestedScrollConnection = nestedScrollConnection,
-    )
-}
-
-@Composable
-private fun Host(
-    modifier: Modifier = Modifier,
-    navHostEngine: NavHostEngine,
-    startRoute: Route,
-    navController: NavHostController,
-    nestedScrollConnection: NestedScrollConnection,
-) {
-    DestinationsNavHost(
-        modifier = modifier,
         engine = navHostEngine,
         navController = navController,
         navGraph = NavGraphs.root,
-        startRoute = startRoute,
         dependenciesContainerBuilder = {
             dependency(nestedScrollConnection)
         },

@@ -11,6 +11,7 @@ val localProperties = Properties().apply {
 val abiCodes = mapOf("x86" to 1, "x86_64" to 2, "armeabi-v7a" to 3, "arm64-v8a" to 4)
 
 plugins {
+    alias(libs.plugins.about.libraries)
     alias(libs.plugins.android.application)
     alias(libs.plugins.hilt.gradle)
     alias(libs.plugins.kotlin.android)
@@ -58,6 +59,7 @@ android {
 
         ksp {
             arg("room.generateKotlin", "true")
+            arg("compose-destinations.generateNavGraphs", "false")
         }
     }
 
@@ -332,6 +334,9 @@ dependencies {
 
     // kotlinx collections immutable
     implementation(libs.kotlinx.collections.immutable)
+
+    // About libraries
+    implementation(libs.about.libraries.compose)
 
     // Local tests: jUnit, coroutines, Android runner
     testImplementation(libs.junit)

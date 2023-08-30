@@ -221,6 +221,8 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="saved_search">Saved search</string>
     <string name="no_options">No options</string>
     <string name="set_to">Set to</string>
+    <string name="version">Version</string>
+    <string name="open_source_licenses">Open source licenses</string>
     <plurals name="every_x_hrs">
         <item quantity="one">Every %d hour</item>
         <item quantity="other">Every %d hours</item>

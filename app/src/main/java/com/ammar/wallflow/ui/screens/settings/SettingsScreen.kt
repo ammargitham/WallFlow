@@ -44,6 +44,7 @@ import com.ammar.wallflow.data.preferences.ObjectDetectionPreferences
 import com.ammar.wallflow.model.ObjectDetectionModel
 import com.ammar.wallflow.model.SavedSearch
 import com.ammar.wallflow.model.SavedSearchSaver
+import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.TopBar
 import com.ammar.wallflow.ui.common.bottomWindowInsets
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
@@ -96,6 +97,8 @@ fun SettingsScreen(
     val searchBarController = LocalMainSearchBarController.current
     val bottomBarController = LocalBottomBarController.current
     val context = LocalContext.current
+    val systemController = LocalSystemController.current
+    val systemState by systemController.state
 
     val storagePerms = remember {
         StoragePermissions.getPermissions(
@@ -134,7 +137,10 @@ fun SettingsScreen(
 
     LaunchedEffect(Unit) {
         searchBarController.update { it.copy(visible = false) }
-        bottomBarController.update { it.copy(visible = false) }
+    }
+
+    LaunchedEffect(systemState.isExpanded) {
+        bottomBarController.update { it.copy(visible = systemState.isExpanded) }
     }
 
     Column(
@@ -142,16 +148,18 @@ fun SettingsScreen(
             .fillMaxSize()
             .windowInsetsPadding(bottomWindowInsets),
     ) {
-        TopBar(
-            navController = navController,
-            title = {
-                Text(
-                    text = stringResource(R.string.settings),
-                    maxLines = 1,
-                )
-            },
-            showBackButton = true,
-        )
+        if (!systemState.isExpanded) {
+            TopBar(
+                navController = navController,
+                title = {
+                    Text(
+                        text = stringResource(R.string.settings),
+                        maxLines = 1,
+                    )
+                },
+                showBackButton = true,
+            )
+        }
         SettingsScreenContent(
             appPreferences = uiState.appPreferences,
             model = uiState.selectedModel,

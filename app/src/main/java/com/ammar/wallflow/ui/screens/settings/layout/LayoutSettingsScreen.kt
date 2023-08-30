@@ -50,10 +50,14 @@ fun LayoutSettingsScreen(
     val searchBarController = LocalMainSearchBarController.current
     val bottomBarController = LocalBottomBarController.current
     val systemController = LocalSystemController.current
+    val systemState by systemController.state
 
     LaunchedEffect(Unit) {
         searchBarController.update { it.copy(visible = false) }
-        bottomBarController.update { it.copy(visible = false) }
+    }
+
+    LaunchedEffect(systemState.isExpanded) {
+        bottomBarController.update { it.copy(visible = systemState.isExpanded) }
     }
 
     Column(
@@ -72,7 +76,7 @@ fun LayoutSettingsScreen(
             showBackButton = true,
         )
         LayoutSettingsScreenContent(
-            supportsTwoPane = systemController.state.value.isExpanded,
+            supportsTwoPane = systemState.isExpanded,
             layoutPreferences = uiState.appPreferences.lookAndFeelPreferences.layoutPreferences,
             onLayoutPreferencesChange = viewModel::updatePreferences,
         )

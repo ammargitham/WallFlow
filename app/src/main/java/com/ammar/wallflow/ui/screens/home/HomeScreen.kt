@@ -27,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -36,7 +35,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.ammar.wallflow.R
 import com.ammar.wallflow.activities.setwallpaper.SetWallpaperActivity
 import com.ammar.wallflow.extensions.getFileNameFromUrl
 import com.ammar.wallflow.extensions.getUriForFile
@@ -44,7 +42,6 @@ import com.ammar.wallflow.extensions.parseMimeType
 import com.ammar.wallflow.extensions.rememberLazyStaggeredGridState
 import com.ammar.wallflow.extensions.search
 import com.ammar.wallflow.extensions.share
-import com.ammar.wallflow.model.MenuItem
 import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.SearchSaver
 import com.ammar.wallflow.model.Tag
@@ -62,11 +59,9 @@ import com.ammar.wallflow.ui.common.searchedit.EditSearchModalBottomSheet
 import com.ammar.wallflow.ui.common.searchedit.SaveAsDialog
 import com.ammar.wallflow.ui.common.searchedit.SavedSearchesDialog
 import com.ammar.wallflow.ui.common.topWindowInsets
-import com.ammar.wallflow.ui.screens.destinations.SettingsScreenDestination
 import com.ammar.wallflow.ui.screens.destinations.WallpaperScreenDestination
 import com.ammar.wallflow.ui.wallpaperviewer.WallpaperViewerViewModel
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.annotation.RootNavGraph
 import com.ramcosta.composedestinations.navigation.navigate
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.launch
@@ -75,7 +70,6 @@ import kotlinx.coroutines.launch
     ExperimentalMaterialApi::class,
     ExperimentalMaterial3Api::class,
 )
-@RootNavGraph(start = true)
 @Destination(
     navArgsDelegate = HomeScreenNavArgs::class,
 )
@@ -130,31 +124,10 @@ fun HomeScreen(
         bottomBarController.update { it.copy(visible = true) }
     }
 
-    LaunchedEffect(uiState.mainSearch, uiState.isHome) {
+    LaunchedEffect(uiState.mainSearch) {
         searchBarController.update {
             it.copy(
                 visible = true,
-                overflowIcon = if (uiState.isHome) {
-                    {
-                        SearchBarOverflowMenu(
-                            items = listOf(
-                                MenuItem(
-                                    text = stringResource(R.string.settings),
-                                    value = "settings",
-                                ),
-                            ),
-                            onItemClick = { item ->
-                                if (item.value == "settings") {
-                                    navController.navigate(SettingsScreenDestination) {
-                                        launchSingleTop = true
-                                    }
-                                }
-                            },
-                        )
-                    }
-                } else {
-                    null
-                },
                 search = uiState.mainSearch ?: MainSearchBar.Defaults.search,
             )
         }

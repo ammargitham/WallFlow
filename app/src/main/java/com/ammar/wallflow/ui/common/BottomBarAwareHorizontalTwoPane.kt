@@ -11,19 +11,23 @@ import com.google.accompanist.adaptive.FoldAwareConfiguration
 import com.google.accompanist.adaptive.HorizontalTwoPaneStrategy
 import com.google.accompanist.adaptive.TwoPane
 import com.google.accompanist.adaptive.calculateDisplayFeatures
+import kotlin.math.roundToInt
 
 @Composable
 fun BottomBarAwareHorizontalTwoPane(
     first: @Composable () -> Unit,
     second: @Composable () -> Unit,
     modifier: Modifier = Modifier,
+    splitFraction: Float = 0.5f,
 ) {
     val context = LocalContext.current
     val systemController = LocalSystemController.current
     val bottomBarController = LocalBottomBarController.current
     val systemState by systemController.state
     val bottomBarState by bottomBarController.state
-    val feedWidth = (systemState.size.width / 2 - bottomBarState.size.width).toDp()
+    val feedWidth = (
+        (systemState.size.width * splitFraction).roundToInt() - bottomBarState.size.width
+        ).toDp()
 
     TwoPane(
         modifier = modifier,

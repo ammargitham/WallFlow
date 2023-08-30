@@ -1,4 +1,5 @@
 [versions]
+aboutLibraries = "10.9.0-b01"
 accompanist = "0.33.0-alpha"
 androidGradlePlugin = "8.2.0-beta01"
 androidxActivity = "1.7.2"
@@ -49,6 +50,7 @@ tflite-gpu = "2.13.0"
 #zoomables = "1.4.0"
 
 [libraries]
+about-libraries-compose = { module = "com.mikepenz:aboutlibraries-compose", version.ref = "aboutLibraries" }
 accompanist-adaptive = { module = "com.google.accompanist:accompanist-adaptive", version.ref = "accompanist" }
 #accompanist-permission = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
 accompanist-placeholder-material = { module = "com.google.accompanist:accompanist-placeholder-material", version.ref = "accompanist" }
@@ -119,6 +121,7 @@ tflite-gpu-delegate-plugin = { module = "org.tensorflow:tensorflow-lite-gpu-dele
 tflite-task-vision = { module = "org.tensorflow:tensorflow-lite-task-vision", version.ref = "tflite" }
 
 [plugins]
+about-libraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutLibraries" }
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 #android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 hilt-gradle = { id = "com.google.dagger.hilt.android", version.ref = "daggerHilt" }

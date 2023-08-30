@@ -1,21 +1,18 @@
 package com.ammar.wallflow.ui.common.bottombar
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.ui.graphics.vector.ImageVector
 import com.ammar.wallflow.R
-import com.ammar.wallflow.ui.screens.destinations.FavoritesScreenDestination
-import com.ammar.wallflow.ui.screens.destinations.HomeScreenDestination
-import com.ammar.wallflow.ui.screens.destinations.TypedDestination
+import com.ammar.wallflow.ui.navigation.NavGraphs
+import com.ammar.wallflow.ui.screens.NavGraph
 
 @Suppress("unused")
 enum class BottomBarDestination(
-    val direction: TypedDestination<*>,
-    val icon: ImageVector,
+    val graph: NavGraph,
+    @DrawableRes val icon: Int,
     @StringRes val label: Int,
 ) {
-    Home(HomeScreenDestination, Icons.Default.Home, R.string.home),
-    Favorites(FavoritesScreenDestination, Icons.Default.Favorite, R.string.favorites),
+    Home(NavGraphs.home, R.drawable.baseline_home_24, R.string.home),
+    Favorites(NavGraphs.favorites, R.drawable.baseline_favorite_24, R.string.favorites),
+    More(NavGraphs.more, R.drawable.baseline_more_horiz_24, R.string.more),
 }
