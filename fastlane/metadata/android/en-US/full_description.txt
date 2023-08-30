@@ -12,6 +12,3 @@ Features
 * Options to tweak the wallpaper grid layout
 * Dynamic theme (Material You)
 * Supports multi-display environments (eg. when connected to external monitors)
-
-Anti-Features explained:
-- Non Free Network Service: The app relies on wallhaven.cc for wallpapers.
