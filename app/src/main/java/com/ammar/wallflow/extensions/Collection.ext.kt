@@ -8,3 +8,6 @@ fun <E> List<E>.randomList(size: Int): List<E> = this.asSequence()
 fun Map<String, String>.toQueryString(): String = this.entries.joinToString("&") { (k, v) ->
     "${k.urlEncoded()}=${v.urlEncoded()}"
 }
+
+fun <K, V> Map<K, V?>.filterNotNullValues(): Map<K, V> =
+    mapNotNull { (key, value) -> value?.let { key to it } }.toMap()
