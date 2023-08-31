@@ -9,6 +9,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.PermanentDrawerSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -37,7 +38,7 @@ fun MoreListContainer(
                 is MoreListItem.Clickable -> {
                     if (isExpanded) {
                         NavigationDrawerItem(
-                            modifier = Modifier.padding(horizontal = 12.dp),
+                            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
                             icon = item.icon?.let {
                                 {
                                     Icon(
@@ -67,7 +68,10 @@ fun MoreListContainer(
                 }
                 is MoreListItem.Content -> item.content()
                 MoreListItem.Divider -> HorizontalDivider(
-                    modifier = Modifier.padding(vertical = 4.dp),
+                    modifier = Modifier.padding(
+                        vertical = 8.dp,
+                        horizontal = 28.dp,
+                    ),
                 )
                 is MoreListItem.Static -> ListItem(
                     modifier = Modifier.padding(
