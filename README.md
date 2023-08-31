@@ -26,9 +26,10 @@
 
 [<img height="80" alt="Get it on GitHub" title="Get it on GitHub" src="./.github/assets/get-it-on-github.png" />](https://github.com/ammargitham/WallFlow/releases/latest)
 
-|                                                                                      Regular                                                                                       |    Plus     |
-|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:-----------:|
-| [<img height="80" alt="Get it on GitHub" title="Get it on GitHub" src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" />](https://f-droid.org/packages/com.ammar.wallflow/) | Coming Soon |
+|                                                                                                           Regular                                                                                                           |    Plus     |
+|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:-----------:|
+|                     [<img height="80" alt="Get it on GitHub" title="Get it on GitHub" src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" />](https://f-droid.org/packages/com.ammar.wallflow/)                      | Coming Soon |
+| [<img height="80" alt="Get it on IzzyOnDroid" title="Get it on IzzyOnDroid" src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png" />](https://apt.izzysoft.de/fdroid/index/apk/com.ammar.wallflow/) | Coming Soon |
 
 \*[_What's the difference between Regular and Plus?_](#note)
 
