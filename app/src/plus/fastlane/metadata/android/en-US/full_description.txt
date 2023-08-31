@@ -1,14 +1,16 @@
-A wallpaper app with beautiful wallpapers from wallhaven.cc (more sources to be added in the future). Designed with Material Design 3 and supports wide screen devices like tablets.
+Beautiful wallpapers from wallhaven.cc (more sources to be added in the future). Designed with Material Design 3 and supports wide screen devices like tablets.
 
 Features
 
+* Smart wallpaper cropping using on-device object detection powered by Tensorflow Lite.
+  * Supports adding your own TFLite models. You can find more models on Tensorflow Hub.
 * Multi-pane layout for tablets and other wide screen devices
 * Auto wallpaper changer
-* Save searches and use them for auto wallpaper changer
+* Save searches
+* Mark wallpapers as favorite
+* Use saved searches and favorites in auto wallpaper
 * Search history
 * Supports all filters provided by wallhaven.cc
-* Smart wallpaper cropping using on-device object detection powered by Tensorflow Lite.
-  * Supports adding your own TFLite models. You can find more models here.
 * Search results caching to reduce api calls
 * Options to tweak the wallpaper grid layout
 * Dynamic theme (Material You)

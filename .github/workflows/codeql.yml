@@ -20,7 +20,7 @@ on:
       - '**/*.svg'
       - '.github/assets/**'
       - '.github/workflows/**'
-      - 'fastlane/**'
+      - '**/fastlane/metadata/**'
   pull_request:
     # The branches below must be a subset of the branches above
     branches: [ "main" ]
@@ -30,7 +30,7 @@ on:
       - '**/*.svg'
       - '.github/assets/**'
       - '.github/workflows/**'
-      - 'fastlane/**'
+      - '**/fastlane/metadata/**'
   schedule:
     - cron: '17 13 * * 0'
 
