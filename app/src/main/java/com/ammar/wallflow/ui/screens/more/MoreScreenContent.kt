@@ -29,7 +29,7 @@ internal fun MoreScreenContent(
     activeOption: ActiveOption? = null,
     detailContent: @Composable () -> Unit = {},
     onSettingsClick: () -> Unit = {},
-    onOpenSourceLicensesClick: () -> Unit = {},
+    // onOpenSourceLicensesClick: () -> Unit = {},
 ) {
     MoreScreenContent(
         modifier = modifier,
@@ -40,7 +40,7 @@ internal fun MoreScreenContent(
                 isExpanded = isExpanded,
                 activeOption = activeOption,
                 onSettingsClick = onSettingsClick,
-                onOpenSourceLicensesClick = onOpenSourceLicensesClick,
+                // onOpenSourceLicensesClick = onOpenSourceLicensesClick,
             )
         },
         detailContent = detailContent,
@@ -85,7 +85,7 @@ private fun MoreList(
     isExpanded: Boolean = false,
     activeOption: ActiveOption? = null,
     onSettingsClick: () -> Unit = {},
-    onOpenSourceLicensesClick: () -> Unit = {},
+    // onOpenSourceLicensesClick: () -> Unit = {},
 ) {
     val context = LocalContext.current
 
@@ -107,10 +107,10 @@ private fun MoreList(
                 value = ActiveOption.SETTINGS.name,
             ),
             MoreListItem.Divider,
-            MoreListItem.Clickable(
-                label = context.getString(R.string.open_source_licenses),
-                value = ActiveOption.OSL.name,
-            ),
+            // MoreListItem.Clickable(
+            //     label = context.getString(R.string.open_source_licenses),
+            //     value = ActiveOption.OSL.name,
+            // ),
             MoreListItem.Static(
                 label = context.getString(R.string.version),
                 supportingText = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
@@ -126,7 +126,7 @@ private fun MoreList(
         onItemClick = {
             when (it.value) {
                 ActiveOption.SETTINGS.name -> onSettingsClick()
-                ActiveOption.OSL.name -> onOpenSourceLicensesClick()
+                // ActiveOption.OSL.name -> onOpenSourceLicensesClick()
                 else -> {}
             }
         },

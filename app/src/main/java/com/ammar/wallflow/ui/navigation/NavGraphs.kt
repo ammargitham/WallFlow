@@ -5,7 +5,6 @@ import com.ammar.wallflow.ui.screens.destinations.FavoritesScreenDestination
 import com.ammar.wallflow.ui.screens.destinations.HomeScreenDestination
 import com.ammar.wallflow.ui.screens.destinations.LayoutSettingsScreenDestination
 import com.ammar.wallflow.ui.screens.destinations.MoreScreenDestination
-import com.ammar.wallflow.ui.screens.destinations.OSLibrariesScreenDestination
 import com.ammar.wallflow.ui.screens.destinations.SettingsScreenDestination
 import com.ammar.wallflow.ui.screens.destinations.WallhavenApiKeyDialogDestination
 import com.ammar.wallflow.ui.screens.destinations.WallpaperScreenDestination
@@ -38,13 +37,13 @@ object NavGraphs {
         ),
     )
 
-    val openSourceLicenses: NavGraph = NavGraph(
-        route = "open_source_licenses",
-        startRoute = OSLibrariesScreenDestination,
-        destinations = listOf(
-            OSLibrariesScreenDestination,
-        ),
-    )
+    // val openSourceLicenses: NavGraph = NavGraph(
+    //     route = "open_source_licenses",
+    //     startRoute = OSLibrariesScreenDestination,
+    //     destinations = listOf(
+    //         OSLibrariesScreenDestination,
+    //     ),
+    // )
 
     val more: NavGraph = NavGraph(
         route = "more",
@@ -54,7 +53,7 @@ object NavGraphs {
         ),
         nestedNavGraphs = listOf(
             settings,
-            openSourceLicenses,
+            // openSourceLicenses,
         ),
     )
 
@@ -64,7 +63,7 @@ object NavGraphs {
         destinations = emptyList(),
         nestedNavGraphs = listOf(
             settings,
-            openSourceLicenses,
+            // openSourceLicenses,
         ),
     )
 

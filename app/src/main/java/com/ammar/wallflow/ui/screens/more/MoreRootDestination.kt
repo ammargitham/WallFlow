@@ -5,7 +5,7 @@ import com.ammar.wallflow.ui.screens.NavGraph
 
 internal enum class ActiveOption {
     SETTINGS,
-    OSL,
+    // OSL,
 }
 
 @Suppress("unused")
@@ -14,5 +14,5 @@ internal enum class MoreRootDestination(
     val activeOption: ActiveOption,
 ) {
     Settings(NavGraphs.settings, ActiveOption.SETTINGS),
-    OpenSourceLicenses(NavGraphs.openSourceLicenses, ActiveOption.OSL),
+    // OpenSourceLicenses(NavGraphs.openSourceLicenses, ActiveOption.OSL),
 }

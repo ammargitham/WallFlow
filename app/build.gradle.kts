@@ -336,7 +336,7 @@ dependencies {
     implementation(libs.kotlinx.collections.immutable)
 
     // About libraries
-    implementation(libs.about.libraries.core)
+    // implementation(libs.about.libraries.core)
 
     // Local tests: jUnit, coroutines, Android runner
     testImplementation(libs.junit)

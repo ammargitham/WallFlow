@@ -70,7 +70,7 @@ fun MoreListContainer(
                 MoreListItem.Divider -> HorizontalDivider(
                     modifier = Modifier.padding(
                         vertical = 8.dp,
-                        horizontal = 28.dp,
+                        horizontal = if (isExpanded) 28.dp else 0.dp,
                     ),
                 )
                 is MoreListItem.Static -> ListItem(

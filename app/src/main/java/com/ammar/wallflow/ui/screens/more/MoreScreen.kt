@@ -128,13 +128,13 @@ fun MoreScreen(
                 navController.navigate(NavGraphs.settings)
             }
         },
-        onOpenSourceLicensesClick = {
-            if (systemState.isExpanded) {
-                detailNavController.navigateOrPop(NavGraphs.openSourceLicenses)
-            } else {
-                navController.navigate(NavGraphs.openSourceLicenses)
-            }
-        },
+        // onOpenSourceLicensesClick = {
+        //     if (systemState.isExpanded) {
+        //         detailNavController.navigateOrPop(NavGraphs.openSourceLicenses)
+        //     } else {
+        //         navController.navigate(NavGraphs.openSourceLicenses)
+        //     }
+        // },
     )
 
     BackHandler(
