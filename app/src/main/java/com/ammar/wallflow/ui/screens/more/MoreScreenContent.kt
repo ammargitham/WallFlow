@@ -113,7 +113,7 @@ private fun MoreList(
             // ),
             MoreListItem.Static(
                 label = context.getString(R.string.version),
-                supportingText = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})",
+                supportingText = BuildConfig.VERSION_NAME,
             ),
         )
     }
