@@ -1,3 +1,0 @@
-Bug Fixes:
-
-- Fix search input not editable

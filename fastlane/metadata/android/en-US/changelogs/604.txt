@@ -1,9 +1,5 @@
-What's New:
+What's changed since v1.1.0:
 * Add wallpaper target preference to auto wallpaper
 * Added new bottom nav destination for settings and other info
-
-Bug Fixes:
 * Fix download not triggering storage permission dialog on lower API levels
-
-Other:
 * Update Kotlin to 1.9.10
