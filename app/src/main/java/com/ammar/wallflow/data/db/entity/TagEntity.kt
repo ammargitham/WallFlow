@@ -6,7 +6,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.model.Purity
-import com.ammar.wallflow.model.Tag
+import com.ammar.wallflow.model.WallhavenTag
 import kotlinx.datetime.Instant
 
 @Entity(
@@ -29,7 +29,7 @@ data class TagEntity(
     @ColumnInfo(name = "created_at") val createdAt: Instant,
 )
 
-fun TagEntity.asTag() = Tag(
+fun TagEntity.asTag() = WallhavenTag(
     id = wallhavenId,
     name = name,
     alias = alias.split(",").map { it.trimAll() },

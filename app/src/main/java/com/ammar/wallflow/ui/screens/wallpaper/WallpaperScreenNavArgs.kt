@@ -7,7 +7,7 @@ import androidx.core.app.TaskStackBuilder
 import androidx.core.net.toUri
 import com.ammar.wallflow.LOCAL_DEEPLINK_SCHEME
 import com.ammar.wallflow.activities.main.MainActivity
-import com.ammar.wallflow.model.Wallpaper
+import com.ammar.wallflow.model.WallhavenWallpaper
 import kotlin.random.Random
 
 const val wallpaperScreenLocalHost = "w"
@@ -16,16 +16,16 @@ const val wallpaperScreenLocalDeepLinkUriPattern =
 const val wallpaperScreenExternalDeepLinkUriPattern = "https://wallhaven.cc/w/{wallpaperId}"
 const val wallpaperScreenExternalShortDeepLinkUriPattern = "https://whvn.cc/{wallpaperId}"
 
-fun getWallpaperScreenLocalDeepLink(wallpaper: Wallpaper) =
-    getWallpaperScreenLocalDeepLink(wallpaper.id)
+fun getWallpaperScreenLocalDeepLink(wallhavenWallpaper: WallhavenWallpaper) =
+    getWallpaperScreenLocalDeepLink(wallhavenWallpaper.id)
 
 fun getWallpaperScreenLocalDeepLink(wallpaperId: String) =
     "$LOCAL_DEEPLINK_SCHEME://$wallpaperScreenLocalHost/$wallpaperId"
 
 fun getWallpaperScreenPendingIntent(
     context: Context,
-    wallpaper: Wallpaper,
-) = getWallpaperScreenPendingIntent(context, wallpaper.id)
+    wallhavenWallpaper: WallhavenWallpaper,
+) = getWallpaperScreenPendingIntent(context, wallhavenWallpaper.id)
 
 fun getWallpaperScreenPendingIntent(
     context: Context,

@@ -56,10 +56,10 @@ import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameter
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.R
-import com.ammar.wallflow.model.Avatar
 import com.ammar.wallflow.model.Purity
-import com.ammar.wallflow.model.Tag
-import com.ammar.wallflow.model.Uploader
+import com.ammar.wallflow.model.WallhavenAvatar
+import com.ammar.wallflow.model.WallhavenTag
+import com.ammar.wallflow.model.WallhavenUploader
 import com.ammar.wallflow.ui.common.ProgressIndicator
 import com.ammar.wallflow.ui.common.TagChip
 import com.ammar.wallflow.ui.common.UploaderChip
@@ -424,8 +424,8 @@ private fun PreviewPropertyRow() {
 @Composable
 fun TagsRow(
     modifier: Modifier = Modifier,
-    tags: List<Tag>,
-    onTagClick: (tag: Tag) -> Unit = {},
+    wallhavenTags: List<WallhavenTag>,
+    onTagClick: (wallhavenTag: WallhavenTag) -> Unit = {},
 ) {
     FlowRow(
         modifier = modifier,
@@ -434,9 +434,9 @@ fun TagsRow(
             alignment = Alignment.CenterHorizontally,
         ),
     ) {
-        tags.map {
+        wallhavenTags.map {
             TagChip(
-                tag = it,
+                wallhavenTag = it,
                 onClick = { onTagClick(it) },
             )
         }
@@ -450,8 +450,8 @@ private fun PreviewTagsRow() {
     WallFlowTheme {
         Surface {
             TagsRow(
-                tags = listOf(
-                    Tag(
+                wallhavenTags = listOf(
+                    WallhavenTag(
                         id = 1,
                         name = "tag1",
                         alias = listOf("tag1"),
@@ -460,7 +460,7 @@ private fun PreviewTagsRow() {
                         purity = Purity.SFW,
                         createdAt = Clock.System.now(),
                     ),
-                    Tag(
+                    WallhavenTag(
                         id = 2,
                         name = "tag2",
                         alias = listOf("tag2"),
@@ -469,7 +469,7 @@ private fun PreviewTagsRow() {
                         purity = Purity.SFW,
                         createdAt = Clock.System.now(),
                     ),
-                    Tag(
+                    WallhavenTag(
                         id = 3,
                         name = "tag3",
                         alias = listOf("tag3"),
@@ -478,7 +478,7 @@ private fun PreviewTagsRow() {
                         purity = Purity.SFW,
                         createdAt = Clock.System.now(),
                     ),
-                    Tag(
+                    WallhavenTag(
                         id = 4,
                         name = "tag4",
                         alias = listOf("tag4"),
@@ -553,7 +553,7 @@ private fun PreviewColorsRow() {
 @Composable
 fun UploaderRow(
     modifier: Modifier = Modifier,
-    uploader: Uploader,
+    wallhavenUploader: WallhavenUploader,
     onClick: () -> Unit = {},
 ) {
     Row(modifier = modifier.fillMaxWidth()) {
@@ -569,7 +569,7 @@ fun UploaderRow(
             modifier = Modifier.weight(3f),
         ) {
             UploaderChip(
-                uploader = uploader,
+                wallhavenUploader = wallhavenUploader,
                 onClick = onClick,
             )
         }
@@ -583,10 +583,10 @@ private fun PreviewUploaderRow() {
     WallFlowTheme {
         Surface {
             UploaderRow(
-                uploader = Uploader(
+                wallhavenUploader = WallhavenUploader(
                     username = "test",
                     group = "",
-                    avatar = Avatar(
+                    avatar = WallhavenAvatar(
                         large = "",
                         medium = "",
                         small = "",

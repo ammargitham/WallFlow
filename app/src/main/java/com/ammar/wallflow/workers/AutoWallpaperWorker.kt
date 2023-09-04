@@ -24,8 +24,8 @@ import androidx.work.workDataOf
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.db.entity.toModel
 import com.ammar.wallflow.data.db.entity.toSavedSearch
-import com.ammar.wallflow.data.network.WallHavenNetworkDataSource
-import com.ammar.wallflow.data.network.model.asWallpaper
+import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
+import com.ammar.wallflow.data.network.model.toWallhavenWallpaper
 import com.ammar.wallflow.data.preferences.AppPreferences
 import com.ammar.wallflow.data.preferences.AutoWallpaperPreferences
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
@@ -49,7 +49,7 @@ import com.ammar.wallflow.model.AutoWallpaperHistory
 import com.ammar.wallflow.model.ObjectDetectionModel
 import com.ammar.wallflow.model.SearchQuery
 import com.ammar.wallflow.model.Source
-import com.ammar.wallflow.model.Wallpaper
+import com.ammar.wallflow.model.WallhavenWallpaper
 import com.ammar.wallflow.model.toSearchQuery
 import com.ammar.wallflow.ui.common.permissions.checkNotificationPermission
 import com.ammar.wallflow.ui.screens.crop.getCropRect
@@ -79,7 +79,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
     private val savedSearchRepository: SavedSearchRepository,
     private val autoWallpaperHistoryRepository: AutoWallpaperHistoryRepository,
     private val objectDetectionModelRepository: ObjectDetectionModelRepository,
-    private val wallHavenNetwork: WallHavenNetworkDataSource,
+    private val wallHavenNetwork: WallhavenNetworkDataSource,
     private val favoritesRepository: FavoritesRepository,
 ) : CoroutineWorker(
     context,
@@ -98,7 +98,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
         }
     }
     private var prevPageNum: Int? = null
-    private var cachedWallpapers = mutableListOf<Wallpaper>()
+    private var cachedWallhavenWallpapers = mutableListOf<WallhavenWallpaper>()
     private val sourceChoices: Set<SourceChoice>
         get() {
             return mutableSetOf<SourceChoice>().apply {
@@ -171,9 +171,9 @@ class AutoWallpaperWorker @AssistedInject constructor(
         )
     }
 
-    private suspend fun setNextWallpaper(): Pair<Wallpaper?, File?> {
+    private suspend fun setNextWallpaper(): Pair<WallhavenWallpaper?, File?> {
         val sourceChoice = getNextSourceChoice()
-        val nextWallpaper: Wallpaper = when (sourceChoice) {
+        val nextWallhavenWallpaper: WallhavenWallpaper = when (sourceChoice) {
             SourceChoice.SAVED_SEARCH -> {
                 val savedSearchId = autoWallpaperPreferences.savedSearchId
                 val savedSearch = savedSearchRepository.getById(savedSearchId)
@@ -188,17 +188,17 @@ class AutoWallpaperWorker @AssistedInject constructor(
                 ?: return null to null
         }
         return try {
-            val (applied, file) = setWallpaper(nextWallpaper)
+            val (applied, file) = setWallpaper(nextWallhavenWallpaper)
             if (applied) {
                 autoWallpaperHistoryRepository.addOrUpdateHistory(
                     AutoWallpaperHistory(
-                        sourceId = nextWallpaper.id,
+                        sourceId = nextWallhavenWallpaper.id,
                         source = Source.WALLHAVEN,
                         sourceChoice = sourceChoice,
                         setOn = Clock.System.now(),
                     ),
                 )
-                nextWallpaper to file
+                nextWallhavenWallpaper to file
             } else {
                 null to null
             }
@@ -210,8 +210,10 @@ class AutoWallpaperWorker @AssistedInject constructor(
 
     private fun getNextSourceChoice() = sourceChoices.random()
 
-    private suspend fun setWallpaper(nextWallpaper: Wallpaper): Pair<Boolean, File?> {
-        val wallpaperFile = safeDownloadWallpaper(nextWallpaper) ?: return false to null
+    private suspend fun setWallpaper(
+        nextWallhavenWallpaper: WallhavenWallpaper,
+    ): Pair<Boolean, File?> {
+        val wallpaperFile = safeDownloadWallpaper(nextWallhavenWallpaper) ?: return false to null
         try {
             val notification = notificationBuilder.apply {
                 setContentText(context.getString(R.string.changing_wallpaper))
@@ -238,7 +240,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
         val screenResolution = context.getScreenResolution(true)
         val maxCropSize = getMaxCropSize(
             screenResolution = screenResolution,
-            imageSize = nextWallpaper.resolution.toSize(),
+            imageSize = nextWallhavenWallpaper.resolution.toSize(),
         )
         val (detectionScale, detection) = try {
             getDetection(uri = uri)
@@ -250,7 +252,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
             maxCropSize = maxCropSize,
             detectionRect = detection?.detection?.boundingBox,
             detectedRectScale = detectionScale,
-            imageSize = nextWallpaper.resolution.toSize(),
+            imageSize = nextWallhavenWallpaper.resolution.toSize(),
             cropScale = 1f,
         )
         val display = context.displayManager.getDisplay(Display.DEFAULT_DISPLAY)
@@ -275,12 +277,12 @@ class AutoWallpaperWorker @AssistedInject constructor(
             scale to detectionWithBitmaps.firstOrNull()
         }
 
-    private suspend fun safeDownloadWallpaper(wallpaper: Wallpaper): File? {
+    private suspend fun safeDownloadWallpaper(wallhavenWallpaper: WallhavenWallpaper): File? {
         var downloadTries = 0
         while (true) {
-            val wallpaperFile = downloadWallpaper(wallpaper)
+            val wallpaperFile = downloadWallpaper(wallhavenWallpaper)
             // check if file size matches
-            if (wallpaperFile.length() == wallpaper.fileSize) {
+            if (wallpaperFile.length() == wallhavenWallpaper.fileSize) {
                 // file was correctly downloaded
                 return wallpaperFile
             }
@@ -298,11 +300,11 @@ class AutoWallpaperWorker @AssistedInject constructor(
         }
     }
 
-    private suspend fun downloadWallpaper(wallpaper: Wallpaper): File {
-        val fileName = wallpaper.path.getFileNameFromUrl()
+    private suspend fun downloadWallpaper(wallhavenWallpaper: WallhavenWallpaper): File {
+        val fileName = wallhavenWallpaper.path.getFileNameFromUrl()
         return context.getTempFileIfExists(fileName) ?: download(
             okHttpClient = okHttpClient,
-            url = wallpaper.path,
+            url = wallhavenWallpaper.path,
             dir = context.getTempDir().absolutePath,
             fileName = fileName,
             progressCallback = { total, downloaded ->
@@ -350,7 +352,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
     private suspend fun getNextWallpaper(
         searchQuery: SearchQuery,
         excludeHistory: Boolean = true,
-    ): Wallpaper? {
+    ): WallhavenWallpaper? {
         val historyIds = if (excludeHistory) {
             autoWallpaperHistoryRepository.getAllBySource(Source.WALLHAVEN).map { it.sourceId }
         } else {
@@ -365,14 +367,14 @@ class AutoWallpaperWorker @AssistedInject constructor(
                     pageNum = prevPageNum,
                 )
                 prevPageNum = nextPageNum
-                cachedWallpapers += wallpapers
+                cachedWallhavenWallpapers += wallpapers
                 hasMore = nextPageNum != null
                 wallpapers
             } else {
                 // not excluding history, means we already loaded all wallpapers previously
                 // in such case, use cachedWallpapers
                 hasMore = false
-                cachedWallpapers
+                cachedWallhavenWallpapers
             }
 
             // Loop until we find a wallpaper
@@ -395,16 +397,16 @@ class AutoWallpaperWorker @AssistedInject constructor(
     private suspend fun loadWallpapers(
         searchQuery: SearchQuery,
         pageNum: Int? = null,
-    ): Pair<List<Wallpaper>, Int?> {
+    ): Pair<List<WallhavenWallpaper>, Int?> {
         val response = wallHavenNetwork.search(searchQuery, pageNum)
         val nextPageNumber = response.meta?.run {
             if (current_page != last_page) current_page + 1 else null
         }
-        return response.data.map { it.asWallpaper() } to nextPageNumber
+        return response.data.map { it.toWallhavenWallpaper() } to nextPageNumber
     }
 
     private fun showSuccessNotification(
-        wallpaper: Wallpaper,
+        wallhavenWallpaper: WallhavenWallpaper,
         file: File,
     ) {
         if (!context.checkNotificationPermission()) return
@@ -425,7 +427,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
             setContentIntent(
                 getWallpaperScreenPendingIntent(
                     context,
-                    wallpaper.id,
+                    wallhavenWallpaper.id,
                 ),
             )
             // setAutoCancel(true)

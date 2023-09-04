@@ -2,11 +2,11 @@ package com.ammar.wallflow.data.network.di
 
 import com.ammar.wallflow.BuildConfig
 import com.ammar.wallflow.WALLHAVEN_BASE_URL
-import com.ammar.wallflow.data.network.WallHavenNetworkDataSource
+import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
 import com.ammar.wallflow.data.network.retrofit.DocumentConverterFactory
-import com.ammar.wallflow.data.network.retrofit.RetrofitWallHavenNetwork
-import com.ammar.wallflow.data.network.retrofit.WallHavenInterceptor
-import com.ammar.wallflow.data.network.retrofit.api.WallHavenNetworkApi
+import com.ammar.wallflow.data.network.retrofit.RetrofitWallhavenNetwork
+import com.ammar.wallflow.data.network.retrofit.WallhavenInterceptor
+import com.ammar.wallflow.data.network.retrofit.api.WallhavenNetworkApi
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
@@ -32,7 +32,7 @@ object NetworkModule {
     @Provides
     @Singleton
     fun providesOkHttpClient(
-        wallHavenInterceptor: WallHavenInterceptor,
+        wallHavenInterceptor: WallhavenInterceptor,
     ) = OkHttpClient.Builder().apply {
         readTimeout(30, TimeUnit.SECONDS)
         addInterceptor(wallHavenInterceptor)
@@ -50,7 +50,7 @@ object NetworkModule {
     fun providesWallhavenNetworkApi(
         networkJson: Json,
         okHttpClient: OkHttpClient,
-    ): WallHavenNetworkApi = Retrofit.Builder().apply {
+    ): WallhavenNetworkApi = Retrofit.Builder().apply {
         baseUrl(WALLHAVEN_BASE_URL)
         client(okHttpClient)
         addConverterFactory(DocumentConverterFactory())
@@ -59,11 +59,11 @@ object NetworkModule {
         )
     }
         .build()
-        .create(WallHavenNetworkApi::class.java)
+        .create(WallhavenNetworkApi::class.java)
 
     @Provides
     @Singleton
     fun providesWallHavenNetworkDataSource(
-        wallHavenNetworkApi: WallHavenNetworkApi,
-    ): WallHavenNetworkDataSource = RetrofitWallHavenNetwork(wallHavenNetworkApi)
+        wallHavenNetworkApi: WallhavenNetworkApi,
+    ): WallhavenNetworkDataSource = RetrofitWallhavenNetwork(wallHavenNetworkApi)
 }

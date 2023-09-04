@@ -22,15 +22,15 @@ import com.ammar.wallflow.data.db.dao.WallpapersDao
 import com.ammar.wallflow.data.db.entity.AutoWallpaperHistoryEntity
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.asWallpaper
-import com.ammar.wallflow.data.network.WallHavenNetworkDataSource
-import com.ammar.wallflow.data.network.model.NetworkMeta
+import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
 import com.ammar.wallflow.data.network.model.NetworkResponse
-import com.ammar.wallflow.data.network.model.NetworkTag
-import com.ammar.wallflow.data.network.model.NetworkThumbs
-import com.ammar.wallflow.data.network.model.NetworkWallpaper
-import com.ammar.wallflow.data.network.model.StringNetworkMetaQuery
-import com.ammar.wallflow.data.network.model.asWallpaper
+import com.ammar.wallflow.data.network.model.NetworkWallhavenMeta
+import com.ammar.wallflow.data.network.model.NetworkWallhavenTag
+import com.ammar.wallflow.data.network.model.NetworkWallhavenThumbs
+import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpaper
+import com.ammar.wallflow.data.network.model.StringNetworkWallhavenMetaQuery
 import com.ammar.wallflow.data.network.model.asWallpaperEntity
+import com.ammar.wallflow.data.network.model.toWallhavenWallpaper
 import com.ammar.wallflow.data.preferences.AutoWallpaperPreferences
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.AutoWallpaperHistoryRepository
@@ -185,8 +185,8 @@ class AutoWallpaperTest {
                     filters = SearchQuery(),
                 ),
             )
-            val networkWallpapers = List(30) { testNetworkWallpaper }
-            val wallpapers = networkWallpapers.map { it.asWallpaper() }
+            val networkWallpapers = List(30) { testNetworkWallhavenWallpaper }
+            val wallpapers = networkWallpapers.map { it.toWallhavenWallpaper() }
             val autoWallpaperHistoryDao = object : FakeAutoWallpaperHistoryDao() {
                 private var history = emptyList<AutoWallpaperHistoryEntity>()
 
@@ -212,19 +212,19 @@ class AutoWallpaperTest {
                     override suspend fun getById(id: Long) = savedSearch.toEntity(1)
                 },
                 autoWallpaperHistoryDao = autoWallpaperHistoryDao,
-                wallHavenNetwork = object : FakeWallHavenNetworkDataSource() {
+                wallHavenNetwork = object : FakeWallhavenNetworkDataSource() {
                     override suspend fun search(
                         searchQuery: SearchQuery,
                         page: Int?,
-                    ): NetworkResponse<List<NetworkWallpaper>> {
+                    ): NetworkResponse<List<NetworkWallhavenWallpaper>> {
                         return NetworkResponse(
                             data = networkWallpapers,
-                            meta = NetworkMeta(
+                            meta = NetworkWallhavenMeta(
                                 current_page = 1,
                                 last_page = 1,
                                 per_page = networkWallpapers.size,
                                 total = networkWallpapers.size,
-                                query = StringNetworkMetaQuery(
+                                query = StringNetworkWallhavenMetaQuery(
                                     value = "",
                                 ),
                                 seed = null,
@@ -277,8 +277,8 @@ class AutoWallpaperTest {
                     filters = SearchQuery(),
                 ),
             )
-            val networkWallpapers = List(30) { testNetworkWallpaper }
-            val wallpapers = networkWallpapers.map { it.asWallpaper() }
+            val networkWallpapers = List(30) { testNetworkWallhavenWallpaper }
+            val wallpapers = networkWallpapers.map { it.toWallhavenWallpaper() }
             val historyWalls = wallpapers.take(4)
             val setOn = Clock.System.now()
             val autoWallpaperHistoryDao = object : FakeAutoWallpaperHistoryDao() {
@@ -314,19 +314,19 @@ class AutoWallpaperTest {
                     override suspend fun getById(id: Long) = savedSearch.toEntity(1)
                 },
                 autoWallpaperHistoryDao = autoWallpaperHistoryDao,
-                wallHavenNetwork = object : FakeWallHavenNetworkDataSource() {
+                wallHavenNetwork = object : FakeWallhavenNetworkDataSource() {
                     override suspend fun search(
                         searchQuery: SearchQuery,
                         page: Int?,
-                    ): NetworkResponse<List<NetworkWallpaper>> {
+                    ): NetworkResponse<List<NetworkWallhavenWallpaper>> {
                         return NetworkResponse(
                             data = networkWallpapers,
-                            meta = NetworkMeta(
+                            meta = NetworkWallhavenMeta(
                                 current_page = 1,
                                 last_page = 1,
                                 per_page = networkWallpapers.size,
                                 total = networkWallpapers.size,
-                                query = StringNetworkMetaQuery(
+                                query = StringNetworkWallhavenMetaQuery(
                                     value = "",
                                 ),
                                 seed = null,
@@ -379,8 +379,8 @@ class AutoWallpaperTest {
                     filters = SearchQuery(),
                 ),
             )
-            val networkWallpapers = List(30) { testNetworkWallpaper }
-            val wallpapers = networkWallpapers.map { it.asWallpaper() }
+            val networkWallpapers = List(30) { testNetworkWallhavenWallpaper }
+            val wallpapers = networkWallpapers.map { it.toWallhavenWallpaper() }
             val historyWalls = wallpapers.map { it }
             val setOn = Clock.System.now()
             val autoWallpaperHistoryDao = object : FakeAutoWallpaperHistoryDao() {
@@ -419,19 +419,19 @@ class AutoWallpaperTest {
                     override suspend fun getById(id: Long) = savedSearch.toEntity(1)
                 },
                 autoWallpaperHistoryDao = autoWallpaperHistoryDao,
-                wallHavenNetwork = object : FakeWallHavenNetworkDataSource() {
+                wallHavenNetwork = object : FakeWallhavenNetworkDataSource() {
                     override suspend fun search(
                         searchQuery: SearchQuery,
                         page: Int?,
-                    ): NetworkResponse<List<NetworkWallpaper>> {
+                    ): NetworkResponse<List<NetworkWallhavenWallpaper>> {
                         return NetworkResponse(
                             data = networkWallpapers,
-                            meta = NetworkMeta(
+                            meta = NetworkWallhavenMeta(
                                 current_page = 1,
                                 last_page = 1,
                                 per_page = networkWallpapers.size,
                                 total = networkWallpapers.size,
-                                query = StringNetworkMetaQuery(
+                                query = StringNetworkWallhavenMetaQuery(
                                     value = "",
                                 ),
                                 seed = null,
@@ -516,7 +516,7 @@ class AutoWallpaperTest {
                     useObjectDetection = false,
                 ),
             )
-            val wallpaperEntity = testNetworkWallpaper.asWallpaperEntity()
+            val wallpaperEntity = testNetworkWallhavenWallpaper.asWallpaperEntity()
             val autoWallpaperHistoryDao = object : FakeAutoWallpaperHistoryDao() {
                 private var history = emptyList<AutoWallpaperHistoryEntity>()
 
@@ -584,7 +584,7 @@ class AutoWallpaperTest {
         savedSearchDao: SavedSearchDao = FakeSavedSearchDao(),
         autoWallpaperHistoryDao: AutoWallpaperHistoryDao = FakeAutoWallpaperHistoryDao(),
         objectDetectionModelDao: ObjectDetectionModelDao = FakeObjectDetectionModelDao(),
-        wallHavenNetwork: WallHavenNetworkDataSource = FakeWallHavenNetworkDataSource(),
+        wallHavenNetwork: WallhavenNetworkDataSource = FakeWallhavenNetworkDataSource(),
         favoriteDao: FavoriteDao = FakeFavoriteDao(),
         wallpapersDao: WallpapersDao = FakeWallpapersDao(),
     ): AutoWallpaperWorker {
@@ -650,10 +650,10 @@ class AutoWallpaperTest {
         it.createNewFile()
     }
 
-    private val testNetworkWallpaper: NetworkWallpaper
+    private val testNetworkWallhavenWallpaper: NetworkWallhavenWallpaper
         get() {
             val id = Random.nextInt().toString()
-            return NetworkWallpaper(
+            return NetworkWallhavenWallpaper(
                 id = id,
                 url = "https://example.com/wallpaper_$id",
                 short_url = "short test",
@@ -672,13 +672,13 @@ class AutoWallpaperTest {
                 created_at = Clock.System.now(),
                 colors = emptyList(),
                 path = "wallpaper_path_$id",
-                thumbs = NetworkThumbs(
+                thumbs = NetworkWallhavenThumbs(
                     large = "test",
                     original = "test",
                     small = "test",
                 ),
                 tags = listOf(
-                    NetworkTag(
+                    NetworkWallhavenTag(
                         id = Random.nextLong(),
                         name = "test",
                         alias = "",

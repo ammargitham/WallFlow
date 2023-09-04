@@ -31,11 +31,11 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.preferences.LayoutPreferences
 import com.ammar.wallflow.model.Favorite
-import com.ammar.wallflow.model.Tag
-import com.ammar.wallflow.model.Uploader
-import com.ammar.wallflow.model.Wallpaper
-import com.ammar.wallflow.model.wallpaper1
-import com.ammar.wallflow.model.wallpaper2
+import com.ammar.wallflow.model.WallhavenTag
+import com.ammar.wallflow.model.WallhavenUploader
+import com.ammar.wallflow.model.WallhavenWallpaper
+import com.ammar.wallflow.model.wallhavenWallpaper1
+import com.ammar.wallflow.model.wallhavenWallpaper2
 import com.ammar.wallflow.ui.common.BottomBarAwareHorizontalTwoPane
 import com.ammar.wallflow.ui.common.WallpaperStaggeredGrid
 import com.ammar.wallflow.ui.theme.WallFlowTheme
@@ -47,28 +47,28 @@ import kotlinx.coroutines.flow.flowOf
 
 @Composable
 internal fun HomeScreenContent(
-    wallpapers: LazyPagingItems<Wallpaper>,
+    wallpapers: LazyPagingItems<WallhavenWallpaper>,
     nestedScrollConnection: NestedScrollConnection,
     modifier: Modifier = Modifier,
     gridState: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
     contentPadding: PaddingValues = PaddingValues(8.dp),
     isExpanded: Boolean = false,
     favorites: ImmutableList<Favorite> = persistentListOf(),
-    tags: ImmutableList<Tag> = persistentListOf(),
+    wallhavenTags: ImmutableList<WallhavenTag> = persistentListOf(),
     isTagsLoading: Boolean = false,
     blurSketchy: Boolean = false,
     blurNsfw: Boolean = false,
-    selectedWallpaper: Wallpaper? = null,
+    selectedWallhavenWallpaper: WallhavenWallpaper? = null,
     layoutPreferences: LayoutPreferences = LayoutPreferences(),
     showFAB: Boolean = true,
-    fullWallpaper: Wallpaper? = null,
+    fullWallhavenWallpaper: WallhavenWallpaper? = null,
     fullWallpaperActionsVisible: Boolean = true,
     fullWallpaperDownloadStatus: DownloadStatus? = null,
     fullWallpaperLoading: Boolean = false,
     showFullWallpaperInfo: Boolean = false,
-    onWallpaperClick: (wallpaper: Wallpaper) -> Unit = {},
-    onWallpaperFavoriteClick: (wallpaper: Wallpaper) -> Unit = {},
-    onTagClick: (tag: Tag) -> Unit = {},
+    onWallpaperClick: (wallhavenWallpaper: WallhavenWallpaper) -> Unit = {},
+    onWallpaperFavoriteClick: (wallhavenWallpaper: WallhavenWallpaper) -> Unit = {},
+    onTagClick: (wallhavenTag: WallhavenTag) -> Unit = {},
     onFABClick: () -> Unit = {},
     onFullWallpaperTransform: () -> Unit = {},
     onFullWallpaperTap: () -> Unit = {},
@@ -78,7 +78,7 @@ internal fun HomeScreenContent(
     onFullWallpaperShareImageClick: () -> Unit = {},
     onFullWallpaperApplyWallpaperClick: () -> Unit = {},
     onFullWallpaperFullScreenClick: () -> Unit = {},
-    onFullWallpaperUploaderClick: (Uploader) -> Unit = {},
+    onFullWallpaperUploaderClick: (WallhavenUploader) -> Unit = {},
     onFullWallpaperDownloadPermissionsGranted: () -> Unit = {},
 ) {
     if (isExpanded) {
@@ -95,10 +95,10 @@ internal fun HomeScreenContent(
                     favorites = favorites,
                     blurSketchy = blurSketchy,
                     blurNsfw = blurNsfw,
-                    tags = tags,
+                    wallhavenTags = wallhavenTags,
                     isTagsLoading = isTagsLoading,
                     onTagClick = onTagClick,
-                    selectedWallpaper = selectedWallpaper,
+                    selectedWallhavenWallpaper = selectedWallhavenWallpaper,
                     showSelection = true,
                     layoutPreferences = layoutPreferences,
                     showFAB = showFAB,
@@ -109,11 +109,11 @@ internal fun HomeScreenContent(
             },
             second = {
                 WallpaperViewer(
-                    wallpaper = fullWallpaper,
+                    wallhavenWallpaper = fullWallhavenWallpaper,
                     actionsVisible = fullWallpaperActionsVisible,
                     downloadStatus = fullWallpaperDownloadStatus,
                     loading = fullWallpaperLoading,
-                    thumbUrl = selectedWallpaper?.thumbs?.original,
+                    thumbUrl = selectedWallhavenWallpaper?.thumbs?.original,
                     showFullScreenAction = true,
                     showInfo = showFullWallpaperInfo,
                     onWallpaperTransform = onFullWallpaperTransform,
@@ -139,10 +139,10 @@ internal fun HomeScreenContent(
             favorites = favorites,
             blurSketchy = blurSketchy,
             blurNsfw = blurNsfw,
-            tags = tags,
+            wallhavenTags = wallhavenTags,
             isTagsLoading = isTagsLoading,
             onTagClick = onTagClick,
-            selectedWallpaper = selectedWallpaper,
+            selectedWallhavenWallpaper = selectedWallhavenWallpaper,
             showSelection = false,
             layoutPreferences = layoutPreferences,
             showFAB = showFAB,
@@ -155,22 +155,22 @@ internal fun HomeScreenContent(
 
 @Composable
 private fun Feed(
-    wallpapers: LazyPagingItems<Wallpaper>,
+    wallpapers: LazyPagingItems<WallhavenWallpaper>,
     modifier: Modifier = Modifier,
     gridState: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
     contentPadding: PaddingValues = PaddingValues(8.dp),
     layoutPreferences: LayoutPreferences = LayoutPreferences(),
     favorites: ImmutableList<Favorite> = persistentListOf(),
-    tags: ImmutableList<Tag> = persistentListOf(),
+    wallhavenTags: ImmutableList<WallhavenTag> = persistentListOf(),
     blurSketchy: Boolean = false,
     blurNsfw: Boolean = false,
     isTagsLoading: Boolean = false,
     showSelection: Boolean = false,
-    selectedWallpaper: Wallpaper? = null,
+    selectedWallhavenWallpaper: WallhavenWallpaper? = null,
     showFAB: Boolean = true,
-    onTagClick: (tag: Tag) -> Unit = {},
-    onWallpaperClick: (wallpaper: Wallpaper) -> Unit = {},
-    onWallpaperFavoriteClick: (wallpaper: Wallpaper) -> Unit = {},
+    onTagClick: (wallhavenTag: WallhavenTag) -> Unit = {},
+    onWallpaperClick: (wallhavenWallpaper: WallhavenWallpaper) -> Unit = {},
+    onWallpaperFavoriteClick: (wallhavenWallpaper: WallhavenWallpaper) -> Unit = {},
     onFABClick: () -> Unit = {},
 ) {
     val expandedFab by remember(gridState.firstVisibleItemIndex) {
@@ -188,17 +188,17 @@ private fun Feed(
             blurSketchy = blurSketchy,
             blurNsfw = blurNsfw,
             header = {
-                if (tags.isNotEmpty()) {
+                if (wallhavenTags.isNotEmpty()) {
                     item(span = StaggeredGridItemSpan.FullLine) {
                         PopularTagsRow(
-                            tags = tags,
+                            wallhavenTags = wallhavenTags,
                             loading = isTagsLoading,
                             onTagClick = onTagClick,
                         )
                     }
                 }
             },
-            selectedWallpaper = selectedWallpaper,
+            selectedWallhavenWallpaper = selectedWallhavenWallpaper,
             showSelection = showSelection,
             gridType = layoutPreferences.gridType,
             gridColType = layoutPreferences.gridColType,
@@ -235,13 +235,20 @@ private fun Feed(
 private fun DefaultPreview() {
     WallFlowTheme {
         Surface {
-            val wallpapers = flowOf(PagingData.from(listOf(wallpaper1, wallpaper2)))
+            val wallpapers = flowOf(
+                PagingData.from(
+                    listOf(
+                        wallhavenWallpaper1,
+                        wallhavenWallpaper2,
+                    ),
+                ),
+            )
             val pagingItems = wallpapers.collectAsLazyPagingItems()
             val nestedScrollConnection = remember {
                 object : NestedScrollConnection {}
             }
             HomeScreenContent(
-                tags = persistentListOf(),
+                wallhavenTags = persistentListOf(),
                 wallpapers = pagingItems,
                 nestedScrollConnection = nestedScrollConnection,
             )

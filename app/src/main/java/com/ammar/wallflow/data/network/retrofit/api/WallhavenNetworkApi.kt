@@ -1,13 +1,13 @@
 package com.ammar.wallflow.data.network.retrofit.api
 
 import com.ammar.wallflow.data.network.model.NetworkResponse
-import com.ammar.wallflow.data.network.model.NetworkWallpaper
+import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpaper
 import org.jsoup.nodes.Document
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 
-interface WallHavenNetworkApi {
+interface WallhavenNetworkApi {
     @GET("search")
     suspend fun search(
         @Query("q") query: String? = null,
@@ -22,12 +22,12 @@ interface WallHavenNetworkApi {
         @Query("ratios") ratios: String? = null,
         @Query("page") page: Int? = null,
         @Query("seed") seed: String? = null,
-    ): NetworkResponse<List<NetworkWallpaper>>
+    ): NetworkResponse<List<NetworkWallhavenWallpaper>>
 
     @GET("w/{id}")
     suspend fun wallpaper(
         @Path("id") id: String,
-    ): NetworkResponse<NetworkWallpaper>
+    ): NetworkResponse<NetworkWallhavenWallpaper>
 
     @GET("https://wallhaven.cc/tags/popular")
     suspend fun popularTags(): Document?

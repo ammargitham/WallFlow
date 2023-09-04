@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.R
 import com.ammar.wallflow.model.MenuItem
 import com.ammar.wallflow.model.Purity
-import com.ammar.wallflow.model.Tag
+import com.ammar.wallflow.model.WallhavenTag
 import com.ammar.wallflow.ui.common.OverflowMenu
 import com.ammar.wallflow.ui.common.TagChip
 import com.ammar.wallflow.ui.theme.WallFlowTheme
@@ -42,9 +42,9 @@ import kotlinx.datetime.Clock
 @Composable
 fun PopularTagsRow(
     modifier: Modifier = Modifier,
-    tags: ImmutableList<Tag> = persistentListOf(),
+    wallhavenTags: ImmutableList<WallhavenTag> = persistentListOf(),
     loading: Boolean = false,
-    onTagClick: (tag: Tag) -> Unit = {},
+    onTagClick: (wallhavenTag: WallhavenTag) -> Unit = {},
 ) {
     LazyRow(
         modifier = modifier,
@@ -56,9 +56,9 @@ fun PopularTagsRow(
                 text = "${stringResource(R.string.popular_tags)}:",
             )
         }
-        items(tags) {
+        items(wallhavenTags) {
             TagChip(
-                tag = it,
+                wallhavenTag = it,
                 loading = loading,
                 onClick = { onTagClick(it) },
             )
@@ -73,8 +73,8 @@ private fun PreviewPopularTagsRow() {
     WallFlowTheme {
         Surface {
             PopularTagsRow(
-                tags = List(5) {
-                    Tag(
+                wallhavenTags = List(5) {
+                    WallhavenTag(
                         id = it.toLong(),
                         name = "Test-$it",
                         alias = emptyList(),

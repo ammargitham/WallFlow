@@ -101,10 +101,10 @@ object MainSearchBar {
                     active -> null
                     else -> when (search.meta) {
                         is TagSearchMeta -> {
-                            { TagChip(tag = search.meta.tag) }
+                            { TagChip(wallhavenTag = search.meta.wallhavenTag) }
                         }
                         is UploaderSearchMeta -> {
-                            { UploaderChip(uploader = search.meta.uploader) }
+                            { UploaderChip(wallhavenUploader = search.meta.wallhavenUploader) }
                         }
                         else -> null
                     }

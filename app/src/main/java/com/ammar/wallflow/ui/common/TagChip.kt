@@ -21,7 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.model.Purity
-import com.ammar.wallflow.model.Tag
+import com.ammar.wallflow.model.WallhavenTag
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.material.fade
@@ -32,7 +32,7 @@ import kotlinx.datetime.Clock
 fun TagChip(
     modifier: Modifier = Modifier,
     loading: Boolean = false,
-    tag: Tag,
+    wallhavenTag: WallhavenTag,
     onClick: () -> Unit = {},
 ) {
     Box(
@@ -40,7 +40,7 @@ fun TagChip(
     ) {
         AssistChip(
             onClick = onClick,
-            label = { Text(text = "#${tag.name}") },
+            label = { Text(text = "#${wallhavenTag.name}") },
         )
         if (loading) {
             Box(
@@ -71,7 +71,7 @@ private fun PreviewTagChip() {
             ) {
                 TagChip(
                     loading = true,
-                    tag = Tag(
+                    wallhavenTag = WallhavenTag(
                         id = 1,
                         name = "Test-1",
                         alias = emptyList(),
@@ -82,7 +82,7 @@ private fun PreviewTagChip() {
                     ),
                 )
                 TagChip(
-                    tag = Tag(
+                    wallhavenTag = WallhavenTag(
                         id = 1,
                         name = "Test-1",
                         alias = emptyList(),

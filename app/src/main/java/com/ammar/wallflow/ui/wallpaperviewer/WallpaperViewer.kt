@@ -51,9 +51,9 @@ import com.ammar.wallflow.extensions.openUrl
 import com.ammar.wallflow.extensions.toDp
 import com.ammar.wallflow.extensions.toast
 import com.ammar.wallflow.extensions.wallpaperManager
-import com.ammar.wallflow.model.Tag
-import com.ammar.wallflow.model.Uploader
-import com.ammar.wallflow.model.Wallpaper
+import com.ammar.wallflow.model.WallhavenTag
+import com.ammar.wallflow.model.WallhavenUploader
+import com.ammar.wallflow.model.WallhavenWallpaper
 import com.ammar.wallflow.ui.common.bottomWindowInsets
 import com.ammar.wallflow.ui.common.permissions.DownloadPermissionsRationalDialog
 import com.ammar.wallflow.ui.common.permissions.rememberDownloadPermissionsState
@@ -69,7 +69,7 @@ import me.saket.telephoto.zoomable.zoomable
 @Composable
 fun WallpaperViewer(
     modifier: Modifier = Modifier,
-    wallpaper: Wallpaper? = null,
+    wallhavenWallpaper: WallhavenWallpaper? = null,
     actionsVisible: Boolean = true,
     downloadStatus: DownloadStatus? = null,
     loading: Boolean = false,
@@ -85,8 +85,8 @@ fun WallpaperViewer(
     onApplyWallpaperClick: () -> Unit = {},
     onFullScreenClick: () -> Unit = {},
     onDownloadPermissionsGranted: () -> Unit = {},
-    onTagClick: (Tag) -> Unit = {},
-    onUploaderClick: (Uploader) -> Unit = {},
+    onTagClick: (WallhavenTag) -> Unit = {},
+    onUploaderClick: (WallhavenUploader) -> Unit = {},
 ) {
     var showRationale by rememberSaveable { mutableStateOf(false) }
     var containerIntSize by remember { mutableStateOf(IntSize.Zero) }
@@ -98,10 +98,10 @@ fun WallpaperViewer(
 
     val imageSize: IntSize by produceState(
         initialValue = IntSize.Zero,
-        key1 = wallpaper?.resolution,
+        key1 = wallhavenWallpaper?.resolution,
         key2 = containerIntSize,
     ) {
-        val resolution = wallpaper?.resolution
+        val resolution = wallhavenWallpaper?.resolution
         if (resolution == null) {
             value = IntSize.Zero
             return@produceState
@@ -147,14 +147,14 @@ fun WallpaperViewer(
     val request by produceState(
         initialValue = null as ImageRequest?,
         key1 = context,
-        key2 = wallpaper?.path,
+        key2 = wallhavenWallpaper?.path,
         key3 = listOf(thumbUrl, imageSize, listener),
     ) {
-        if (wallpaper?.path == null && thumbUrl == null) {
+        if (wallhavenWallpaper?.path == null && thumbUrl == null) {
             return@produceState
         }
         value = ImageRequest.Builder(context).apply {
-            data(wallpaper?.path ?: thumbUrl)
+            data(wallhavenWallpaper?.path ?: thumbUrl)
             placeholderMemoryCacheKey(thumbUrl)
             if (imageSize != IntSize.Zero) {
                 size(imageSize.width, imageSize.height)
@@ -234,7 +234,7 @@ fun WallpaperViewer(
         AnimatedVisibility(
             modifier = Modifier.align(Alignment.BottomCenter),
             visible = painter.state is AsyncImagePainter.State.Success &&
-                painter.request.data == wallpaper?.path &&
+                painter.request.data == wallhavenWallpaper?.path &&
                 actionsVisible,
             enter = fadeIn(),
             exit = fadeOut(),
@@ -267,11 +267,11 @@ fun WallpaperViewer(
     }
 
     if (showInfo) {
-        wallpaper?.run {
+        wallhavenWallpaper?.run {
             WallpaperInfoBottomSheet(
                 contentModifier = Modifier.windowInsetsPadding(bottomWindowInsets),
                 onDismissRequest = onInfoDismiss,
-                wallpaper = this,
+                wallhavenWallpaper = this,
                 onTagClick = onTagClick,
                 onUploaderClick = { uploader?.let(onUploaderClick) },
                 onSourceClick = { context.openUrl(source) },

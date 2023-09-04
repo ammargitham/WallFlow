@@ -6,16 +6,17 @@ import androidx.core.graphics.toColorInt
 import com.ammar.wallflow.data.db.entity.WallpaperEntity
 import com.ammar.wallflow.data.network.model.util.InstantSerializer
 import com.ammar.wallflow.model.Purity
-import com.ammar.wallflow.model.Wallpaper
+import com.ammar.wallflow.model.WallhavenWallpaper
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
+@Suppress("PropertyName")
 @Serializable
-data class NetworkWallpaper(
+data class NetworkWallhavenWallpaper(
     val id: String,
     val url: String,
     val short_url: String,
-    val uploader: NetworkUploader? = null,
+    val uploader: NetworkWallhavenUploader? = null,
     val views: Int,
     val favorites: Int,
     val source: String,
@@ -31,16 +32,16 @@ data class NetworkWallpaper(
     val created_at: Instant,
     val colors: List<String>,
     val path: String,
-    val thumbs: NetworkThumbs,
-    val tags: List<NetworkTag>? = null,
+    val thumbs: NetworkWallhavenThumbs,
+    val tags: List<NetworkWallhavenTag>? = null,
 )
 
-fun NetworkWallpaper.asWallpaper() = Wallpaper(
+fun NetworkWallhavenWallpaper.toWallhavenWallpaper() = WallhavenWallpaper(
     id = id,
     url = url,
     shortUrl = short_url,
     views = views,
-    uploader = uploader?.asUploader(),
+    uploader = uploader?.toWallhavenUploader(),
     favorites = favorites,
     source = source,
     purity = Purity.fromName(purity),
@@ -51,11 +52,11 @@ fun NetworkWallpaper.asWallpaper() = Wallpaper(
     createdAt = created_at,
     colors = colors.map { Color(it.toColorInt()) },
     path = path,
-    thumbs = thumbs.asThumbs(),
-    tags = tags?.map { it.toTag() },
+    thumbs = thumbs.toWallhavenThumbs(),
+    tags = tags?.map { it.toWallhavenTag() },
 )
 
-fun NetworkWallpaper.asWallpaperEntity(
+fun NetworkWallhavenWallpaper.asWallpaperEntity(
     id: Long = 0,
     uploaderId: Long? = null,
 ) = WallpaperEntity(

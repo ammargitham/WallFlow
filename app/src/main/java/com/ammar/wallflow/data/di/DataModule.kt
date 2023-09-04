@@ -1,7 +1,7 @@
 package com.ammar.wallflow.data.di
 
-import com.ammar.wallflow.data.repository.DefaultWallHavenRepository
-import com.ammar.wallflow.data.repository.WallHavenRepository
+import com.ammar.wallflow.data.repository.DefaultWallhavenRepository
+import com.ammar.wallflow.data.repository.WallhavenRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -14,6 +14,6 @@ interface DataModule {
     @Singleton
     @Binds
     fun bindsWallHavenRepository(
-        wallHavenRepository: DefaultWallHavenRepository,
-    ): WallHavenRepository
+        wallHavenRepository: DefaultWallhavenRepository,
+    ): WallhavenRepository
 }

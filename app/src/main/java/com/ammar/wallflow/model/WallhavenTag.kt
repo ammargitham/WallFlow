@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 
 @Stable
 @Serializable
-data class Tag(
+data class WallhavenTag(
     val id: Long,
     val name: String,
     val alias: List<String>,

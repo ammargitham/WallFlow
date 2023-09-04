@@ -11,7 +11,7 @@ import com.ammar.wallflow.data.preferences.LayoutPreferences
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.FavoritesRepository
 import com.ammar.wallflow.data.repository.SavedSearchRepository
-import com.ammar.wallflow.data.repository.WallHavenRepository
+import com.ammar.wallflow.data.repository.WallhavenRepository
 import com.ammar.wallflow.data.repository.utils.Resource
 import com.ammar.wallflow.data.repository.utils.successOr
 import com.ammar.wallflow.model.Favorite
@@ -21,9 +21,9 @@ import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.SearchQuery
 import com.ammar.wallflow.model.Sorting
 import com.ammar.wallflow.model.Source
-import com.ammar.wallflow.model.Tag
 import com.ammar.wallflow.model.TopRange
-import com.ammar.wallflow.model.Wallpaper
+import com.ammar.wallflow.model.WallhavenTag
+import com.ammar.wallflow.model.WallhavenWallpaper
 import com.ammar.wallflow.model.toSearchQuery
 import com.ammar.wallflow.ui.screens.navArgs
 import com.ammar.wallflow.utils.combine
@@ -53,7 +53,7 @@ import kotlinx.datetime.Clock
 )
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val wallHavenRepository: WallHavenRepository,
+    private val wallHavenRepository: WallhavenRepository,
     private val appPreferencesRepository: AppPreferencesRepository,
     private val savedSearchRepository: SavedSearchRepository,
     private val favoritesRepository: FavoritesRepository,
@@ -96,9 +96,9 @@ class HomeViewModel @Inject constructor(
         ->
         local.merge(
             HomeUiState(
-                tags = (
+                wallhavenTags = (
                     if (tags is Resource.Loading) {
-                        tempTags
+                        tempWallhavenTags
                     } else {
                         tags.successOr(
                             emptyList(),
@@ -141,8 +141,8 @@ class HomeViewModel @Inject constructor(
 
     fun setWallpapersLoading(refreshing: Boolean) = wallpapersLoadingFlow.update { refreshing }
 
-    fun setSelectedWallpaper(wallpaper: Wallpaper) = localUiState.update {
-        it.copy(selectedWallpaper = partial(wallpaper))
+    fun setSelectedWallpaper(wallhavenWallpaper: WallhavenWallpaper) = localUiState.update {
+        it.copy(selectedWallhavenWallpaper = partial(wallhavenWallpaper))
     }
 
     fun showSaveSearchAsDialog(search: Search? = null) = localUiState.update {
@@ -162,16 +162,16 @@ class HomeViewModel @Inject constructor(
         it.copy(showSavedSearchesDialog = partial(show))
     }
 
-    fun toggleFavorite(wallpaper: Wallpaper) = viewModelScope.launch {
+    fun toggleFavorite(wallhavenWallpaper: WallhavenWallpaper) = viewModelScope.launch {
         favoritesRepository.toggleFavorite(
-            sourceId = wallpaper.id,
+            sourceId = wallhavenWallpaper.id,
             source = Source.WALLHAVEN,
         )
     }
 }
 
-private val tempTags = List(3) {
-    Tag(
+private val tempWallhavenTags = List(3) {
+    WallhavenTag(
         id = it + 1L,
         name = "Loading...", // no need for string resource as "Loading..." won't be visible
         alias = emptyList(),
@@ -185,7 +185,7 @@ private val tempTags = List(3) {
 @Stable
 @Partialize
 data class HomeUiState(
-    val tags: ImmutableList<Tag> = persistentListOf(),
+    val wallhavenTags: ImmutableList<WallhavenTag> = persistentListOf(),
     val areTagsLoading: Boolean = true,
     val mainSearch: Search? = null,
     val homeSearch: Search = Search(
@@ -199,7 +199,7 @@ data class HomeUiState(
     val blurSketchy: Boolean = false,
     val blurNsfw: Boolean = false,
     val showNSFW: Boolean = false,
-    val selectedWallpaper: Wallpaper? = null,
+    val selectedWallhavenWallpaper: WallhavenWallpaper? = null,
     val saveSearchAsSearch: Search? = null,
     val showSavedSearchesDialog: Boolean = false,
     val savedSearches: List<SavedSearch> = emptyList(),

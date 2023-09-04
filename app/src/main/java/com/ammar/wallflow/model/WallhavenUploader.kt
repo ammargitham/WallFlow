@@ -3,14 +3,14 @@ package com.ammar.wallflow.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Uploader(
+data class WallhavenUploader(
     val username: String,
     val group: String,
-    val avatar: Avatar,
+    val avatar: WallhavenAvatar,
 )
 
 @Serializable
-data class Avatar(
+data class WallhavenAvatar(
     val large: String,
     val medium: String,
     val small: String,

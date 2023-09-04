@@ -17,21 +17,21 @@ import com.ammar.wallflow.data.db.entity.WallpaperTagsEntity
 import com.ammar.wallflow.data.db.entity.WallpaperWithUploaderAndTags
 import com.ammar.wallflow.data.db.entity.asTag
 import com.ammar.wallflow.data.db.entity.asWallpaper
-import com.ammar.wallflow.data.network.WallHavenNetworkDataSource
-import com.ammar.wallflow.data.network.model.NetworkTag
-import com.ammar.wallflow.data.network.model.NetworkUploader
-import com.ammar.wallflow.data.network.model.NetworkWallpaper
+import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
+import com.ammar.wallflow.data.network.model.NetworkWallhavenTag
+import com.ammar.wallflow.data.network.model.NetworkWallhavenUploader
+import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpaper
 import com.ammar.wallflow.data.network.model.asTagEntity
 import com.ammar.wallflow.data.network.model.asUploaderEntity
 import com.ammar.wallflow.data.network.model.asWallpaperEntity
 import com.ammar.wallflow.data.repository.utils.NetworkBoundResource
 import com.ammar.wallflow.data.repository.utils.Resource
-import com.ammar.wallflow.data.repository.utils.TagsDocumentParser.parsePopularTags
+import com.ammar.wallflow.data.repository.utils.WallhavenTagsDocumentParser.parsePopularTags
 import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.SearchQuery
-import com.ammar.wallflow.model.Tag
-import com.ammar.wallflow.model.Wallpaper
+import com.ammar.wallflow.model.WallhavenTag
+import com.ammar.wallflow.model.WallhavenWallpaper
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -44,19 +44,23 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 
 @OptIn(ExperimentalPagingApi::class)
-class DefaultWallHavenRepository @Inject constructor(
+class DefaultWallhavenRepository @Inject constructor(
     private val appDatabase: AppDatabase,
-    private val wallHavenNetwork: WallHavenNetworkDataSource,
+    private val wallHavenNetwork: WallhavenNetworkDataSource,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
-) : WallHavenRepository {
+) : WallhavenRepository {
     private val popularTagsDao = appDatabase.popularTagsDao()
     private val lastUpdatedDao = appDatabase.lastUpdatedDao()
     private val wallpapersDao = appDatabase.wallpapersDao()
     private val tagsDao = appDatabase.tagsDao()
     private val uploadersDao = appDatabase.uploadersDao()
 
-    private val popularTagNetworkResource =
-        object : NetworkBoundResource<List<TagEntity>, List<Tag>, List<NetworkTag>>(
+    private val popularWallhavenTagNetworkResource =
+        object : NetworkBoundResource<
+            List<TagEntity>,
+            List<WallhavenTag>,
+            List<NetworkWallhavenTag>,
+            >(
             initialValue = emptyList(),
             ioDispatcher = ioDispatcher,
         ) {
@@ -76,12 +80,14 @@ class DefaultWallHavenRepository @Inject constructor(
                 }
             }
 
-            override suspend fun fetchFromNetwork(dbData: List<TagEntity>): List<NetworkTag> {
+            override suspend fun fetchFromNetwork(
+                dbData: List<TagEntity>,
+            ): List<NetworkWallhavenTag> {
                 val doc = wallHavenNetwork.popularTags()
                 return doc?.let(::parsePopularTags) ?: emptyList()
             }
 
-            override suspend fun saveFetchResult(fetchResult: List<NetworkTag>) {
+            override suspend fun saveFetchResult(fetchResult: List<NetworkWallhavenTag>) {
                 appDatabase.withTransaction {
                     popularTagsDao.deleteAll()
                     // insert non-existing tags first
@@ -100,7 +106,7 @@ class DefaultWallHavenRepository @Inject constructor(
         }
 
     internal suspend fun insertTags(
-        tags: List<NetworkTag>,
+        tags: List<NetworkWallhavenTag>,
         shouldUpdate: Boolean,
     ): List<TagEntity> {
         val existingTags = tagsDao.getByWallhavenIds(tags.map { it.id })
@@ -131,7 +137,11 @@ class DefaultWallHavenRepository @Inject constructor(
     }
 
     private fun getWallpaperNetworkResource(wallpaperWallhavenId: String) =
-        object : NetworkBoundResource<WallpaperWithUploaderAndTags?, Wallpaper?, NetworkWallpaper>(
+        object : NetworkBoundResource<
+            WallpaperWithUploaderAndTags?,
+            WallhavenWallpaper?,
+            NetworkWallhavenWallpaper,
+            >(
             initialValue = null,
             ioDispatcher = ioDispatcher,
         ) {
@@ -144,7 +154,7 @@ class DefaultWallHavenRepository @Inject constructor(
             override suspend fun fetchFromNetwork(dbData: WallpaperWithUploaderAndTags?) =
                 wallHavenNetwork.wallpaper(wallpaperWallhavenId).data
 
-            override suspend fun saveFetchResult(fetchResult: NetworkWallpaper) {
+            override suspend fun saveFetchResult(fetchResult: NetworkWallhavenWallpaper) {
                 appDatabase.withTransaction {
                     var uploaderId: Long? = null
                     if (fetchResult.uploader != null) {
@@ -201,7 +211,7 @@ class DefaultWallHavenRepository @Inject constructor(
             }
         }
 
-    internal suspend fun insertUploader(uploader: NetworkUploader): Long {
+    internal suspend fun insertUploader(uploader: NetworkWallhavenUploader): Long {
         val existingUploader = uploadersDao.getByUsername(uploader.username)
         if (existingUploader != null) {
             return existingUploader.id
@@ -214,7 +224,7 @@ class DefaultWallHavenRepository @Inject constructor(
         pageSize: Int,
         prefetchDistance: Int,
         initialLoadSize: Int,
-    ): Flow<PagingData<Wallpaper>> = Pager(
+    ): Flow<PagingData<WallhavenWallpaper>> = Pager(
         config = PagingConfig(
             pageSize = pageSize,
             prefetchDistance = prefetchDistance,
@@ -236,16 +246,16 @@ class DefaultWallHavenRepository @Inject constructor(
 
     override fun popularTags() = flow {
         withContext(ioDispatcher) {
-            popularTagNetworkResource.init()
+            popularWallhavenTagNetworkResource.init()
         }
-        emitAll(popularTagNetworkResource.data)
+        emitAll(popularWallhavenTagNetworkResource.data)
     }
 
     override suspend fun refreshPopularTags() {
-        popularTagNetworkResource.refresh()
+        popularWallhavenTagNetworkResource.refresh()
     }
 
-    override fun wallpaper(wallpaperWallhavenId: String): Flow<Resource<Wallpaper?>> {
+    override fun wallpaper(wallpaperWallhavenId: String): Flow<Resource<WallhavenWallpaper?>> {
         val resource = getWallpaperNetworkResource(wallpaperWallhavenId)
         return flow {
             withContext(ioDispatcher) {

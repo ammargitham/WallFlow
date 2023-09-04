@@ -4,8 +4,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntSize
 import androidx.core.graphics.toColorInt
 import com.ammar.wallflow.model.Purity
-import com.ammar.wallflow.model.Thumbs
-import com.ammar.wallflow.model.Wallpaper
+import com.ammar.wallflow.model.WallhavenThumbs
+import com.ammar.wallflow.model.WallhavenWallpaper
 import kotlin.test.assertEquals
 import kotlinx.datetime.Instant
 import org.junit.Test
@@ -37,7 +37,7 @@ class WallpaperEntityTest {
                 small = "https://th.wallhaven.cc/small/85/85k6eo.jpg",
             ),
         )
-        val expected = Wallpaper(
+        val expected = WallhavenWallpaper(
             id = "85k6eo",
             url = "https://wallhaven.cc/w/85k6eo",
             shortUrl = "https://whvn.cc/85k6eo",
@@ -59,7 +59,7 @@ class WallpaperEntityTest {
                 "#cccccc",
             ).map { Color(it.toColorInt()) },
             path = "https://w.wallhaven.cc/full/85/wallhaven-85k6eo.png",
-            thumbs = Thumbs(
+            thumbs = WallhavenThumbs(
                 large = "https://th.wallhaven.cc/lg/85/85k6eo.jpg",
                 original = "https://th.wallhaven.cc/orig/85/85k6eo.jpg",
                 small = "https://th.wallhaven.cc/small/85/85k6eo.jpg",

@@ -10,7 +10,7 @@ import com.ammar.wallflow.data.db.entity.SearchQueryEntity
 import com.ammar.wallflow.data.db.entity.SearchQueryRemoteKeyEntity
 import com.ammar.wallflow.data.db.entity.SearchQueryWallpaperEntity
 import com.ammar.wallflow.data.db.entity.WallpaperEntity
-import com.ammar.wallflow.data.network.WallHavenNetworkDataSource
+import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
 import com.ammar.wallflow.data.network.model.asWallpaperEntity
 import com.ammar.wallflow.model.SearchQuery
 import java.io.IOException
@@ -21,7 +21,7 @@ import retrofit2.HttpException
 class WallpapersRemoteMediator(
     private val searchQuery: SearchQuery,
     private val appDatabase: AppDatabase,
-    private val wallHavenNetwork: WallHavenNetworkDataSource,
+    private val wallHavenNetwork: WallhavenNetworkDataSource,
     private val clock: Clock = Clock.System,
 ) : RemoteMediator<Int, WallpaperEntity>() {
     private val wallpapersDao = appDatabase.wallpapersDao()

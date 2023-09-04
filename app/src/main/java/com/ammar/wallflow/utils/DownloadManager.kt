@@ -14,7 +14,7 @@ import com.ammar.wallflow.extensions.getMLModelsDir
 import com.ammar.wallflow.extensions.getTempDir
 import com.ammar.wallflow.extensions.getTempFileIfExists
 import com.ammar.wallflow.extensions.workManager
-import com.ammar.wallflow.model.Wallpaper
+import com.ammar.wallflow.model.WallhavenWallpaper
 import com.ammar.wallflow.workers.DownloadWorker
 import com.ammar.wallflow.workers.DownloadWorker.Companion.NotificationType
 import com.ammar.wallflow.workers.DownloadWorker.Companion.OUTPUT_KEY_ERROR
@@ -28,15 +28,15 @@ import kotlinx.coroutines.flow.map
 class DownloadManager @Inject constructor() {
     fun requestDownload(
         context: Context,
-        wallpaper: Wallpaper,
+        wallhavenWallpaper: WallhavenWallpaper,
         notificationType: NotificationType = NotificationType.VISIBLE_SUCCESS,
         downloadLocation: DownloadLocation = DownloadLocation.DOWNLOADS,
     ) = requestDownload(
         context = context,
-        url = wallpaper.path,
+        url = wallhavenWallpaper.path,
         downloadLocation = downloadLocation,
         notificationType = notificationType,
-        extraWorkerData = arrayOf(DownloadWorker.INPUT_KEY_WALLPAPER_ID to wallpaper.id),
+        extraWorkerData = arrayOf(DownloadWorker.INPUT_KEY_WALLPAPER_ID to wallhavenWallpaper.id),
     )
 
     fun requestDownload(
@@ -111,13 +111,13 @@ class DownloadManager @Inject constructor() {
 
     suspend fun downloadWallpaperAsync(
         context: Application,
-        wallpaper: Wallpaper,
+        wallhavenWallpaper: WallhavenWallpaper,
         onLoadingChange: (loading: Boolean) -> Unit = {},
         onResult: (file: File?) -> Unit,
     ) {
         try {
             onLoadingChange(true)
-            val fileName = wallpaper.path.getFileNameFromUrl()
+            val fileName = wallhavenWallpaper.path.getFileNameFromUrl()
             val fileIfExists = context.getTempFileIfExists(fileName)
             if (fileIfExists != null) {
                 onLoadingChange(false)
@@ -126,7 +126,7 @@ class DownloadManager @Inject constructor() {
             }
             val workName = requestDownload(
                 context = context,
-                wallpaper = wallpaper,
+                wallhavenWallpaper = wallhavenWallpaper,
                 downloadLocation = DownloadLocation.APP_TEMP,
                 notificationType = NotificationType.SILENT,
             )

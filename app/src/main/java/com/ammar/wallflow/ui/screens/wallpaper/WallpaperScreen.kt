@@ -110,7 +110,7 @@ fun WallpaperScreen(
         modifier = Modifier.fillMaxSize(),
     ) {
         WallpaperViewer(
-            wallpaper = viewerUiState.wallpaper,
+            wallhavenWallpaper = viewerUiState.wallhavenWallpaper,
             actionsVisible = viewerUiState.actionsVisible,
             downloadStatus = viewerUiState.downloadStatus,
             loading = viewerUiState.loading,
@@ -126,9 +126,9 @@ fun WallpaperScreen(
             },
             onInfoClick = viewerViewModel::showInfo,
             onInfoDismiss = { viewerViewModel.showInfo(false) },
-            onShareLinkClick = { viewerUiState.wallpaper?.run { context.share(url) } },
+            onShareLinkClick = { viewerUiState.wallhavenWallpaper?.run { context.share(url) } },
             onShareImageClick = {
-                val wallpaper = viewerUiState.wallpaper ?: return@WallpaperViewer
+                val wallpaper = viewerUiState.wallhavenWallpaper ?: return@WallpaperViewer
                 viewerViewModel.downloadForSharing {
                     if (it == null) return@downloadForSharing
                     context.share(
@@ -156,7 +156,7 @@ fun WallpaperScreen(
             onTagClick = {
                 val search = Search(
                     query = "id:${it.id}",
-                    meta = TagSearchMeta(tag = it),
+                    meta = TagSearchMeta(wallhavenTag = it),
                 )
                 if (searchBarController.state.value.search == search) {
                     return@WallpaperViewer
@@ -166,7 +166,7 @@ fun WallpaperScreen(
             onUploaderClick = {
                 val search = Search(
                     query = "@${it.username}",
-                    meta = UploaderSearchMeta(uploader = it),
+                    meta = UploaderSearchMeta(wallhavenUploader = it),
                 )
                 if (searchBarController.state.value.search == search) {
                     return@WallpaperViewer

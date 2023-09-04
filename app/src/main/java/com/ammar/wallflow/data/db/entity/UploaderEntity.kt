@@ -4,8 +4,8 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.ammar.wallflow.model.Avatar
-import com.ammar.wallflow.model.Uploader
+import com.ammar.wallflow.model.WallhavenAvatar
+import com.ammar.wallflow.model.WallhavenUploader
 
 @Entity(
     tableName = "uploaders",
@@ -30,13 +30,13 @@ data class AvatarEntity(
     val tiny: String,
 )
 
-fun UploaderEntity.asUploader() = Uploader(
+fun UploaderEntity.asUploader() = WallhavenUploader(
     username = username,
     group = group,
     avatar = avatar.asAvatar(),
 )
 
-fun AvatarEntity.asAvatar() = Avatar(
+fun AvatarEntity.asAvatar() = WallhavenAvatar(
     large = large,
     medium = medium,
     small = small,

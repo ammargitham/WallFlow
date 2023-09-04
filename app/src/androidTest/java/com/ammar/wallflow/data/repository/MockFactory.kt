@@ -1,7 +1,7 @@
 package com.ammar.wallflow.data.repository
 
-import com.ammar.wallflow.data.network.model.NetworkThumbs
-import com.ammar.wallflow.data.network.model.NetworkWallpaper
+import com.ammar.wallflow.data.network.model.NetworkWallhavenThumbs
+import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpaper
 import com.ammar.wallflow.extensions.toHexString
 import kotlin.math.absoluteValue
 import kotlin.random.Random
@@ -10,7 +10,9 @@ import kotlinx.datetime.Clock
 object MockFactory {
     fun generateNetworkWallpapers(size: Int = 10) = List(size) { generateNetworkWallpaper() }
 
-    fun generateNetworkWallpaper(idNumber: Int = Random.nextInt().absoluteValue) = NetworkWallpaper(
+    fun generateNetworkWallpaper(
+        idNumber: Int = Random.nextInt().absoluteValue,
+    ) = NetworkWallhavenWallpaper(
         id = "wallpaper${idNumber + 1}",
         url = "https://example.com/wallpaper${idNumber + 1}",
         short_url = "https://example.com/w${idNumber + 1}",
@@ -28,7 +30,7 @@ object MockFactory {
         created_at = Clock.System.now(),
         colors = List(Random.nextInt(5)) { RandomColors.nextColor().toHexString() },
         path = "wallpapers/wallpaper${idNumber + 1}.jpg",
-        thumbs = NetworkThumbs(
+        thumbs = NetworkWallhavenThumbs(
             large = "https://example.com/wallpaper${idNumber + 1}/large",
             original = "https://example.com/wallpaper${idNumber + 1}/original",
             small = "https://example.com/wallpaper${idNumber + 1}/small",

@@ -1,16 +1,16 @@
 package com.ammar.wallflow.data.repository.utils
 
-import com.ammar.wallflow.data.network.model.NetworkTag
+import com.ammar.wallflow.data.network.model.NetworkWallhavenTag
 import java.net.URL
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
 import org.jsoup.nodes.Document
 
-object TagsDocumentParser {
-    internal fun parsePopularTags(doc: Document): List<NetworkTag> {
+object WallhavenTagsDocumentParser {
+    internal fun parsePopularTags(doc: Document): List<NetworkWallhavenTag> {
         val tagListEle = doc.select("div#taglist").first() ?: return emptyList()
         val tagMainElements = tagListEle.select("div.taglist-tagmain")
-        val tags = tagMainElements.fold(ArrayList<NetworkTag>()) { targetList, ele ->
+        val tags = tagMainElements.fold(ArrayList<NetworkWallhavenTag>()) { targetList, ele ->
             val tagNameSpan = ele.selectFirst("span.taglist-name") ?: return@fold targetList
             val nameAnchorEle = tagNameSpan.selectFirst("a")
             val href = nameAnchorEle?.attr("href") ?: return@fold targetList
@@ -38,7 +38,7 @@ object TagsDocumentParser {
             val createdAtStr = creatorEle?.selectFirst("time")?.attr("datetime")
             val createdAt = createdAtStr?.let { Instant.parse(it) } ?: Clock.System.now()
             targetList.add(
-                NetworkTag(
+                NetworkWallhavenTag(
                     id = id,
                     name = name,
                     alias = "",

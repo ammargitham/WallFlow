@@ -32,9 +32,9 @@ import com.ammar.wallflow.extensions.toPx
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.SearchQuery
-import com.ammar.wallflow.model.Tag
-import com.ammar.wallflow.model.wallpaper1
-import com.ammar.wallflow.model.wallpaper2
+import com.ammar.wallflow.model.WallhavenTag
+import com.ammar.wallflow.model.wallhavenWallpaper1
+import com.ammar.wallflow.model.wallhavenWallpaper2
 import com.ammar.wallflow.ui.common.Suggestion
 import com.ammar.wallflow.ui.common.bottombar.BottomBar
 import com.ammar.wallflow.ui.common.bottombar.NavRail
@@ -254,9 +254,10 @@ private fun PreviewMainActivityContentTable() {
 private fun PreviewContent(
     useNavRail: Boolean = false,
 ) {
-    val previewWallpaperFlow = flowOf(PagingData.from(listOf(wallpaper1, wallpaper2)))
-    val previewTags = List(10) {
-        Tag(
+    val previewWallpaperFlow =
+        flowOf(PagingData.from(listOf(wallhavenWallpaper1, wallhavenWallpaper2)))
+    val previewWallhavenTags = List(10) {
+        WallhavenTag(
             id = it.toLong(),
             name = "tag_$it",
             alias = emptyList(),
@@ -286,7 +287,7 @@ private fun PreviewContent(
                 }
                 HomeScreenContent(
                     modifier = Modifier.windowInsetsPadding(topWindowInsets),
-                    tags = previewTags,
+                    wallhavenTags = previewWallhavenTags,
                     wallpapers = pagingItems,
                     nestedScrollConnection = nestedScrollConnection,
                     contentPadding = PaddingValues(

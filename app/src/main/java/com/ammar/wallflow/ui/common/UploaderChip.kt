@@ -20,14 +20,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.ammar.wallflow.R
-import com.ammar.wallflow.model.Avatar
-import com.ammar.wallflow.model.Uploader
+import com.ammar.wallflow.model.WallhavenAvatar
+import com.ammar.wallflow.model.WallhavenUploader
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 
 @Composable
 fun UploaderChip(
     modifier: Modifier = Modifier,
-    uploader: Uploader,
+    wallhavenUploader: WallhavenUploader,
     onClick: () -> Unit = {},
 ) {
     AssistChip(
@@ -42,12 +42,12 @@ fun UploaderChip(
                     painter = painterResource(R.drawable.outline_account_circle_24),
                     colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface),
                 ),
-                model = uploader.avatar.medium,
+                model = wallhavenUploader.avatar.medium,
                 contentScale = ContentScale.Crop,
-                contentDescription = "${uploader.username}'s avatar",
+                contentDescription = "${wallhavenUploader.username}'s avatar",
             )
         },
-        label = { Text(text = uploader.username) },
+        label = { Text(text = wallhavenUploader.username) },
     )
 }
 
@@ -62,10 +62,10 @@ private fun PreviewUploaderChip() {
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
             ) {
                 UploaderChip(
-                    uploader = Uploader(
+                    wallhavenUploader = WallhavenUploader(
                         username = "test",
                         group = "",
-                        avatar = Avatar(
+                        avatar = WallhavenAvatar(
                             large = "",
                             medium = "",
                             small = "",

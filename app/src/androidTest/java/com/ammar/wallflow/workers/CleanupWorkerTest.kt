@@ -14,13 +14,13 @@ import androidx.work.WorkerParameters
 import com.ammar.wallflow.data.db.database.AppDatabase
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.WallpaperEntity
-import com.ammar.wallflow.data.network.model.NetworkMeta
-import com.ammar.wallflow.data.network.model.NetworkWallpaper
-import com.ammar.wallflow.data.network.model.StringNetworkMetaQuery
+import com.ammar.wallflow.data.network.model.NetworkWallhavenMeta
+import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpaper
+import com.ammar.wallflow.data.network.model.StringNetworkWallhavenMetaQuery
 import com.ammar.wallflow.data.network.model.asWallpaperEntity
-import com.ammar.wallflow.data.network.retrofit.RetrofitWallHavenNetwork
+import com.ammar.wallflow.data.network.retrofit.RetrofitWallhavenNetwork
 import com.ammar.wallflow.data.repository.MockFactory
-import com.ammar.wallflow.data.repository.MockWallHavenNetworkApi
+import com.ammar.wallflow.data.repository.MockWallhavenNetworkApi
 import com.ammar.wallflow.data.repository.WallpapersRemoteMediator
 import com.ammar.wallflow.extensions.getFileNameFromUrl
 import com.ammar.wallflow.extensions.getTempDir
@@ -49,8 +49,8 @@ class CleanupWorkerTest {
     private lateinit var context: Context
     private lateinit var db: AppDatabase
     private lateinit var tempDir: File
-    private val mockNetworkApi = MockWallHavenNetworkApi()
-    private val wallHavenNetworkDataSource = RetrofitWallHavenNetwork(mockNetworkApi)
+    private val mockNetworkApi = MockWallhavenNetworkApi()
+    private val wallHavenNetworkDataSource = RetrofitWallhavenNetwork(mockNetworkApi)
     private val testDispatcher = StandardTestDispatcher()
 
     @Before
@@ -171,7 +171,7 @@ class CleanupWorkerTest {
         val clock = TestClock(Clock.System.now())
         val query1 = "test1"
         val mockNetworkWallpapers1 = MockFactory.generateNetworkWallpapers(20)
-        simulateSearch(clock, query1, mockNetworkWallpapers = mockNetworkWallpapers1)
+        simulateSearch(clock, query1, mockNetworkWallhavenWallpapers = mockNetworkWallpapers1)
         assertEquals(20, wallpapersDao.count())
         assertEquals(1, searchQueryDao.count())
 
@@ -188,7 +188,7 @@ class CleanupWorkerTest {
         clock.plus(2.days)
         val query2 = "test2"
         val mockNetworkWallpapers2 = MockFactory.generateNetworkWallpapers(20)
-        simulateSearch(clock, query2, mockNetworkWallpapers = mockNetworkWallpapers2)
+        simulateSearch(clock, query2, mockNetworkWallhavenWallpapers = mockNetworkWallpapers2)
         assertEquals(40, wallpapersDao.count())
         assertEquals(2, searchQueryDao.count())
 
@@ -235,7 +235,7 @@ class CleanupWorkerTest {
         val query1 = "test1"
         val query1NewCount = 20
         val mockNetworkWallpapers1 = MockFactory.generateNetworkWallpapers(query1NewCount)
-        simulateSearch(clock, query1, mockNetworkWallpapers = mockNetworkWallpapers1)
+        simulateSearch(clock, query1, mockNetworkWallhavenWallpapers = mockNetworkWallpapers1)
         assertEquals(query1NewCount, wallpapersDao.count())
         assertEquals(1, searchQueryDao.count())
 
@@ -265,7 +265,7 @@ class CleanupWorkerTest {
         mockNetworkWallpapers2 += (mockNetworkWallpapers1 - cached.toSet()).shuffled().take(7)
 
         val query2 = "test2"
-        simulateSearch(clock, query2, mockNetworkWallpapers = mockNetworkWallpapers2)
+        simulateSearch(clock, query2, mockNetworkWallhavenWallpapers = mockNetworkWallpapers2)
         assertEquals(query1NewCount + query2NewCount, wallpapersDao.count())
         assertEquals(2, searchQueryDao.count())
 
@@ -302,7 +302,7 @@ class CleanupWorkerTest {
         val query1 = "test1"
         val query1NewCount = 20
         val mockNetworkWallpapers1 = MockFactory.generateNetworkWallpapers(query1NewCount)
-        simulateSearch(clock, query1, mockNetworkWallpapers = mockNetworkWallpapers1)
+        simulateSearch(clock, query1, mockNetworkWallhavenWallpapers = mockNetworkWallpapers1)
         assertEquals(query1NewCount, wallpapersDao.count())
         assertEquals(1, searchQueryDao.count())
 
@@ -334,7 +334,7 @@ class CleanupWorkerTest {
         // forward time by 2.days
         clock.plus(2.days)
         val query2 = "test2"
-        simulateSearch(clock, query2, mockNetworkWallpapers = mockNetworkWallpapers2)
+        simulateSearch(clock, query2, mockNetworkWallhavenWallpapers = mockNetworkWallpapers2)
         assertEquals(query1NewCount + query2NewCount, wallpapersDao.count())
         assertEquals(2, searchQueryDao.count())
 
@@ -432,7 +432,7 @@ class CleanupWorkerTest {
         val query1 = "test1"
         val query1NewCount = 20
         val mockNetworkWallpapers1 = MockFactory.generateNetworkWallpapers(query1NewCount)
-        simulateSearch(clock, query1, mockNetworkWallpapers = mockNetworkWallpapers1)
+        simulateSearch(clock, query1, mockNetworkWallhavenWallpapers = mockNetworkWallpapers1)
         assertEquals(query1NewCount, wallpapersDao.count())
         assertEquals(1, searchQueryDao.count())
 
@@ -483,14 +483,15 @@ class CleanupWorkerTest {
         query: String,
         perPage: Int = 20,
         totalResultsCount: Int = 198,
-        mockNetworkWallpapers: List<NetworkWallpaper> = MockFactory.generateNetworkWallpapers(20),
+        mockNetworkWallhavenWallpapers: List<NetworkWallhavenWallpaper> =
+            MockFactory.generateNetworkWallpapers(20),
     ) {
         val searchQuery = SearchQuery(includedTags = setOf(query))
         mockNetworkApi.setWallpapersForQuery(
             query = searchQuery.getQString(),
-            networkWallpapers = mockNetworkWallpapers,
-            meta = NetworkMeta(
-                query = StringNetworkMetaQuery(""),
+            networkWallhavenWallpapers = mockNetworkWallhavenWallpapers,
+            meta = NetworkWallhavenMeta(
+                query = StringNetworkWallhavenMetaQuery(""),
                 current_page = 1,
                 last_page = totalResultsCount / perPage + 1,
                 per_page = perPage,

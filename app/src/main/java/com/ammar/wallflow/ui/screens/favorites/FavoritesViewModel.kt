@@ -10,7 +10,7 @@ import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.FavoritesRepository
 import com.ammar.wallflow.model.Favorite
 import com.ammar.wallflow.model.Source
-import com.ammar.wallflow.model.Wallpaper
+import com.ammar.wallflow.model.WallhavenWallpaper
 import com.github.materiiapps.partial.Partialize
 import com.github.materiiapps.partial.partial
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -52,13 +52,13 @@ class FavoritesViewModel @Inject constructor(
         initialValue = FavoritesUiState(),
     )
 
-    fun setSelectedWallpaper(wallpaper: Wallpaper) = localUiState.update {
-        it.copy(selectedWallpaper = partial(wallpaper))
+    fun setSelectedWallpaper(wallhavenWallpaper: WallhavenWallpaper) = localUiState.update {
+        it.copy(selectedWallhavenWallpaper = partial(wallhavenWallpaper))
     }
 
-    fun toggleFavorite(wallpaper: Wallpaper) = viewModelScope.launch {
+    fun toggleFavorite(wallhavenWallpaper: WallhavenWallpaper) = viewModelScope.launch {
         favoritesRepository.toggleFavorite(
-            sourceId = wallpaper.id,
+            sourceId = wallhavenWallpaper.id,
             source = Source.WALLHAVEN,
         )
     }
@@ -69,7 +69,7 @@ class FavoritesViewModel @Inject constructor(
 data class FavoritesUiState(
     val blurSketchy: Boolean = false,
     val blurNsfw: Boolean = false,
-    val selectedWallpaper: Wallpaper? = null,
+    val selectedWallhavenWallpaper: WallhavenWallpaper? = null,
     val layoutPreferences: LayoutPreferences = LayoutPreferences(),
     val favorites: ImmutableList<Favorite> = persistentListOf(),
 )

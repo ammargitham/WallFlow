@@ -1,23 +1,23 @@
 package com.ammar.wallflow.data.network.model
 
 import com.ammar.wallflow.data.db.entity.ThumbsEntity
-import com.ammar.wallflow.model.Thumbs
+import com.ammar.wallflow.model.WallhavenThumbs
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class NetworkThumbs(
+data class NetworkWallhavenThumbs(
     val large: String,
     val original: String,
     val small: String,
 )
 
-fun NetworkThumbs.asThumbs() = Thumbs(
+fun NetworkWallhavenThumbs.toWallhavenThumbs() = WallhavenThumbs(
     large = large,
     original = original,
     small = small,
 )
 
-fun NetworkThumbs.asThumbsEntity() = ThumbsEntity(
+fun NetworkWallhavenThumbs.asThumbsEntity() = ThumbsEntity(
     large = large,
     original = original,
     small = small,

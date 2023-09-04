@@ -12,7 +12,7 @@ import okhttp3.Interceptor
 import okhttp3.Response
 
 @Singleton
-class WallHavenInterceptor @Inject constructor(
+class WallhavenInterceptor @Inject constructor(
     private val appPreferencesRepository: AppPreferencesRepository,
     private val globalErrorsRepository: GlobalErrorsRepository,
 ) : Interceptor {

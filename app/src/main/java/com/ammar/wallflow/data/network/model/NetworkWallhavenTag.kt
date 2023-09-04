@@ -4,12 +4,13 @@ import com.ammar.wallflow.data.db.entity.TagEntity
 import com.ammar.wallflow.data.network.model.util.InstantSerializer
 import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.model.Purity
-import com.ammar.wallflow.model.Tag
+import com.ammar.wallflow.model.WallhavenTag
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
+@Suppress("PropertyName")
 @Serializable
-data class NetworkTag(
+data class NetworkWallhavenTag(
     val id: Long,
     val name: String,
     val alias: String,
@@ -20,7 +21,7 @@ data class NetworkTag(
     val created_at: Instant,
 )
 
-fun NetworkTag.asTagEntity(id: Long = 0) = TagEntity(
+fun NetworkWallhavenTag.asTagEntity(id: Long = 0) = TagEntity(
     id = id,
     wallhavenId = this.id,
     name = name,
@@ -31,7 +32,7 @@ fun NetworkTag.asTagEntity(id: Long = 0) = TagEntity(
     createdAt = created_at,
 )
 
-fun NetworkTag.toTag() = Tag(
+fun NetworkWallhavenTag.toWallhavenTag() = WallhavenTag(
     id = id,
     name = name,
     alias = alias.split(",").map { it.trimAll() },

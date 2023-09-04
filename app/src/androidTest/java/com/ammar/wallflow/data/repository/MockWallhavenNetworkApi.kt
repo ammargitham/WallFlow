@@ -1,16 +1,16 @@
 package com.ammar.wallflow.data.repository
 
-import com.ammar.wallflow.data.network.model.NetworkMeta
 import com.ammar.wallflow.data.network.model.NetworkResponse
-import com.ammar.wallflow.data.network.model.NetworkWallpaper
-import com.ammar.wallflow.data.network.retrofit.api.WallHavenNetworkApi
+import com.ammar.wallflow.data.network.model.NetworkWallhavenMeta
+import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpaper
+import com.ammar.wallflow.data.network.retrofit.api.WallhavenNetworkApi
 import java.io.IOException
 import org.jsoup.nodes.Document
 
-class MockWallHavenNetworkApi : WallHavenNetworkApi {
+class MockWallhavenNetworkApi : WallhavenNetworkApi {
     var failureMsg: String? = null
-    private val wallpaperMap = mutableMapOf<String, List<NetworkWallpaper>>()
-    private val metaMap = mutableMapOf<String, NetworkMeta?>()
+    private val wallpaperMap = mutableMapOf<String, List<NetworkWallhavenWallpaper>>()
+    private val metaMap = mutableMapOf<String, NetworkWallhavenMeta?>()
 
     override suspend fun search(
         query: String?,
@@ -25,7 +25,7 @@ class MockWallHavenNetworkApi : WallHavenNetworkApi {
         ratios: String?,
         page: Int?,
         seed: String?,
-    ): NetworkResponse<List<NetworkWallpaper>> {
+    ): NetworkResponse<List<NetworkWallhavenWallpaper>> {
         failureMsg?.run { throw IOException(this) }
         return NetworkResponse(
             data = wallpaperMap.getOrDefault(query, emptyList()),
@@ -37,16 +37,16 @@ class MockWallHavenNetworkApi : WallHavenNetworkApi {
         TODO("Not yet implemented")
     }
 
-    override suspend fun wallpaper(id: String): NetworkResponse<NetworkWallpaper> {
+    override suspend fun wallpaper(id: String): NetworkResponse<NetworkWallhavenWallpaper> {
         TODO("Not yet implemented")
     }
 
     fun setWallpapersForQuery(
         query: String,
-        networkWallpapers: List<NetworkWallpaper>,
-        meta: NetworkMeta? = null,
+        networkWallhavenWallpapers: List<NetworkWallhavenWallpaper>,
+        meta: NetworkWallhavenMeta? = null,
     ) {
-        wallpaperMap[query] = networkWallpapers
+        wallpaperMap[query] = networkWallhavenWallpapers
         metaMap[query] = meta
     }
 

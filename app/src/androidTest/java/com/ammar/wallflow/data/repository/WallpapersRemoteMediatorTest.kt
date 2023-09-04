@@ -10,9 +10,9 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ammar.wallflow.data.db.database.AppDatabase
 import com.ammar.wallflow.data.db.entity.WallpaperEntity
-import com.ammar.wallflow.data.network.model.NetworkMeta
-import com.ammar.wallflow.data.network.model.StringNetworkMetaQuery
-import com.ammar.wallflow.data.network.retrofit.RetrofitWallHavenNetwork
+import com.ammar.wallflow.data.network.model.NetworkWallhavenMeta
+import com.ammar.wallflow.data.network.model.StringNetworkWallhavenMetaQuery
+import com.ammar.wallflow.data.network.retrofit.RetrofitWallhavenNetwork
 import com.ammar.wallflow.extensions.randomList
 import com.ammar.wallflow.model.SearchQuery
 import kotlin.test.assertEquals
@@ -33,8 +33,8 @@ import org.junit.runner.RunWith
 )
 @RunWith(AndroidJUnit4::class)
 class WallpapersRemoteMediatorTest {
-    private val mockNetworkApi = MockWallHavenNetworkApi()
-    private val wallHavenNetworkDataSource = RetrofitWallHavenNetwork(mockNetworkApi)
+    private val mockNetworkApi = MockWallhavenNetworkApi()
+    private val wallHavenNetworkDataSource = RetrofitWallhavenNetwork(mockNetworkApi)
     private val mockDb = Room.inMemoryDatabaseBuilder(
         context = ApplicationProvider.getApplicationContext(),
         klass = AppDatabase::class.java,
@@ -57,9 +57,9 @@ class WallpapersRemoteMediatorTest {
         val mockNetworkWallpapers = MockFactory.generateNetworkWallpapers(20)
         mockNetworkApi.setWallpapersForQuery(
             query = searchQuery.getQString(),
-            networkWallpapers = mockNetworkWallpapers,
-            meta = NetworkMeta(
-                query = StringNetworkMetaQuery(""),
+            networkWallhavenWallpapers = mockNetworkWallpapers,
+            meta = NetworkWallhavenMeta(
+                query = StringNetworkWallhavenMetaQuery(""),
                 current_page = 1,
                 last_page = 10,
                 per_page = 20,
@@ -169,9 +169,9 @@ class WallpapersRemoteMediatorTest {
         val queryWallpaperWallhavenIds = queryWallpapers1.map { it.id }
         mockNetworkApi.setWallpapersForQuery(
             query = searchQuery.getQString(),
-            networkWallpapers = queryWallpapers1,
-            meta = NetworkMeta(
-                query = StringNetworkMetaQuery(""),
+            networkWallhavenWallpapers = queryWallpapers1,
+            meta = NetworkWallhavenMeta(
+                query = StringNetworkWallhavenMetaQuery(""),
                 current_page = 1,
                 last_page = 10,
                 per_page = 20,
@@ -202,9 +202,9 @@ class WallpapersRemoteMediatorTest {
         val queryWallpapers2 = MockFactory.generateNetworkWallpapers(10)
         mockNetworkApi.setWallpapersForQuery(
             query = searchQuery.getQString(),
-            networkWallpapers = queryWallpapers2,
-            meta = NetworkMeta(
-                query = StringNetworkMetaQuery(""),
+            networkWallhavenWallpapers = queryWallpapers2,
+            meta = NetworkWallhavenMeta(
+                query = StringNetworkWallhavenMetaQuery(""),
                 current_page = 1,
                 last_page = 1,
                 per_page = 20,
@@ -227,9 +227,9 @@ class WallpapersRemoteMediatorTest {
         val query1Wallpapers = MockFactory.generateNetworkWallpapers(20)
         mockNetworkApi.setWallpapersForQuery(
             query = searchQuery1.getQString(),
-            networkWallpapers = query1Wallpapers,
-            meta = NetworkMeta(
-                query = StringNetworkMetaQuery(""),
+            networkWallhavenWallpapers = query1Wallpapers,
+            meta = NetworkWallhavenMeta(
+                query = StringNetworkWallhavenMetaQuery(""),
                 current_page = 1,
                 last_page = 10,
                 per_page = 20,
@@ -253,9 +253,9 @@ class WallpapersRemoteMediatorTest {
             query1Wallpapers.randomList(5) + MockFactory.generateNetworkWallpaper(21)
         mockNetworkApi.setWallpapersForQuery(
             query = searchQuery2.getQString(),
-            networkWallpapers = query2Wallpapers,
-            meta = NetworkMeta(
-                query = StringNetworkMetaQuery(""),
+            networkWallhavenWallpapers = query2Wallpapers,
+            meta = NetworkWallhavenMeta(
+                query = StringNetworkWallhavenMetaQuery(""),
                 current_page = 1,
                 last_page = 1,
                 per_page = 20,

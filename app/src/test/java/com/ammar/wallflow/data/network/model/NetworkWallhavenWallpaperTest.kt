@@ -10,7 +10,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.junit.Test
 
-class NetworkWallpaperTest {
+class NetworkWallhavenWallpaperTest {
     @Test
     fun `convert json to NetworkWallpaper`() {
         // language=JSON
@@ -46,9 +46,9 @@ class NetworkWallpaperTest {
               }
             }
         """.trimIndent()
-        val networkWallpaper = Json.decodeFromString<NetworkWallpaper>(json)
+        val networkWallhavenWallpaper = Json.decodeFromString<NetworkWallhavenWallpaper>(json)
         assertEquals(
-            NetworkWallpaper(
+            NetworkWallhavenWallpaper(
                 id = "85k6eo",
                 url = "https://wallhaven.cc/w/85k6eo",
                 short_url = "https://whvn.cc/85k6eo",
@@ -67,14 +67,14 @@ class NetworkWallpaperTest {
                 created_at = Instant.parse("2023-04-26T02:41:32Z"),
                 colors = listOf("#996633", "#999999", "#cc6633", "#e7d8b1", "#cccccc"),
                 path = "https://w.wallhaven.cc/full/85/wallhaven-85k6eo.png",
-                thumbs = NetworkThumbs(
+                thumbs = NetworkWallhavenThumbs(
                     large = "https://th.wallhaven.cc/lg/85/85k6eo.jpg",
                     original = "https://th.wallhaven.cc/orig/85/85k6eo.jpg",
                     small = "https://th.wallhaven.cc/small/85/85k6eo.jpg",
                 ),
                 tags = null,
             ),
-            networkWallpaper,
+            networkWallhavenWallpaper,
         )
     }
 
@@ -114,7 +114,7 @@ class NetworkWallpaperTest {
               }
             }
         """.trimIndent()
-        val networkWallpaper = NetworkWallpaper(
+        val networkWallhavenWallpaper = NetworkWallhavenWallpaper(
             id = "85k6eo",
             url = "https://wallhaven.cc/w/85k6eo",
             short_url = "https://whvn.cc/85k6eo",
@@ -133,7 +133,7 @@ class NetworkWallpaperTest {
             created_at = Instant.parse("2023-04-26T02:41:32Z"),
             colors = listOf("#996633", "#999999", "#cc6633", "#e7d8b1", "#cccccc"),
             path = "https://w.wallhaven.cc/full/85/wallhaven-85k6eo.png",
-            thumbs = NetworkThumbs(
+            thumbs = NetworkWallhavenThumbs(
                 large = "https://th.wallhaven.cc/lg/85/85k6eo.jpg",
                 original = "https://th.wallhaven.cc/orig/85/85k6eo.jpg",
                 small = "https://th.wallhaven.cc/small/85/85k6eo.jpg",
@@ -144,7 +144,7 @@ class NetworkWallpaperTest {
             prettyPrint = true
             prettyPrintIndent = "  "
         }
-        val json = format.encodeToString(networkWallpaper)
+        val json = format.encodeToString(networkWallhavenWallpaper)
         assertEquals(
             expected,
             json,
@@ -153,7 +153,7 @@ class NetworkWallpaperTest {
 
     @Test
     fun `convert NetworkWallpaper to WallpaperEntity`() {
-        val networkWallpaper = NetworkWallpaper(
+        val networkWallhavenWallpaper = NetworkWallhavenWallpaper(
             id = "85k6eo",
             url = "https://wallhaven.cc/w/85k6eo",
             short_url = "https://whvn.cc/85k6eo",
@@ -172,7 +172,7 @@ class NetworkWallpaperTest {
             created_at = Instant.parse("2023-04-26T02:41:32Z"),
             colors = listOf("#996633", "#999999", "#cc6633", "#e7d8b1", "#cccccc"),
             path = "https://w.wallhaven.cc/full/85/wallhaven-85k6eo.png",
-            thumbs = NetworkThumbs(
+            thumbs = NetworkWallhavenThumbs(
                 large = "https://th.wallhaven.cc/lg/85/85k6eo.jpg",
                 original = "https://th.wallhaven.cc/orig/85/85k6eo.jpg",
                 small = "https://th.wallhaven.cc/small/85/85k6eo.jpg",
@@ -205,7 +205,7 @@ class NetworkWallpaperTest {
         )
         assertEquals(
             expected,
-            networkWallpaper.asWallpaperEntity(),
+            networkWallhavenWallpaper.asWallpaperEntity(),
         )
     }
 }

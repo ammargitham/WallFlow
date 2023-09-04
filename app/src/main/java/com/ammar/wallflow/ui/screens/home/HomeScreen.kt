@@ -44,10 +44,10 @@ import com.ammar.wallflow.extensions.search
 import com.ammar.wallflow.extensions.share
 import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.SearchSaver
-import com.ammar.wallflow.model.Tag
 import com.ammar.wallflow.model.TagSearchMeta
 import com.ammar.wallflow.model.UploaderSearchMeta
-import com.ammar.wallflow.model.Wallpaper
+import com.ammar.wallflow.model.WallhavenTag
+import com.ammar.wallflow.model.WallhavenWallpaper
 import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.SearchBar
 import com.ammar.wallflow.ui.common.bottomWindowInsets
@@ -133,7 +133,9 @@ fun HomeScreen(
         }
     }
 
-    val onWallpaperClick: (wallpaper: Wallpaper) -> Unit = remember(systemState.isExpanded) {
+    val onWallpaperClick: (
+        wallhavenWallpaper: WallhavenWallpaper,
+    ) -> Unit = remember(systemState.isExpanded) {
         {
             if (systemState.isExpanded) {
                 viewModel.setSelectedWallpaper(it)
@@ -150,7 +152,7 @@ fun HomeScreen(
         }
     }
 
-    val onTagClick: (tag: Tag) -> Unit = remember {
+    val onTagClick: (wallhavenTag: WallhavenTag) -> Unit = remember {
         fn@{
             val search = Search(
                 query = "id:${it.id}",
@@ -182,16 +184,16 @@ fun HomeScreen(
                 top = SearchBar.Defaults.height,
                 bottom = bottomPadding + 8.dp,
             ),
-            tags = if (uiState.isHome) uiState.tags else persistentListOf(),
+            wallhavenTags = if (uiState.isHome) uiState.wallhavenTags else persistentListOf(),
             isTagsLoading = uiState.areTagsLoading,
             wallpapers = wallpapers,
             favorites = uiState.favorites,
             blurSketchy = uiState.blurSketchy,
             blurNsfw = uiState.blurNsfw,
-            selectedWallpaper = uiState.selectedWallpaper,
+            selectedWallhavenWallpaper = uiState.selectedWallhavenWallpaper,
             layoutPreferences = uiState.layoutPreferences,
             showFAB = uiState.isHome,
-            fullWallpaper = viewerUiState.wallpaper,
+            fullWallhavenWallpaper = viewerUiState.wallhavenWallpaper,
             fullWallpaperActionsVisible = viewerUiState.actionsVisible,
             fullWallpaperDownloadStatus = viewerUiState.downloadStatus,
             fullWallpaperLoading = viewerUiState.loading,
@@ -205,10 +207,10 @@ fun HomeScreen(
             onFullWallpaperInfoClick = viewerViewModel::showInfo,
             onFullWallpaperInfoDismiss = { viewerViewModel.showInfo(false) },
             onFullWallpaperShareLinkClick = {
-                viewerUiState.wallpaper?.run { context.share(url) }
+                viewerUiState.wallhavenWallpaper?.run { context.share(url) }
             },
             onFullWallpaperShareImageClick = {
-                val wallpaper = viewerUiState.wallpaper ?: return@HomeScreenContent
+                val wallpaper = viewerUiState.wallhavenWallpaper ?: return@HomeScreenContent
                 viewerViewModel.downloadForSharing {
                     if (it == null) return@downloadForSharing
                     context.share(
@@ -234,7 +236,7 @@ fun HomeScreen(
                 }
             },
             onFullWallpaperFullScreenClick = {
-                viewerUiState.wallpaper?.run {
+                viewerUiState.wallhavenWallpaper?.run {
                     navController.navigate(
                         WallpaperScreenDestination(
                             thumbUrl = thumbs.original,
@@ -246,7 +248,7 @@ fun HomeScreen(
             onFullWallpaperUploaderClick = {
                 val search = Search(
                     query = "@${it.username}",
-                    meta = UploaderSearchMeta(uploader = it),
+                    meta = UploaderSearchMeta(wallhavenUploader = it),
                 )
                 if (searchBarController.state.value.search == search) {
                     return@HomeScreenContent

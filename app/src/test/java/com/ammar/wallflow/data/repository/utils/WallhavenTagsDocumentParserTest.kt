@@ -1,13 +1,13 @@
 package com.ammar.wallflow.data.repository.utils
 
-import com.ammar.wallflow.data.network.model.NetworkTag
-import com.ammar.wallflow.data.repository.utils.TagsDocumentParser.parsePopularTags
+import com.ammar.wallflow.data.network.model.NetworkWallhavenTag
+import com.ammar.wallflow.data.repository.utils.WallhavenTagsDocumentParser.parsePopularTags
 import kotlin.test.assertContentEquals
 import kotlinx.datetime.Instant
 import org.jsoup.Jsoup
 import org.junit.Test
 
-class TagsDocumentParserTest {
+class WallhavenTagsDocumentParserTest {
     @Test
     fun `parse popular tags from document`() {
         val docInputStream = this.javaClass.classLoader?.getResourceAsStream("popular_tags.html")
@@ -17,7 +17,7 @@ class TagsDocumentParserTest {
         assertContentEquals(
             tags.subList(0, 3),
             listOf(
-                NetworkTag(
+                NetworkWallhavenTag(
                     id = 37,
                     name = "nature",
                     alias = "",
@@ -26,7 +26,7 @@ class TagsDocumentParserTest {
                     purity = "sfw",
                     created_at = Instant.parse("2014-02-02T19:24:56+00:00"),
                 ),
-                NetworkTag(
+                NetworkWallhavenTag(
                     id = 711,
                     name = "landscape",
                     alias = "",
@@ -35,7 +35,7 @@ class TagsDocumentParserTest {
                     purity = "sfw",
                     created_at = Instant.parse("2014-03-04T14:51:14+00:00"),
                 ),
-                NetworkTag(
+                NetworkWallhavenTag(
                     id = 65348,
                     name = "4K",
                     alias = "",

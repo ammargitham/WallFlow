@@ -13,9 +13,9 @@ import com.ammar.wallflow.data.db.entity.SavedSearchEntity
 import com.ammar.wallflow.data.db.entity.WallpaperEntity
 import com.ammar.wallflow.data.db.entity.WallpaperTagsEntity
 import com.ammar.wallflow.data.db.entity.WallpaperWithUploaderAndTags
-import com.ammar.wallflow.data.network.WallHavenNetworkDataSource
+import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
 import com.ammar.wallflow.data.network.model.NetworkResponse
-import com.ammar.wallflow.data.network.model.NetworkWallpaper
+import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpaper
 import com.ammar.wallflow.model.SearchQuery
 import com.ammar.wallflow.model.Source
 import kotlinx.coroutines.flow.Flow
@@ -103,17 +103,17 @@ internal open class FakeObjectDetectionModelDao : ObjectDetectionModelDao {
     }
 }
 
-internal open class FakeWallHavenNetworkDataSource : WallHavenNetworkDataSource {
+internal open class FakeWallhavenNetworkDataSource : WallhavenNetworkDataSource {
     override suspend fun search(
         searchQuery: SearchQuery,
         page: Int?,
-    ): NetworkResponse<List<NetworkWallpaper>> {
+    ): NetworkResponse<List<NetworkWallhavenWallpaper>> {
         throw RuntimeException()
     }
 
     override suspend fun wallpaper(
         wallpaperWallhavenId: String,
-    ): NetworkResponse<NetworkWallpaper> {
+    ): NetworkResponse<NetworkWallhavenWallpaper> {
         throw RuntimeException()
     }
 

@@ -20,12 +20,12 @@ data class Search(
 
 @Serializable
 data class TagSearchMeta(
-    val tag: Tag,
+    val wallhavenTag: WallhavenTag,
 ) : SearchMeta()
 
 @Serializable
 data class UploaderSearchMeta(
-    val uploader: Uploader,
+    val wallhavenUploader: WallhavenUploader,
 ) : SearchMeta()
 
 fun Search.toSearchHistoryEntity(

@@ -26,9 +26,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.R
 import com.ammar.wallflow.extensions.capitalise
-import com.ammar.wallflow.model.Tag
-import com.ammar.wallflow.model.Wallpaper
-import com.ammar.wallflow.model.wallpaper1
+import com.ammar.wallflow.model.WallhavenTag
+import com.ammar.wallflow.model.WallhavenWallpaper
+import com.ammar.wallflow.model.wallhavenWallpaper1
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import kotlinx.coroutines.launch
 
@@ -37,9 +37,9 @@ import kotlinx.coroutines.launch
 fun WallpaperInfoBottomSheet(
     modifier: Modifier = Modifier,
     contentModifier: Modifier = Modifier,
-    wallpaper: Wallpaper,
+    wallhavenWallpaper: WallhavenWallpaper,
     onDismissRequest: () -> Unit = {},
-    onTagClick: (tag: Tag) -> Unit = {},
+    onTagClick: (wallhavenTag: WallhavenTag) -> Unit = {},
     onUploaderClick: () -> Unit = {},
     onSourceClick: () -> Unit = {},
 ) {
@@ -69,7 +69,7 @@ fun WallpaperInfoBottomSheet(
                     bottom = 16.dp,
                 )
                 .heightIn(min = 100.dp),
-            wallpaper = wallpaper,
+            wallhavenWallpaper = wallhavenWallpaper,
             onTagClick = {
                 onTagClick(it)
                 dismissSheet()
@@ -89,8 +89,8 @@ fun WallpaperInfoBottomSheet(
 @Composable
 fun WallpaperInfoBottomSheetContent(
     modifier: Modifier = Modifier,
-    wallpaper: Wallpaper,
-    onTagClick: (tag: Tag) -> Unit = {},
+    wallhavenWallpaper: WallhavenWallpaper,
+    onTagClick: (wallhavenTag: WallhavenTag) -> Unit = {},
     onUploaderClick: () -> Unit = {},
     onSourceClick: () -> Unit = {},
 ) {
@@ -105,25 +105,25 @@ fun WallpaperInfoBottomSheetContent(
         //     style = MaterialTheme.typography.headlineSmall,
         // )
 
-        if (!wallpaper.tags.isNullOrEmpty()) {
+        if (!wallhavenWallpaper.tags.isNullOrEmpty()) {
             TagsRow(
                 modifier = Modifier.fillMaxWidth(),
-                tags = wallpaper.tags,
+                wallhavenTags = wallhavenWallpaper.tags,
                 onTagClick = onTagClick,
             )
         }
 
-        if (wallpaper.colors.isNotEmpty()) {
+        if (wallhavenWallpaper.colors.isNotEmpty()) {
             ColorsRow(
                 modifier = Modifier.fillMaxWidth(),
-                colors = wallpaper.colors,
+                colors = wallhavenWallpaper.colors,
             )
         }
 
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            if (wallpaper.source.isNotBlank()) {
+            if (wallhavenWallpaper.source.isNotBlank()) {
                 PropertyRow(title = stringResource(R.string.source)) {
                     Box(
                         modifier = Modifier
@@ -134,16 +134,16 @@ fun WallpaperInfoBottomSheetContent(
                             modifier = Modifier.clickable(onClick = onSourceClick),
                             color = MaterialTheme.colorScheme.primary,
                             textDecoration = TextDecoration.Underline,
-                            text = wallpaper.source,
+                            text = wallhavenWallpaper.source,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
                     }
                 }
             }
-            if (wallpaper.uploader != null) {
+            if (wallhavenWallpaper.uploader != null) {
                 UploaderRow(
-                    uploader = wallpaper.uploader,
+                    wallhavenUploader = wallhavenWallpaper.uploader,
                     onClick = onUploaderClick,
                 )
             }
@@ -154,25 +154,25 @@ fun WallpaperInfoBottomSheetContent(
                         .weight(3f),
                 ) {
                     Text(
-                        text = wallpaper.category.capitalise(),
+                        text = wallhavenWallpaper.category.capitalise(),
                     )
                 }
             }
             PropertyRow(
                 title = stringResource(R.string.resolution),
-                text = wallpaper.resolution.toString(),
+                text = wallhavenWallpaper.resolution.toString(),
             )
             PropertyRow(
                 title = stringResource(R.string.size),
-                text = Formatter.formatShortFileSize(context, wallpaper.fileSize),
+                text = Formatter.formatShortFileSize(context, wallhavenWallpaper.fileSize),
             )
             PropertyRow(
                 title = stringResource(R.string.views),
-                text = wallpaper.views.toString(),
+                text = wallhavenWallpaper.views.toString(),
             )
             PropertyRow(
                 title = stringResource(R.string.favorites),
-                text = wallpaper.favorites.toString(),
+                text = wallhavenWallpaper.favorites.toString(),
             )
         }
     }
@@ -186,7 +186,7 @@ private fun PreviewWallpaperInfoBottomSheetContent() {
         Surface {
             WallpaperInfoBottomSheetContent(
                 modifier = Modifier.padding(16.dp),
-                wallpaper = wallpaper1,
+                wallhavenWallpaper = wallhavenWallpaper1,
             )
         }
     }

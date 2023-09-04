@@ -12,8 +12,8 @@ import com.ammar.wallflow.data.db.dao.WallpapersDao
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.asWallpaper
 import com.ammar.wallflow.model.Source
-import com.ammar.wallflow.model.Wallpaper
-import com.ammar.wallflow.model.wallpaper1
+import com.ammar.wallflow.model.WallhavenWallpaper
+import com.ammar.wallflow.model.wallhavenWallpaper1
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher
@@ -36,7 +36,7 @@ class FavoritesRepository @Inject constructor(
         pageSize: Int = 24,
         prefetchDistance: Int = pageSize,
         initialLoadSize: Int = pageSize * 3,
-    ): Flow<PagingData<Wallpaper>> = Pager(
+    ): Flow<PagingData<WallhavenWallpaper>> = Pager(
         config = PagingConfig(
             pageSize = pageSize,
             prefetchDistance = prefetchDistance,
@@ -49,10 +49,10 @@ class FavoritesRepository @Inject constructor(
             when (entity.source) {
                 Source.WALLHAVEN -> {
                     val wallpaperEntity = wallpapersDao.getByWallhavenId(entity.sourceId)
-                    wallpaperEntity?.asWallpaper() ?: wallpaper1
+                    wallpaperEntity?.asWallpaper() ?: wallhavenWallpaper1
                 }
             }
-        }.filter { wallpaper -> wallpaper != wallpaper1 }
+        }.filter { wallpaper -> wallpaper != wallhavenWallpaper1 }
     }.flowOn(ioDispatcher)
 
     suspend fun toggleFavorite(
