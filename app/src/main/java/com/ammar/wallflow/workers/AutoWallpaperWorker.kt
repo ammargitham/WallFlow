@@ -49,8 +49,8 @@ import com.ammar.wallflow.model.AutoWallpaperHistory
 import com.ammar.wallflow.model.ObjectDetectionModel
 import com.ammar.wallflow.model.SearchQuery
 import com.ammar.wallflow.model.Source
-import com.ammar.wallflow.model.WallhavenWallpaper
 import com.ammar.wallflow.model.toSearchQuery
+import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import com.ammar.wallflow.ui.common.permissions.checkNotificationPermission
 import com.ammar.wallflow.ui.screens.crop.getCropRect
 import com.ammar.wallflow.ui.screens.crop.getMaxCropSize

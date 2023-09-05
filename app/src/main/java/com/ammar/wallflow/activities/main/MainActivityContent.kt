@@ -32,9 +32,9 @@ import com.ammar.wallflow.extensions.toPx
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.SearchQuery
-import com.ammar.wallflow.model.WallhavenTag
-import com.ammar.wallflow.model.wallhavenWallpaper1
-import com.ammar.wallflow.model.wallhavenWallpaper2
+import com.ammar.wallflow.model.wallhaven.WallhavenTag
+import com.ammar.wallflow.model.wallhaven.wallhavenWallpaper1
+import com.ammar.wallflow.model.wallhaven.wallhavenWallpaper2
 import com.ammar.wallflow.ui.common.Suggestion
 import com.ammar.wallflow.ui.common.bottombar.BottomBar
 import com.ammar.wallflow.ui.common.bottombar.NavRail

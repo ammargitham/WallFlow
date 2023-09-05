@@ -51,9 +51,9 @@ import com.ammar.wallflow.extensions.openUrl
 import com.ammar.wallflow.extensions.toDp
 import com.ammar.wallflow.extensions.toast
 import com.ammar.wallflow.extensions.wallpaperManager
-import com.ammar.wallflow.model.WallhavenTag
-import com.ammar.wallflow.model.WallhavenUploader
-import com.ammar.wallflow.model.WallhavenWallpaper
+import com.ammar.wallflow.model.wallhaven.WallhavenTag
+import com.ammar.wallflow.model.wallhaven.WallhavenUploader
+import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import com.ammar.wallflow.ui.common.bottomWindowInsets
 import com.ammar.wallflow.ui.common.permissions.DownloadPermissionsRationalDialog
 import com.ammar.wallflow.ui.common.permissions.rememberDownloadPermissionsState

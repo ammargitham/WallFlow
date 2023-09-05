@@ -26,9 +26,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.R
 import com.ammar.wallflow.extensions.capitalise
-import com.ammar.wallflow.model.WallhavenTag
-import com.ammar.wallflow.model.WallhavenWallpaper
-import com.ammar.wallflow.model.wallhavenWallpaper1
+import com.ammar.wallflow.model.wallhaven.WallhavenTag
+import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
+import com.ammar.wallflow.model.wallhaven.wallhavenWallpaper1
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import kotlinx.coroutines.launch
 

@@ -4,8 +4,8 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.ammar.wallflow.model.WallhavenAvatar
-import com.ammar.wallflow.model.WallhavenUploader
+import com.ammar.wallflow.model.wallhaven.WallhavenAvatar
+import com.ammar.wallflow.model.wallhaven.WallhavenUploader
 
 @Entity(
     tableName = "uploaders",

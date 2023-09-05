@@ -20,8 +20,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.ammar.wallflow.R
-import com.ammar.wallflow.model.WallhavenAvatar
-import com.ammar.wallflow.model.WallhavenUploader
+import com.ammar.wallflow.model.wallhaven.WallhavenAvatar
+import com.ammar.wallflow.model.wallhaven.WallhavenUploader
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 
 @Composable

@@ -6,7 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.ammar.wallflow.data.repository.WallhavenRepository
 import com.ammar.wallflow.data.repository.utils.Resource
 import com.ammar.wallflow.data.repository.utils.successOr
-import com.ammar.wallflow.model.WallhavenWallpaper
+import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import com.ammar.wallflow.utils.DownloadManager
 import com.ammar.wallflow.utils.DownloadStatus
 import com.github.materiiapps.partial.Partialize

@@ -21,7 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.model.Purity
-import com.ammar.wallflow.model.WallhavenTag
+import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.material.fade

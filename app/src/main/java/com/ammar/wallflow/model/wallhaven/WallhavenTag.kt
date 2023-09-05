@@ -1,6 +1,7 @@
-package com.ammar.wallflow.model
+package com.ammar.wallflow.model.wallhaven
 
 import androidx.compose.runtime.Stable
+import com.ammar.wallflow.model.Purity
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 

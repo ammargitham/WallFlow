@@ -14,7 +14,7 @@ import com.ammar.wallflow.extensions.getMLModelsDir
 import com.ammar.wallflow.extensions.getTempDir
 import com.ammar.wallflow.extensions.getTempFileIfExists
 import com.ammar.wallflow.extensions.workManager
-import com.ammar.wallflow.model.WallhavenWallpaper
+import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import com.ammar.wallflow.workers.DownloadWorker
 import com.ammar.wallflow.workers.DownloadWorker.Companion.NotificationType
 import com.ammar.wallflow.workers.DownloadWorker.Companion.OUTPUT_KEY_ERROR

@@ -22,9 +22,9 @@ import com.ammar.wallflow.model.SearchQuery
 import com.ammar.wallflow.model.Sorting
 import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.model.TopRange
-import com.ammar.wallflow.model.WallhavenTag
-import com.ammar.wallflow.model.WallhavenWallpaper
 import com.ammar.wallflow.model.toSearchQuery
+import com.ammar.wallflow.model.wallhaven.WallhavenTag
+import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import com.ammar.wallflow.ui.screens.navArgs
 import com.ammar.wallflow.utils.combine
 import com.github.materiiapps.partial.Partialize

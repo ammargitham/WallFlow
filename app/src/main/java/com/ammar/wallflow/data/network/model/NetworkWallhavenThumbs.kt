@@ -1,7 +1,7 @@
 package com.ammar.wallflow.data.network.model
 
 import com.ammar.wallflow.data.db.entity.ThumbsEntity
-import com.ammar.wallflow.model.WallhavenThumbs
+import com.ammar.wallflow.model.wallhaven.WallhavenThumbs
 import kotlinx.serialization.Serializable
 
 @Serializable

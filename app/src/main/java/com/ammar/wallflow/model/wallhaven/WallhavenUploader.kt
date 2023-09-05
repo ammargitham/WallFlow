@@ -1,4 +1,4 @@
-package com.ammar.wallflow.model
+package com.ammar.wallflow.model.wallhaven
 
 import kotlinx.serialization.Serializable
 

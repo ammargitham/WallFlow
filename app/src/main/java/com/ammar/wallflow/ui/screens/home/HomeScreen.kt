@@ -46,8 +46,8 @@ import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.SearchSaver
 import com.ammar.wallflow.model.TagSearchMeta
 import com.ammar.wallflow.model.UploaderSearchMeta
-import com.ammar.wallflow.model.WallhavenTag
-import com.ammar.wallflow.model.WallhavenWallpaper
+import com.ammar.wallflow.model.wallhaven.WallhavenTag
+import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.SearchBar
 import com.ammar.wallflow.ui.common.bottomWindowInsets

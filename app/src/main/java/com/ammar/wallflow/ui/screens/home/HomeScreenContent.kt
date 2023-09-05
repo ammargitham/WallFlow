@@ -31,11 +31,11 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.preferences.LayoutPreferences
 import com.ammar.wallflow.model.Favorite
-import com.ammar.wallflow.model.WallhavenTag
-import com.ammar.wallflow.model.WallhavenUploader
-import com.ammar.wallflow.model.WallhavenWallpaper
-import com.ammar.wallflow.model.wallhavenWallpaper1
-import com.ammar.wallflow.model.wallhavenWallpaper2
+import com.ammar.wallflow.model.wallhaven.WallhavenTag
+import com.ammar.wallflow.model.wallhaven.WallhavenUploader
+import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
+import com.ammar.wallflow.model.wallhaven.wallhavenWallpaper1
+import com.ammar.wallflow.model.wallhaven.wallhavenWallpaper2
 import com.ammar.wallflow.ui.common.BottomBarAwareHorizontalTwoPane
 import com.ammar.wallflow.ui.common.WallpaperStaggeredGrid
 import com.ammar.wallflow.ui.theme.WallFlowTheme

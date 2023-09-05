@@ -49,8 +49,8 @@ import coil.request.Parameters
 import com.ammar.wallflow.R
 import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.extensions.aspectRatio
-import com.ammar.wallflow.model.WallhavenWallpaper
-import com.ammar.wallflow.model.wallhavenWallpaper1
+import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
+import com.ammar.wallflow.model.wallhaven.wallhavenWallpaper1
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import com.google.accompanist.placeholder.PlaceholderHighlight
 import com.google.accompanist.placeholder.material.fade

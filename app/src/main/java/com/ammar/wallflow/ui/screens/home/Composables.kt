@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.R
 import com.ammar.wallflow.model.MenuItem
 import com.ammar.wallflow.model.Purity
-import com.ammar.wallflow.model.WallhavenTag
+import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.ui.common.OverflowMenu
 import com.ammar.wallflow.ui.common.TagChip
 import com.ammar.wallflow.ui.theme.WallFlowTheme

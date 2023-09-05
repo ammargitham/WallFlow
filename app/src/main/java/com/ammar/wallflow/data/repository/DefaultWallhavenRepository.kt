@@ -30,8 +30,8 @@ import com.ammar.wallflow.data.repository.utils.WallhavenTagsDocumentParser.pars
 import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.SearchQuery
-import com.ammar.wallflow.model.WallhavenTag
-import com.ammar.wallflow.model.WallhavenWallpaper
+import com.ammar.wallflow.model.wallhaven.WallhavenTag
+import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow

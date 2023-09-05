@@ -10,7 +10,7 @@ import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.FavoritesRepository
 import com.ammar.wallflow.model.Favorite
 import com.ammar.wallflow.model.Source
-import com.ammar.wallflow.model.WallhavenWallpaper
+import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import com.github.materiiapps.partial.Partialize
 import com.github.materiiapps.partial.partial
 import dagger.hilt.android.lifecycle.HiltViewModel

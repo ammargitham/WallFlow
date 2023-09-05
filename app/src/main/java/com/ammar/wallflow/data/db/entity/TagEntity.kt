@@ -6,7 +6,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.model.Purity
-import com.ammar.wallflow.model.WallhavenTag
+import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import kotlinx.datetime.Instant
 
 @Entity(

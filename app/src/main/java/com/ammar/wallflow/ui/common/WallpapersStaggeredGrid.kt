@@ -29,7 +29,7 @@ import com.ammar.wallflow.extensions.toDp
 import com.ammar.wallflow.model.Favorite
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.Source
-import com.ammar.wallflow.model.WallhavenWallpaper
+import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 

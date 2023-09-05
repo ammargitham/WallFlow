@@ -12,8 +12,8 @@ import com.ammar.wallflow.data.db.dao.WallpapersDao
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.asWallpaper
 import com.ammar.wallflow.model.Source
-import com.ammar.wallflow.model.WallhavenWallpaper
-import com.ammar.wallflow.model.wallhavenWallpaper1
+import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
+import com.ammar.wallflow.model.wallhaven.wallhavenWallpaper1
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher

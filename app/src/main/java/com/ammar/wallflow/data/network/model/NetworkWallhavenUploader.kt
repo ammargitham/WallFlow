@@ -2,8 +2,8 @@ package com.ammar.wallflow.data.network.model
 
 import com.ammar.wallflow.data.db.entity.AvatarEntity
 import com.ammar.wallflow.data.db.entity.UploaderEntity
-import com.ammar.wallflow.model.WallhavenAvatar
-import com.ammar.wallflow.model.WallhavenUploader
+import com.ammar.wallflow.model.wallhaven.WallhavenAvatar
+import com.ammar.wallflow.model.wallhaven.WallhavenUploader
 import kotlinx.serialization.Serializable
 
 @Serializable

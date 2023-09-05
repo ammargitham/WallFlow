@@ -11,8 +11,8 @@ import androidx.room.Junction
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 import com.ammar.wallflow.model.Purity
-import com.ammar.wallflow.model.WallhavenThumbs
-import com.ammar.wallflow.model.WallhavenWallpaper
+import com.ammar.wallflow.model.wallhaven.WallhavenThumbs
+import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import kotlinx.datetime.Instant
 
 @Entity(

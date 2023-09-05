@@ -4,7 +4,7 @@ import com.ammar.wallflow.data.db.entity.TagEntity
 import com.ammar.wallflow.data.network.model.util.InstantSerializer
 import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.model.Purity
-import com.ammar.wallflow.model.WallhavenTag
+import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 

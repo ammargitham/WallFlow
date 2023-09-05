@@ -7,7 +7,7 @@ import androidx.core.app.TaskStackBuilder
 import androidx.core.net.toUri
 import com.ammar.wallflow.LOCAL_DEEPLINK_SCHEME
 import com.ammar.wallflow.activities.main.MainActivity
-import com.ammar.wallflow.model.WallhavenWallpaper
+import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import kotlin.random.Random
 
 const val wallpaperScreenLocalHost = "w"

@@ -57,9 +57,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.R
 import com.ammar.wallflow.model.Purity
-import com.ammar.wallflow.model.WallhavenAvatar
-import com.ammar.wallflow.model.WallhavenTag
-import com.ammar.wallflow.model.WallhavenUploader
+import com.ammar.wallflow.model.wallhaven.WallhavenAvatar
+import com.ammar.wallflow.model.wallhaven.WallhavenTag
+import com.ammar.wallflow.model.wallhaven.WallhavenUploader
 import com.ammar.wallflow.ui.common.ProgressIndicator
 import com.ammar.wallflow.ui.common.TagChip
 import com.ammar.wallflow.ui.common.UploaderChip

@@ -1,11 +1,12 @@
 @file:UseSerializers(ColorSerializer::class, IntSizeSerializer::class)
 
-package com.ammar.wallflow.model
+package com.ammar.wallflow.model.wallhaven
 
 import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntSize
 import androidx.core.graphics.toColorInt
+import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.serializers.ColorSerializer
 import com.ammar.wallflow.model.serializers.IntSizeSerializer
 import kotlinx.datetime.Clock

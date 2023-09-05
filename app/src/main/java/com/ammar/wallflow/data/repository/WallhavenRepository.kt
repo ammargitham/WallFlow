@@ -3,8 +3,8 @@ package com.ammar.wallflow.data.repository
 import androidx.paging.PagingData
 import com.ammar.wallflow.data.repository.utils.Resource
 import com.ammar.wallflow.model.SearchQuery
-import com.ammar.wallflow.model.WallhavenTag
-import com.ammar.wallflow.model.WallhavenWallpaper
+import com.ammar.wallflow.model.wallhaven.WallhavenTag
+import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import kotlinx.coroutines.flow.Flow
 
 interface WallhavenRepository {

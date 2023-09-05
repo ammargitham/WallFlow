@@ -4,8 +4,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntSize
 import androidx.core.graphics.toColorInt
 import com.ammar.wallflow.model.Purity
-import com.ammar.wallflow.model.WallhavenThumbs
-import com.ammar.wallflow.model.WallhavenWallpaper
+import com.ammar.wallflow.model.wallhaven.WallhavenThumbs
+import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import kotlin.test.assertEquals
 import kotlinx.datetime.Instant
 import org.junit.Test
