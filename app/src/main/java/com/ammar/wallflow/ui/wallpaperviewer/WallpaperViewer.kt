@@ -51,6 +51,8 @@ import com.ammar.wallflow.extensions.openUrl
 import com.ammar.wallflow.extensions.toDp
 import com.ammar.wallflow.extensions.toast
 import com.ammar.wallflow.extensions.wallpaperManager
+import com.ammar.wallflow.model.DownloadableWallpaper
+import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.model.wallhaven.WallhavenUploader
 import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
@@ -69,11 +71,11 @@ import me.saket.telephoto.zoomable.zoomable
 @Composable
 fun WallpaperViewer(
     modifier: Modifier = Modifier,
-    wallhavenWallpaper: WallhavenWallpaper? = null,
+    wallpaper: Wallpaper? = null,
     actionsVisible: Boolean = true,
     downloadStatus: DownloadStatus? = null,
     loading: Boolean = false,
-    thumbUrl: String? = null,
+    thumbData: String? = null,
     showInfo: Boolean = false,
     showFullScreenAction: Boolean = false,
     onWallpaperTransform: () -> Unit = {},
@@ -98,10 +100,10 @@ fun WallpaperViewer(
 
     val imageSize: IntSize by produceState(
         initialValue = IntSize.Zero,
-        key1 = wallhavenWallpaper?.resolution,
+        key1 = wallpaper?.resolution,
         key2 = containerIntSize,
     ) {
-        val resolution = wallhavenWallpaper?.resolution
+        val resolution = wallpaper?.resolution
         if (resolution == null) {
             value = IntSize.Zero
             return@produceState
@@ -147,15 +149,15 @@ fun WallpaperViewer(
     val request by produceState(
         initialValue = null as ImageRequest?,
         key1 = context,
-        key2 = wallhavenWallpaper?.path,
-        key3 = listOf(thumbUrl, imageSize, listener),
+        key2 = wallpaper?.data,
+        key3 = listOf(thumbData, imageSize, listener),
     ) {
-        if (wallhavenWallpaper?.path == null && thumbUrl == null) {
+        if (wallpaper?.data == null && thumbData == null) {
             return@produceState
         }
         value = ImageRequest.Builder(context).apply {
-            data(wallhavenWallpaper?.path ?: thumbUrl)
-            placeholderMemoryCacheKey(thumbUrl)
+            data(wallpaper?.data ?: thumbData)
+            placeholderMemoryCacheKey(thumbData)
             if (imageSize != IntSize.Zero) {
                 size(imageSize.width, imageSize.height)
             }
@@ -234,7 +236,7 @@ fun WallpaperViewer(
         AnimatedVisibility(
             modifier = Modifier.align(Alignment.BottomCenter),
             visible = painter.state is AsyncImagePainter.State.Success &&
-                painter.request.data == wallhavenWallpaper?.path &&
+                painter.request.data == wallpaper?.data &&
                 actionsVisible,
             enter = fadeIn(),
             exit = fadeOut(),
@@ -243,6 +245,8 @@ fun WallpaperViewer(
                 downloadStatus = downloadStatus,
                 applyWallpaperEnabled = applyWallpaperEnabled,
                 showFullScreenAction = showFullScreenAction,
+                showDownloadAction = wallpaper is DownloadableWallpaper,
+                showShareLinkAction = wallpaper is WallhavenWallpaper,
                 onInfoClick = onInfoClick,
                 onDownloadClick = { downloadPermissionsState.launchMultiplePermissionRequest() },
                 onShareLinkClick = onShareLinkClick,
@@ -267,14 +271,22 @@ fun WallpaperViewer(
     }
 
     if (showInfo) {
-        wallhavenWallpaper?.run {
+        wallpaper?.run {
             WallpaperInfoBottomSheet(
                 contentModifier = Modifier.windowInsetsPadding(bottomWindowInsets),
                 onDismissRequest = onInfoDismiss,
-                wallhavenWallpaper = this,
+                wallpaper = this,
                 onTagClick = onTagClick,
-                onUploaderClick = { uploader?.let(onUploaderClick) },
-                onSourceClick = { context.openUrl(source) },
+                onUploaderClick = {
+                    if (this is WallhavenWallpaper) {
+                        uploader?.let(onUploaderClick)
+                    }
+                },
+                onSourceClick = {
+                    if (this is WallhavenWallpaper) {
+                        context.openUrl(wallhavenSource)
+                    }
+                },
             )
         }
     }

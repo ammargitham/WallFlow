@@ -13,6 +13,7 @@ import com.ammar.wallflow.data.db.entity.LastUpdatedCategory
 import com.ammar.wallflow.data.db.entity.LastUpdatedEntity
 import com.ammar.wallflow.data.db.entity.PopularTagEntity
 import com.ammar.wallflow.data.db.entity.TagEntity
+import com.ammar.wallflow.data.db.entity.WallpaperEntity
 import com.ammar.wallflow.data.db.entity.WallpaperTagsEntity
 import com.ammar.wallflow.data.db.entity.WallpaperWithUploaderAndTags
 import com.ammar.wallflow.data.db.entity.asTag
@@ -30,6 +31,7 @@ import com.ammar.wallflow.data.repository.utils.WallhavenTagsDocumentParser.pars
 import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.SearchQuery
+import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import javax.inject.Inject
@@ -224,7 +226,7 @@ class DefaultWallhavenRepository @Inject constructor(
         pageSize: Int,
         prefetchDistance: Int,
         initialLoadSize: Int,
-    ): Flow<PagingData<WallhavenWallpaper>> = Pager(
+    ): Flow<PagingData<Wallpaper>> = Pager(
         config = PagingConfig(
             pageSize = pageSize,
             prefetchDistance = prefetchDistance,
@@ -239,7 +241,7 @@ class DefaultWallhavenRepository @Inject constructor(
             wallpapersDao.pagingSource(queryString = searchQuery.toQueryString())
         },
     ).flow.map {
-        it.map { entity ->
+        it.map<WallpaperEntity, Wallpaper> { entity ->
             entity.asWallpaper()
         }
     }.flowOn(ioDispatcher)

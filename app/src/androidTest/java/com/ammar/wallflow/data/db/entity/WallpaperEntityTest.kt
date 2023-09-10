@@ -4,7 +4,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntSize
 import androidx.core.graphics.toColorInt
 import com.ammar.wallflow.model.Purity
-import com.ammar.wallflow.model.wallhaven.WallhavenThumbs
 import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import kotlin.test.assertEquals
 import kotlinx.datetime.Instant
@@ -44,12 +43,12 @@ class WallpaperEntityTest {
             uploader = null,
             views = 444,
             favorites = 43,
-            source = "",
+            wallhavenSource = "",
             purity = Purity.SKETCHY,
             category = "people",
             resolution = IntSize(1429, 1031),
             fileSize = 1159446,
-            fileType = "image/png",
+            mimeType = "image/png",
             createdAt = Instant.parse("2023-04-26T02:41:32Z"),
             colors = listOf(
                 "#996633",
@@ -58,12 +57,8 @@ class WallpaperEntityTest {
                 "#e7d8b1",
                 "#cccccc",
             ).map { Color(it.toColorInt()) },
-            path = "https://w.wallhaven.cc/full/85/wallhaven-85k6eo.png",
-            thumbs = WallhavenThumbs(
-                large = "https://th.wallhaven.cc/lg/85/85k6eo.jpg",
-                original = "https://th.wallhaven.cc/orig/85/85k6eo.jpg",
-                small = "https://th.wallhaven.cc/small/85/85k6eo.jpg",
-            ),
+            data = "https://w.wallhaven.cc/full/85/wallhaven-85k6eo.png",
+            thumbData = "https://th.wallhaven.cc/orig/85/85k6eo.jpg",
             tags = null,
         )
         assertEquals(

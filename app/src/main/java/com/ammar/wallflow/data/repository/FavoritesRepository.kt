@@ -1,5 +1,6 @@
 package com.ammar.wallflow.data.repository
 
+import android.content.Context
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -11,13 +12,16 @@ import com.ammar.wallflow.data.db.dao.FavoriteDao
 import com.ammar.wallflow.data.db.dao.WallpapersDao
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.asWallpaper
+import com.ammar.wallflow.data.repository.local.LocalWallpapersRepository
+import com.ammar.wallflow.data.repository.utils.successOr
 import com.ammar.wallflow.model.Source
-import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
+import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.wallhaven.wallhavenWallpaper1
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
@@ -27,16 +31,18 @@ import kotlinx.datetime.Clock
 class FavoritesRepository @Inject constructor(
     private val favoriteDao: FavoriteDao,
     private val wallpapersDao: WallpapersDao,
+    private val localWallpapersRepository: LocalWallpapersRepository,
     @IoDispatcher val ioDispatcher: CoroutineDispatcher,
 ) {
     fun observeAll() = favoriteDao.observeAll()
 
     @OptIn(ExperimentalPagingApi::class)
     fun favoriteWallpapersPager(
+        context: Context,
         pageSize: Int = 24,
         prefetchDistance: Int = pageSize,
         initialLoadSize: Int = pageSize * 3,
-    ): Flow<PagingData<WallhavenWallpaper>> = Pager(
+    ): Flow<PagingData<Wallpaper>> = Pager(
         config = PagingConfig(
             pageSize = pageSize,
             prefetchDistance = prefetchDistance,
@@ -51,6 +57,10 @@ class FavoritesRepository @Inject constructor(
                     val wallpaperEntity = wallpapersDao.getByWallhavenId(entity.sourceId)
                     wallpaperEntity?.asWallpaper() ?: wallhavenWallpaper1
                 }
+                Source.LOCAL -> localWallpapersRepository.wallpaper(
+                    context = context,
+                    wallpaperUriStr = entity.sourceId,
+                ).firstOrNull()?.successOr(null) ?: wallhavenWallpaper1
             }
         }.filter { wallpaper -> wallpaper != wallhavenWallpaper1 }
     }.flowOn(ioDispatcher)
@@ -81,13 +91,19 @@ class FavoritesRepository @Inject constructor(
         )
     }
 
-    suspend fun getRandom() = withContext(ioDispatcher) {
+    suspend fun getRandom(
+        context: Context,
+    ) = withContext(ioDispatcher) {
         val entity = favoriteDao.getRandom() ?: return@withContext null
         when (entity.source) {
             Source.WALLHAVEN -> {
                 val wallpaperEntity = wallpapersDao.getByWallhavenId(entity.sourceId)
                 wallpaperEntity?.asWallpaper()
             }
+            Source.LOCAL -> localWallpapersRepository.wallpaper(
+                context = context,
+                wallpaperUriStr = entity.sourceId,
+            ).firstOrNull()?.successOr(null)
         }
     }
 }

@@ -5,7 +5,6 @@ import com.ammar.wallflow.data.network.model.NetworkWallhavenMeta
 import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpaper
 import com.ammar.wallflow.data.network.retrofit.api.WallhavenNetworkApi
 import java.io.IOException
-import org.jsoup.nodes.Document
 
 class MockWallhavenNetworkApi : WallhavenNetworkApi {
     var failureMsg: String? = null
@@ -33,13 +32,9 @@ class MockWallhavenNetworkApi : WallhavenNetworkApi {
         )
     }
 
-    override suspend fun popularTags(): Document? {
-        TODO("Not yet implemented")
-    }
+    override suspend fun popularTags() = throw RuntimeException()
 
-    override suspend fun wallpaper(id: String): NetworkResponse<NetworkWallhavenWallpaper> {
-        TODO("Not yet implemented")
-    }
+    override suspend fun wallpaper(id: String) = throw RuntimeException()
 
     fun setWallpapersForQuery(
         query: String,

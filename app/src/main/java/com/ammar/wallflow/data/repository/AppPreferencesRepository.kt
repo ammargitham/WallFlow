@@ -97,6 +97,7 @@ class AppPreferencesRepository @Inject constructor(
                     it[PreferencesKeys.ENABLE_AUTO_WALLPAPER] = enabled
                     it[PreferencesKeys.AUTO_WALLPAPER_SAVED_SEARCH_ENABLED] = savedSearchEnabled
                     it[PreferencesKeys.AUTO_WALLPAPER_FAVORITES_ENABLED] = favoritesEnabled
+                    it[PreferencesKeys.AUTO_WALLPAPER_LOCAL_ENABLED] = localEnabled
                     it[PreferencesKeys.AUTO_WALLPAPER_SAVED_SEARCH_ID] = savedSearchId
                     it[PreferencesKeys.AUTO_WALLPAPER_USE_OBJECT_DETECTION] = useObjectDetection
                     it[PreferencesKeys.AUTO_WALLPAPER_FREQUENCY] = frequency.toString()
@@ -123,6 +124,7 @@ class AppPreferencesRepository @Inject constructor(
                     it[PreferencesKeys.LAYOUT_GRID_COL_MIN_WIDTH_PCT] =
                         layoutPreferences.gridColMinWidthPct
                     it[PreferencesKeys.LAYOUT_ROUNDED_CORNERS] = layoutPreferences.roundedCorners
+                    it[PreferencesKeys.SHOW_LOCAL_TAB] = showLocalTab
                 }
             }
         }
@@ -172,14 +174,16 @@ class AppPreferencesRepository @Inject constructor(
                     ?: (savedSearchId > 0)
                 )
             val favoritesEnabled = get(PreferencesKeys.AUTO_WALLPAPER_FAVORITES_ENABLED) ?: false
+            val localEnabled = get(PreferencesKeys.AUTO_WALLPAPER_LOCAL_ENABLED) ?: false
             AutoWallpaperPreferences(
                 enabled = when {
-                    !savedSearchEnabled && !favoritesEnabled -> false
+                    !savedSearchEnabled && !favoritesEnabled && !localEnabled -> false
                     savedSearchEnabled && savedSearchId <= 0 -> false
                     else -> get(PreferencesKeys.ENABLE_AUTO_WALLPAPER) ?: false
                 },
                 savedSearchEnabled = savedSearchEnabled,
                 favoritesEnabled = favoritesEnabled,
+                localEnabled = localEnabled,
                 savedSearchId = savedSearchId,
                 useObjectDetection = get(PreferencesKeys.AUTO_WALLPAPER_USE_OBJECT_DETECTION)
                     ?: true,
@@ -223,6 +227,7 @@ class AppPreferencesRepository @Inject constructor(
                     ?: 40,
                 roundedCorners = preferences[PreferencesKeys.LAYOUT_ROUNDED_CORNERS] ?: true,
             ),
+            showLocalTab = preferences[PreferencesKeys.SHOW_LOCAL_TAB] ?: true,
         ),
     )
 

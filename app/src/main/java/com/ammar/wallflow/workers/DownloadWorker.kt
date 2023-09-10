@@ -22,6 +22,7 @@ import com.ammar.wallflow.extensions.getFileNameFromUrl
 import com.ammar.wallflow.extensions.getShareChooserIntent
 import com.ammar.wallflow.extensions.notificationManager
 import com.ammar.wallflow.extensions.workManager
+import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.services.DownloadSuccessActionsService
 import com.ammar.wallflow.ui.common.permissions.checkNotificationPermission
 import com.ammar.wallflow.ui.screens.wallpaper.getWallpaperScreenPendingIntent
@@ -72,7 +73,7 @@ class DownloadWorker @AssistedInject constructor(
         }
     }
     private val notificationType by lazy {
-        NotificationType.values().firstOrNull {
+        NotificationType.entries.firstOrNull {
             it.type == inputData.getInt(INPUT_KEY_NOTIFICATION_TYPE, NotificationType.VISIBLE.type)
         } ?: NotificationType.VISIBLE
     }
@@ -109,11 +110,13 @@ class DownloadWorker @AssistedInject constructor(
         val wallpaperId = inputData.getString(INPUT_KEY_WALLPAPER_ID)
         try {
             val file = if (wallpaperId != null) {
+                val source = Source.valueOf(inputData.getString(INPUT_KEY_WALLPAPER_SOURCE) ?: "")
                 downloadWallpaper(
                     url = url,
                     dir = destinationDir,
                     fileName = fileName,
                     wallpaperId = wallpaperId,
+                    source = source,
                 )
             } else {
                 download(
@@ -151,6 +154,7 @@ class DownloadWorker @AssistedInject constructor(
         dir: String,
         fileName: String? = null,
         wallpaperId: String,
+        source: Source,
     ): File {
         val file = download(
             okHttpClient = okHttpClient,
@@ -163,7 +167,7 @@ class DownloadWorker @AssistedInject constructor(
             scanFile(file)
         }
         try {
-            notifyWallpaperDownloadSuccess(wallpaperId, file)
+            notifyWallpaperDownloadSuccess(wallpaperId, file, source)
         } catch (e: Exception) {
             Log.e(TAG, "download: Error notifying success", e)
         }
@@ -210,6 +214,7 @@ class DownloadWorker @AssistedInject constructor(
     private fun notifyWallpaperDownloadSuccess(
         wallpaperId: String,
         file: File,
+        source: Source,
     ) {
         if (!shouldShowSuccessNotification()) return
         val bitmap = decodeSampledBitmapFromFile(context, file.absolutePath)
@@ -224,6 +229,7 @@ class DownloadWorker @AssistedInject constructor(
             setContentIntent(
                 getWallpaperScreenPendingIntent(
                     context,
+                    source,
                     wallpaperId,
                 ),
             )
@@ -286,6 +292,7 @@ class DownloadWorker @AssistedInject constructor(
         const val INPUT_KEY_NOTIFICATION_TYPE = "notification_type"
         const val INPUT_KEY_NOTIFICATION_TITLE = "notification_title"
         const val INPUT_KEY_WALLPAPER_ID = "wallpaper_id"
+        const val INPUT_KEY_WALLPAPER_SOURCE = "wallpaper_source"
         const val INPUT_KEY_SCAN_FILE = "scan_file"
         const val OUTPUT_KEY_ERROR = "error"
         const val OUTPUT_KEY_FILE_PATH = "output_file_path"

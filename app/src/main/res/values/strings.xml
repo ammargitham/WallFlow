@@ -223,6 +223,12 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="set_to">Set to</string>
     <string name="version">Version</string>
     <string name="open_source_licenses">Open source licenses</string>
+    <string name="local">Local</string>
+    <string name="manage_dirs">Manage Directories</string>
+    <string name="add_dir">Add Directory</string>
+    <string name="location">Location</string>
+    <string name="show_local_tab">Show Local tab</string>
+    <string name="no_local_dirs">No local directories added</string>
     <plurals name="every_x_hrs">
         <item quantity="one">Every %d hour</item>
         <item quantity="other">Every %d hours</item>

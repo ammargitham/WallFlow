@@ -167,6 +167,7 @@ fun SettingsScreen(
             autoWallpaperNextRun = uiState.autoWallpaperNextRun,
             autoWallpaperSavedSearch = uiState.autoWallpaperSavedSearch,
             autoWallpaperStatus = uiState.autoWallpaperStatus,
+            showLocalTab = uiState.appPreferences.lookAndFeelPreferences.showLocalTab,
             onBlurSketchyCheckChange = viewModel::setBlurSketchy,
             onBlurNsfwCheckChange = viewModel::setBlurNsfw,
             onWallhavenApiKeyItemClick = {
@@ -199,6 +200,13 @@ fun SettingsScreen(
             },
             onThemeClick = { viewModel.showThemeOptionsDialog(true) },
             onLayoutClick = { navController.navigate(LayoutSettingsScreenDestination) },
+            onShowLocalTabChange = {
+                viewModel.updateLookAndFeelPrefs(
+                    uiState.appPreferences.lookAndFeelPreferences.copy(
+                        showLocalTab = it,
+                    ),
+                )
+            },
         )
     }
 
@@ -310,6 +318,7 @@ fun SettingsScreen(
     if (uiState.showAutoWallpaperSourcesDialog) {
         AutoWallpaperSourceOptionsDialog(
             savedSearches = uiState.savedSearches,
+            localDirectories = uiState.localDirectories,
             autoWallpaperPreferences = uiState.tempAutoWallpaperPreferences
                 ?: uiState.appPreferences.autoWallpaperPreferences,
             onSaveClick = {
@@ -404,6 +413,7 @@ fun SettingsScreenContent(
     hasSetWallpaperPermission: Boolean = true,
     autoWallpaperNextRun: NextRun = NextRun.NotScheduled,
     autoWallpaperStatus: AutoWallpaperWorker.Companion.Status? = null,
+    showLocalTab: Boolean = true,
     onBlurSketchyCheckChange: (checked: Boolean) -> Unit = {},
     onBlurNsfwCheckChange: (checked: Boolean) -> Unit = {},
     onWallhavenApiKeyItemClick: () -> Unit = {},
@@ -420,6 +430,7 @@ fun SettingsScreenContent(
     onAutoWallpaperSetToClick: () -> Unit = {},
     onThemeClick: () -> Unit = {},
     onLayoutClick: () -> Unit = {},
+    onShowLocalTabChange: (Boolean) -> Unit = {},
 ) {
     val context = LocalContext.current
 
@@ -438,8 +449,10 @@ fun SettingsScreenContent(
             )
             dividerItem()
             lookAndFeelSection(
+                showLocalTab = showLocalTab,
                 onThemeClick = onThemeClick,
                 onLayoutClick = onLayoutClick,
+                onShowLocalTabChange = onShowLocalTabChange,
             )
             if (objectsDetector.isEnabled) {
                 dividerItem()
@@ -469,6 +482,9 @@ fun SettingsScreenContent(
                         favoritesEnabled = appPreferences
                             .autoWallpaperPreferences
                             .favoritesEnabled,
+                        localEnabled = appPreferences
+                            .autoWallpaperPreferences
+                            .localEnabled,
                     ),
                     useObjectDetection = appPreferences.autoWallpaperPreferences.useObjectDetection,
                     nextRun = autoWallpaperNextRun,
@@ -531,12 +547,16 @@ private fun getSourcesSummary(
     savedSearch: SavedSearch?,
     savedSearchEnabled: Boolean,
     favoritesEnabled: Boolean,
+    localEnabled: Boolean,
 ) = mutableListOf<String>().apply {
     if (savedSearchEnabled) {
         add("${context.getString(R.string.saved_search)} (${savedSearch?.name ?: ""})")
     }
     if (favoritesEnabled) {
         add(context.getString(R.string.favorites))
+    }
+    if (localEnabled) {
+        add(context.getString(R.string.local))
     }
 }.joinToString(", ")
 

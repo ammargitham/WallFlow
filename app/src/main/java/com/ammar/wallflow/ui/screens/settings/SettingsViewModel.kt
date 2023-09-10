@@ -19,12 +19,16 @@ import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.ObjectDetectionModelRepository
 import com.ammar.wallflow.data.repository.SavedSearchRepository
 import com.ammar.wallflow.extensions.TAG
+import com.ammar.wallflow.extensions.accessibleFolders
 import com.ammar.wallflow.extensions.getMLModelsFileIfExists
 import com.ammar.wallflow.extensions.workManager
 import com.ammar.wallflow.model.ObjectDetectionModel
 import com.ammar.wallflow.model.SavedSearch
+import com.ammar.wallflow.model.local.LocalDirectory
 import com.ammar.wallflow.utils.DownloadManager
 import com.ammar.wallflow.utils.DownloadStatus
+import com.ammar.wallflow.utils.combine
+import com.ammar.wallflow.utils.getRealPath
 import com.ammar.wallflow.workers.AutoWallpaperWorker
 import com.ammar.wallflow.workers.DownloadWorker
 import com.github.materiiapps.partial.Partialize
@@ -36,7 +40,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -53,6 +57,18 @@ class SettingsViewModel @Inject constructor(
 ) : AndroidViewModel(application) {
     private val localUiStateFlow = MutableStateFlow(SettingsUiStatePartial())
     private val autoWallpaperNextRunFlow = getAutoWallpaperNextRun()
+    private val localDirectories = flowOf(
+        application.accessibleFolders
+            .map { p ->
+                LocalDirectory(
+                    uri = p.uri,
+                    path = getRealPath(
+                        context = application,
+                        uri = p.uri,
+                    ) ?: p.uri.toString(),
+                )
+            },
+    )
 
     val uiState = combine(
         appPreferencesRepository.appPreferencesFlow,
@@ -60,7 +76,15 @@ class SettingsViewModel @Inject constructor(
         localUiStateFlow,
         savedSearchRepository.getAll(),
         autoWallpaperNextRunFlow,
-    ) { appPreferences, objectDetectionModels, localUiState, savedSearches, autoWallpaperNextRun ->
+        localDirectories,
+    ) {
+            appPreferences,
+            objectDetectionModels,
+            localUiState,
+            savedSearches,
+            autoWallpaperNextRun,
+            dirs,
+        ->
         val selectedModelId = appPreferences.objectDetectionPreferences.modelId
         val selectedModel = if (selectedModelId == 0L) {
             ObjectDetectionModel.DEFAULT
@@ -81,6 +105,7 @@ class SettingsViewModel @Inject constructor(
                     appPreferences.autoWallpaperPreferences.savedSearchId == it.id
                 },
                 autoWallpaperNextRun = autoWallpaperNextRun,
+                localDirectories = dirs,
             ),
         )
     }.stateIn(
@@ -290,7 +315,8 @@ class SettingsViewModel @Inject constructor(
     fun updateAutoWallpaperPrefs(autoWallpaperPreferences: AutoWallpaperPreferences) {
         if (autoWallpaperPreferences.enabled &&
             !autoWallpaperPreferences.savedSearchEnabled &&
-            !autoWallpaperPreferences.favoritesEnabled
+            !autoWallpaperPreferences.favoritesEnabled &&
+            !autoWallpaperPreferences.localEnabled
         ) {
             localUiStateFlow.update {
                 it.copy(
@@ -424,6 +450,7 @@ data class SettingsUiState(
     val autoWallpaperStatus: AutoWallpaperWorker.Companion.Status? = null,
     val showThemeOptionsDialog: Boolean = false,
     val showAutoWallpaperSetToDialog: Boolean = false,
+    val localDirectories: List<LocalDirectory> = emptyList(),
 )
 
 sealed class NextRun {

@@ -11,7 +11,6 @@ import androidx.room.Junction
 import androidx.room.PrimaryKey
 import androidx.room.Relation
 import com.ammar.wallflow.model.Purity
-import com.ammar.wallflow.model.wallhaven.WallhavenThumbs
 import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import kotlinx.datetime.Instant
 
@@ -81,20 +80,14 @@ fun WallpaperEntity.asWallpaper(
     views = views,
     favorites = favorites,
     purity = purity,
-    source = source,
+    wallhavenSource = source,
     category = this.category,
     resolution = IntSize(dimensionX, dimensionY),
     fileSize = fileSize,
-    fileType = fileType,
+    mimeType = fileType,
     createdAt = createdAt,
     colors = colors.map { Color(it.toColorInt()) },
-    path = path,
-    thumbs = thumbs.asThumbs(),
+    data = path,
+    thumbData = thumbs.original,
     tags = tags?.map { it.asTag() },
-)
-
-private fun ThumbsEntity.asThumbs() = WallhavenThumbs(
-    large = large,
-    original = original,
-    small = small,
 )

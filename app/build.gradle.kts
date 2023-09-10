@@ -338,6 +338,15 @@ dependencies {
     // About libraries
     implementation(libs.about.libraries.core)
 
+    // DocumentFileCompat
+    implementation(libs.documentfilecompat)
+
+    // ExifInterface
+    implementation(libs.exifinterface)
+
+    // LeakCanary
+    debugImplementation(libs.leakcanary.android)
+
     // Local tests: jUnit, coroutines, Android runner
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)

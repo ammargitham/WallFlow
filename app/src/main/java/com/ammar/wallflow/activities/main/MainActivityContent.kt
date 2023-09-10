@@ -32,6 +32,7 @@ import com.ammar.wallflow.extensions.toPx
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.SearchQuery
+import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.model.wallhaven.wallhavenWallpaper1
 import com.ammar.wallflow.model.wallhaven.wallhavenWallpaper2
@@ -70,6 +71,7 @@ fun MainActivityContent(
     searchBarOverflowIcon: @Composable (() -> Unit)? = null,
     searchBarShowNSFW: Boolean = false,
     searchBarShowQuery: Boolean = true,
+    showLocalTab: Boolean = true,
     onBackClick: () -> Unit = {},
     onFixWallHavenApiKeyClick: () -> Unit = {},
     onDismissGlobalError: (error: GlobalError) -> Unit = {},
@@ -156,6 +158,7 @@ fun MainActivityContent(
                         .align(Alignment.TopStart)
                         .onSizeChanged(onBottomBarSizeChanged),
                     currentDestination = currentDestination,
+                    showLocalTab = showLocalTab,
                     onItemClick = onBottomBarItemClick,
                 )
             } else {
@@ -165,6 +168,7 @@ fun MainActivityContent(
                         .align(Alignment.BottomCenter)
                         .onSizeChanged(onBottomBarSizeChanged),
                     currentDestination = currentDestination,
+                    showLocalTab = showLocalTab,
                     onItemClick = onBottomBarItemClick,
                 )
             }
@@ -254,8 +258,14 @@ private fun PreviewMainActivityContentTable() {
 private fun PreviewContent(
     useNavRail: Boolean = false,
 ) {
-    val previewWallpaperFlow =
-        flowOf(PagingData.from(listOf(wallhavenWallpaper1, wallhavenWallpaper2)))
+    val previewWallpaperFlow = flowOf(
+        PagingData.from(
+            listOf<Wallpaper>(
+                wallhavenWallpaper1,
+                wallhavenWallpaper2,
+            ),
+        ),
+    )
     val previewWallhavenTags = List(10) {
         WallhavenTag(
             id = it.toLong(),

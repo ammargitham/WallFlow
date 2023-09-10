@@ -1,5 +1,8 @@
 package com.ammar.wallflow.workers
 
+import android.content.Context
+import android.net.Uri
+import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import com.ammar.wallflow.data.db.dao.AutoWallpaperHistoryDao
 import com.ammar.wallflow.data.db.dao.FavoriteDao
@@ -16,8 +19,12 @@ import com.ammar.wallflow.data.db.entity.WallpaperWithUploaderAndTags
 import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
 import com.ammar.wallflow.data.network.model.NetworkResponse
 import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpaper
+import com.ammar.wallflow.data.repository.local.LocalWallpapersRepository
+import com.ammar.wallflow.data.repository.utils.Resource
 import com.ammar.wallflow.model.SearchQuery
 import com.ammar.wallflow.model.Source
+import com.ammar.wallflow.model.Wallpaper
+import com.ammar.wallflow.model.local.LocalWallpaper
 import kotlinx.coroutines.flow.Flow
 import okhttp3.Call
 import okhttp3.OkHttpClient
@@ -233,5 +240,28 @@ internal val fakeOkHttpClient = object : OkHttpClient() {
     override fun newCall(request: Request): Call {
         // Overriding to throw error if download requested
         throw IllegalStateException("Test called okhttp client!")
+    }
+}
+
+internal open class FakeLocalWallpapersRepository : LocalWallpapersRepository {
+    override fun wallpapersPager(
+        context: Context,
+        uris: Collection<Uri>,
+    ): Flow<PagingData<Wallpaper>> {
+        throw RuntimeException()
+    }
+
+    override fun wallpaper(
+        context: Context,
+        wallpaperUriStr: String,
+    ): Flow<Resource<LocalWallpaper?>> {
+        throw RuntimeException()
+    }
+
+    override suspend fun getRandom(
+        context: Context,
+        uris: Collection<Uri>,
+    ): Wallpaper? {
+        throw RuntimeException()
     }
 }

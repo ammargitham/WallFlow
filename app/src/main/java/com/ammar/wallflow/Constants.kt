@@ -34,11 +34,17 @@ const val FILE_PROVIDER_AUTHORITY = BuildConfig.APPLICATION_ID + ".fileprovider"
 const val LOCAL_DEEPLINK_SCHEME = "wallflow"
 
 const val EFFICIENT_DET_LITE_0_MODEL_NAME = "EfficientDet-Lite0"
-const val EFFICIENT_DET_LITE_0_MODEL_URL =
-    "https://tfhub.dev/tensorflow/lite-model/efficientdet/lite0/detection/metadata/1?lite-format=tflite"
+const val EFFICIENT_DET_LITE_0_MODEL_URL = "https://tfhub.dev/tensorflow/lite-model/" +
+    "efficientdet/lite0/detection/metadata/1?lite-format=tflite"
 const val EFFICIENT_DET_LITE_0_MODEL_FILE_NAME =
     "lite-model_efficientdet_lite0_detection_metadata_1.tflite"
 
 val INTERNAL_MODELS = listOf(
     EFFICIENT_DET_LITE_0_MODEL_NAME,
 )
+
+const val MIME_TYPE_BMP = "image/bmp"
+const val MIME_TYPE_HEIC = "image/heic"
+const val MIME_TYPE_JPEG = "image/jpeg"
+const val MIME_TYPE_PNG = "image/png"
+const val MIME_TYPE_WEBP = "image/webp"

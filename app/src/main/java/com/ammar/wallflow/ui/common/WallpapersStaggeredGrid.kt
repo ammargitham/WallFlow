@@ -28,8 +28,7 @@ import com.ammar.wallflow.data.preferences.GridType
 import com.ammar.wallflow.extensions.toDp
 import com.ammar.wallflow.model.Favorite
 import com.ammar.wallflow.model.Purity
-import com.ammar.wallflow.model.Source
-import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
+import com.ammar.wallflow.model.Wallpaper
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
@@ -38,11 +37,11 @@ fun WallpaperStaggeredGrid(
     modifier: Modifier = Modifier,
     state: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
     contentPadding: PaddingValues = PaddingValues(0.dp),
-    wallpapers: LazyPagingItems<WallhavenWallpaper>,
+    wallpapers: LazyPagingItems<Wallpaper>,
     header: (LazyStaggeredGridScope.() -> Unit)? = null,
     blurSketchy: Boolean = false,
     blurNsfw: Boolean = false,
-    selectedWallhavenWallpaper: WallhavenWallpaper? = null,
+    selectedWallpaper: Wallpaper? = null,
     showSelection: Boolean = false,
     gridType: GridType = GridType.STAGGERED,
     gridColType: GridColType = GridColType.ADAPTIVE,
@@ -50,8 +49,8 @@ fun WallpaperStaggeredGrid(
     gridColMinWidthPct: Int = 40,
     roundedCorners: Boolean = true,
     favorites: ImmutableList<Favorite> = persistentListOf(),
-    onWallpaperClick: (wallhavenWallpaper: WallhavenWallpaper) -> Unit = {},
-    onWallpaperFavoriteClick: (wallhavenWallpaper: WallhavenWallpaper) -> Unit = {},
+    onWallpaperClick: (wallpaper: Wallpaper) -> Unit = {},
+    onWallpaperFavoriteClick: (wallpaper: Wallpaper) -> Unit = {},
 ) {
     val isRefreshing = wallpapers.loadState.refresh == LoadState.Loading
     var gridSize by remember { mutableStateOf(IntSize.Zero) }
@@ -103,15 +102,15 @@ fun WallpaperStaggeredGrid(
             val wallpaper = wallpapers[index]
             wallpaper?.let {
                 WallpaperCard(
-                    wallhavenWallpaper = it,
+                    wallpaper = it,
                     blur = when (it.purity) {
                         Purity.SFW -> false
                         Purity.SKETCHY -> blurSketchy
                         Purity.NSFW -> blurNsfw
                     },
-                    isSelected = showSelection && selectedWallhavenWallpaper?.id == it.id,
+                    isSelected = showSelection && selectedWallpaper?.id == it.id,
                     isFavorite = favorites.find { f ->
-                        f.sourceId == it.id && f.source == Source.WALLHAVEN
+                        f.sourceId == it.id && f.source == it.source
                     } != null,
                     fixedHeight = gridType == GridType.FIXED_SIZE,
                     roundedCorners = roundedCorners,

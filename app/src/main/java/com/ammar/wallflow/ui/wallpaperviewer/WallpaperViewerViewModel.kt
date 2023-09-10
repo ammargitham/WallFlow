@@ -4,8 +4,11 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.ammar.wallflow.data.repository.WallhavenRepository
+import com.ammar.wallflow.data.repository.local.LocalWallpapersRepository
 import com.ammar.wallflow.data.repository.utils.Resource
 import com.ammar.wallflow.data.repository.utils.successOr
+import com.ammar.wallflow.model.Source
+import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import com.ammar.wallflow.utils.DownloadManager
 import com.ammar.wallflow.utils.DownloadStatus
@@ -30,32 +33,35 @@ import kotlinx.coroutines.launch
 class WallpaperViewerViewModel @Inject constructor(
     private val application: Application,
     private val wallHavenRepository: WallhavenRepository,
+    private val localWallpapersRepository: LocalWallpapersRepository,
     private val downloadManager: DownloadManager,
 ) : AndroidViewModel(
     application = application,
 ) {
     private val localUiState = MutableStateFlow(WallpaperViewerUiStatePartial())
-    private val wallpaperIdFlow = MutableStateFlow<String?>(null)
-    private val thumbUrlFlow = MutableStateFlow<String?>(null)
+    private val argsFlow = MutableStateFlow(WallpaperViewerArgs())
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    private val wallpaperFlow = wallpaperIdFlow.flatMapLatest {
-        if (it == null) {
+    private val wallpaperFlow = argsFlow.flatMapLatest {
+        if (it.source == null || it.wallpaperId == null) {
             flowOf(Resource.Success(null))
         } else {
-            wallHavenRepository.wallpaper(it)
+            when (it.source) {
+                Source.WALLHAVEN -> wallHavenRepository.wallpaper(it.wallpaperId)
+                Source.LOCAL -> localWallpapersRepository.wallpaper(application, it.wallpaperId)
+            }
         }
     }
 
     val uiState = combine(
         localUiState,
         wallpaperFlow,
-        thumbUrlFlow,
-    ) { local, wallpaper, thumbUrl ->
+        argsFlow,
+    ) { local, wallpaper, args ->
         local.merge(
             WallpaperViewerUiState(
-                wallhavenWallpaper = wallpaper.successOr(null),
-                thumbUrl = thumbUrl,
+                wallpaper = wallpaper.successOr(null),
+                thumbData = args.thumbData,
                 loading = wallpaper is Resource.Loading,
             ),
         )
@@ -65,14 +71,21 @@ class WallpaperViewerViewModel @Inject constructor(
         initialValue = WallpaperViewerUiState(),
     )
 
-    fun setWallpaperId(wallpaperId: String?, thumbUrl: String?) {
-        wallpaperIdFlow.update { wallpaperId }
-        thumbUrlFlow.update { thumbUrl }
+    fun setWallpaper(
+        source: Source,
+        wallpaperId: String?,
+        thumbData: String?,
+    ) = argsFlow.update {
+        WallpaperViewerArgs(
+            source = source,
+            wallpaperId = wallpaperId,
+            thumbData = thumbData,
+        )
     }
 
     fun onWallpaperTap() = localUiState.update {
         it.copy(
-            actionsVisible = partial(!it.actionsVisible.getOrElse { false }),
+            actionsVisible = partial(!it.actionsVisible.getOrElse { true }),
         )
     }
 
@@ -87,7 +100,10 @@ class WallpaperViewerViewModel @Inject constructor(
     }
 
     fun download() = viewModelScope.launch {
-        uiState.value.wallhavenWallpaper?.run {
+        uiState.value.wallpaper?.run {
+            if (this !is WallhavenWallpaper) {
+                return@run
+            }
             val workName = downloadManager.requestDownload(application, this)
             downloadManager.getProgress(application, workName).collectLatest { state ->
                 localUiState.update { it.copy(downloadStatus = partial(state)) }
@@ -96,11 +112,14 @@ class WallpaperViewerViewModel @Inject constructor(
     }
 
     fun downloadForSharing(onResult: (file: File?) -> Unit) {
-        uiState.value.wallhavenWallpaper?.run {
+        uiState.value.wallpaper?.run {
+            if (this !is WallhavenWallpaper) {
+                return@run
+            }
             viewModelScope.launch {
                 downloadManager.downloadWallpaperAsync(
                     context = application,
-                    wallhavenWallpaper = this@run,
+                    wallpaper = this@run,
                     onLoadingChange = { loading ->
                         localUiState.update { it.copy(loading = partial(loading)) }
                     },
@@ -113,10 +132,16 @@ class WallpaperViewerViewModel @Inject constructor(
 
 @Partialize
 data class WallpaperViewerUiState(
-    val wallhavenWallpaper: WallhavenWallpaper? = null,
-    val thumbUrl: String? = null,
+    val wallpaper: Wallpaper? = null,
+    val thumbData: String? = null,
     val actionsVisible: Boolean = true,
     val showInfo: Boolean = false,
     val downloadStatus: DownloadStatus? = null,
     val loading: Boolean = true,
+)
+
+data class WallpaperViewerArgs(
+    val source: Source? = null,
+    val wallpaperId: String? = null,
+    val thumbData: String? = null,
 )

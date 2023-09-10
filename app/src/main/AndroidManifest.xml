@@ -33,6 +33,7 @@
         <activity
             android:name=".activities.main.MainActivity"
             android:exported="true"
+            android:launchMode="singleTop"
             android:theme="@style/Theme.WallFlow">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -66,9 +67,9 @@
 
         <service
             android:name="androidx.work.impl.foreground.SystemForegroundService"
-            android:exported="false"
             android:directBootAware="false"
             android:enabled="@bool/enable_system_foreground_service_default"
+            android:exported="false"
             android:foregroundServiceType="dataSync|shortService"
             tools:targetApi="n" />
 

@@ -73,6 +73,8 @@ fun WallpaperActions(
     downloadStatus: DownloadStatus? = null,
     applyWallpaperEnabled: Boolean = true,
     showFullScreenAction: Boolean = false,
+    showDownloadAction: Boolean = true,
+    showShareLinkAction: Boolean = true,
     onInfoClick: () -> Unit = {},
     onDownloadClick: () -> Unit = {},
     onShareLinkClick: () -> Unit = {},
@@ -88,11 +90,14 @@ fun WallpaperActions(
                 FullScreenButton(onClick = onFullScreenClick)
             }
             InfoButton(onClick = onInfoClick)
-            DownloadButton(
-                downloadStatus = downloadStatus,
-                onClick = onDownloadClick,
-            )
+            if (showDownloadAction) {
+                DownloadButton(
+                    downloadStatus = downloadStatus,
+                    onClick = onDownloadClick,
+                )
+            }
             ShareButton(
+                showShareLinkAction = showShareLinkAction,
                 onLinkClick = onShareLinkClick,
                 onImageClick = onShareImageClick,
             )
@@ -315,6 +320,7 @@ private fun PreviewDownloadButton(
 @Composable
 private fun ShareButton(
     modifier: Modifier = Modifier,
+    showShareLinkAction: Boolean = true,
     onLinkClick: () -> Unit = {},
     onImageClick: () -> Unit = {},
 ) {
@@ -328,7 +334,13 @@ private fun ShareButton(
     ) {
         IconButton(
             modifier = Modifier.tooltipTrigger(),
-            onClick = { expanded = true },
+            onClick = {
+                if (!showShareLinkAction) {
+                    onImageClick()
+                    return@IconButton
+                }
+                expanded = true
+            },
         ) {
             Icon(
                 imageVector = Icons.Default.Share,

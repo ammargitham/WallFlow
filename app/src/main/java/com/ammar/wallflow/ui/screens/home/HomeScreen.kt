@@ -1,6 +1,5 @@
 package com.ammar.wallflow.ui.screens.home
 
-import android.content.Intent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
@@ -27,31 +26,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.ammar.wallflow.activities.setwallpaper.SetWallpaperActivity
-import com.ammar.wallflow.extensions.getFileNameFromUrl
-import com.ammar.wallflow.extensions.getUriForFile
-import com.ammar.wallflow.extensions.parseMimeType
 import com.ammar.wallflow.extensions.rememberLazyStaggeredGridState
 import com.ammar.wallflow.extensions.search
-import com.ammar.wallflow.extensions.share
 import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.SearchSaver
 import com.ammar.wallflow.model.TagSearchMeta
 import com.ammar.wallflow.model.UploaderSearchMeta
+import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
-import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.SearchBar
 import com.ammar.wallflow.ui.common.bottomWindowInsets
-import com.ammar.wallflow.ui.common.bottombar.BottomBarController
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
 import com.ammar.wallflow.ui.common.mainsearch.LocalMainSearchBarController
 import com.ammar.wallflow.ui.common.mainsearch.MainSearchBar
@@ -61,6 +52,10 @@ import com.ammar.wallflow.ui.common.searchedit.SavedSearchesDialog
 import com.ammar.wallflow.ui.common.topWindowInsets
 import com.ammar.wallflow.ui.screens.destinations.WallpaperScreenDestination
 import com.ammar.wallflow.ui.wallpaperviewer.WallpaperViewerViewModel
+import com.ammar.wallflow.utils.applyWallpaper
+import com.ammar.wallflow.utils.getStartBottomPadding
+import com.ammar.wallflow.utils.shareWallpaper
+import com.ammar.wallflow.utils.shareWallpaperUrl
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.navigate
 import kotlinx.collections.immutable.persistentListOf
@@ -133,19 +128,22 @@ fun HomeScreen(
         }
     }
 
-    val onWallpaperClick: (
-        wallhavenWallpaper: WallhavenWallpaper,
-    ) -> Unit = remember(systemState.isExpanded) {
+    val onWallpaperClick: (wallpaper: Wallpaper) -> Unit = remember(systemState.isExpanded) {
         {
             if (systemState.isExpanded) {
                 viewModel.setSelectedWallpaper(it)
-                viewerViewModel.setWallpaperId(it.id, it.thumbs.original)
+                viewerViewModel.setWallpaper(
+                    source = it.source,
+                    wallpaperId = it.id,
+                    thumbData = it.thumbData,
+                )
             } else {
                 // navigate to wallpaper screen
                 navController.navigate(
                     WallpaperScreenDestination(
+                        source = it.source,
                         wallpaperId = it.id,
-                        thumbUrl = it.thumbs.original,
+                        thumbData = it.thumbData,
                     ),
                 )
             }
@@ -190,10 +188,10 @@ fun HomeScreen(
             favorites = uiState.favorites,
             blurSketchy = uiState.blurSketchy,
             blurNsfw = uiState.blurNsfw,
-            selectedWallhavenWallpaper = uiState.selectedWallhavenWallpaper,
+            selectedWallpaper = uiState.selectedWallpaper,
             layoutPreferences = uiState.layoutPreferences,
             showFAB = uiState.isHome,
-            fullWallhavenWallpaper = viewerUiState.wallhavenWallpaper,
+            fullWallpaper = viewerUiState.wallpaper,
             fullWallpaperActionsVisible = viewerUiState.actionsVisible,
             fullWallpaperDownloadStatus = viewerUiState.downloadStatus,
             fullWallpaperLoading = viewerUiState.loading,
@@ -207,40 +205,24 @@ fun HomeScreen(
             onFullWallpaperInfoClick = viewerViewModel::showInfo,
             onFullWallpaperInfoDismiss = { viewerViewModel.showInfo(false) },
             onFullWallpaperShareLinkClick = {
-                viewerUiState.wallhavenWallpaper?.run { context.share(url) }
+                val wallpaper = viewerUiState.wallpaper ?: return@HomeScreenContent
+                shareWallpaperUrl(context, wallpaper)
             },
             onFullWallpaperShareImageClick = {
-                val wallpaper = viewerUiState.wallhavenWallpaper ?: return@HomeScreenContent
-                viewerViewModel.downloadForSharing {
-                    if (it == null) return@downloadForSharing
-                    context.share(
-                        uri = context.getUriForFile(it),
-                        type = wallpaper.fileType.ifBlank { parseMimeType(wallpaper.path) },
-                        title = wallpaper.path.getFileNameFromUrl(),
-                        grantTempPermission = true,
-                    )
-                }
+                val wallpaper = viewerUiState.wallpaper ?: return@HomeScreenContent
+                shareWallpaper(context, viewerViewModel, wallpaper)
             },
             onFullWallpaperApplyWallpaperClick = {
-                viewerViewModel.downloadForSharing {
-                    val file = it ?: return@downloadForSharing
-                    context.startActivity(
-                        Intent().apply {
-                            setClass(context, SetWallpaperActivity::class.java)
-                            putExtra(
-                                SetWallpaperActivity.EXTRA_URI,
-                                context.getUriForFile(file),
-                            )
-                        },
-                    )
-                }
+                val wallpaper = viewerUiState.wallpaper ?: return@HomeScreenContent
+                applyWallpaper(context, viewerViewModel, wallpaper)
             },
             onFullWallpaperFullScreenClick = {
-                viewerUiState.wallhavenWallpaper?.run {
+                viewerUiState.wallpaper?.run {
                     navController.navigate(
                         WallpaperScreenDestination(
-                            thumbUrl = thumbs.original,
+                            source = source,
                             wallpaperId = id,
+                            thumbData = thumbData,
                         ),
                     )
                 }
@@ -322,29 +304,4 @@ fun HomeScreen(
             )
         }
     }
-}
-
-private fun getStartBottomPadding(
-    density: Density,
-    bottomBarController: BottomBarController,
-    bottomWindowInsets: WindowInsets,
-    navigationBarsInsets: WindowInsets,
-): Dp = with(density) {
-    val bottomBarState by bottomBarController.state
-    val bottomInsetsPadding = if (bottomBarState.isRail) {
-        bottomWindowInsets.getBottom(density).toDp()
-    } else {
-        0.dp
-    }
-    val bottomNavPadding = if (bottomBarState.isRail || bottomBarState.visible) {
-        0.dp
-    } else {
-        navigationBarsInsets.getBottom(density).toDp()
-    }
-    val bottomBarPadding = if (bottomBarState.isRail) {
-        0.dp
-    } else {
-        bottomBarState.size.height.toDp()
-    }
-    return bottomInsetsPadding + bottomBarPadding + bottomNavPadding
 }

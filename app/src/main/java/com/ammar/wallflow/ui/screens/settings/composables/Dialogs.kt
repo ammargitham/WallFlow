@@ -1,6 +1,5 @@
 package com.ammar.wallflow.ui.screens.settings.composables
 
-import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider as CPPP
 import android.content.res.Configuration
 import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
@@ -56,6 +55,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider as CPPP
 import androidx.compose.ui.unit.dp
 import androidx.work.Constraints
 import com.ammar.wallflow.DISABLED_ALPHA
@@ -76,6 +76,7 @@ import com.ammar.wallflow.model.ConstraintType
 import com.ammar.wallflow.model.SavedSearch
 import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.WallpaperTarget
+import com.ammar.wallflow.model.local.LocalDirectory
 import com.ammar.wallflow.ui.common.Dropdown
 import com.ammar.wallflow.ui.common.DropdownOption
 import com.ammar.wallflow.ui.common.NameState
@@ -653,6 +654,7 @@ fun AutoWallpaperSourceOptionsDialog(
     modifier: Modifier = Modifier,
     autoWallpaperPreferences: AutoWallpaperPreferences = AutoWallpaperPreferences(),
     savedSearches: List<SavedSearch> = emptyList(),
+    localDirectories: List<LocalDirectory> = emptyList(),
     onSaveClick: (AutoWallpaperPreferences) -> Unit = {},
     onDismissRequest: () -> Unit = {},
 ) {
@@ -664,8 +666,11 @@ fun AutoWallpaperSourceOptionsDialog(
     }
     val saveEnabled by remember {
         derivedStateOf {
-            // if both saved search and favorites is disabled
-            if (!localPrefs.savedSearchEnabled && !localPrefs.favoritesEnabled) {
+            // if all sources are disabled
+            if (!localPrefs.savedSearchEnabled &&
+                !localPrefs.favoritesEnabled &&
+                !localPrefs.localEnabled
+            ) {
                 return@derivedStateOf false
             }
             // if saved search is enabled and saved search id is not set
@@ -685,11 +690,16 @@ fun AutoWallpaperSourceOptionsDialog(
                     favoritesEnabled = localPrefs.favoritesEnabled,
                     savedSearches = savedSearches,
                     selectedSavedSearchId = localPrefs.savedSearchId,
+                    localEnabled = localPrefs.localEnabled,
+                    localDirectories = localDirectories,
                     onChangeSavedSearchEnabled = {
                         localPrefs = localPrefs.copy(savedSearchEnabled = it)
                     },
                     onChangeFavoritesEnabled = {
                         localPrefs = localPrefs.copy(favoritesEnabled = it)
+                    },
+                    onChangeLocalEnabled = {
+                        localPrefs = localPrefs.copy(localEnabled = it)
                     },
                     onSavedSearchIdChange = {
                         localPrefs = localPrefs.copy(savedSearchId = it)
@@ -722,27 +732,53 @@ private fun AutoWallpaperSourceOptionsDialogContent(
     favoritesEnabled: Boolean = false,
     savedSearches: List<SavedSearch> = emptyList(),
     selectedSavedSearchId: Long? = null,
+    localEnabled: Boolean = false,
+    localDirectories: List<LocalDirectory> = emptyList(),
     onChangeSavedSearchEnabled: (Boolean) -> Unit = {},
     onChangeFavoritesEnabled: (Boolean) -> Unit = {},
+    onChangeLocalEnabled: (Boolean) -> Unit = {},
     onSavedSearchIdChange: (Long) -> Unit = {},
 ) {
+    val localSavedSearchEnabled = savedSearchEnabled && savedSearches.isNotEmpty()
+    val localLocalEnabled = localEnabled && localDirectories.isNotEmpty()
+    val savedSearchAlpha = if (savedSearches.isNotEmpty()) 1f else DISABLED_ALPHA
+    val localAlpha = if (localDirectories.isNotEmpty()) 1f else DISABLED_ALPHA
+
     Column(
         modifier = modifier,
     ) {
         ListItem(
             modifier = Modifier
-                .clickable { onChangeSavedSearchEnabled(!savedSearchEnabled) }
+                .clickable { onChangeSavedSearchEnabled(!localSavedSearchEnabled) }
                 .padding(horizontal = 8.dp),
-            headlineContent = { Text(text = stringResource(R.string.saved_search)) },
+            headlineContent = {
+                Text(
+                    text = stringResource(R.string.saved_search),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = savedSearchAlpha),
+                )
+            },
+            supportingContent = if (savedSearches.isEmpty()) {
+                {
+                    Text(
+                        text = stringResource(R.string.no_saved_searches),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                            alpha = savedSearchAlpha,
+                        ),
+                    )
+                }
+            } else {
+                null
+            },
             leadingContent = {
                 Checkbox(
                     modifier = Modifier.size(24.dp),
-                    checked = savedSearchEnabled,
+                    enabled = savedSearches.isNotEmpty(),
+                    checked = localSavedSearchEnabled,
                     onCheckedChange = onChangeSavedSearchEnabled,
                 )
             },
         )
-        AnimatedVisibility(visible = savedSearchEnabled) {
+        AnimatedVisibility(visible = localSavedSearchEnabled) {
             Dropdown(
                 modifier = Modifier
                     .padding(
@@ -772,6 +808,37 @@ private fun AutoWallpaperSourceOptionsDialogContent(
                     modifier = Modifier.size(24.dp),
                     checked = favoritesEnabled,
                     onCheckedChange = onChangeFavoritesEnabled,
+                )
+            },
+        )
+        ListItem(
+            modifier = Modifier
+                .clickable { onChangeLocalEnabled(!localLocalEnabled) }
+                .padding(horizontal = 8.dp),
+            headlineContent = {
+                Text(
+                    text = stringResource(R.string.local),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = localAlpha),
+                )
+            },
+            supportingContent = if (localDirectories.isEmpty()) {
+                {
+                    Text(
+                        text = stringResource(R.string.no_local_dirs),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                            alpha = localAlpha,
+                        ),
+                    )
+                }
+            } else {
+                null
+            },
+            leadingContent = {
+                Checkbox(
+                    modifier = Modifier.size(24.dp),
+                    enabled = localDirectories.isNotEmpty(),
+                    checked = localLocalEnabled,
+                    onCheckedChange = onChangeLocalEnabled,
                 )
             },
         )

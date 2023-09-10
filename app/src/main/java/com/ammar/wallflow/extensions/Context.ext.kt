@@ -7,6 +7,7 @@ import android.content.ClipData
 import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
+import android.content.UriPermission
 import android.graphics.Bitmap
 import android.graphics.BitmapRegionDecoder
 import android.hardware.display.DisplayManager
@@ -160,7 +161,7 @@ fun getShareChooserIntent(
         }
         clipData = ClipData.newRawUri(title, uri)
         putExtra(Intent.EXTRA_STREAM, uri)
-        this.type = type
+        setTypeAndNormalize(type)
     },
     title,
 )
@@ -247,3 +248,6 @@ val Context.workManager
 
 val Context.notificationManager
     get() = NotificationManagerCompat.from(this)
+
+val Context.accessibleFolders: List<UriPermission>
+    get() = contentResolver.persistedUriPermissions

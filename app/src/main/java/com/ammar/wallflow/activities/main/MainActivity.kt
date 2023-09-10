@@ -1,5 +1,6 @@
 package com.ammar.wallflow.activities.main
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -34,6 +35,7 @@ import com.ammar.wallflow.extensions.search
 import com.ammar.wallflow.extensions.toPxF
 import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.model.Search
+import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.model.TagSearchMeta
 import com.ammar.wallflow.model.UploaderSearchMeta
 import com.ammar.wallflow.ui.common.LocalSystemController
@@ -46,6 +48,7 @@ import com.ammar.wallflow.ui.common.searchedit.SaveAsDialog
 import com.ammar.wallflow.ui.common.searchedit.SavedSearchesDialog
 import com.ammar.wallflow.ui.screens.destinations.HomeScreenDestination
 import com.ammar.wallflow.ui.screens.destinations.WallhavenApiKeyDialogDestination
+import com.ammar.wallflow.ui.screens.destinations.WallpaperScreenDestination
 import com.ammar.wallflow.ui.screens.home.HomeScreenNavArgs
 import com.ammar.wallflow.ui.screens.navArgs
 import com.ammar.wallflow.ui.theme.WallFlowTheme
@@ -55,6 +58,11 @@ import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    private val wallhavenUriPattern = Regex(
+        "https?://(?:whvn|wallhaven).cc(?:/w)?/(?<wallpaperId>\\S+)",
+        RegexOption.IGNORE_CASE,
+    )
+    lateinit var navController: NavHostController
 
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,7 +74,7 @@ class MainActivity : ComponentActivity() {
             val useNavRail = windowSizeClass.widthSizeClass > WindowWidthSizeClass.Compact
             val isExpanded = windowSizeClass.widthSizeClass >= WindowWidthSizeClass.Expanded
 
-            val navController = rememberNavController()
+            navController = rememberNavController()
             val viewModel: MainActivityViewModel = hiltViewModel()
             val uiState by viewModel.uiState.collectAsStateWithLifecycle()
             val currentBackStackEntry by navController.currentBackStackEntryAsState()
@@ -113,6 +121,10 @@ class MainActivity : ComponentActivity() {
                         return Offset.Zero
                     }
                 }
+            }
+
+            LaunchedEffect(Unit) {
+                handleIntent(intent ?: return@LaunchedEffect)
             }
 
             LaunchedEffect(searchBarControllerState.search) {
@@ -165,6 +177,7 @@ class MainActivity : ComponentActivity() {
                         searchBarOverflowIcon = searchBarControllerState.overflowIcon,
                         searchBarShowNSFW = uiState.searchBarShowNSFW,
                         searchBarShowQuery = searchBarControllerState.showQuery,
+                        showLocalTab = uiState.showLocalTab,
                         onSearchBarQueryChange = viewModel::onSearchBarQueryChange,
                         onBackClick = { navController.navigateUp() },
                         onSearchBarSearch = {
@@ -293,6 +306,27 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        handleIntent(intent ?: return)
+    }
+
+    private fun handleIntent(intent: Intent) {
+        val handled = navController.handleDeepLink(intent)
+        if (handled) {
+            return
+        }
+        val result = wallhavenUriPattern.matchEntire(intent.data?.toString() ?: "") ?: return
+        val wallpaperId = result.groups["wallpaperId"]?.value ?: return
+        navController.navigate(
+            WallpaperScreenDestination(
+                source = Source.WALLHAVEN,
+                wallpaperId = wallpaperId,
+                thumbData = null,
+            ),
+        )
     }
 
     private fun doSearch(

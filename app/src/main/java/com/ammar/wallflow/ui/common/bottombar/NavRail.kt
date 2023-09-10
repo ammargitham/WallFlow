@@ -21,6 +21,7 @@ import com.ammar.wallflow.ui.screens.NavGraph
 fun NavRail(
     modifier: Modifier = Modifier,
     currentDestination: NavDestination? = null,
+    showLocalTab: Boolean = true,
     onItemClick: (destination: NavGraph) -> Unit = {},
 ) {
     val bottomBarController = LocalBottomBarController.current
@@ -36,21 +37,29 @@ fun NavRail(
             modifier = modifier,
         ) {
             Spacer(Modifier.weight(1f))
-            BottomBarDestination.entries.forEach { destination ->
-                NavigationRailItem(
-                    icon = {
-                        Icon(
-                            painter = painterResource(destination.icon),
-                            contentDescription = stringResource(destination.label),
-                        )
-                    },
-                    label = { Text(stringResource(destination.label)) },
-                    selected = currentDestination?.hierarchy?.any {
-                        it.route == destination.graph.route
-                    } == true,
-                    onClick = { onItemClick(destination.graph) },
-                )
-            }
+            BottomBarDestination.entries
+                .filter {
+                    if (it != BottomBarDestination.Local) {
+                        true
+                    } else {
+                        showLocalTab
+                    }
+                }
+                .forEach { destination ->
+                    NavigationRailItem(
+                        icon = {
+                            Icon(
+                                painter = painterResource(destination.icon),
+                                contentDescription = stringResource(destination.label),
+                            )
+                        },
+                        label = { Text(stringResource(destination.label)) },
+                        selected = currentDestination?.hierarchy?.any {
+                            it.route == destination.graph.route
+                        } == true,
+                        onClick = { onItemClick(destination.graph) },
+                    )
+                }
             Spacer(Modifier.weight(1f))
         }
     }

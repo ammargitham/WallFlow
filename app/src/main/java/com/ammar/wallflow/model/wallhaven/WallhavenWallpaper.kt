@@ -6,7 +6,9 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntSize
 import androidx.core.graphics.toColorInt
+import com.ammar.wallflow.model.DownloadableWallpaper
 import com.ammar.wallflow.model.Purity
+import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.model.serializers.ColorSerializer
 import com.ammar.wallflow.model.serializers.IntSizeSerializer
 import kotlinx.datetime.Clock
@@ -14,28 +16,27 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.UseSerializers
 
 @Stable
-@kotlinx.serialization.Serializable
 data class WallhavenWallpaper(
-    val id: String,
+    override val source: Source = Source.WALLHAVEN,
+    override val id: String,
+    override val resolution: IntSize,
+    override val fileSize: Long,
+    override val data: String,
+    override val mimeType: String,
+    override val thumbData: String,
+    override val purity: Purity,
     val url: String,
     val shortUrl: String,
     val uploader: WallhavenUploader?,
     val views: Int,
     val favorites: Int,
-    val source: String,
-    val purity: Purity,
+    val wallhavenSource: String,
     val category: String,
-    val resolution: IntSize,
-    val fileSize: Long,
-    val fileType: String,
     val createdAt: Instant,
     val colors: List<Color>,
-    val path: String,
-    val thumbs: WallhavenThumbs,
     val tags: List<WallhavenTag>?,
-)
+) : DownloadableWallpaper()
 
-@kotlinx.serialization.Serializable
 data class WallhavenThumbs(
     val large: String,
     val original: String,
@@ -59,23 +60,19 @@ val wallhavenWallpaper1 = WallhavenWallpaper(
     ),
     views = 1000,
     favorites = 50,
-    source = "https://example.com/source1",
+    wallhavenSource = "https://example.com/source1",
     purity = Purity.SFW,
     category = "landscape",
     resolution = IntSize(1920, 1080),
     fileSize = 1000000,
-    fileType = "jpg",
+    mimeType = "jpg",
     createdAt = Clock.System.now(),
     colors = listOf(
         Color("#e64d19".toColorInt()),
         Color("#575c36".toColorInt()),
     ),
-    path = "wallpapers/wallpaper1",
-    thumbs = WallhavenThumbs(
-        large = "https://example.com/wallpaper1/large",
-        original = "https://example.com/wallpaper1/original",
-        small = "https://example.com/wallpaper1/small",
-    ),
+    data = "wallpapers/wallpaper1",
+    thumbData = "https://example.com/wallpaper1/original",
     tags = listOf(
         WallhavenTag(
             id = 1,
@@ -114,23 +111,19 @@ val wallhavenWallpaper2 = WallhavenWallpaper(
     ),
     views = 500,
     favorites = 20,
-    source = "https://example.com/source2",
+    wallhavenSource = "https://example.com/source2",
     purity = Purity.NSFW,
     category = "portrait",
     resolution = IntSize(1080, 1920),
     fileSize = 500000,
-    fileType = "png",
+    mimeType = "png",
     createdAt = Clock.System.now(),
     colors = listOf(
         Color("#09c081".toColorInt()),
         Color("#2ba4b5".toColorInt()),
     ),
-    path = "wallpapers/wallpaper2",
-    thumbs = WallhavenThumbs(
-        large = "https://example.com/wallpaper2/large",
-        original = "https://example.com/wallpaper2/original",
-        small = "https://example.com/wallpaper2/small",
-    ),
+    data = "wallpapers/wallpaper2",
+    thumbData = "https://example.com/wallpaper2/original",
     tags = listOf(
         WallhavenTag(
             id = 3,

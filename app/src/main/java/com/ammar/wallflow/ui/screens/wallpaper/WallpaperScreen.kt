@@ -1,6 +1,5 @@
 package com.ammar.wallflow.ui.screens.wallpaper
 
-import android.content.Intent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.BottomSheetDefaults
@@ -20,13 +19,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
-import com.ammar.wallflow.activities.setwallpaper.SetWallpaperActivity
-import com.ammar.wallflow.extensions.getFileNameFromUrl
-import com.ammar.wallflow.extensions.getUriForFile
-import com.ammar.wallflow.extensions.parseMimeType
 import com.ammar.wallflow.extensions.search
-import com.ammar.wallflow.extensions.share
 import com.ammar.wallflow.model.Search
+import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.model.TagSearchMeta
 import com.ammar.wallflow.model.UploaderSearchMeta
 import com.ammar.wallflow.ui.common.LocalSystemController
@@ -35,6 +30,9 @@ import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
 import com.ammar.wallflow.ui.common.mainsearch.LocalMainSearchBarController
 import com.ammar.wallflow.ui.wallpaperviewer.WallpaperViewer
 import com.ammar.wallflow.ui.wallpaperviewer.WallpaperViewerViewModel
+import com.ammar.wallflow.utils.applyWallpaper
+import com.ammar.wallflow.utils.shareWallpaper
+import com.ammar.wallflow.utils.shareWallpaperUrl
 import com.ramcosta.composedestinations.annotation.DeepLink
 import com.ramcosta.composedestinations.annotation.Destination
 
@@ -42,15 +40,14 @@ import com.ramcosta.composedestinations.annotation.Destination
 @Destination(
     deepLinks = [
         DeepLink(uriPattern = wallpaperScreenLocalDeepLinkUriPattern),
-        DeepLink(uriPattern = wallpaperScreenExternalDeepLinkUriPattern),
-        DeepLink(uriPattern = wallpaperScreenExternalShortDeepLinkUriPattern),
     ],
 )
 @Composable
 fun WallpaperScreen(
     navController: NavController,
+    source: Source,
     wallpaperId: String,
-    thumbUrl: String?,
+    thumbData: String?,
     viewModel: WallpaperViewModel = hiltViewModel(),
     viewerViewModel: WallpaperViewerViewModel = hiltViewModel(),
 ) {
@@ -70,8 +67,8 @@ fun WallpaperScreen(
     val systemController = LocalSystemController.current
     val context = LocalContext.current
 
-    LaunchedEffect(wallpaperId, thumbUrl) {
-        viewerViewModel.setWallpaperId(wallpaperId, thumbUrl)
+    LaunchedEffect(wallpaperId, thumbData) {
+        viewerViewModel.setWallpaper(source, wallpaperId, thumbData)
     }
 
     LaunchedEffect(Unit) {
@@ -110,11 +107,11 @@ fun WallpaperScreen(
         modifier = Modifier.fillMaxSize(),
     ) {
         WallpaperViewer(
-            wallhavenWallpaper = viewerUiState.wallhavenWallpaper,
+            wallpaper = viewerUiState.wallpaper,
             actionsVisible = viewerUiState.actionsVisible,
             downloadStatus = viewerUiState.downloadStatus,
             loading = viewerUiState.loading,
-            thumbUrl = viewerUiState.thumbUrl,
+            thumbData = viewerUiState.thumbData,
             showInfo = viewerUiState.showInfo,
             onWallpaperTransform = {
                 viewModel.onWallpaperTransform()
@@ -126,32 +123,17 @@ fun WallpaperScreen(
             },
             onInfoClick = viewerViewModel::showInfo,
             onInfoDismiss = { viewerViewModel.showInfo(false) },
-            onShareLinkClick = { viewerUiState.wallhavenWallpaper?.run { context.share(url) } },
+            onShareLinkClick = {
+                val wallpaper = viewerUiState.wallpaper ?: return@WallpaperViewer
+                shareWallpaperUrl(context, wallpaper)
+            },
             onShareImageClick = {
-                val wallpaper = viewerUiState.wallhavenWallpaper ?: return@WallpaperViewer
-                viewerViewModel.downloadForSharing {
-                    if (it == null) return@downloadForSharing
-                    context.share(
-                        uri = context.getUriForFile(it),
-                        type = wallpaper.fileType.ifBlank { parseMimeType(wallpaper.path) },
-                        title = wallpaper.path.getFileNameFromUrl(),
-                        grantTempPermission = true,
-                    )
-                }
+                val wallpaper = viewerUiState.wallpaper ?: return@WallpaperViewer
+                shareWallpaper(context, viewerViewModel, wallpaper)
             },
             onApplyWallpaperClick = {
-                viewerViewModel.downloadForSharing {
-                    val file = it ?: return@downloadForSharing
-                    context.startActivity(
-                        Intent().apply {
-                            setClass(context, SetWallpaperActivity::class.java)
-                            putExtra(
-                                SetWallpaperActivity.EXTRA_URI,
-                                context.getUriForFile(file),
-                            )
-                        },
-                    )
-                }
+                val wallpaper = viewerUiState.wallpaper ?: return@WallpaperViewer
+                applyWallpaper(context, viewerViewModel, wallpaper)
             },
             onTagClick = {
                 val search = Search(

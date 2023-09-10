@@ -1,5 +1,6 @@
 package com.ammar.wallflow.ui.screens.crop
 
+import com.ammar.wallflow.utils.objectdetection.detectObjects as actualDetectObjects
 import android.app.Application
 import android.hardware.display.DisplayManager
 import android.net.Uri
@@ -32,7 +33,6 @@ import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.utils.DownloadManager
 import com.ammar.wallflow.utils.DownloadManager.Companion.DownloadLocation
 import com.ammar.wallflow.utils.DownloadStatus
-import com.ammar.wallflow.utils.objectdetection.detectObjects as actualDetectObjects
 import com.ammar.wallflow.workers.DownloadWorker.Companion.NotificationType
 import com.github.materiiapps.partial.Partialize
 import com.github.materiiapps.partial.partial
@@ -205,12 +205,10 @@ class CropViewModel(
         )
         viewModelScope.launch {
             downloadManager.getProgress(application, workName).collectLatest { state ->
-                // Log.d(TAG, "state: $state")
                 modelDownloadStatusFlow.update { state }
                 localUiStateFlow.update { it.copy(modelDownloadStatus = partial(state)) }
                 if (!state.isSuccessOrFail()) return@collectLatest
                 if (state is DownloadStatus.Failed) {
-                    // application.toast("Model download failed: ${state.e?.message ?: "Unknown reason"}")
                     return@collectLatest
                 }
                 if (state is DownloadStatus.Success) {

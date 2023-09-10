@@ -20,11 +20,10 @@ import com.ammar.wallflow.model.SavedSearch
 import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.SearchQuery
 import com.ammar.wallflow.model.Sorting
-import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.model.TopRange
+import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.toSearchQuery
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
-import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import com.ammar.wallflow.ui.screens.navArgs
 import com.ammar.wallflow.utils.combine
 import com.github.materiiapps.partial.Partialize
@@ -141,8 +140,8 @@ class HomeViewModel @Inject constructor(
 
     fun setWallpapersLoading(refreshing: Boolean) = wallpapersLoadingFlow.update { refreshing }
 
-    fun setSelectedWallpaper(wallhavenWallpaper: WallhavenWallpaper) = localUiState.update {
-        it.copy(selectedWallhavenWallpaper = partial(wallhavenWallpaper))
+    fun setSelectedWallpaper(wallpaper: Wallpaper) = localUiState.update {
+        it.copy(selectedWallpaper = partial(wallpaper))
     }
 
     fun showSaveSearchAsDialog(search: Search? = null) = localUiState.update {
@@ -162,10 +161,10 @@ class HomeViewModel @Inject constructor(
         it.copy(showSavedSearchesDialog = partial(show))
     }
 
-    fun toggleFavorite(wallhavenWallpaper: WallhavenWallpaper) = viewModelScope.launch {
+    fun toggleFavorite(wallpaper: Wallpaper) = viewModelScope.launch {
         favoritesRepository.toggleFavorite(
-            sourceId = wallhavenWallpaper.id,
-            source = Source.WALLHAVEN,
+            sourceId = wallpaper.id,
+            source = wallpaper.source,
         )
     }
 }
@@ -199,7 +198,7 @@ data class HomeUiState(
     val blurSketchy: Boolean = false,
     val blurNsfw: Boolean = false,
     val showNSFW: Boolean = false,
-    val selectedWallhavenWallpaper: WallhavenWallpaper? = null,
+    val selectedWallpaper: Wallpaper? = null,
     val saveSearchAsSearch: Search? = null,
     val showSavedSearchesDialog: Boolean = false,
     val savedSearches: List<SavedSearch> = emptyList(),

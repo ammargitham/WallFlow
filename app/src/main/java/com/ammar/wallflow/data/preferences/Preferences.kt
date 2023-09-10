@@ -28,6 +28,9 @@ object PreferencesKeys {
     val AUTO_WALLPAPER_FAVORITES_ENABLED = booleanPreferencesKey(
         "auto_wallpaper_favorites_enabled",
     )
+    val AUTO_WALLPAPER_LOCAL_ENABLED = booleanPreferencesKey(
+        "auto_wallpaper_local_enabled",
+    )
     val AUTO_WALLPAPER_SAVED_SEARCH_ID = longPreferencesKey("auto_wallpaper_saved_search_id")
     val AUTO_WALLPAPER_USE_OBJECT_DETECTION = booleanPreferencesKey(
         "auto_wallpaper_use_object_detection",
@@ -43,4 +46,5 @@ object PreferencesKeys {
     val LAYOUT_GRID_COL_COUNT = intPreferencesKey("layout_grid_col_count")
     val LAYOUT_GRID_COL_MIN_WIDTH_PCT = intPreferencesKey("layout_grid_col_min_width_pct")
     val LAYOUT_ROUNDED_CORNERS = booleanPreferencesKey("layout_rounded_corners")
+    val SHOW_LOCAL_TAB = booleanPreferencesKey("show_local_tab")
 }

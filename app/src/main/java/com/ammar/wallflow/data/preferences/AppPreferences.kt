@@ -64,6 +64,7 @@ data class AutoWallpaperPreferences(
     val enabled: Boolean = false,
     val savedSearchEnabled: Boolean = false,
     val favoritesEnabled: Boolean = false,
+    val localEnabled: Boolean = false,
     val savedSearchId: Long = 0,
     val useObjectDetection: Boolean = true,
     val frequency: DateTimePeriod = defaultAutoWallpaperFreq,
@@ -92,6 +93,7 @@ enum class Theme {
 data class LookAndFeelPreferences(
     val theme: Theme = Theme.SYSTEM,
     val layoutPreferences: LayoutPreferences = LayoutPreferences(),
+    val showLocalTab: Boolean = true,
 )
 
 enum class GridType {

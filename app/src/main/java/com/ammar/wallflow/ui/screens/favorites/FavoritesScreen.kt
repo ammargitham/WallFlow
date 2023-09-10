@@ -1,6 +1,5 @@
 package com.ammar.wallflow.ui.screens.favorites
 
-import android.content.Intent
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,20 +18,15 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.ammar.wallflow.activities.setwallpaper.SetWallpaperActivity
 import com.ammar.wallflow.data.preferences.LayoutPreferences
-import com.ammar.wallflow.extensions.getFileNameFromUrl
-import com.ammar.wallflow.extensions.getUriForFile
-import com.ammar.wallflow.extensions.parseMimeType
 import com.ammar.wallflow.extensions.search
-import com.ammar.wallflow.extensions.share
 import com.ammar.wallflow.model.Favorite
 import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.TagSearchMeta
 import com.ammar.wallflow.model.UploaderSearchMeta
+import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.model.wallhaven.WallhavenUploader
-import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import com.ammar.wallflow.ui.common.BottomBarAwareHorizontalTwoPane
 import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.WallpaperStaggeredGrid
@@ -43,6 +37,9 @@ import com.ammar.wallflow.ui.screens.destinations.WallpaperScreenDestination
 import com.ammar.wallflow.ui.wallpaperviewer.WallpaperViewer
 import com.ammar.wallflow.ui.wallpaperviewer.WallpaperViewerViewModel
 import com.ammar.wallflow.utils.DownloadStatus
+import com.ammar.wallflow.utils.applyWallpaper
+import com.ammar.wallflow.utils.shareWallpaper
+import com.ammar.wallflow.utils.shareWallpaperUrl
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.navigate
 import kotlinx.collections.immutable.ImmutableList
@@ -71,23 +68,27 @@ fun FavoritesScreen(
         searchBarController.update { it.copy(visible = false) }
     }
 
-    val onWallpaperClick: (wallhavenWallpaper: WallhavenWallpaper) -> Unit =
-        remember(systemState.isExpanded) {
-            {
-                if (systemState.isExpanded) {
-                    viewModel.setSelectedWallpaper(it)
-                    viewerViewModel.setWallpaperId(it.id, it.thumbs.original)
-                } else {
-                    // navigate to wallpaper screen
-                    navController.navigate(
-                        WallpaperScreenDestination(
-                            wallpaperId = it.id,
-                            thumbUrl = it.thumbs.original,
-                        ),
-                    )
-                }
+    val onWallpaperClick: (wallpaper: Wallpaper) -> Unit = remember(systemState.isExpanded) {
+        {
+            if (systemState.isExpanded) {
+                viewModel.setSelectedWallpaper(it)
+                viewerViewModel.setWallpaper(
+                    source = it.source,
+                    wallpaperId = it.id,
+                    thumbData = it.thumbData,
+                )
+            } else {
+                // navigate to wallpaper screen
+                navController.navigate(
+                    WallpaperScreenDestination(
+                        source = it.source,
+                        wallpaperId = it.id,
+                        thumbData = it.thumbData,
+                    ),
+                )
             }
         }
+    }
 
     Box(
         modifier = Modifier
@@ -102,10 +103,10 @@ fun FavoritesScreen(
             favorites = uiState.favorites,
             blurSketchy = uiState.blurSketchy,
             blurNsfw = uiState.blurNsfw,
-            selectedWallhavenWallpaper = uiState.selectedWallhavenWallpaper,
+            selectedWallpaper = uiState.selectedWallpaper,
             showSelection = systemState.isExpanded,
             layoutPreferences = uiState.layoutPreferences,
-            fullWallhavenWallpaper = viewerUiState.wallhavenWallpaper,
+            fullWallpaper = viewerUiState.wallpaper,
             fullWallpaperActionsVisible = viewerUiState.actionsVisible,
             fullWallpaperDownloadStatus = viewerUiState.downloadStatus,
             fullWallpaperLoading = viewerUiState.loading,
@@ -117,39 +118,23 @@ fun FavoritesScreen(
             onFullWallpaperInfoClick = viewerViewModel::showInfo,
             onFullWallpaperInfoDismiss = { viewerViewModel.showInfo(false) },
             onFullWallpaperShareLinkClick = {
-                viewerUiState.wallhavenWallpaper?.run { context.share(url) }
+                val wallpaper = viewerUiState.wallpaper ?: return@FavoritesScreenContent
+                shareWallpaperUrl(context, wallpaper)
             },
             onFullWallpaperShareImageClick = {
-                val wallpaper = viewerUiState.wallhavenWallpaper ?: return@FavoritesScreenContent
-                viewerViewModel.downloadForSharing {
-                    if (it == null) return@downloadForSharing
-                    context.share(
-                        uri = context.getUriForFile(it),
-                        type = wallpaper.fileType.ifBlank { parseMimeType(wallpaper.path) },
-                        title = wallpaper.path.getFileNameFromUrl(),
-                        grantTempPermission = true,
-                    )
-                }
+                val wallpaper = viewerUiState.wallpaper ?: return@FavoritesScreenContent
+                shareWallpaper(context, viewerViewModel, wallpaper)
             },
             onFullWallpaperApplyWallpaperClick = {
-                viewerViewModel.downloadForSharing {
-                    val file = it ?: return@downloadForSharing
-                    context.startActivity(
-                        Intent().apply {
-                            setClass(context, SetWallpaperActivity::class.java)
-                            putExtra(
-                                SetWallpaperActivity.EXTRA_URI,
-                                context.getUriForFile(file),
-                            )
-                        },
-                    )
-                }
+                val wallpaper = viewerUiState.wallpaper ?: return@FavoritesScreenContent
+                applyWallpaper(context, viewerViewModel, wallpaper)
             },
             onFullWallpaperFullScreenClick = {
-                viewerUiState.wallhavenWallpaper?.run {
+                viewerUiState.wallpaper?.run {
                     navController.navigate(
                         WallpaperScreenDestination(
-                            thumbUrl = thumbs.original,
+                            source = source,
+                            thumbData = thumbData,
                             wallpaperId = id,
                         ),
                     )
@@ -182,7 +167,7 @@ fun FavoritesScreen(
 
 @Composable
 private fun FavoritesScreenContent(
-    wallpapers: LazyPagingItems<WallhavenWallpaper>,
+    wallpapers: LazyPagingItems<Wallpaper>,
     modifier: Modifier = Modifier,
     isExpanded: Boolean = false,
     gridState: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
@@ -190,16 +175,16 @@ private fun FavoritesScreenContent(
     favorites: ImmutableList<Favorite> = persistentListOf(),
     blurSketchy: Boolean = false,
     blurNsfw: Boolean = false,
-    selectedWallhavenWallpaper: WallhavenWallpaper? = null,
+    selectedWallpaper: Wallpaper? = null,
     showSelection: Boolean = false,
     layoutPreferences: LayoutPreferences = LayoutPreferences(),
-    fullWallhavenWallpaper: WallhavenWallpaper? = null,
+    fullWallpaper: Wallpaper? = null,
     fullWallpaperActionsVisible: Boolean = true,
     fullWallpaperDownloadStatus: DownloadStatus? = null,
     fullWallpaperLoading: Boolean = false,
     showFullWallpaperInfo: Boolean = false,
-    onWallpaperClick: (wallhavenWallpaper: WallhavenWallpaper) -> Unit = {},
-    onWallpaperFavoriteClick: (wallhavenWallpaper: WallhavenWallpaper) -> Unit = {},
+    onWallpaperClick: (wallpaper: Wallpaper) -> Unit = {},
+    onWallpaperFavoriteClick: (wallpaper: Wallpaper) -> Unit = {},
     onFullWallpaperTransform: () -> Unit = {},
     onFullWallpaperTap: () -> Unit = {},
     onFullWallpaperInfoClick: () -> Unit = {},
@@ -224,7 +209,7 @@ private fun FavoritesScreenContent(
                     favorites = favorites,
                     blurSketchy = blurSketchy,
                     blurNsfw = blurNsfw,
-                    selectedWallhavenWallpaper = selectedWallhavenWallpaper,
+                    selectedWallpaper = selectedWallpaper,
                     showSelection = showSelection,
                     gridType = layoutPreferences.gridType,
                     gridColType = layoutPreferences.gridColType,
@@ -237,11 +222,11 @@ private fun FavoritesScreenContent(
             },
             second = {
                 WallpaperViewer(
-                    wallhavenWallpaper = fullWallhavenWallpaper,
+                    wallpaper = fullWallpaper,
                     actionsVisible = fullWallpaperActionsVisible,
                     downloadStatus = fullWallpaperDownloadStatus,
                     loading = fullWallpaperLoading,
-                    thumbUrl = selectedWallhavenWallpaper?.thumbs?.original,
+                    thumbData = selectedWallpaper?.thumbData,
                     showFullScreenAction = true,
                     showInfo = showFullWallpaperInfo,
                     onWallpaperTransform = onFullWallpaperTransform,
@@ -267,7 +252,7 @@ private fun FavoritesScreenContent(
             favorites = favorites,
             blurSketchy = blurSketchy,
             blurNsfw = blurNsfw,
-            selectedWallhavenWallpaper = selectedWallhavenWallpaper,
+            selectedWallpaper = selectedWallpaper,
             showSelection = showSelection,
             gridType = layoutPreferences.gridType,
             gridColType = layoutPreferences.gridColType,

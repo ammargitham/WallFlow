@@ -52,7 +52,6 @@ class DownloadSuccessActionsService : LifecycleService() {
                         Log.w(TAG, "File not deleted: $filePath")
                         return@withContext
                     }
-                    Log.d(TAG, "File deleted!")
                 } catch (e: Exception) {
                     Log.e(TAG, "Error deleting file: $filePath", e)
                 }

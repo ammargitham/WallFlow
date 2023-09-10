@@ -49,6 +49,7 @@ import coil.request.Parameters
 import com.ammar.wallflow.R
 import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.extensions.aspectRatio
+import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import com.ammar.wallflow.model.wallhaven.wallhavenWallpaper1
 import com.ammar.wallflow.ui.theme.WallFlowTheme
@@ -62,7 +63,7 @@ private val cardHeight = 300.dp
 @Composable
 fun WallpaperCard(
     modifier: Modifier = Modifier,
-    wallhavenWallpaper: WallhavenWallpaper,
+    wallpaper: Wallpaper,
     blur: Boolean = false,
     fixedHeight: Boolean = false,
     roundedCorners: Boolean = true,
@@ -74,14 +75,14 @@ fun WallpaperCard(
     val context = LocalContext.current
     val request = remember(
         context,
-        wallhavenWallpaper,
+        wallpaper,
     ) {
         ImageRequest.Builder(context).apply {
-            data(wallhavenWallpaper.thumbs.original)
+            data(wallpaper.thumbData ?: wallpaper.data)
             crossfade(true)
             parameters(
                 Parameters.Builder().apply {
-                    set("fallback_url", wallhavenWallpaper.path)
+                    set("fallback_url", wallpaper.data)
                 }.build(),
             )
         }.build()
@@ -114,7 +115,7 @@ fun WallpaperCard(
                     it.height(200.dp)
                 } else {
                     it
-                        .aspectRatio(wallhavenWallpaper.resolution.aspectRatio)
+                        .aspectRatio(wallpaper.resolution.aspectRatio)
                         .heightIn(min = 60.dp)
                 }
             }
@@ -148,15 +149,33 @@ fun WallpaperCard(
                     )
                 },
             model = request,
-            placeholder = ColorPainter(wallhavenWallpaper.colors.firstOrNull() ?: Color.White),
-            fallback = ColorPainter(wallhavenWallpaper.colors.firstOrNull() ?: Color.White),
-            error = ColorPainter(wallhavenWallpaper.colors.firstOrNull() ?: Color.White),
+            placeholder = ColorPainter(
+                if (wallpaper is WallhavenWallpaper) {
+                    wallpaper.colors.firstOrNull() ?: Color.White
+                } else {
+                    Color.White
+                },
+            ),
+            fallback = ColorPainter(
+                if (wallpaper is WallhavenWallpaper) {
+                    wallpaper.colors.firstOrNull() ?: Color.White
+                } else {
+                    Color.White
+                },
+            ),
+            error = ColorPainter(
+                if (wallpaper is WallhavenWallpaper) {
+                    wallpaper.colors.firstOrNull() ?: Color.White
+                } else {
+                    Color.White
+                },
+            ),
             contentDescription = stringResource(R.string.wallpaper),
             contentScale = ContentScale.Crop,
             onError = {
                 Log.e(
                     TAG,
-                    "Error loading: ${wallhavenWallpaper.thumbs.original}",
+                    "Error loading: ${wallpaper.thumbData}",
                     it.result.throwable,
                 )
             },
@@ -212,7 +231,7 @@ private fun PreviewWallpaperCard() {
     WallFlowTheme {
         WallpaperCard(
             modifier = Modifier.width(200.dp),
-            wallhavenWallpaper = wallhavenWallpaper1,
+            wallpaper = wallhavenWallpaper1,
         )
     }
 }
@@ -223,7 +242,7 @@ private fun PreviewWallpaperCardSelected() {
     WallFlowTheme {
         WallpaperCard(
             modifier = Modifier.width(200.dp),
-            wallhavenWallpaper = wallhavenWallpaper1,
+            wallpaper = wallhavenWallpaper1,
             isSelected = true,
         )
     }

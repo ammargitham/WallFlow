@@ -225,8 +225,10 @@ private fun PreviewGeneralSection() {
 }
 
 internal fun LazyListScope.lookAndFeelSection(
+    showLocalTab: Boolean = true,
     onThemeClick: () -> Unit = {},
     onLayoutClick: () -> Unit = {},
+    onShowLocalTabChange: (Boolean) -> Unit = {},
 ) {
     item { Header(stringResource(R.string.look_and_feel)) }
     item {
@@ -239,6 +241,19 @@ internal fun LazyListScope.lookAndFeelSection(
         ListItem(
             modifier = Modifier.clickable(onClick = onLayoutClick),
             headlineContent = { Text(text = stringResource(R.string.layout)) },
+        )
+    }
+    item {
+        ListItem(
+            modifier = Modifier.clickable { onShowLocalTabChange(!showLocalTab) },
+            headlineContent = { Text(text = stringResource(R.string.show_local_tab)) },
+            trailingContent = {
+                Switch(
+                    modifier = Modifier.height(24.dp),
+                    checked = showLocalTab,
+                    onCheckedChange = onShowLocalTabChange,
+                )
+            },
         )
     }
 }

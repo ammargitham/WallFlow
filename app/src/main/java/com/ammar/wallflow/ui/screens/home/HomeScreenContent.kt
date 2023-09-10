@@ -31,9 +31,9 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.preferences.LayoutPreferences
 import com.ammar.wallflow.model.Favorite
+import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.model.wallhaven.WallhavenUploader
-import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import com.ammar.wallflow.model.wallhaven.wallhavenWallpaper1
 import com.ammar.wallflow.model.wallhaven.wallhavenWallpaper2
 import com.ammar.wallflow.ui.common.BottomBarAwareHorizontalTwoPane
@@ -47,7 +47,7 @@ import kotlinx.coroutines.flow.flowOf
 
 @Composable
 internal fun HomeScreenContent(
-    wallpapers: LazyPagingItems<WallhavenWallpaper>,
+    wallpapers: LazyPagingItems<Wallpaper>,
     nestedScrollConnection: NestedScrollConnection,
     modifier: Modifier = Modifier,
     gridState: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
@@ -58,16 +58,16 @@ internal fun HomeScreenContent(
     isTagsLoading: Boolean = false,
     blurSketchy: Boolean = false,
     blurNsfw: Boolean = false,
-    selectedWallhavenWallpaper: WallhavenWallpaper? = null,
+    selectedWallpaper: Wallpaper? = null,
     layoutPreferences: LayoutPreferences = LayoutPreferences(),
     showFAB: Boolean = true,
-    fullWallhavenWallpaper: WallhavenWallpaper? = null,
+    fullWallpaper: Wallpaper? = null,
     fullWallpaperActionsVisible: Boolean = true,
     fullWallpaperDownloadStatus: DownloadStatus? = null,
     fullWallpaperLoading: Boolean = false,
     showFullWallpaperInfo: Boolean = false,
-    onWallpaperClick: (wallhavenWallpaper: WallhavenWallpaper) -> Unit = {},
-    onWallpaperFavoriteClick: (wallhavenWallpaper: WallhavenWallpaper) -> Unit = {},
+    onWallpaperClick: (wallpaper: Wallpaper) -> Unit = {},
+    onWallpaperFavoriteClick: (wallpaper: Wallpaper) -> Unit = {},
     onTagClick: (wallhavenTag: WallhavenTag) -> Unit = {},
     onFABClick: () -> Unit = {},
     onFullWallpaperTransform: () -> Unit = {},
@@ -98,7 +98,7 @@ internal fun HomeScreenContent(
                     wallhavenTags = wallhavenTags,
                     isTagsLoading = isTagsLoading,
                     onTagClick = onTagClick,
-                    selectedWallhavenWallpaper = selectedWallhavenWallpaper,
+                    selectedWallpaper = selectedWallpaper,
                     showSelection = true,
                     layoutPreferences = layoutPreferences,
                     showFAB = showFAB,
@@ -109,11 +109,11 @@ internal fun HomeScreenContent(
             },
             second = {
                 WallpaperViewer(
-                    wallhavenWallpaper = fullWallhavenWallpaper,
+                    wallpaper = fullWallpaper,
                     actionsVisible = fullWallpaperActionsVisible,
                     downloadStatus = fullWallpaperDownloadStatus,
                     loading = fullWallpaperLoading,
-                    thumbUrl = selectedWallhavenWallpaper?.thumbs?.original,
+                    thumbData = selectedWallpaper?.thumbData,
                     showFullScreenAction = true,
                     showInfo = showFullWallpaperInfo,
                     onWallpaperTransform = onFullWallpaperTransform,
@@ -142,7 +142,7 @@ internal fun HomeScreenContent(
             wallhavenTags = wallhavenTags,
             isTagsLoading = isTagsLoading,
             onTagClick = onTagClick,
-            selectedWallhavenWallpaper = selectedWallhavenWallpaper,
+            selectedWallpaper = selectedWallpaper,
             showSelection = false,
             layoutPreferences = layoutPreferences,
             showFAB = showFAB,
@@ -155,7 +155,7 @@ internal fun HomeScreenContent(
 
 @Composable
 private fun Feed(
-    wallpapers: LazyPagingItems<WallhavenWallpaper>,
+    wallpapers: LazyPagingItems<Wallpaper>,
     modifier: Modifier = Modifier,
     gridState: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
     contentPadding: PaddingValues = PaddingValues(8.dp),
@@ -166,11 +166,11 @@ private fun Feed(
     blurNsfw: Boolean = false,
     isTagsLoading: Boolean = false,
     showSelection: Boolean = false,
-    selectedWallhavenWallpaper: WallhavenWallpaper? = null,
+    selectedWallpaper: Wallpaper? = null,
     showFAB: Boolean = true,
     onTagClick: (wallhavenTag: WallhavenTag) -> Unit = {},
-    onWallpaperClick: (wallhavenWallpaper: WallhavenWallpaper) -> Unit = {},
-    onWallpaperFavoriteClick: (wallhavenWallpaper: WallhavenWallpaper) -> Unit = {},
+    onWallpaperClick: (wallpaper: Wallpaper) -> Unit = {},
+    onWallpaperFavoriteClick: (wallpaper: Wallpaper) -> Unit = {},
     onFABClick: () -> Unit = {},
 ) {
     val expandedFab by remember(gridState.firstVisibleItemIndex) {
@@ -198,7 +198,7 @@ private fun Feed(
                     }
                 }
             },
-            selectedWallhavenWallpaper = selectedWallhavenWallpaper,
+            selectedWallpaper = selectedWallpaper,
             showSelection = showSelection,
             gridType = layoutPreferences.gridType,
             gridColType = layoutPreferences.gridColType,
@@ -237,7 +237,7 @@ private fun DefaultPreview() {
         Surface {
             val wallpapers = flowOf(
                 PagingData.from(
-                    listOf(
+                    listOf<Wallpaper>(
                         wallhavenWallpaper1,
                         wallhavenWallpaper2,
                     ),

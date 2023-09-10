@@ -1,7 +1,8 @@
 package com.ammar.wallflow.ui.screens.favorites
 
+import android.app.Application
 import androidx.compose.runtime.Stable
-import androidx.lifecycle.ViewModel
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.ammar.wallflow.data.db.entity.toFavorite
@@ -9,8 +10,7 @@ import com.ammar.wallflow.data.preferences.LayoutPreferences
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.FavoritesRepository
 import com.ammar.wallflow.model.Favorite
-import com.ammar.wallflow.model.Source
-import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
+import com.ammar.wallflow.model.Wallpaper
 import com.github.materiiapps.partial.Partialize
 import com.github.materiiapps.partial.partial
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -27,10 +27,15 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class FavoritesViewModel @Inject constructor(
+    application: Application,
     private val favoritesRepository: FavoritesRepository,
     appPreferencesRepository: AppPreferencesRepository,
-) : ViewModel() {
-    val favoriteWallpapers = favoritesRepository.favoriteWallpapersPager().cachedIn(viewModelScope)
+) : AndroidViewModel(
+    application = application,
+) {
+    val favoriteWallpapers = favoritesRepository.favoriteWallpapersPager(
+        context = application,
+    ).cachedIn(viewModelScope)
     private val localUiState = MutableStateFlow(FavoritesUiStatePartial())
 
     val uiState = combine(
@@ -52,14 +57,14 @@ class FavoritesViewModel @Inject constructor(
         initialValue = FavoritesUiState(),
     )
 
-    fun setSelectedWallpaper(wallhavenWallpaper: WallhavenWallpaper) = localUiState.update {
-        it.copy(selectedWallhavenWallpaper = partial(wallhavenWallpaper))
+    fun setSelectedWallpaper(wallpaper: Wallpaper) = localUiState.update {
+        it.copy(selectedWallpaper = partial(wallpaper))
     }
 
-    fun toggleFavorite(wallhavenWallpaper: WallhavenWallpaper) = viewModelScope.launch {
+    fun toggleFavorite(wallpaper: Wallpaper) = viewModelScope.launch {
         favoritesRepository.toggleFavorite(
-            sourceId = wallhavenWallpaper.id,
-            source = Source.WALLHAVEN,
+            sourceId = wallpaper.id,
+            source = wallpaper.source,
         )
     }
 }
@@ -69,7 +74,7 @@ class FavoritesViewModel @Inject constructor(
 data class FavoritesUiState(
     val blurSketchy: Boolean = false,
     val blurNsfw: Boolean = false,
-    val selectedWallhavenWallpaper: WallhavenWallpaper? = null,
+    val selectedWallpaper: Wallpaper? = null,
     val layoutPreferences: LayoutPreferences = LayoutPreferences(),
     val favorites: ImmutableList<Favorite> = persistentListOf(),
 )

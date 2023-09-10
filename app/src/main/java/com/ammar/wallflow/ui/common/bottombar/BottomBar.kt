@@ -20,6 +20,7 @@ import com.ammar.wallflow.ui.screens.NavGraph
 fun BottomBar(
     modifier: Modifier = Modifier,
     currentDestination: NavDestination? = null,
+    showLocalTab: Boolean = true,
     onItemClick: (destination: NavGraph) -> Unit = {},
 ) {
     val bottomBarController = LocalBottomBarController.current
@@ -32,21 +33,29 @@ fun BottomBar(
         exit = slideOutVertically(targetOffsetY = { it }),
     ) {
         NavigationBar {
-            BottomBarDestination.entries.forEach { destination ->
-                NavigationBarItem(
-                    selected = currentDestination?.hierarchy?.any {
-                        it.route == destination.graph.route
-                    } == true,
-                    onClick = { onItemClick(destination.graph) },
-                    icon = {
-                        Icon(
-                            painter = painterResource(destination.icon),
-                            contentDescription = stringResource(destination.label),
-                        )
-                    },
-                    label = { Text(stringResource(destination.label)) },
-                )
-            }
+            BottomBarDestination.entries
+                .filter {
+                    if (it != BottomBarDestination.Local) {
+                        true
+                    } else {
+                        showLocalTab
+                    }
+                }
+                .forEach { destination ->
+                    NavigationBarItem(
+                        selected = currentDestination?.hierarchy?.any {
+                            it.route == destination.graph.route
+                        } == true,
+                        onClick = { onItemClick(destination.graph) },
+                        icon = {
+                            Icon(
+                                painter = painterResource(destination.icon),
+                                contentDescription = stringResource(destination.label),
+                            )
+                        },
+                        label = { Text(stringResource(destination.label)) },
+                    )
+                }
         }
     }
 }
