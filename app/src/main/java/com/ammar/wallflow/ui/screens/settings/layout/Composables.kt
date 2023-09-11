@@ -38,7 +38,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -55,7 +54,6 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -113,6 +111,7 @@ internal fun LayoutPreview(
     val paddingPx = paddingDp.toPxF()
     val cornerRadiusPx by animateFloatAsState(
         targetValue = if (layoutPreferences.roundedCorners) paddingPx else 0f,
+        label = "cornerRadiusPx",
     )
     val maxDeviceHeight = screenResolution.height.toDp() / 4
     val gridWidthDp = gridSize.width.toDp()
@@ -273,7 +272,7 @@ internal fun LazyListScope.gridTypeSection(
                 Text(text = stringResource(R.string.grid_type))
             },
             trailingContent = {
-                val options = GridType.values().associateWith { getLabelForGridType(it) }
+                val options = GridType.entries.associateWith { getLabelForGridType(it) }
                 var expanded by remember { mutableStateOf(false) }
 
                 // TODO: Replace with DropDown composable
@@ -281,23 +280,20 @@ internal fun LazyListScope.gridTypeSection(
                     expanded = expanded,
                     onExpandedChange = { expanded = !expanded },
                 ) {
-                    // workaround for issue: https://issuetracker.google.com/289237728
-                    CompositionLocalProvider(LocalTextInputService provides null) {
-                        OutlinedTextField(
-                            modifier = Modifier
-                                .menuAnchor()
-                                .fillMaxWidth(0.5f),
-                            readOnly = true,
-                            value = options[gridType] ?: "",
-                            onValueChange = {},
-                            trailingIcon = {
-                                ExposedDropdownMenuDefaults.TrailingIcon(
-                                    expanded = expanded,
-                                )
-                            },
-                            colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                        )
-                    }
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth(0.5f),
+                        readOnly = true,
+                        value = options[gridType] ?: "",
+                        onValueChange = {},
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(
+                                expanded = expanded,
+                            )
+                        },
+                        colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                    )
                     ExposedDropdownMenu(
                         expanded = expanded,
                         onDismissRequest = { expanded = false },
@@ -349,7 +345,7 @@ internal fun LazyListScope.gridColTypeSection(
                 Text(text = stringResource(R.string.grid_col_type))
             },
             trailingContent = {
-                val options = GridColType.values().associateWith { getLabelForGridColType(it) }
+                val options = GridColType.entries.associateWith { getLabelForGridColType(it) }
                 var expanded by remember { mutableStateOf(false) }
 
                 // TODO: Replace with DropDown composable
@@ -357,23 +353,20 @@ internal fun LazyListScope.gridColTypeSection(
                     expanded = expanded,
                     onExpandedChange = { expanded = !expanded },
                 ) {
-                    // workaround for issue: https://issuetracker.google.com/289237728
-                    CompositionLocalProvider(LocalTextInputService provides null) {
-                        OutlinedTextField(
-                            modifier = Modifier
-                                .menuAnchor()
-                                .fillMaxWidth(0.5f),
-                            readOnly = true,
-                            value = options[gridColType] ?: "",
-                            onValueChange = {},
-                            trailingIcon = {
-                                ExposedDropdownMenuDefaults.TrailingIcon(
-                                    expanded = expanded,
-                                )
-                            },
-                            colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                        )
-                    }
+                    OutlinedTextField(
+                        modifier = Modifier
+                            .menuAnchor()
+                            .fillMaxWidth(0.5f),
+                        readOnly = true,
+                        value = options[gridColType] ?: "",
+                        onValueChange = {},
+                        trailingIcon = {
+                            ExposedDropdownMenuDefaults.TrailingIcon(
+                                expanded = expanded,
+                            )
+                        },
+                        colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                    )
                     ExposedDropdownMenu(
                         expanded = expanded,
                         onDismissRequest = { expanded = false },

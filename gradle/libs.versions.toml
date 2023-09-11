@@ -1,31 +1,31 @@
 [versions]
-aboutLibraries = "10.9.0-b01"
-accompanist = "0.33.0-alpha"
-androidGradlePlugin = "8.2.0-beta02"
+aboutLibraries = "10.9.0-b02"
+accompanist = "0.33.1-alpha"
+androidGradlePlugin = "8.2.0-beta03"
 androidxActivity = "1.7.2"
 # @keep
 androidxComposeCompiler = "1.5.3"
-androidxComposeMaterial = "1.5.0"
-androidxComposeMaterial3 = "1.2.0-alpha06"
-androidxComposeRuntime = "1.0.0-alpha04"
-androidxComposeUi = "1.5.0"
-androidxCore = "1.10.1"
+androidxComposeMaterial = "1.5.1"
+androidxComposeMaterial3 = "1.2.0-alpha07"
+androidxComposeRuntimeTracing = "1.0.0-alpha04"
+androidxComposeUi = "1.5.1"
+androidxCore = "1.12.0"
 androidxDatastore = "1.0.0"
-androidxHilt = "1.0.0"
-androidxLifecycle = "2.6.1"
-androidxPaging = "3.2.0"
+androidxHilt = "1.1.0-alpha01"
+androidxLifecycle = "2.6.2"
+androidxPaging = "3.2.1"
 androidxRoom = "2.6.0-beta01"
 androidxTest = "1.5.0"
 androidxTestExt = "1.1.5"
 androidxTestRunner = "1.5.2"
 androidxTestServices = "1.4.2"
 #androidXWindow = "1.2.0-beta01"
-androidxWork = "2.9.0-alpha02"
+androidxWork = "2.9.0-beta01"
 cloudy = "0.1.2"
 coil = "2.4.0"
 coroutines = "1.7.3"
-composeDestinations = "1.9.51"
-daggerHilt = "2.47"
+composeDestinations = "1.9.53"
+daggerHilt = "2.48"
 documentFileCompat = "1.0.7"
 #easycrop = "0.1.1"
 easycrop-fork = "0.1.2"
@@ -34,7 +34,7 @@ jsoup = "1.16.1"
 junit = "4.13.2"
 kotlin = "1.9.10"
 kotlinxCollectionsImmutable = "0.3.5"
-kotlinxDatetime = "0.4.0"
+kotlinxDatetime = "0.4.1"
 kotlinxSerializationJson = "1.6.0"
 ksp = "1.9.10-1.0.13"
 # @keep
@@ -50,7 +50,6 @@ spotless = "6.20.0"
 telephoto = "0.5.0"
 tflite = "0.4.4"
 tflite-gpu = "2.13.0"
-#zoomables = "1.4.0"
 
 [libraries]
 about-libraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutLibraries" }
@@ -63,7 +62,7 @@ androidx-activity-compose = { module = "androidx.activity:activity-compose", ver
 androidx-compose-material = { module = "androidx.compose.material:material", version.ref = "androidxComposeMaterial" }
 androidx-compose-material3 = { module = "androidx.compose.material3:material3", version.ref = "androidxComposeMaterial3" }
 androidx-compose-material3-window-size-cls = { module = "androidx.compose.material3:material3-window-size-class", version.ref = "androidxComposeMaterial3" }
-androidx-compose-runtime-tracing = { module = "androidx.compose.runtime:runtime-tracing", version.ref = "androidxComposeRuntime" }
+androidx-compose-runtime-tracing = { module = "androidx.compose.runtime:runtime-tracing", version.ref = "androidxComposeRuntimeTracing" }
 androidx-compose-ui = { module = "androidx.compose.ui:ui", version.ref = "androidxComposeUi" }
 androidx-compose-ui-test-junit4 = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "androidxComposeUi" }
 androidx-compose-ui-test-manifest = { module = "androidx.compose.ui:ui-test-manifest", version.ref = "androidxComposeUi" }
@@ -132,7 +131,6 @@ android-application = { id = "com.android.application", version.ref = "androidGr
 #android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 hilt-gradle = { id = "com.google.dagger.hilt.android", version.ref = "daggerHilt" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
-kotlin-kapt = { id = "org.jetbrains.kotlin.kapt", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 room = { id = "androidx.room", version.ref = "androidxRoom" }

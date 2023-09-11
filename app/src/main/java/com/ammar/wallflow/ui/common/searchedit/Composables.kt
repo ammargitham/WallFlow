@@ -47,7 +47,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -62,7 +61,6 @@ import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalTextInputService
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.capitalize
@@ -145,7 +143,7 @@ internal fun CategoriesFilter(
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Category.values().map {
+            Category.entries.map {
                 val selected = it in categories
 
                 FilterChip(
@@ -191,7 +189,7 @@ internal fun PurityFilter(
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Purity.values().filter {
+            Purity.entries.filter {
                 if (it == Purity.NSFW) showNSFW else true
             }.map {
                 val selected = it in purities
@@ -248,7 +246,7 @@ internal fun SortingFilter(
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Sorting.values().map {
+            Sorting.entries.map {
                 val selected = it == sorting
 
                 FilterChip(
@@ -288,7 +286,7 @@ internal fun TopRangeFilter(
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            TopRange.values().map {
+            TopRange.entries.map {
                 val selected = it == topRange
 
                 FilterChip(
@@ -325,7 +323,7 @@ internal fun OrderFilter(
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Order.values().map {
+            Order.entries.map {
                 val selected = it == order
 
                 FilterChip(
@@ -538,24 +536,21 @@ internal fun RatioFilter(
         expanded = expanded,
         onExpandedChange = { expanded = !expanded },
     ) {
-        // workaround for issue: https://issuetracker.google.com/289237728
-        CompositionLocalProvider(LocalTextInputService provides null) {
-            TagInputField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .menuAnchor(),
-                readOnly = true,
-                tags = ratios,
-                showTagClearAction = false,
-                onAddTag = {},
-                onRemoveTag = { onChange(ratios - it) },
-                label = { Text(text = stringResource(R.string.ratio)) },
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                tagFromInputString = { Ratio.fromSize(IntSize(1, 1)) }, // dummy method
-                getTagString = { it.toRatioString().capitalize(Locale.current) },
-            )
-        }
+        TagInputField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor(),
+            readOnly = true,
+            tags = ratios,
+            showTagClearAction = false,
+            onAddTag = {},
+            onRemoveTag = { onChange(ratios - it) },
+            label = { Text(text = stringResource(R.string.ratio)) },
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            colors = ExposedDropdownMenuDefaults.textFieldColors(),
+            tagFromInputString = { Ratio.fromSize(IntSize(1, 1)) }, // dummy method
+            getTagString = { it.toRatioString().capitalize(Locale.current) },
+        )
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },

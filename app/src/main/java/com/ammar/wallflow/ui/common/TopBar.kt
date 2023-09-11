@@ -9,7 +9,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -67,7 +67,7 @@ fun TopBar(
                 ) {
                     IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
-                            imageVector = Icons.Outlined.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.back),
                         )
                     }

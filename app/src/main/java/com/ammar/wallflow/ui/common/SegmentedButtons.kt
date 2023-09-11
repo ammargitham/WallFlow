@@ -11,8 +11,8 @@ import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.List
 import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material.icons.rounded.List
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -68,7 +68,8 @@ fun <T> SegmentedButtons(
             val isChecked = option.value in value
             val currentEnabled = enabled && option.enabled
             val currentContainerColor by animateColorAsState(
-                if (isChecked) containerColorChecked else containerColor,
+                targetValue = if (isChecked) containerColorChecked else containerColor,
+                label = "currentContainerColor",
             )
 
             val optionModifier = when (index) {
@@ -205,17 +206,17 @@ private val tempToggleOptions: List<SegmentedButtonOption<String>> = listOf(
     ),
     SegmentedButtonOption(
         "Second",
-        icon = { rememberVectorPainter(Icons.Rounded.List) },
+        icon = { rememberVectorPainter(Icons.AutoMirrored.Rounded.List) },
         text = "Second",
     ),
     SegmentedButtonOption(
         "Third",
-        icon = { rememberVectorPainter(Icons.Rounded.List) },
+        icon = { rememberVectorPainter(Icons.AutoMirrored.Rounded.List) },
     ),
     SegmentedButtonOption(
         "Fourth",
         false,
-        icon = { rememberVectorPainter(Icons.Rounded.List) },
+        icon = { rememberVectorPainter(Icons.AutoMirrored.Rounded.List) },
     ),
 )
 

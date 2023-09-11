@@ -34,11 +34,13 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.PlainTooltipBox
+import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipBox
+import androidx.compose.material3.TooltipDefaults.rememberPlainTooltipPositionProvider
 import androidx.compose.material3.contentColorFor
-import androidx.compose.material3.rememberPlainTooltipState
+import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -118,15 +120,17 @@ private fun ApplyWallpaperFAB(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
 ) {
-    val tooltipState = rememberPlainTooltipState()
-
-    PlainTooltipBox(
+    TooltipBox(
         modifier = modifier,
-        tooltip = { Text(text = stringResource(R.string.apply_wallpaper)) },
-        tooltipState = tooltipState,
+        positionProvider = rememberPlainTooltipPositionProvider(),
+        state = rememberTooltipState(),
+        tooltip = {
+            PlainTooltip {
+                Text(text = stringResource(R.string.apply_wallpaper))
+            }
+        },
     ) {
         FloatingActionButton(
-            modifier = Modifier.tooltipTrigger(),
             onClick = onClick,
             containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
             elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation(),
@@ -145,15 +149,17 @@ private fun FullScreenButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
 ) {
-    val tooltipState = rememberPlainTooltipState()
-
-    PlainTooltipBox(
+    TooltipBox(
         modifier = modifier,
-        tooltip = { Text(text = stringResource(R.string.full_screen)) },
-        tooltipState = tooltipState,
+        positionProvider = rememberPlainTooltipPositionProvider(),
+        state = rememberTooltipState(),
+        tooltip = {
+            PlainTooltip {
+                Text(text = stringResource(R.string.full_screen))
+            }
+        },
     ) {
         IconButton(
-            modifier = Modifier.tooltipTrigger(),
             onClick = onClick,
         ) {
             Icon(
@@ -170,15 +176,17 @@ private fun InfoButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
 ) {
-    val tooltipState = rememberPlainTooltipState()
-
-    PlainTooltipBox(
+    TooltipBox(
         modifier = modifier,
-        tooltip = { Text(text = stringResource(R.string.info)) },
-        tooltipState = tooltipState,
+        positionProvider = rememberPlainTooltipPositionProvider(),
+        state = rememberTooltipState(),
+        tooltip = {
+            PlainTooltip {
+                Text(text = stringResource(R.string.info))
+            }
+        },
     ) {
         IconButton(
-            modifier = Modifier.tooltipTrigger(),
             onClick = onClick,
         ) {
             Icon(
@@ -213,13 +221,13 @@ private fun DownloadButton(
     downloadStatus: DownloadStatus? = null,
     onClick: () -> Unit = {},
 ) {
-    val tooltipState = rememberPlainTooltipState()
     val progress by animateFloatAsState(
         when (downloadStatus) {
             is DownloadStatus.Running -> downloadStatus.progress
             is DownloadStatus.Paused -> downloadStatus.progress
             else -> -1F
         },
+        label = "progress",
     )
     val clickable = remember(downloadStatus) {
         (
@@ -243,6 +251,7 @@ private fun DownloadButton(
             is DownloadStatus.Failed -> errorContainerColor
             else -> defaultContainerColor
         },
+        label = "containerColor",
     )
 
     val icon = remember(downloadStatus) {
@@ -254,13 +263,17 @@ private fun DownloadButton(
         }
     }
 
-    PlainTooltipBox(
+    TooltipBox(
         modifier = modifier,
-        tooltip = { Text(text = stringResource(R.string.download)) },
-        tooltipState = tooltipState,
+        positionProvider = rememberPlainTooltipPositionProvider(),
+        state = rememberTooltipState(),
+        tooltip = {
+            PlainTooltip {
+                Text(text = stringResource(R.string.download))
+            }
+        },
     ) {
         IconButton(
-            modifier = Modifier.tooltipTrigger(),
             onClick = if (clickable) {
                 onClick
             } else {
@@ -271,7 +284,10 @@ private fun DownloadButton(
                 contentColor = contentColorFor(containerColor),
             ),
         ) {
-            Crossfade(targetState = icon) {
+            Crossfade(
+                targetState = icon,
+                label = "iconCrossfade",
+            ) {
                 Icon(
                     painter = painterResource(it),
                     contentDescription = stringResource(R.string.download),
@@ -324,16 +340,20 @@ private fun ShareButton(
     onLinkClick: () -> Unit = {},
     onImageClick: () -> Unit = {},
 ) {
-    val tooltipState = rememberPlainTooltipState()
+    val tooltipState = rememberTooltipState()
     var expanded by remember { mutableStateOf(false) }
 
-    PlainTooltipBox(
+    TooltipBox(
         modifier = modifier.wrapContentSize(Alignment.TopStart),
-        tooltip = { Text(text = stringResource(R.string.share)) },
-        tooltipState = tooltipState,
+        positionProvider = rememberPlainTooltipPositionProvider(),
+        state = tooltipState,
+        tooltip = {
+            PlainTooltip {
+                Text(text = stringResource(R.string.share))
+            }
+        },
     ) {
         IconButton(
-            modifier = Modifier.tooltipTrigger(),
             onClick = {
                 if (!showShareLinkAction) {
                     onImageClick()

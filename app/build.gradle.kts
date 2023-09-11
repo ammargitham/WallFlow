@@ -15,15 +15,10 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.hilt.gradle)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.kotlin.kapt)
     alias(libs.plugins.kotlinx.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
     alias(libs.plugins.spotless)
-}
-
-kapt {
-    correctErrorTypes = true
 }
 
 fun getAbi() = if (hasProperty("abi")) {
@@ -241,14 +236,14 @@ dependencies {
 
     // Hilt Dependency Injection
     implementation(libs.hilt.android)
-    kapt(libs.hilt.android.compiler)
-    kapt(libs.androidx.hilt.compiler)
+    ksp(libs.hilt.android.compiler)
+    ksp(libs.androidx.hilt.compiler)
     // Hilt and instrumented tests.
     androidTestImplementation(libs.hilt.android.testing)
-    kaptAndroidTest(libs.hilt.android.compiler)
+    kspAndroidTest(libs.hilt.android.compiler)
     // Hilt and Robolectric tests.
     testImplementation(libs.hilt.android.testing)
-    kaptTest(libs.hilt.android.compiler)
+    kspTest(libs.hilt.android.compiler)
 
     // Arch Components
     implementation(libs.androidx.lifecycle.viewmodel.compose)
