@@ -1,6 +1,7 @@
 package com.ammar.wallflow.ui.navigation
 
 import com.ammar.wallflow.ui.screens.NavGraph
+import com.ammar.wallflow.ui.screens.destinations.BackupRestoreScreenDestination
 import com.ammar.wallflow.ui.screens.destinations.FavoritesScreenDestination
 import com.ammar.wallflow.ui.screens.destinations.HomeScreenDestination
 import com.ammar.wallflow.ui.screens.destinations.LayoutSettingsScreenDestination
@@ -47,6 +48,14 @@ object NavGraphs {
         ),
     )
 
+    val backup_restore: NavGraph = NavGraph(
+        route = "backup_restore",
+        startRoute = BackupRestoreScreenDestination,
+        destinations = listOf(
+            BackupRestoreScreenDestination,
+        ),
+    )
+
     val openSourceLicenses: NavGraph = NavGraph(
         route = "open_source_licenses",
         startRoute = OSLibrariesScreenDestination,
@@ -63,6 +72,7 @@ object NavGraphs {
         ),
         nestedNavGraphs = listOf(
             settings,
+            backup_restore,
             openSourceLicenses,
         ),
     )

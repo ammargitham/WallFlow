@@ -26,6 +26,16 @@ interface WallpapersDao {
         wallhavenId: String,
     ): WallpaperWithUploaderAndTags?
 
+    @Transaction
+    @Query("SELECT * FROM wallpapers WHERE wallhaven_id in (:wallhavenIds)")
+    suspend fun getAllWithUploaderAndTagsByWallhavenIds(
+        wallhavenIds: Collection<String>,
+    ): List<WallpaperWithUploaderAndTags>
+
+    @Transaction
+    @Query("SELECT * FROM wallpapers")
+    suspend fun getAllWithUploaderAndTags(): List<WallpaperWithUploaderAndTags>
+
     @Query("SELECT * FROM wallpapers WHERE wallhaven_id IN (:wallhavenIds)")
     suspend fun getByWallhavenIds(wallhavenIds: List<String>): List<WallpaperEntity>
 
@@ -64,6 +74,9 @@ interface WallpapersDao {
     @Upsert
     suspend fun upsert(vararg wallpaper: WallpaperEntity): List<Long>
 
+    @Upsert
+    suspend fun upsert(wallpapers: Collection<WallpaperEntity>)
+
     @Query(
         """
             SELECT
@@ -90,6 +103,12 @@ interface WallpapersDao {
         """,
     )
     suspend fun getAllUniqueToSearchQueryId(searchQueryId: Long): List<WallpaperEntity>
+
+    @Query("SELECT * FROM wallpapers WHERE wallhaven_id in (:wallhavenIds)")
+    suspend fun getAllByWallhavenIds(wallhavenIds: Collection<String>): List<WallpaperEntity>
+
+    @Query("SELECT wallhaven_id FROM wallpapers")
+    suspend fun getAllWallhavenIds(): List<String>
 
     @Query(
         """

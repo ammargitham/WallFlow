@@ -13,7 +13,7 @@ data class NetworkWallhavenUploader(
     val avatar: Map<String, String>,
 )
 
-fun NetworkWallhavenUploader.asUploaderEntity(id: Long = 0) = UploaderEntity(
+fun NetworkWallhavenUploader.toEntity(id: Long = 0) = UploaderEntity(
     id = id,
     username = username,
     group = group,

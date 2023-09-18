@@ -11,7 +11,7 @@ import com.ammar.wallflow.IoDispatcher
 import com.ammar.wallflow.data.db.dao.FavoriteDao
 import com.ammar.wallflow.data.db.dao.WallpapersDao
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
-import com.ammar.wallflow.data.db.entity.asWallpaper
+import com.ammar.wallflow.data.db.entity.toWallpaper
 import com.ammar.wallflow.data.repository.local.LocalWallpapersRepository
 import com.ammar.wallflow.data.repository.utils.successOr
 import com.ammar.wallflow.model.Source
@@ -55,7 +55,7 @@ class FavoritesRepository @Inject constructor(
             when (entity.source) {
                 Source.WALLHAVEN -> {
                     val wallpaperEntity = wallpapersDao.getByWallhavenId(entity.sourceId)
-                    wallpaperEntity?.asWallpaper() ?: wallhavenWallpaper1
+                    wallpaperEntity?.toWallpaper() ?: wallhavenWallpaper1
                 }
                 Source.LOCAL -> localWallpapersRepository.wallpaper(
                     context = context,
@@ -98,12 +98,25 @@ class FavoritesRepository @Inject constructor(
         when (entity.source) {
             Source.WALLHAVEN -> {
                 val wallpaperEntity = wallpapersDao.getByWallhavenId(entity.sourceId)
-                wallpaperEntity?.asWallpaper()
+                wallpaperEntity?.toWallpaper()
             }
             Source.LOCAL -> localWallpapersRepository.wallpaper(
                 context = context,
                 wallpaperUriStr = entity.sourceId,
             ).firstOrNull()?.successOr(null)
         }
+    }
+
+    suspend fun insertEntities(entities: Collection<FavoriteEntity>) = withContext(ioDispatcher) {
+        val existing = favoriteDao.getAll()
+        val existingMap = existing.associateBy { (it.source to it.sourceId) }
+        val insertFavorites = entities.filter {
+            // only take non-existing favorites
+            existingMap[(it.source to it.sourceId)] == null
+        }.map {
+            // reset id
+            it.copy(id = 0)
+        }
+        favoriteDao.insertAll(insertFavorites)
     }
 }

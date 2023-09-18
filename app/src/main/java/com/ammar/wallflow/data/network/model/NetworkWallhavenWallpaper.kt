@@ -56,7 +56,7 @@ fun NetworkWallhavenWallpaper.toWallhavenWallpaper() = WallhavenWallpaper(
     tags = tags?.map { it.toWallhavenTag() },
 )
 
-fun NetworkWallhavenWallpaper.asWallpaperEntity(
+fun NetworkWallhavenWallpaper.toWallpaperEntity(
     id: Long = 0,
     uploaderId: Long? = null,
 ) = WallpaperEntity(

@@ -267,4 +267,14 @@ class AppPreferencesRepository @Inject constructor(
     suspend fun getAutoWallHavenWorkRequestId() = mapAppPreferences(dataStore.data.first())
         .autoWallpaperPreferences
         .workRequestId
+
+    suspend fun setPreferences(appPreferences: AppPreferences) {
+        updateWallhavenApiKey(appPreferences.wallhavenApiKey)
+        updateHomeSearch(appPreferences.homeSearch)
+        updateBlurSketchy(appPreferences.blurSketchy)
+        updateBlurNsfw(appPreferences.blurNsfw)
+        updateObjectDetectionPrefs(appPreferences.objectDetectionPreferences)
+        updateAutoWallpaperPrefs(appPreferences.autoWallpaperPreferences)
+        updateLookAndFeelPreferences(appPreferences.lookAndFeelPreferences)
+    }
 }

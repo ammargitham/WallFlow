@@ -11,15 +11,15 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.work.Data
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
+import com.ammar.wallflow.MockFactory
 import com.ammar.wallflow.data.db.database.AppDatabase
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.WallpaperEntity
 import com.ammar.wallflow.data.network.model.NetworkWallhavenMeta
 import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpaper
 import com.ammar.wallflow.data.network.model.StringNetworkWallhavenMetaQuery
-import com.ammar.wallflow.data.network.model.asWallpaperEntity
+import com.ammar.wallflow.data.network.model.toWallpaperEntity
 import com.ammar.wallflow.data.network.retrofit.RetrofitWallhavenNetwork
-import com.ammar.wallflow.data.repository.MockFactory
 import com.ammar.wallflow.data.repository.MockWallhavenNetworkApi
 import com.ammar.wallflow.data.repository.WallpapersRemoteMediator
 import com.ammar.wallflow.extensions.getFileNameFromUrl
@@ -405,7 +405,7 @@ class CleanupWorkerTest {
     fun testCleanupWorkerOldTempFiles() = runTest(testDispatcher) {
         // create temp files
         val wallpapers = MockFactory.generateNetworkWallpapers(10).map {
-            it.asWallpaperEntity()
+            it.toWallpaperEntity()
         }
         val now = Clock.System.now()
         createTempFiles(wallpapers, now)

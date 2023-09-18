@@ -6,6 +6,7 @@ import androidx.room.PrimaryKey
 import com.ammar.wallflow.model.SavedSearch
 import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.SearchQuery
+import kotlinx.serialization.Serializable
 
 @Entity(
     tableName = "saved_searches",
@@ -16,6 +17,7 @@ import com.ammar.wallflow.model.SearchQuery
         ),
     ],
 )
+@Serializable
 data class SavedSearchEntity(
     @PrimaryKey(autoGenerate = true) val id: Long,
     val name: String,

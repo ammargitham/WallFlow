@@ -5,6 +5,7 @@ import com.ammar.wallflow.ui.screens.NavGraph
 
 internal enum class ActiveOption {
     SETTINGS,
+    BACKUP_RESTORE,
     OSL,
 }
 
@@ -14,5 +15,6 @@ internal enum class MoreRootDestination(
     val activeOption: ActiveOption,
 ) {
     Settings(NavGraphs.settings, ActiveOption.SETTINGS),
+    BackupRestore(NavGraphs.backup_restore, ActiveOption.BACKUP_RESTORE),
     OpenSourceLicenses(NavGraphs.openSourceLicenses, ActiveOption.OSL),
 }

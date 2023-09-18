@@ -13,18 +13,18 @@ import com.ammar.wallflow.data.db.entity.LastUpdatedCategory
 import com.ammar.wallflow.data.db.entity.LastUpdatedEntity
 import com.ammar.wallflow.data.db.entity.PopularTagEntity
 import com.ammar.wallflow.data.db.entity.TagEntity
+import com.ammar.wallflow.data.db.entity.UploaderEntity
 import com.ammar.wallflow.data.db.entity.WallpaperEntity
 import com.ammar.wallflow.data.db.entity.WallpaperTagsEntity
 import com.ammar.wallflow.data.db.entity.WallpaperWithUploaderAndTags
 import com.ammar.wallflow.data.db.entity.asTag
-import com.ammar.wallflow.data.db.entity.asWallpaper
+import com.ammar.wallflow.data.db.entity.toWallpaper
 import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
 import com.ammar.wallflow.data.network.model.NetworkWallhavenTag
 import com.ammar.wallflow.data.network.model.NetworkWallhavenUploader
 import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpaper
-import com.ammar.wallflow.data.network.model.asTagEntity
-import com.ammar.wallflow.data.network.model.asUploaderEntity
-import com.ammar.wallflow.data.network.model.asWallpaperEntity
+import com.ammar.wallflow.data.network.model.toEntity
+import com.ammar.wallflow.data.network.model.toWallpaperEntity
 import com.ammar.wallflow.data.repository.utils.NetworkBoundResource
 import com.ammar.wallflow.data.repository.utils.Resource
 import com.ammar.wallflow.data.repository.utils.WallhavenTagsDocumentParser.parsePopularTags
@@ -93,7 +93,7 @@ class DefaultWallhavenRepository @Inject constructor(
                 appDatabase.withTransaction {
                     popularTagsDao.deleteAll()
                     // insert non-existing tags first
-                    val tagIds = insertTags(fetchResult, false).map { it.id }
+                    val tagIds = upsertTags(fetchResult, false).map { it.id }
                     // create and insert PopularTagEntities
                     popularTagsDao.insert(tagIds.map { PopularTagEntity(0, it) })
                     upsertLastUpdated(LastUpdatedCategory.POPULAR_TAGS)
@@ -107,10 +107,10 @@ class DefaultWallhavenRepository @Inject constructor(
             }
         }
 
-    internal suspend fun insertTags(
+    internal suspend fun upsertTags(
         tags: List<NetworkWallhavenTag>,
         shouldUpdate: Boolean,
-    ): List<TagEntity> {
+    ) = withContext(ioDispatcher) {
         val existingTags = tagsDao.getByWallhavenIds(tags.map { it.id })
 
         if (shouldUpdate) {
@@ -132,93 +132,92 @@ class DefaultWallhavenRepository @Inject constructor(
 
         // insert new tags
         val existingTagWallhavenIds = existingTags.map { it.wallhavenId }
-        val newTags = tags.filter { it.id !in existingTagWallhavenIds }.map { it.asTagEntity() }
+        val newTags = tags.filter { it.id !in existingTagWallhavenIds }.map { it.toEntity() }
         tagsDao.insert(newTags)
-
-        return tagsDao.getByNames(tags.map { it.name })
+        tagsDao.getByNames(tags.map { it.name })
     }
 
-    private fun getWallpaperNetworkResource(wallpaperWallhavenId: String) =
-        object : NetworkBoundResource<
-            WallpaperWithUploaderAndTags?,
-            WallhavenWallpaper?,
-            NetworkWallhavenWallpaper,
-            >(
-            initialValue = null,
-            ioDispatcher = ioDispatcher,
-        ) {
-            override suspend fun loadFromDb() =
-                wallpapersDao.getWithUploaderAndTagsByWallhavenId(wallpaperWallhavenId)
+    private fun getWallpaperNetworkResource(
+        wallpaperWallhavenId: String,
+    ) = object : NetworkBoundResource<
+        WallpaperWithUploaderAndTags?,
+        WallhavenWallpaper?,
+        NetworkWallhavenWallpaper,
+        >(
+        initialValue = null,
+        ioDispatcher = ioDispatcher,
+    ) {
+        override suspend fun loadFromDb() =
+            wallpapersDao.getWithUploaderAndTagsByWallhavenId(wallpaperWallhavenId)
 
-            override suspend fun shouldFetchData(dbData: WallpaperWithUploaderAndTags?) =
-                dbData?.uploader == null
+        override suspend fun shouldFetchData(dbData: WallpaperWithUploaderAndTags?) =
+            dbData?.uploader == null
 
-            override suspend fun fetchFromNetwork(dbData: WallpaperWithUploaderAndTags?) =
-                wallHavenNetwork.wallpaper(wallpaperWallhavenId).data
+        override suspend fun fetchFromNetwork(dbData: WallpaperWithUploaderAndTags?) =
+            wallHavenNetwork.wallpaper(wallpaperWallhavenId).data
 
-            override suspend fun saveFetchResult(fetchResult: NetworkWallhavenWallpaper) {
-                appDatabase.withTransaction {
-                    var uploaderId: Long? = null
-                    if (fetchResult.uploader != null) {
-                        // create uploader if not exists in db
-                        uploaderId = insertUploader(fetchResult.uploader)
-                    }
-                    var tagsIds: List<Long>? = null
-                    if (fetchResult.tags != null) {
-                        // create tags if not exists in db
-                        tagsIds = insertTags(fetchResult.tags, true).map { it.id }
-                    }
-                    // insert or update wallpaper in db
-                    val existingWallpaper = wallpapersDao.getByWallhavenId(wallpaperWallhavenId)
-                    val wallpaperDbId: Long
-                    if (existingWallpaper != null) {
-                        wallpaperDbId = existingWallpaper.id
-                        wallpapersDao.update(
-                            fetchResult.asWallpaperEntity(
-                                id = wallpaperDbId,
-                                uploaderId = uploaderId,
-                            ),
-                        )
-                    } else {
-                        wallpaperDbId = wallpapersDao.insert(
-                            fetchResult.asWallpaperEntity(uploaderId = uploaderId),
-                        ).first()
-                    }
-                    if (existingWallpaper != null) {
-                        // delete existing wallpaper tag mappings
-                        wallpapersDao.deleteWallpaperTagMappings(existingWallpaper.id)
-                    }
-                    if (tagsIds != null) {
-                        // insert new wallpaper tag mappings
-                        wallpapersDao.insertWallpaperTagMappings(
-                            tagsIds.map {
-                                WallpaperTagsEntity(
-                                    wallpaperId = wallpaperDbId,
-                                    tagId = it,
-                                )
-                            },
-                        )
-                    }
+        override suspend fun saveFetchResult(fetchResult: NetworkWallhavenWallpaper) {
+            appDatabase.withTransaction {
+                var uploaderId: Long? = null
+                if (fetchResult.uploader != null) {
+                    // create uploader if not exists in db
+                    uploaderId = insertUploader(fetchResult.uploader)
                 }
-            }
-
-            override fun entityConverter(dbData: WallpaperWithUploaderAndTags?) =
-                dbData?.let {
-                    val (wallpaper, uploader, tags) = it
-                    wallpaper.asWallpaper(uploader, tags)
+                var tagsIds: List<Long>? = null
+                if (fetchResult.tags != null) {
+                    // create tags if not exists in db
+                    tagsIds = upsertTags(fetchResult.tags, true).map { it.id }
                 }
-
-            override fun onFetchFailed(throwable: Throwable) {
-                Log.e(TAG, "onFetchFailed: ", throwable)
+                // insert or update wallpaper in db
+                val existingWallpaper = wallpapersDao.getByWallhavenId(wallpaperWallhavenId)
+                val wallpaperDbId: Long
+                if (existingWallpaper != null) {
+                    wallpaperDbId = existingWallpaper.id
+                    wallpapersDao.update(
+                        fetchResult.toWallpaperEntity(
+                            id = wallpaperDbId,
+                            uploaderId = uploaderId,
+                        ),
+                    )
+                } else {
+                    wallpaperDbId = wallpapersDao.insert(
+                        fetchResult.toWallpaperEntity(uploaderId = uploaderId),
+                    ).first()
+                }
+                if (existingWallpaper != null) {
+                    // delete existing wallpaper tag mappings
+                    wallpapersDao.deleteWallpaperTagMappings(existingWallpaper.id)
+                }
+                if (tagsIds != null) {
+                    // insert new wallpaper tag mappings
+                    wallpapersDao.insertWallpaperTagMappings(
+                        tagsIds.map {
+                            WallpaperTagsEntity(
+                                wallpaperId = wallpaperDbId,
+                                tagId = it,
+                            )
+                        },
+                    )
+                }
             }
         }
 
-    internal suspend fun insertUploader(uploader: NetworkWallhavenUploader): Long {
+        override fun entityConverter(dbData: WallpaperWithUploaderAndTags?) =
+            dbData?.let {
+                val (wallpaper, uploader, tags) = it
+                wallpaper.toWallpaper(uploader, tags)
+            }
+
+        override fun onFetchFailed(throwable: Throwable) {
+            Log.e(TAG, "onFetchFailed: ", throwable)
+        }
+    }
+
+    internal suspend fun insertUploader(
+        uploader: NetworkWallhavenUploader,
+    ) = withContext(ioDispatcher) {
         val existingUploader = uploadersDao.getByUsername(uploader.username)
-        if (existingUploader != null) {
-            return existingUploader.id
-        }
-        return uploadersDao.insert(uploader.asUploaderEntity()).first()
+        existingUploader?.id ?: uploadersDao.insert(uploader.toEntity()).first()
     }
 
     override fun wallpapersPager(
@@ -242,7 +241,7 @@ class DefaultWallhavenRepository @Inject constructor(
         },
     ).flow.map {
         it.map<WallpaperEntity, Wallpaper> { entity ->
-            entity.asWallpaper()
+            entity.toWallpaper()
         }
     }.flowOn(ioDispatcher)
 
@@ -279,5 +278,51 @@ class DefaultWallhavenRepository @Inject constructor(
                 lastUpdatedOn = lastUpdatedOn,
             )
         lastUpdatedDao.upsert(lastUpdated)
+    }
+
+    override suspend fun insertTagEntities(
+        tags: Collection<TagEntity>,
+    ): Unit = withContext(ioDispatcher) {
+        val existingTags = tagsDao.getByWallhavenIds(tags.map { it.wallhavenId })
+        val existingMap = existingTags.associateBy { it.wallhavenId }
+        val insertTags = tags.filter {
+            // only take non-existing
+            existingMap[it.wallhavenId] == null
+        }.map {
+            // reset id
+            it.copy(id = 0)
+        }
+        tagsDao.insert(insertTags)
+    }
+
+    override suspend fun insertUploaderEntities(
+        uploaders: Collection<UploaderEntity>,
+    ): Unit = withContext(ioDispatcher) {
+        val existingUploaders = uploadersDao.getByUsernames(uploaders.map { it.username })
+        val existingMap = existingUploaders.associateBy { it.username }
+        val insertUploaders = uploaders.filter {
+            // only take non-existing
+            existingMap[it.username] == null
+        }.map {
+            // reset id
+            it.copy(id = 0)
+        }
+        uploadersDao.insert(insertUploaders)
+    }
+
+    override suspend fun insertWallpaperEntities(
+        entities: Collection<WallpaperEntity>,
+    ): Unit = withContext(ioDispatcher) {
+        val wallhavenIds = entities.map { it.wallhavenId }
+        val existingWallpapers = wallpapersDao.getAllByWallhavenIds(wallhavenIds)
+        val existingMap = existingWallpapers.associateBy { it.wallhavenId }
+        val entitiesToInsert = entities.filter {
+            // only take non-existing
+            existingMap[it.wallhavenId] == null
+        }.map {
+            // reset id
+            it.copy(id = 0)
+        }
+        wallpapersDao.insert(entitiesToInsert)
     }
 }

@@ -6,6 +6,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.ammar.wallflow.model.wallhaven.WallhavenAvatar
 import com.ammar.wallflow.model.wallhaven.WallhavenUploader
+import kotlinx.serialization.Serializable
 
 @Entity(
     tableName = "uploaders",
@@ -16,6 +17,7 @@ import com.ammar.wallflow.model.wallhaven.WallhavenUploader
         ),
     ],
 )
+@Serializable
 data class UploaderEntity(
     @PrimaryKey(autoGenerate = true) val id: Long,
     val username: String,
@@ -23,6 +25,7 @@ data class UploaderEntity(
     @Embedded("avatar_") val avatar: AvatarEntity,
 )
 
+@Serializable
 data class AvatarEntity(
     val large: String,
     val medium: String,

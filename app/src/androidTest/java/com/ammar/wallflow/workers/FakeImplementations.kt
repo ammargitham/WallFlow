@@ -32,7 +32,15 @@ import okhttp3.Request
 import org.jsoup.nodes.Document
 
 internal open class FakeSavedSearchDao : SavedSearchDao {
-    override fun getAll(): Flow<List<SavedSearchEntity>> {
+    override fun observeAll(): Flow<List<SavedSearchEntity>> {
+        throw RuntimeException()
+    }
+
+    override suspend fun getAll(): List<SavedSearchEntity> {
+        throw RuntimeException()
+    }
+
+    override suspend fun getAllByNames(names: Collection<String>): List<SavedSearchEntity> {
         throw RuntimeException()
     }
 
@@ -45,6 +53,10 @@ internal open class FakeSavedSearchDao : SavedSearchDao {
     }
 
     override suspend fun upsert(savedSearchDao: SavedSearchEntity) {
+        throw RuntimeException()
+    }
+
+    override suspend fun upsert(savedSearchDaos: Collection<SavedSearchEntity>) {
         throw RuntimeException()
     }
 
@@ -134,6 +146,10 @@ internal open class FakeFavoriteDao : FavoriteDao {
         throw RuntimeException()
     }
 
+    override suspend fun getAll(): List<FavoriteEntity> {
+        throw RuntimeException()
+    }
+
     override fun pagingSource(): PagingSource<Int, FavoriteEntity> {
         throw RuntimeException()
     }
@@ -181,6 +197,16 @@ internal open class FakeWallpapersDao : WallpapersDao {
         throw RuntimeException()
     }
 
+    override suspend fun getAllWithUploaderAndTagsByWallhavenIds(
+        wallhavenIds: Collection<String>,
+    ): List<WallpaperWithUploaderAndTags> {
+        throw RuntimeException()
+    }
+
+    override suspend fun getAllWithUploaderAndTags(): List<WallpaperWithUploaderAndTags> {
+        throw RuntimeException()
+    }
+
     override suspend fun getByWallhavenIds(wallhavenIds: List<String>): List<WallpaperEntity> {
         throw RuntimeException()
     }
@@ -213,7 +239,21 @@ internal open class FakeWallpapersDao : WallpapersDao {
         throw RuntimeException()
     }
 
+    override suspend fun upsert(wallpapers: Collection<WallpaperEntity>) {
+        throw RuntimeException()
+    }
+
     override suspend fun getAllUniqueToSearchQueryId(searchQueryId: Long): List<WallpaperEntity> {
+        throw RuntimeException()
+    }
+
+    override suspend fun getAllByWallhavenIds(
+        wallhavenIds: Collection<String>,
+    ): List<WallpaperEntity> {
+        throw RuntimeException()
+    }
+
+    override suspend fun getAllWallhavenIds(): List<String> {
         throw RuntimeException()
     }
 

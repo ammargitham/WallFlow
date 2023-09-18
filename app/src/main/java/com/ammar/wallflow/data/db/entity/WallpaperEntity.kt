@@ -13,6 +13,7 @@ import androidx.room.Relation
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 
 @Entity(
     tableName = "wallpapers",
@@ -23,6 +24,7 @@ import kotlinx.datetime.Instant
         ),
     ],
 )
+@Serializable
 data class WallpaperEntity(
     @PrimaryKey(autoGenerate = true) val id: Long,
     @ColumnInfo(name = "wallhaven_id") val wallhavenId: String,
@@ -63,13 +65,14 @@ data class WallpaperWithUploaderAndTags(
     val tags: List<TagEntity>?,
 )
 
+@Serializable
 data class ThumbsEntity(
     val large: String,
     val original: String,
     val small: String,
 )
 
-fun WallpaperEntity.asWallpaper(
+fun WallpaperEntity.toWallpaper(
     uploader: UploaderEntity? = null,
     tags: List<TagEntity>? = null,
 ) = WallhavenWallpaper(

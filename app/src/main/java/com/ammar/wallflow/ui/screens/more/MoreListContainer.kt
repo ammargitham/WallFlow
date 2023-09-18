@@ -2,8 +2,11 @@ package com.ammar.wallflow.ui.screens.more
 
 import android.content.res.Configuration
 import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -16,10 +19,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import com.ammar.wallflow.BuildConfig
+import com.ammar.wallflow.R
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 
 @Composable
@@ -104,23 +110,67 @@ sealed interface MoreListItem {
     ) : MoreListItem
 }
 
-private class MoreListContainerCPP : CollectionPreviewParameterProvider<Boolean>(
+private data class MoreListContainerProps(
+    val items: List<MoreListItem>,
+    val isExpanded: Boolean,
+    val selectedItemValue: String? = null,
+)
+
+private val clickable = MoreListItem.Clickable(
+    icon = R.drawable.baseline_settings_24,
+    label = "Settings",
+    value = ActiveOption.SETTINGS.name,
+)
+
+private val static = MoreListItem.Static(
+    label = "Version",
+    supportingText = BuildConfig.VERSION_NAME,
+)
+
+private val content = MoreListItem.Content {
+    Image(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(250.dp),
+        painter = painterResource(R.drawable.ic_launcher_foreground),
+        contentDescription = stringResource(R.string.app_name),
+    )
+}
+
+private val previewItems = listOf(
+    content,
+    MoreListItem.Divider,
+    clickable,
+    MoreListItem.Divider,
+    static,
+)
+
+private class MoreListContainerCPP : CollectionPreviewParameterProvider<MoreListContainerProps>(
     listOf(
-        false,
-        true,
+        MoreListContainerProps(
+            items = previewItems,
+            isExpanded = false,
+        ),
+        MoreListContainerProps(
+            items = previewItems,
+            isExpanded = true,
+            selectedItemValue = ActiveOption.SETTINGS.name,
+        ),
     ),
 )
 
 @Preview
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-fun PreviewMoreListContainer(
-    @PreviewParameter(MoreListContainerCPP::class) isExpanded: Boolean,
+private fun PreviewMoreListContainer(
+    @PreviewParameter(MoreListContainerCPP::class) props: MoreListContainerProps,
 ) {
     WallFlowTheme {
         Surface {
             MoreListContainer(
-                isExpanded = isExpanded,
+                items = props.items,
+                isExpanded = props.isExpanded,
+                selectedItemValue = props.selectedItemValue,
             )
         }
     }

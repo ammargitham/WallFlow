@@ -102,6 +102,20 @@ fun MoreScreen(
         ),
     )
 
+    val moreNavigate: (NavGraph) -> Unit = remember(
+        detailNavController,
+        navController,
+        systemState.isExpanded,
+    ) {
+        {
+            if (systemState.isExpanded) {
+                detailNavController.navigateOrPop(it)
+            } else {
+                navController.navigate(it)
+            }
+        }
+    }
+
     LaunchedEffect(Unit) {
         searchBarController.update { it.copy(visible = false) }
         bottomBarController.update { it.copy(visible = true) }
@@ -121,20 +135,9 @@ fun MoreScreen(
                 navGraph = NavGraphs.moreDetail,
             )
         },
-        onSettingsClick = {
-            if (systemState.isExpanded) {
-                detailNavController.navigateOrPop(NavGraphs.settings)
-            } else {
-                navController.navigate(NavGraphs.settings)
-            }
-        },
-        onOpenSourceLicensesClick = {
-            if (systemState.isExpanded) {
-                detailNavController.navigateOrPop(NavGraphs.openSourceLicenses)
-            } else {
-                navController.navigate(NavGraphs.openSourceLicenses)
-            }
-        },
+        onSettingsClick = { moreNavigate(NavGraphs.settings) },
+        onBackupRestoreClick = { moreNavigate(NavGraphs.backup_restore) },
+        onOpenSourceLicensesClick = { moreNavigate(NavGraphs.openSourceLicenses) },
     )
 
     BackHandler(

@@ -83,7 +83,7 @@ class HomeViewModel @Inject constructor(
         appPreferencesRepository.appPreferencesFlow,
         localUiState,
         debouncedWallpapersLoadingFlow,
-        savedSearchRepository.getAll(),
+        savedSearchRepository.observeAll(),
         favoritesRepository.observeAll(),
     ) {
             tags,
@@ -149,7 +149,7 @@ class HomeViewModel @Inject constructor(
     }
 
     fun saveSearchAs(name: String, search: Search) = viewModelScope.launch {
-        savedSearchRepository.addOrUpdateSavedSearch(
+        savedSearchRepository.upsert(
             SavedSearch(
                 name = name,
                 search = search,

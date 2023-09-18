@@ -1,7 +1,7 @@
 [versions]
 aboutLibraries = "10.9.0-b02"
 accompanist = "0.33.1-alpha"
-androidGradlePlugin = "8.2.0-beta03"
+androidGradlePlugin = "8.2.0-beta04"
 androidxActivity = "1.7.2"
 # @keep
 androidxComposeCompiler = "1.5.3"

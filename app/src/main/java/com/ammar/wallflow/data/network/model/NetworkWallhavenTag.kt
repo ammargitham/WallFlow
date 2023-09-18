@@ -21,7 +21,7 @@ data class NetworkWallhavenTag(
     val created_at: Instant,
 )
 
-fun NetworkWallhavenTag.asTagEntity(id: Long = 0) = TagEntity(
+fun NetworkWallhavenTag.toEntity(id: Long = 0) = TagEntity(
     id = id,
     wallhavenId = this.id,
     name = name,

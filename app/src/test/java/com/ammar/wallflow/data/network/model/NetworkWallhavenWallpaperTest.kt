@@ -205,7 +205,7 @@ class NetworkWallhavenWallpaperTest {
         )
         assertEquals(
             expected,
-            networkWallhavenWallpaper.asWallpaperEntity(),
+            networkWallhavenWallpaper.toWallpaperEntity(),
         )
     }
 }

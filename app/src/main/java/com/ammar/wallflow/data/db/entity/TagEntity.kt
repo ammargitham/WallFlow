@@ -8,6 +8,7 @@ import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 
 @Entity(
     tableName = "tags",
@@ -18,6 +19,7 @@ import kotlinx.datetime.Instant
         ),
     ],
 )
+@Serializable
 data class TagEntity(
     @PrimaryKey(autoGenerate = true) val id: Long,
     @ColumnInfo(name = "wallhaven_id") val wallhavenId: Long,

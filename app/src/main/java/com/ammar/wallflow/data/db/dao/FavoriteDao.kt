@@ -15,6 +15,9 @@ interface FavoriteDao {
     fun observeAll(): Flow<List<FavoriteEntity>>
 
     @Query("SELECT * FROM favorites ORDER BY favorited_on DESC")
+    suspend fun getAll(): List<FavoriteEntity>
+
+    @Query("SELECT * FROM favorites ORDER BY favorited_on DESC")
     fun pagingSource(): PagingSource<Int, FavoriteEntity>
 
     @Query(

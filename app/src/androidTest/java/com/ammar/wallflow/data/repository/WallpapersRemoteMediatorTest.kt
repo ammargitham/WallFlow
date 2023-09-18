@@ -8,6 +8,7 @@ import androidx.paging.RemoteMediator.MediatorResult
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.ammar.wallflow.MockFactory
 import com.ammar.wallflow.data.db.database.AppDatabase
 import com.ammar.wallflow.data.db.entity.WallpaperEntity
 import com.ammar.wallflow.data.network.model.NetworkWallhavenMeta
@@ -250,7 +251,9 @@ class WallpapersRemoteMediatorTest {
         remoteMediator1.load(LoadType.REFRESH, pagingState1)
 
         val query2Wallpapers =
-            query1Wallpapers.randomList(5) + MockFactory.generateNetworkWallpaper(21)
+            query1Wallpapers.randomList(5) + MockFactory.generateNetworkWallpaper(
+                idNumber = 21,
+            )
         mockNetworkApi.setWallpapersForQuery(
             query = searchQuery2.getQString(),
             networkWallhavenWallpapers = query2Wallpapers,

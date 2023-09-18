@@ -9,7 +9,10 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface SavedSearchDao {
     @Query("SELECT * FROM saved_searches ORDER BY name")
-    fun getAll(): Flow<List<SavedSearchEntity>>
+    fun observeAll(): Flow<List<SavedSearchEntity>>
+
+    @Query("SELECT * FROM saved_searches ORDER BY name")
+    suspend fun getAll(): List<SavedSearchEntity>
 
     @Query("SELECT * FROM saved_searches WHERE id = :id")
     suspend fun getById(id: Long): SavedSearchEntity?
@@ -17,8 +20,14 @@ interface SavedSearchDao {
     @Query("SELECT * FROM saved_searches WHERE name = :name")
     suspend fun getByName(name: String): SavedSearchEntity?
 
+    @Query("SELECT * FROM saved_searches WHERE name in (:names)")
+    suspend fun getAllByNames(names: Collection<String>): List<SavedSearchEntity>
+
     @Upsert
     suspend fun upsert(savedSearchDao: SavedSearchEntity)
+
+    @Upsert
+    suspend fun upsert(savedSearchDaos: Collection<SavedSearchEntity>)
 
     @Query("DELETE FROM saved_searches WHERE name = :name")
     suspend fun deleteByName(name: String)

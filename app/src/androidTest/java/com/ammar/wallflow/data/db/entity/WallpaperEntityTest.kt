@@ -63,7 +63,7 @@ class WallpaperEntityTest {
         )
         assertEquals(
             expected,
-            wallpaperEntity.asWallpaper(),
+            wallpaperEntity.toWallpaper(),
         )
     }
 }

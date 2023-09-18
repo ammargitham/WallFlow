@@ -24,7 +24,7 @@ import com.ammar.wallflow.data.db.dao.SavedSearchDao
 import com.ammar.wallflow.data.db.dao.WallpapersDao
 import com.ammar.wallflow.data.db.entity.AutoWallpaperHistoryEntity
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
-import com.ammar.wallflow.data.db.entity.asWallpaper
+import com.ammar.wallflow.data.db.entity.toWallpaper
 import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
 import com.ammar.wallflow.data.network.model.NetworkResponse
 import com.ammar.wallflow.data.network.model.NetworkWallhavenMeta
@@ -32,8 +32,8 @@ import com.ammar.wallflow.data.network.model.NetworkWallhavenTag
 import com.ammar.wallflow.data.network.model.NetworkWallhavenThumbs
 import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpaper
 import com.ammar.wallflow.data.network.model.StringNetworkWallhavenMetaQuery
-import com.ammar.wallflow.data.network.model.asWallpaperEntity
 import com.ammar.wallflow.data.network.model.toWallhavenWallpaper
+import com.ammar.wallflow.data.network.model.toWallpaperEntity
 import com.ammar.wallflow.data.preferences.AutoWallpaperPreferences
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.AutoWallpaperHistoryRepository
@@ -521,7 +521,7 @@ class AutoWallpaperTest {
                     useObjectDetection = false,
                 ),
             )
-            val wallpaperEntity = testNetworkWallhavenWallpaper.asWallpaperEntity()
+            val wallpaperEntity = testNetworkWallhavenWallpaper.toWallpaperEntity()
             val autoWallpaperHistoryDao = object : FakeAutoWallpaperHistoryDao() {
                 private var history = emptyList<AutoWallpaperHistoryEntity>()
 
@@ -559,7 +559,7 @@ class AutoWallpaperTest {
 
             every {
                 worker["setWallpaper"](
-                    wallpaperEntity.asWallpaper(),
+                    wallpaperEntity.toWallpaper(),
                 )
             } returns (true to tempFile.toUri())
 
@@ -574,7 +574,7 @@ class AutoWallpaperTest {
                     ),
                 ),
             )
-            verify { worker["setWallpaper"](wallpaperEntity.asWallpaper()) }
+            verify { worker["setWallpaper"](wallpaperEntity.toWallpaper()) }
             val updatedHistory = autoWallpaperHistoryDao.getAll()
             assertEquals(1, updatedHistory.count())
         } finally {

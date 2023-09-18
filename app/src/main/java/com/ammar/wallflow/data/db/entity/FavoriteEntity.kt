@@ -7,6 +7,7 @@ import androidx.room.PrimaryKey
 import com.ammar.wallflow.model.Favorite
 import com.ammar.wallflow.model.Source
 import kotlinx.datetime.Instant
+import kotlinx.serialization.Serializable
 
 @Entity(
     tableName = "favorites",
@@ -17,6 +18,7 @@ import kotlinx.datetime.Instant
         ),
     ],
 )
+@Serializable
 data class FavoriteEntity(
     @PrimaryKey(autoGenerate = true) val id: Long,
     @ColumnInfo(name = "source_id") val sourceId: String,

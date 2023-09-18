@@ -17,7 +17,6 @@ import android.util.DisplayMetrics
 import android.util.Log
 import android.view.Display
 import android.view.Surface
-import android.view.WindowManager
 import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.compose.ui.geometry.Rect
@@ -27,6 +26,7 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.FileProvider
 import androidx.core.graphics.toRect
 import androidx.core.net.toUri
+import androidx.core.provider.DocumentsContractCompat
 import androidx.work.WorkManager
 import com.ammar.wallflow.FILE_PROVIDER_AUTHORITY
 import com.ammar.wallflow.R
@@ -39,6 +39,10 @@ import com.ammar.wallflow.utils.withMLModelsDir
 import com.ammar.wallflow.utils.withTempDir
 import java.io.File
 import java.io.InputStream
+import okio.buffer
+import okio.sink
+import okio.source
+import okio.use
 
 fun Context.openUrl(url: String) {
     var tempUrl = url
@@ -193,9 +197,6 @@ fun Context.getMLModelsFileIfExists(fileName: String): File? {
 val Context.displayManager
     get() = getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
 
-val Context.windowManager
-    get() = getSystemService(Context.WINDOW_SERVICE) as WindowManager
-
 fun Context.getScreenResolution(
     inDefaultOrientation: Boolean = false,
     displayId: Int = Display.DEFAULT_DISPLAY,
@@ -249,5 +250,26 @@ val Context.workManager
 val Context.notificationManager
     get() = NotificationManagerCompat.from(this)
 
-val Context.accessibleFolders: List<UriPermission>
+val Context.accessibleUris: List<UriPermission>
     get() = contentResolver.persistedUriPermissions
+
+val Context.accessibleFolders: List<UriPermission>
+    get() = accessibleUris.filter { DocumentsContractCompat.isTreeUri(it.uri) }
+
+fun Context.writeToUri(
+    uri: Uri,
+    content: String,
+) = contentResolver.openOutputStream(uri)?.use { outputStream ->
+    outputStream
+        .sink()
+        .buffer()
+        .writeUtf8(content)
+        .close()
+}
+
+fun Context.readFromUri(
+    uri: Uri,
+) = contentResolver.openInputStream(uri)?.use { inputStream ->
+    val buffer = inputStream.source().buffer()
+    buffer.readUtf8()
+}

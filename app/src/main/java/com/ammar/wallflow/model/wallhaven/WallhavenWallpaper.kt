@@ -6,6 +6,9 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntSize
 import androidx.core.graphics.toColorInt
+import com.ammar.wallflow.data.db.entity.ThumbsEntity
+import com.ammar.wallflow.data.db.entity.WallpaperEntity
+import com.ammar.wallflow.extensions.toHexString
 import com.ammar.wallflow.model.DownloadableWallpaper
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.Source
@@ -37,10 +40,32 @@ data class WallhavenWallpaper(
     val tags: List<WallhavenTag>?,
 ) : DownloadableWallpaper()
 
-data class WallhavenThumbs(
-    val large: String,
-    val original: String,
-    val small: String,
+fun WallhavenWallpaper.toEntity(
+    id: Long = 0L,
+    uploaderId: Long = 0L,
+) = WallpaperEntity(
+    id = id,
+    wallhavenId = this.id,
+    url = url,
+    shortUrl = shortUrl,
+    uploaderId = uploaderId,
+    views = views,
+    favorites = favorites,
+    source = wallhavenSource,
+    purity = purity,
+    category = category,
+    dimensionX = resolution.width,
+    dimensionY = resolution.height,
+    fileSize = fileSize,
+    fileType = mimeType,
+    createdAt = createdAt,
+    colors = colors.map { it.toHexString() },
+    path = data,
+    thumbs = ThumbsEntity(
+        large = "",
+        original = thumbData,
+        small = "",
+    ),
 )
 
 // Examples

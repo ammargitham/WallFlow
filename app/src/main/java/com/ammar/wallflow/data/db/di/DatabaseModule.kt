@@ -65,6 +65,9 @@ class DatabaseModule {
     @Provides
     fun providesFavoritesDao(appDatabase: AppDatabase) = appDatabase.favoriteDao()
 
+    @Provides
+    fun providesUploadersDao(appDatabase: AppDatabase) = appDatabase.uploadersDao()
+
     lateinit var appDatabase: AppDatabase
 
     @Provides

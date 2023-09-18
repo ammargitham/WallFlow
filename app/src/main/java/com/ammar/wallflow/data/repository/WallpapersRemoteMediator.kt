@@ -11,7 +11,7 @@ import com.ammar.wallflow.data.db.entity.SearchQueryRemoteKeyEntity
 import com.ammar.wallflow.data.db.entity.SearchQueryWallpaperEntity
 import com.ammar.wallflow.data.db.entity.WallpaperEntity
 import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
-import com.ammar.wallflow.data.network.model.asWallpaperEntity
+import com.ammar.wallflow.data.network.model.toWallpaperEntity
 import com.ammar.wallflow.model.SearchQuery
 import java.io.IOException
 import kotlinx.datetime.Clock
@@ -99,7 +99,7 @@ class WallpapersRemoteMediator(
                 val networkWallpapers = response.data
                 val wallhavenWallpaperIds = networkWallpapers.map { it.id }
 
-                wallpapersDao.insert(networkWallpapers.map { it.asWallpaperEntity() })
+                wallpapersDao.insert(networkWallpapers.map { it.toWallpaperEntity() })
                 val wallpaperEntities = wallpapersDao.getByWallhavenIds(wallhavenWallpaperIds)
 
                 // update mapping table

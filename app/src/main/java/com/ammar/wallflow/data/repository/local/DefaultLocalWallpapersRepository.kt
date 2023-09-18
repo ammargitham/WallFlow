@@ -63,13 +63,17 @@ class DefaultLocalWallpapersRepository @Inject constructor(
         wallpaperUriStr: String,
     ): Flow<Resource<LocalWallpaper?>> {
         val uri = Uri.parse(wallpaperUriStr)
-        val doc = DocumentFileCompat.fromSingleUri(context, uri)
-            ?: return flowOf(
-                Resource.Error(
-                    IllegalArgumentException("Invalid or non-existing uri"),
-                ),
-            )
-        return flowOf(Resource.Success(dfcToLocalWallpaper(context, doc)))
+        try {
+            val doc = DocumentFileCompat.fromSingleUri(context, uri)
+                ?: return flowOf(
+                    Resource.Error(
+                        IllegalArgumentException("Invalid or non-existing uri"),
+                    ),
+                )
+            return flowOf(Resource.Success(dfcToLocalWallpaper(context, doc)))
+        } catch (e: Exception) {
+            return flowOf(Resource.Error(e))
+        }
     }
 
     override suspend fun getRandom(

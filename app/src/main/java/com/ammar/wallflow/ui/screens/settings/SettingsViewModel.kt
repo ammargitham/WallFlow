@@ -74,7 +74,7 @@ class SettingsViewModel @Inject constructor(
         appPreferencesRepository.appPreferencesFlow,
         objectDetectionModelRepository.getAll(),
         localUiStateFlow,
-        savedSearchRepository.getAll(),
+        savedSearchRepository.observeAll(),
         autoWallpaperNextRunFlow,
         localDirectories,
     ) {
@@ -288,7 +288,7 @@ class SettingsViewModel @Inject constructor(
 
     fun updateSavedSearch(savedSearch: SavedSearch) {
         viewModelScope.launch {
-            savedSearchRepository.addOrUpdateSavedSearch(savedSearch)
+            savedSearchRepository.upsert(savedSearch)
         }
     }
 
@@ -302,7 +302,7 @@ class SettingsViewModel @Inject constructor(
         }
         if (confirmed) {
             viewModelScope.launch {
-                savedSearchRepository.deleteSavedSearch(savedSearch)
+                savedSearchRepository.delete(savedSearch)
                 // close the dialog
                 localUiStateFlow.update { it.copy(deleteSavedSearch = partial(null)) }
             }

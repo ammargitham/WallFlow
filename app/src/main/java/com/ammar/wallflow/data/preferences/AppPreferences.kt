@@ -27,6 +27,7 @@ import kotlinx.serialization.UseSerializers
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
+@Serializable
 data class AppPreferences(
     val wallhavenApiKey: String = "",
     val homeSearch: Search = Search(
@@ -48,6 +49,7 @@ enum class ObjectDetectionDelegate {
     GPU,
 }
 
+@Serializable
 data class ObjectDetectionPreferences(
     val enabled: Boolean = false,
     val delegate: ObjectDetectionDelegate = ObjectDetectionDelegate.GPU,
@@ -90,6 +92,7 @@ enum class Theme {
     DARK,
 }
 
+@Serializable
 data class LookAndFeelPreferences(
     val theme: Theme = Theme.SYSTEM,
     val layoutPreferences: LayoutPreferences = LayoutPreferences(),
@@ -111,6 +114,7 @@ const val maxGridCols = 5L
 const val minGridColWidthPct = 10L
 const val maxGridColWidthPct = 50L
 
+@Serializable
 data class LayoutPreferences(
     val gridType: GridType = GridType.STAGGERED,
     val gridColType: GridColType = GridColType.ADAPTIVE,

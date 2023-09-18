@@ -30,6 +30,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.ammar.wallflow.MainDispatcher
 import com.ammar.wallflow.data.preferences.Theme
 import com.ammar.wallflow.extensions.search
 import com.ammar.wallflow.extensions.toPxF
@@ -55,6 +56,9 @@ import com.ammar.wallflow.ui.theme.WallFlowTheme
 import com.ramcosta.composedestinations.navigation.navigate
 import com.ramcosta.composedestinations.utils.startDestination
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.withContext
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
@@ -62,7 +66,11 @@ class MainActivity : ComponentActivity() {
         "https?://(?:whvn|wallhaven).cc(?:/w)?/(?<wallpaperId>\\S+)",
         RegexOption.IGNORE_CASE,
     )
-    lateinit var navController: NavHostController
+    private lateinit var navController: NavHostController
+
+    @Inject
+    @MainDispatcher
+    lateinit var mainDispatcher: CoroutineDispatcher
 
     @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -124,7 +132,9 @@ class MainActivity : ComponentActivity() {
             }
 
             LaunchedEffect(Unit) {
-                handleIntent(intent ?: return@LaunchedEffect)
+                withContext(mainDispatcher) {
+                    handleIntent(intent ?: return@withContext)
+                }
             }
 
             LaunchedEffect(searchBarControllerState.search) {

@@ -1,6 +1,7 @@
 package com.ammar.wallflow.data.network.di
 
 import com.ammar.wallflow.BuildConfig
+import com.ammar.wallflow.MIME_TYPE_JSON
 import com.ammar.wallflow.WALLHAVEN_BASE_URL
 import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
 import com.ammar.wallflow.data.network.retrofit.DocumentConverterFactory
@@ -55,7 +56,7 @@ object NetworkModule {
         client(okHttpClient)
         addConverterFactory(DocumentConverterFactory())
         addConverterFactory(
-            networkJson.asConverterFactory("application/json".toMediaType()),
+            networkJson.asConverterFactory(MIME_TYPE_JSON.toMediaType()),
         )
     }
         .build()

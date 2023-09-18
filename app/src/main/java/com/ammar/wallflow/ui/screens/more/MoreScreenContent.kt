@@ -29,6 +29,7 @@ internal fun MoreScreenContent(
     activeOption: ActiveOption? = null,
     detailContent: @Composable () -> Unit = {},
     onSettingsClick: () -> Unit = {},
+    onBackupRestoreClick: () -> Unit = {},
     onOpenSourceLicensesClick: () -> Unit = {},
 ) {
     MoreScreenContent(
@@ -40,6 +41,7 @@ internal fun MoreScreenContent(
                 isExpanded = isExpanded,
                 activeOption = activeOption,
                 onSettingsClick = onSettingsClick,
+                onBackupRestoreClick = onBackupRestoreClick,
                 onOpenSourceLicensesClick = onOpenSourceLicensesClick,
             )
         },
@@ -85,6 +87,7 @@ private fun MoreList(
     isExpanded: Boolean = false,
     activeOption: ActiveOption? = null,
     onSettingsClick: () -> Unit = {},
+    onBackupRestoreClick: () -> Unit = {},
     onOpenSourceLicensesClick: () -> Unit = {},
 ) {
     val context = LocalContext.current
@@ -106,6 +109,11 @@ private fun MoreList(
                 label = context.getString(R.string.settings),
                 value = ActiveOption.SETTINGS.name,
             ),
+            MoreListItem.Clickable(
+                icon = R.drawable.baseline_settings_backup_restore_24,
+                label = context.getString(R.string.backup_and_restore),
+                value = ActiveOption.BACKUP_RESTORE.name,
+            ),
             MoreListItem.Divider,
             MoreListItem.Clickable(
                 label = context.getString(R.string.open_source_licenses),
@@ -126,6 +134,7 @@ private fun MoreList(
         onItemClick = {
             when (it.value) {
                 ActiveOption.SETTINGS.name -> onSettingsClick()
+                ActiveOption.BACKUP_RESTORE.name -> onBackupRestoreClick()
                 ActiveOption.OSL.name -> onOpenSourceLicensesClick()
                 else -> {}
             }

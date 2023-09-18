@@ -1,10 +1,14 @@
-package com.ammar.wallflow.data.repository
+package com.ammar.wallflow
 
 import androidx.compose.ui.graphics.Color
+import kotlin.random.Random
 
 object RandomColors {
-    fun nextColorInt() = (Math.random() * 16777215).toInt() or (0xFF shl 24)
-    fun nextColor() = Color(nextColorInt())
+    private fun nextColorInt(
+        random: Random = Random,
+    ) = (random.nextDouble() * 16777215).toInt() or (0xFF shl 24)
+
+    fun nextColor(random: Random = Random) = Color(nextColorInt(random))
 }
 
 // internal class RandomColors {
