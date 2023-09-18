@@ -83,6 +83,7 @@ object NavGraphs {
         destinations = emptyList(),
         nestedNavGraphs = listOf(
             settings,
+            backup_restore,
             openSourceLicenses,
         ),
     )
