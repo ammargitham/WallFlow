@@ -1,0 +1,7 @@
+What's new:
+* Add local wallpapers directories.
+  * Note very large directories may take some time to load.
+* Use added local directories for auto wallpaper.
+* Backup and restore settings, favorites, and saved searches.
+  * Note that permissions to access local wallpapers are lost on a re-install, so any local wallpapers marked as favorite won't be restored.
+* View all open source libraries used in the app in the "More" screen.
