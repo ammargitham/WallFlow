@@ -27,20 +27,15 @@ import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TooltipBox
-import androidx.compose.material3.TooltipDefaults.rememberPlainTooltipPositionProvider
 import androidx.compose.material3.contentColorFor
-import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -114,87 +109,87 @@ fun WallpaperActions(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ApplyWallpaperFAB(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
 ) {
-    TooltipBox(
+    // TooltipBox(
+    //     modifier = modifier,
+    //     positionProvider = rememberPlainTooltipPositionProvider(),
+    //     state = rememberTooltipState(),
+    //     tooltip = {
+    //         PlainTooltip {
+    //             Text(text = stringResource(R.string.apply_wallpaper))
+    //         }
+    //     },
+    // ) {
+    FloatingActionButton(
         modifier = modifier,
-        positionProvider = rememberPlainTooltipPositionProvider(),
-        state = rememberTooltipState(),
-        tooltip = {
-            PlainTooltip {
-                Text(text = stringResource(R.string.apply_wallpaper))
-            }
-        },
+        onClick = onClick,
+        containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
+        elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation(),
     ) {
-        FloatingActionButton(
-            onClick = onClick,
-            containerColor = BottomAppBarDefaults.bottomAppBarFabColor,
-            elevation = FloatingActionButtonDefaults.bottomAppBarFabElevation(),
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.outline_wallpaper_24),
-                contentDescription = stringResource(R.string.apply_wallpaper),
-            )
-        }
+        Icon(
+            painter = painterResource(R.drawable.outline_wallpaper_24),
+            contentDescription = stringResource(R.string.apply_wallpaper),
+        )
     }
+    // }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun FullScreenButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
 ) {
-    TooltipBox(
+    // TooltipBox(
+    //     modifier = modifier,
+    //     positionProvider = rememberPlainTooltipPositionProvider(),
+    //     state = rememberTooltipState(),
+    //     tooltip = {
+    //         PlainTooltip {
+    //             Text(text = stringResource(R.string.full_screen))
+    //         }
+    //     },
+    // ) {
+    IconButton(
         modifier = modifier,
-        positionProvider = rememberPlainTooltipPositionProvider(),
-        state = rememberTooltipState(),
-        tooltip = {
-            PlainTooltip {
-                Text(text = stringResource(R.string.full_screen))
-            }
-        },
+        onClick = onClick,
     ) {
-        IconButton(
-            onClick = onClick,
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.baseline_open_in_full_24),
-                contentDescription = stringResource(R.string.full_screen),
-            )
-        }
+        Icon(
+            painter = painterResource(R.drawable.baseline_open_in_full_24),
+            contentDescription = stringResource(R.string.full_screen),
+        )
     }
+    // }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun InfoButton(
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
 ) {
-    TooltipBox(
+    // TooltipBox(
+    //     modifier = modifier,
+    //     positionProvider = rememberPlainTooltipPositionProvider(),
+    //     state = rememberTooltipState(),
+    //     tooltip = {
+    //         PlainTooltip {
+    //             Text(text = stringResource(R.string.info))
+    //         }
+    //     },
+    // ) {
+    IconButton(
         modifier = modifier,
-        positionProvider = rememberPlainTooltipPositionProvider(),
-        state = rememberTooltipState(),
-        tooltip = {
-            PlainTooltip {
-                Text(text = stringResource(R.string.info))
-            }
-        },
+        onClick = onClick,
     ) {
-        IconButton(
-            onClick = onClick,
-        ) {
-            Icon(
-                imageVector = Icons.Outlined.Info,
-                contentDescription = stringResource(R.string.info),
-            )
-        }
+        Icon(
+            imageVector = Icons.Outlined.Info,
+            contentDescription = stringResource(R.string.info),
+        )
     }
+    // }
 }
 
 @Preview
@@ -214,7 +209,6 @@ private fun PreviewWallpaperActions() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun DownloadButton(
     modifier: Modifier = Modifier,
@@ -263,46 +257,47 @@ private fun DownloadButton(
         }
     }
 
-    TooltipBox(
+    // TooltipBox(
+    //     modifier = modifier,
+    //     positionProvider = rememberPlainTooltipPositionProvider(),
+    //     state = rememberTooltipState(),
+    //     tooltip = {
+    //         PlainTooltip {
+    //             Text(text = stringResource(R.string.download))
+    //         }
+    //     },
+    // ) {
+    IconButton(
         modifier = modifier,
-        positionProvider = rememberPlainTooltipPositionProvider(),
-        state = rememberTooltipState(),
-        tooltip = {
-            PlainTooltip {
-                Text(text = stringResource(R.string.download))
-            }
+        onClick = if (clickable) {
+            onClick
+        } else {
+            {}
         },
+        colors = IconButtonDefaults.iconButtonColors(
+            containerColor = containerColor,
+            contentColor = contentColorFor(containerColor),
+        ),
     ) {
-        IconButton(
-            onClick = if (clickable) {
-                onClick
-            } else {
-                {}
-            },
-            colors = IconButtonDefaults.iconButtonColors(
-                containerColor = containerColor,
-                contentColor = contentColorFor(containerColor),
-            ),
+        Crossfade(
+            targetState = icon,
+            label = "iconCrossfade",
         ) {
-            Crossfade(
-                targetState = icon,
-                label = "iconCrossfade",
-            ) {
-                Icon(
-                    painter = painterResource(it),
-                    contentDescription = stringResource(R.string.download),
-                )
-            }
-        }
-        if (showProgress) {
-            ProgressIndicator(
-                modifier = Modifier
-                    .size(48.dp)
-                    .padding(4.dp),
-                progress = progress,
+            Icon(
+                painter = painterResource(it),
+                contentDescription = stringResource(R.string.download),
             )
         }
     }
+    if (showProgress) {
+        ProgressIndicator(
+            modifier = Modifier
+                .size(48.dp)
+                .padding(4.dp),
+            progress = progress,
+        )
+    }
+    // }
 }
 
 private class DownloadStatusParameterProvider :
@@ -332,7 +327,6 @@ private fun PreviewDownloadButton(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ShareButton(
     modifier: Modifier = Modifier,
@@ -340,66 +334,67 @@ private fun ShareButton(
     onLinkClick: () -> Unit = {},
     onImageClick: () -> Unit = {},
 ) {
-    val tooltipState = rememberTooltipState()
+    // val tooltipState = rememberTooltipState()
     var expanded by remember { mutableStateOf(false) }
 
-    TooltipBox(
+    // TooltipBox(
+    //     modifier = modifier.wrapContentSize(Alignment.TopStart),
+    //     positionProvider = rememberPlainTooltipPositionProvider(),
+    //     state = tooltipState,
+    //     tooltip = {
+    //         PlainTooltip {
+    //             Text(text = stringResource(R.string.share))
+    //         }
+    //     },
+    // ) {
+    IconButton(
         modifier = modifier.wrapContentSize(Alignment.TopStart),
-        positionProvider = rememberPlainTooltipPositionProvider(),
-        state = tooltipState,
-        tooltip = {
-            PlainTooltip {
-                Text(text = stringResource(R.string.share))
+        onClick = {
+            if (!showShareLinkAction) {
+                onImageClick()
+                return@IconButton
             }
+            expanded = true
         },
     ) {
-        IconButton(
-            onClick = {
-                if (!showShareLinkAction) {
-                    onImageClick()
-                    return@IconButton
-                }
-                expanded = true
-            },
-        ) {
-            Icon(
-                imageVector = Icons.Default.Share,
-                contentDescription = stringResource(R.string.share),
-            )
-        }
-        DropdownMenu(
-            modifier = Modifier.widthIn(min = 150.dp),
-            expanded = expanded,
-            onDismissRequest = { expanded = false },
-        ) {
-            DropdownMenuItem(
-                text = { Text(text = stringResource(R.string.link)) },
-                onClick = {
-                    expanded = false
-                    onLinkClick()
-                },
-                leadingIcon = {
-                    Icon(
-                        painter = painterResource(R.drawable.outline_link_24),
-                        contentDescription = null,
-                    )
-                },
-            )
-            DropdownMenuItem(
-                text = { Text(text = stringResource(R.string.image)) },
-                onClick = {
-                    expanded = false
-                    onImageClick()
-                },
-                leadingIcon = {
-                    Icon(
-                        painter = painterResource(R.drawable.outline_image_24),
-                        contentDescription = null,
-                    )
-                },
-            )
-        }
+        Icon(
+            imageVector = Icons.Default.Share,
+            contentDescription = stringResource(R.string.share),
+        )
     }
+    DropdownMenu(
+        modifier = Modifier.widthIn(min = 150.dp),
+        expanded = expanded,
+        onDismissRequest = { expanded = false },
+    ) {
+        DropdownMenuItem(
+            text = { Text(text = stringResource(R.string.link)) },
+            onClick = {
+                expanded = false
+                onLinkClick()
+            },
+            leadingIcon = {
+                Icon(
+                    painter = painterResource(R.drawable.outline_link_24),
+                    contentDescription = null,
+                )
+            },
+        )
+        DropdownMenuItem(
+            text = { Text(text = stringResource(R.string.image)) },
+            onClick = {
+                expanded = false
+                onImageClick()
+            },
+            leadingIcon = {
+                Icon(
+                    painter = painterResource(R.drawable.outline_image_24),
+                    contentDescription = null,
+                )
+            },
+        )
+    }
+    // }
 }
 
 @Composable
