@@ -5,8 +5,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.pm.ServiceInfo
 import android.graphics.Bitmap
-import android.media.MediaScannerConnection
-import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -164,7 +162,7 @@ class DownloadWorker @AssistedInject constructor(
             progressCallback = this::notifyProgress,
         )
         if (inputData.getBoolean(INPUT_KEY_SCAN_FILE, false)) {
-            scanFile(file)
+            scanFile(context, file)
         }
         try {
             notifyWallpaperDownloadSuccess(wallpaperId, file, source)
@@ -266,23 +264,6 @@ class DownloadWorker @AssistedInject constructor(
 
     private fun shouldShowSuccessNotification() =
         shouldShowNotification() && notificationType == NotificationType.VISIBLE_SUCCESS
-
-    private fun scanFile(file: File) {
-        var connection: MediaScannerConnection? = null
-        connection = MediaScannerConnection(
-            context,
-            object : MediaScannerConnection.MediaScannerConnectionClient {
-                override fun onScanCompleted(path: String?, uri: Uri?) {
-                    connection?.disconnect()
-                }
-
-                override fun onMediaScannerConnected() {
-                    connection?.scanFile(file.absolutePath, null)
-                }
-            },
-        )
-        connection.connect()
-    }
 
     companion object {
         const val INPUT_KEY_URL = "url"

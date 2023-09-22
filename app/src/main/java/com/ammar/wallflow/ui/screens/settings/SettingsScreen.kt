@@ -493,6 +493,7 @@ fun SettingsScreenContent(
                     autoWallpaperStatus = autoWallpaperStatus,
                     targets = appPreferences.autoWallpaperPreferences.targets,
                     markFavorite = appPreferences.autoWallpaperPreferences.markFavorite,
+                    download = appPreferences.autoWallpaperPreferences.download,
                     onEnabledChange = {
                         onAutoWallpaperPrefsChange(
                             appPreferences.autoWallpaperPreferences.copy(
@@ -524,6 +525,13 @@ fun SettingsScreenContent(
                         onAutoWallpaperPrefsChange(
                             appPreferences.autoWallpaperPreferences.copy(
                                 markFavorite = it,
+                            ),
+                        )
+                    },
+                    onDownloadChange = {
+                        onAutoWallpaperPrefsChange(
+                            appPreferences.autoWallpaperPreferences.copy(
+                                download = it,
                             ),
                         )
                     },

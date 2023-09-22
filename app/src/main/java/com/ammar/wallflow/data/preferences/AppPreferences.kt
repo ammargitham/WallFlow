@@ -75,6 +75,7 @@ data class AutoWallpaperPreferences(
     val workRequestId: UUID? = null,
     val targets: Set<WallpaperTarget> = setOf(WallpaperTarget.HOME, WallpaperTarget.LOCKSCREEN),
     val markFavorite: Boolean = false,
+    val download: Boolean = false,
 )
 
 val MutableStateAutoWallpaperPreferencesSaver =

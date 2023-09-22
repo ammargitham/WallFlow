@@ -1,5 +1,6 @@
 package com.ammar.wallflow.ui.screens.settings.composables
 
+import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider as CPPP
 import android.content.res.Configuration
 import android.os.Build
 import android.text.format.DateFormat
@@ -48,7 +49,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider as CPPP
 import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.DISABLED_ALPHA
 import com.ammar.wallflow.R
@@ -374,6 +374,7 @@ internal fun LazyListScope.autoWallpaperSection(
     frequency: DateTimePeriod = defaultAutoWallpaperFreq,
     nextRun: NextRun = NextRun.NotScheduled,
     markFavorite: Boolean = false,
+    download: Boolean = false,
     showNotification: Boolean = false,
     autoWallpaperStatus: AutoWallpaperWorker.Companion.Status? = null,
     targets: Set<WallpaperTarget> = setOf(WallpaperTarget.HOME, WallpaperTarget.LOCKSCREEN),
@@ -385,6 +386,7 @@ internal fun LazyListScope.autoWallpaperSection(
     onChangeNowClick: () -> Unit = {},
     onNextRunInfoClick: () -> Unit = {},
     onMarkFavoriteChange: (Boolean) -> Unit = {},
+    onDownloadChange: (Boolean) -> Unit = {},
     onShowNotificationChange: (Boolean) -> Unit = {},
     onSetToClick: () -> Unit = {},
 ) {
@@ -588,6 +590,34 @@ internal fun LazyListScope.autoWallpaperSection(
             supportingContent = {
                 Text(
                     text = stringResource(R.string.auto_wallpaper_mark_as_favorite_desc),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = alpha),
+                )
+            },
+        )
+    }
+    item {
+        ListItem(
+            modifier = Modifier.clickable(
+                enabled = enabled,
+                onClick = { onDownloadChange(!download) },
+            ),
+            headlineContent = {
+                Text(
+                    text = stringResource(R.string.download),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
+                )
+            },
+            trailingContent = {
+                Switch(
+                    modifier = Modifier.height(24.dp),
+                    enabled = enabled,
+                    checked = download,
+                    onCheckedChange = onDownloadChange,
+                )
+            },
+            supportingContent = {
+                Text(
+                    text = stringResource(R.string.auto_wallpaper_download_desc),
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = alpha),
                 )
             },
