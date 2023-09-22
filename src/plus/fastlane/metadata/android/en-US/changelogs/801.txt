@@ -1,0 +1,2 @@
+Bug Fixes:
+* Fix crash when trying to set a wallpaper

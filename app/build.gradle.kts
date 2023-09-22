@@ -100,7 +100,6 @@ android {
         create("plus") {
             dimension = "feature"
             applicationIdSuffix = ".plus"
-            versionNameSuffix = "-plus"
         }
     }
 
