@@ -247,6 +247,8 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="backup_failed">Backup failed!</string>
     <string name="restore_done">Restore done!</string>
     <string name="restore_failed">Restore failed!</string>
+    <string name="mark_as_favorite">Mark as Favorite</string>
+    <string name="auto_wallpaper_mark_as_favorite_desc">Mark wallpapers as favorite when used in auto wallpaper</string>
     <plurals name="every_x_hrs">
         <item quantity="one">Every %d hour</item>
         <item quantity="other">Every %d hours</item>

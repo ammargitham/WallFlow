@@ -171,6 +171,9 @@ class AutoWallpaperWorker @AssistedInject constructor(
                 ),
             )
         }
+        if (autoWallpaperPreferences.markFavorite) {
+            markFavorite(nextWallpaper)
+        }
         if (autoWallpaperPreferences.showNotification) {
             showSuccessNotification(nextWallpaper, uri)
         }
@@ -462,6 +465,17 @@ class AutoWallpaperWorker @AssistedInject constructor(
             AUTO_WALLPAPER_SUCCESS_NOTIFICATION_ID,
             notification,
         )
+    }
+
+    private suspend fun markFavorite(wallpaper: Wallpaper) {
+        try {
+            favoritesRepository.addFavorite(
+                sourceId = wallpaper.id,
+                source = wallpaper.source,
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "markFavorite: ", e)
+        }
     }
 
     companion object {

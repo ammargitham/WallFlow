@@ -91,6 +91,27 @@ class FavoritesRepository @Inject constructor(
         )
     }
 
+    suspend fun addFavorite(
+        sourceId: String,
+        source: Source,
+    ) = withContext(ioDispatcher) {
+        val exists = favoriteDao.exists(
+            sourceId = sourceId,
+            source = source,
+        )
+        if (exists) {
+            return@withContext
+        }
+        favoriteDao.upsert(
+            FavoriteEntity(
+                id = 0,
+                sourceId = sourceId,
+                source = source,
+                favoritedOn = Clock.System.now(),
+            ),
+        )
+    }
+
     suspend fun getRandom(
         context: Context,
     ) = withContext(ioDispatcher) {
