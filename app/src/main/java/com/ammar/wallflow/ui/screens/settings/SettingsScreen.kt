@@ -177,7 +177,7 @@ fun SettingsScreen(
             onObjectDetectionDelegateClick = { viewModel.showObjectDetectionDelegateOptions(true) },
             onObjectDetectionModelClick = { viewModel.showObjectDetectionModelOptions(true) },
             onManageSavedSearchesClick = { viewModel.showSavedSearches(true) },
-            onAutoWallpaperPresChange = {
+            onAutoWallpaperPrefsChange = {
                 if (it.enabled) {
                     viewModel.setTempAutoWallpaperPrefs(it)
                     // need to check if we have all permissions before enabling auto wallpaper
@@ -421,7 +421,7 @@ fun SettingsScreenContent(
     onObjectDetectionDelegateClick: () -> Unit = {},
     onObjectDetectionModelClick: () -> Unit = {},
     onManageSavedSearchesClick: () -> Unit = {},
-    onAutoWallpaperPresChange: (AutoWallpaperPreferences) -> Unit = {},
+    onAutoWallpaperPrefsChange: (AutoWallpaperPreferences) -> Unit = {},
     onAutoWallpaperSourcesClick: () -> Unit = {},
     onAutoWallpaperFrequencyClick: () -> Unit = {},
     onAutoWallpaperConstraintsClick: () -> Unit = {},
@@ -492,8 +492,10 @@ fun SettingsScreenContent(
                     showNotification = appPreferences.autoWallpaperPreferences.showNotification,
                     autoWallpaperStatus = autoWallpaperStatus,
                     targets = appPreferences.autoWallpaperPreferences.targets,
+                    markFavorite = appPreferences.autoWallpaperPreferences.markFavorite,
+                    download = appPreferences.autoWallpaperPreferences.download,
                     onEnabledChange = {
-                        onAutoWallpaperPresChange(
+                        onAutoWallpaperPrefsChange(
                             appPreferences.autoWallpaperPreferences.copy(
                                 enabled = it,
                             ),
@@ -502,7 +504,7 @@ fun SettingsScreenContent(
                     onSourcesClick = onAutoWallpaperSourcesClick,
                     onFrequencyClick = onAutoWallpaperFrequencyClick,
                     onUseObjectDetectionChange = {
-                        onAutoWallpaperPresChange(
+                        onAutoWallpaperPrefsChange(
                             appPreferences.autoWallpaperPreferences.copy(
                                 useObjectDetection = it,
                             ),
@@ -512,13 +514,27 @@ fun SettingsScreenContent(
                     onChangeNowClick = onAutoWallpaperChangeNowClick,
                     onNextRunInfoClick = onAutoWallpaperNextRunInfoClick,
                     onShowNotificationChange = {
-                        onAutoWallpaperPresChange(
+                        onAutoWallpaperPrefsChange(
                             appPreferences.autoWallpaperPreferences.copy(
                                 showNotification = it,
                             ),
                         )
                     },
                     onSetToClick = onAutoWallpaperSetToClick,
+                    onMarkFavoriteChange = {
+                        onAutoWallpaperPrefsChange(
+                            appPreferences.autoWallpaperPreferences.copy(
+                                markFavorite = it,
+                            ),
+                        )
+                    },
+                    onDownloadChange = {
+                        onAutoWallpaperPrefsChange(
+                            appPreferences.autoWallpaperPreferences.copy(
+                                download = it,
+                            ),
+                        )
+                    },
                 )
             }
         }

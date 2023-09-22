@@ -64,6 +64,7 @@ import com.ammar.wallflow.utils.NotificationChannels
 import com.ammar.wallflow.utils.NotificationIds.AUTO_WALLPAPER_NOTIFICATION_ID
 import com.ammar.wallflow.utils.NotificationIds.AUTO_WALLPAPER_SUCCESS_NOTIFICATION_ID
 import com.ammar.wallflow.utils.decodeSampledBitmapFromUri
+import com.ammar.wallflow.utils.getPublicDownloadsFile
 import com.ammar.wallflow.utils.objectdetection.detectObjects
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -170,6 +171,12 @@ class AutoWallpaperWorker @AssistedInject constructor(
                     FAILURE_REASON to FailureReason.NO_WALLPAPER_FOUND.name,
                 ),
             )
+        }
+        if (autoWallpaperPreferences.markFavorite) {
+            markFavorite(nextWallpaper)
+        }
+        if (autoWallpaperPreferences.download) {
+            saveWallpaperToDownloads(nextWallpaper, uri)
         }
         if (autoWallpaperPreferences.showNotification) {
             showSuccessNotification(nextWallpaper, uri)
@@ -462,6 +469,42 @@ class AutoWallpaperWorker @AssistedInject constructor(
             AUTO_WALLPAPER_SUCCESS_NOTIFICATION_ID,
             notification,
         )
+    }
+
+    private suspend fun markFavorite(wallpaper: Wallpaper) {
+        try {
+            favoritesRepository.addFavorite(
+                sourceId = wallpaper.id,
+                source = wallpaper.source,
+            )
+        } catch (e: Exception) {
+            Log.e(TAG, "markFavorite: ", e)
+        }
+    }
+
+    private fun saveWallpaperToDownloads(
+        wallpaper: Wallpaper,
+        uri: Uri,
+    ) {
+        if (wallpaper.source == Source.LOCAL) {
+            // Don't save Local files
+            Log.i(TAG, "Download skipped as it is a Local wallpaper")
+            return
+        }
+        if (wallpaper !is DownloadableWallpaper) {
+            // only downloadable wallpapers can be saved
+            Log.i(TAG, "Download skipped as it is not a downloadable wallpaper")
+            return
+        }
+        try {
+            val url = wallpaper.data
+            val fileName = url.getFileNameFromUrl()
+            val dest = getPublicDownloadsFile(fileName)
+            copyFiles(context, uri, dest)
+            scanFile(context, dest)
+        } catch (e: Exception) {
+            Log.e(TAG, "saveWallpaperToDownloads: ", e)
+        }
     }
 
     companion object {

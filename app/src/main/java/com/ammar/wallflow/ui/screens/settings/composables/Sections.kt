@@ -1,5 +1,6 @@
 package com.ammar.wallflow.ui.screens.settings.composables
 
+import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider as CPPP
 import android.content.res.Configuration
 import android.os.Build
 import android.text.format.DateFormat
@@ -47,6 +48,7 @@ import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.DISABLED_ALPHA
 import com.ammar.wallflow.R
@@ -371,6 +373,8 @@ internal fun LazyListScope.autoWallpaperSection(
     useObjectDetection: Boolean = true,
     frequency: DateTimePeriod = defaultAutoWallpaperFreq,
     nextRun: NextRun = NextRun.NotScheduled,
+    markFavorite: Boolean = false,
+    download: Boolean = false,
     showNotification: Boolean = false,
     autoWallpaperStatus: AutoWallpaperWorker.Companion.Status? = null,
     targets: Set<WallpaperTarget> = setOf(WallpaperTarget.HOME, WallpaperTarget.LOCKSCREEN),
@@ -381,6 +385,8 @@ internal fun LazyListScope.autoWallpaperSection(
     onConstraintsClick: () -> Unit = {},
     onChangeNowClick: () -> Unit = {},
     onNextRunInfoClick: () -> Unit = {},
+    onMarkFavoriteChange: (Boolean) -> Unit = {},
+    onDownloadChange: (Boolean) -> Unit = {},
     onShowNotificationChange: (Boolean) -> Unit = {},
     onSetToClick: () -> Unit = {},
 ) {
@@ -565,6 +571,62 @@ internal fun LazyListScope.autoWallpaperSection(
         ListItem(
             modifier = Modifier.clickable(
                 enabled = enabled,
+                onClick = { onMarkFavoriteChange(!markFavorite) },
+            ),
+            headlineContent = {
+                Text(
+                    text = stringResource(R.string.mark_as_favorite),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
+                )
+            },
+            trailingContent = {
+                Switch(
+                    modifier = Modifier.height(24.dp),
+                    enabled = enabled,
+                    checked = markFavorite,
+                    onCheckedChange = onMarkFavoriteChange,
+                )
+            },
+            supportingContent = {
+                Text(
+                    text = stringResource(R.string.auto_wallpaper_mark_as_favorite_desc),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = alpha),
+                )
+            },
+        )
+    }
+    item {
+        ListItem(
+            modifier = Modifier.clickable(
+                enabled = enabled,
+                onClick = { onDownloadChange(!download) },
+            ),
+            headlineContent = {
+                Text(
+                    text = stringResource(R.string.download),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
+                )
+            },
+            trailingContent = {
+                Switch(
+                    modifier = Modifier.height(24.dp),
+                    enabled = enabled,
+                    checked = download,
+                    onCheckedChange = onDownloadChange,
+                )
+            },
+            supportingContent = {
+                Text(
+                    text = stringResource(R.string.auto_wallpaper_download_desc),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = alpha),
+                )
+            },
+        )
+    }
+    item {
+        ListItem(
+            modifier = Modifier.clickable(
+                enabled = enabled,
                 onClick = { onShowNotificationChange(!showNotification) },
             ),
             headlineContent = {
@@ -602,28 +664,28 @@ internal fun LazyListScope.autoWallpaperSection(
     }
 }
 
-@Preview
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun PreviewAutoWallpaperSection() {
-    WallFlowTheme {
-        Surface {
-            LazyColumn {
-                autoWallpaperSection()
-            }
-        }
-    }
-}
+private data class PreviewAutoWallpaperSectionProps(
+    val enabled: Boolean = false,
+)
+
+private class AutoWallpaperSectionPPP : CPPP<PreviewAutoWallpaperSectionProps>(
+    listOf(
+        PreviewAutoWallpaperSectionProps(),
+        PreviewAutoWallpaperSectionProps(enabled = true),
+    ),
+)
 
 @Preview
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun PreviewAutoWallpaperSectionEnabled() {
+private fun PreviewAutoWallpaperSection(
+    @PreviewParameter(AutoWallpaperSectionPPP::class) props: PreviewAutoWallpaperSectionProps,
+) {
     WallFlowTheme {
         Surface {
             LazyColumn {
                 autoWallpaperSection(
-                    enabled = true,
+                    enabled = props.enabled,
                 )
             }
         }

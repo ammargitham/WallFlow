@@ -109,6 +109,8 @@ class AppPreferencesRepository @Inject constructor(
                     it[PreferencesKeys.AUTO_WALLPAPER_TARGETS] = targets.map {
                         it.name
                     }.toSet()
+                    it[PreferencesKeys.AUTO_WALLPAPER_MARK_FAVORITE] = markFavorite
+                    it[PreferencesKeys.AUTO_WALLPAPER_DOWNLOAD] = download
                 }
             }
         }
@@ -203,6 +205,8 @@ class AppPreferencesRepository @Inject constructor(
                     WallpaperTarget.HOME,
                     WallpaperTarget.LOCKSCREEN,
                 ),
+                markFavorite = get(PreferencesKeys.AUTO_WALLPAPER_MARK_FAVORITE) ?: false,
+                download = get(PreferencesKeys.AUTO_WALLPAPER_DOWNLOAD) ?: false,
             )
         },
         lookAndFeelPreferences = LookAndFeelPreferences(

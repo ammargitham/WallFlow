@@ -1,5 +1,8 @@
 package com.ammar.wallflow.workers
 
+import android.content.Context
+import android.media.MediaScannerConnection
+import android.net.Uri
 import com.ammar.wallflow.extensions.await
 import com.ammar.wallflow.utils.ContentDisposition
 import java.io.File
@@ -9,6 +12,7 @@ import okhttp3.Request
 import okhttp3.Response
 import okio.buffer
 import okio.sink
+import okio.source
 
 suspend fun download(
     okHttpClient: OkHttpClient,
@@ -85,4 +89,34 @@ private fun createFile(
     tempFile.parentFile?.mkdirs()
     tempFile.createNewFile()
     return tempFile
+}
+
+@Throws(IOException::class)
+fun copyFiles(
+    context: Context,
+    source: Uri,
+    dest: File,
+) {
+    context.contentResolver.openInputStream(source)?.use {
+        it.source().use { a ->
+            dest.sink().buffer().use { b -> b.writeAll(a) }
+        }
+    }
+}
+
+fun scanFile(context: Context, file: File) {
+    var connection: MediaScannerConnection? = null
+    connection = MediaScannerConnection(
+        context,
+        object : MediaScannerConnection.MediaScannerConnectionClient {
+            override fun onScanCompleted(path: String?, uri: Uri?) {
+                connection?.disconnect()
+            }
+
+            override fun onMediaScannerConnected() {
+                connection?.scanFile(file.absolutePath, null)
+            }
+        },
+    )
+    connection.connect()
 }
