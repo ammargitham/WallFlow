@@ -303,6 +303,17 @@ class SettingsViewModel @Inject constructor(
         if (confirmed) {
             viewModelScope.launch {
                 savedSearchRepository.delete(savedSearch)
+                // if saved search was set as the auto wallpaper source, remove it
+                val appPreferences = uiState.value.appPreferences
+                if (appPreferences.autoWallpaperPreferences.savedSearchId == savedSearch.id) {
+                    updateAutoWallpaperPrefs(
+                        appPreferences.autoWallpaperPreferences.copy(
+                            savedSearchId = -1,
+                            savedSearchEnabled = false,
+                        ),
+                        showSourcesDialog = false,
+                    )
+                }
                 // close the dialog
                 localUiStateFlow.update { it.copy(deleteSavedSearch = partial(null)) }
             }
@@ -312,37 +323,46 @@ class SettingsViewModel @Inject constructor(
         localUiStateFlow.update { it.copy(deleteSavedSearch = partial(savedSearch)) }
     }
 
-    fun updateAutoWallpaperPrefs(autoWallpaperPreferences: AutoWallpaperPreferences) {
-        if (autoWallpaperPreferences.enabled &&
-            !autoWallpaperPreferences.savedSearchEnabled &&
-            !autoWallpaperPreferences.favoritesEnabled &&
-            !autoWallpaperPreferences.localEnabled
+    fun updateAutoWallpaperPrefs(
+        autoWallpaperPreferences: AutoWallpaperPreferences,
+        showSourcesDialog: Boolean = true,
+    ) {
+        var prefs = autoWallpaperPreferences
+        if (prefs.enabled &&
+            (!prefs.savedSearchEnabled || prefs.savedSearchId <= 0) &&
+            !prefs.favoritesEnabled &&
+            !prefs.localEnabled
         ) {
-            localUiStateFlow.update {
-                it.copy(
-                    tempAutoWallpaperPreferences = partial(autoWallpaperPreferences),
-                    showAutoWallpaperSourcesDialog = partial(true),
-                )
+            if (showSourcesDialog) {
+                localUiStateFlow.update {
+                    it.copy(
+                        tempAutoWallpaperPreferences = partial(prefs),
+                        showAutoWallpaperSourcesDialog = partial(true),
+                    )
+                }
+                return
+            } else {
+                // disable auto wallpaper
+                prefs = prefs.copy(enabled = false)
             }
-            return
         }
         viewModelScope.launch {
-            appPreferencesRepository.updateAutoWallpaperPrefs(autoWallpaperPreferences)
-            if (autoWallpaperPreferences.enabled) {
+            appPreferencesRepository.updateAutoWallpaperPrefs(prefs)
+            if (prefs.enabled) {
                 // only reschedule if enabled or frequency or constraints change
                 val currentPrefs = uiState.value.appPreferences.autoWallpaperPreferences
                 if (
                     currentPrefs.enabled &&
-                    currentPrefs.frequency == autoWallpaperPreferences.frequency &&
-                    currentPrefs.constraints == autoWallpaperPreferences.constraints
+                    currentPrefs.frequency == prefs.frequency &&
+                    currentPrefs.constraints == prefs.constraints
                 ) {
                     return@launch
                 }
                 // schedule worker with updated preferences
                 AutoWallpaperWorker.schedule(
                     context = application,
-                    constraints = autoWallpaperPreferences.constraints,
-                    interval = autoWallpaperPreferences.frequency,
+                    constraints = prefs.constraints,
+                    interval = prefs.frequency,
                     appPreferencesRepository = appPreferencesRepository,
                 )
             } else {

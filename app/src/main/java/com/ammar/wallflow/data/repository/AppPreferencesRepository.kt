@@ -171,16 +171,14 @@ class AppPreferencesRepository @Inject constructor(
         },
         autoWallpaperPreferences = with(preferences) {
             val savedSearchId = get(PreferencesKeys.AUTO_WALLPAPER_SAVED_SEARCH_ID) ?: 0
-            val savedSearchEnabled = (
-                get(PreferencesKeys.AUTO_WALLPAPER_SAVED_SEARCH_ENABLED)
-                    ?: (savedSearchId > 0)
-                )
+            val savedSearchEnabled =
+                (get(PreferencesKeys.AUTO_WALLPAPER_SAVED_SEARCH_ENABLED) ?: false) &&
+                    savedSearchId > 0
             val favoritesEnabled = get(PreferencesKeys.AUTO_WALLPAPER_FAVORITES_ENABLED) ?: false
             val localEnabled = get(PreferencesKeys.AUTO_WALLPAPER_LOCAL_ENABLED) ?: false
             AutoWallpaperPreferences(
                 enabled = when {
                     !savedSearchEnabled && !favoritesEnabled && !localEnabled -> false
-                    savedSearchEnabled && savedSearchId <= 0 -> false
                     else -> get(PreferencesKeys.ENABLE_AUTO_WALLPAPER) ?: false
                 },
                 savedSearchEnabled = savedSearchEnabled,

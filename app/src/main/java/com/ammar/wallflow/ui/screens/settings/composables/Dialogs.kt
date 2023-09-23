@@ -1,5 +1,6 @@
 package com.ammar.wallflow.ui.screens.settings.composables
 
+import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider as CPPP
 import android.content.res.Configuration
 import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
@@ -55,7 +56,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider as CPPP
 import androidx.compose.ui.unit.dp
 import androidx.work.Constraints
 import com.ammar.wallflow.DISABLED_ALPHA
@@ -693,7 +693,14 @@ fun AutoWallpaperSourceOptionsDialog(
                     localEnabled = localPrefs.localEnabled,
                     localDirectories = localDirectories,
                     onChangeSavedSearchEnabled = {
-                        localPrefs = localPrefs.copy(savedSearchEnabled = it)
+                        localPrefs = localPrefs.copy(
+                            savedSearchEnabled = it,
+                            savedSearchId = if (localPrefs.savedSearchId <= 0) {
+                                savedSearches.firstOrNull()?.id ?: -1
+                            } else {
+                                localPrefs.savedSearchId
+                            },
+                        )
                     },
                     onChangeFavoritesEnabled = {
                         localPrefs = localPrefs.copy(favoritesEnabled = it)
