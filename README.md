@@ -37,13 +37,13 @@
 
 <div align="center">
 
-| <img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" alt="Home" width="150"> | <img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/2_dark.png" alt="Filters" width="150"> | <img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" alt="Wallpaper Info" width="150"> | <img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/4.png" alt="Search History" width="150"> |
-|:--------------------------------------------------------------------------------------------------:|:----------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------:|:------------------------------------------------------------------------------------------------------------:|
-|                                            <b>Home</b>                                             |                                               <b>Filters</b>                                               |                                            <b>Wallpaper Info</b>                                             |                                            <b>Search History</b>                                             |
+| <img src="./src/base/fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" alt="Home" width="150"> | <img src="./src/base/fastlane/metadata/android/en-US/images/phoneScreenshots/2_dark.png" alt="Filters" width="150"> | <img src="./src/base/fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" alt="Wallpaper Info" width="150"> | <img src="./src/base/fastlane/metadata/android/en-US/images/phoneScreenshots/4.png" alt="Search History" width="150"> |
+|:-----------------------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------:|
+|                                                 <b>Home</b>                                                 |                                                   <b>Filters</b>                                                    |                                                 <b>Wallpaper Info</b>                                                 |                                                 <b>Search History</b>                                                 |
 
-| <img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/5.png" alt="Crop and Set Wallpaper" width="150"> | <img src="./fastlane/metadata/android/en-US/images/phoneScreenshots/6.png" alt="Settings 1" width="150"> |
-|:--------------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------:|
-|                                            <b>Crop and Set Wallpaper</b>                                             |                                             <b>Settings</b>                                              |
+| <img src="./src/base/fastlane/metadata/android/en-US/images/phoneScreenshots/5.png" alt="Crop and Set Wallpaper" width="150"> | <img src="./src/base/fastlane/metadata/android/en-US/images/phoneScreenshots/6.png" alt="Settings 1" width="150"> |
+|:-----------------------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------------------------:|
+|                                                 <b>Crop and Set Wallpaper</b>                                                 |                                                  <b>Settings</b>                                                  |
 
 </div>
 
@@ -74,6 +74,7 @@ Two versions are provided (both free and open-source)
 **All other features are same in both versions.**
 
 ## Roadmap
+
 - [ ] Add more sources
 - [ ] Support foldables inner and outer screens together
 - [ ] More theme colors
