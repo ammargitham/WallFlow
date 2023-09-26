@@ -120,8 +120,8 @@
     <string name="not_scheduled">"Не планируется"</string>
     <string name="next_run_at">"Следующий запуск на %1 (<i>приблизительно</i>)"</string>
     <string name="next_run_time_info">
-        "This is the earliest time that the system will consider running auto wallpaper.
-Auto wallpaper will almost never run at this time. It is dependent on many factors like the underlying system scheduler, doze and power saving modes of the OS, and meeting any configured constraints."
+        "Это первый момент, когда система рассматривает возможность запуска смены обоев. 
+Смена обоев в настоящее время почти никогда не запускается. Это зависит от многих факторов, таких как базовый системный планировщик, режимы сна и энергосбережения ОС, а также соответствие любым настроенным ограничениям."
     </string>
     <string name="show_change_notification">"Показывать уведомление после изменения обоев"</string>
     <string name="notification">"Уведомление"</string>
@@ -208,7 +208,7 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="cleanup_channel_name">"Очистка кеша"</string>
     <string name="cleanup_channel_description">"Канал для отображения старого кеша и уведомления о ходе очистки файлов"</string>
     <string name="cache_clean_up">"Кеш очищен"</string>
-    <string name="object_detection_setting_warning">Note: If you face any errors or crash during object detection, try choosing a different delegate. If none of the delegates work on your device, turn off object detection</string>
+    <string name="object_detection_setting_warning">"Примечание: Если при обнаружении объекта вы столкнулись с какими-либо ошибками или сбоями, попробуйте выбрать другого делегата. Если ни один из делегатов не работает на вашем устройстве, отключите обнаружение объектов."</string>
     <string name="grid_col_type">"Тип столбца сетки"</string>
     <string name="adaptive">"Адаптивный"</string>
     <string name="fixed">"Фиксированный"</string>
