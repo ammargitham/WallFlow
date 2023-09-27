@@ -10,7 +10,7 @@
     <string name="settings">"Настройки"</string>
     <string name="back">"Назад"</string>
     <string name="wallhaven_api_key">"Ключ API Wallhaven"</string>
-    <string name="wallhaven_api_key_desc">"Необходим для просмотра NSFW контента"<string>
+    <string name="wallhaven_api_key_desc">"Необходим для просмотра NSFW контента"</string>
     <string name="confirm">"Подтвердить"</string>
     <string name="dismiss">"Отклонить"</string>
     <string name="properties">"Свойства"</string>
@@ -53,7 +53,7 @@
     <string name="purities_supp">"пробы: %1$s"</string>
     <string name="account">"Аккаунт"</string>
     <string name="set">"Установить"</string>
-    <string name="detecting">"Обнаружение..."</string>
+    <string name="detecting">"Обнаружение…"</string>
     <string name="zero_detected_objects">"Нет объектов"</string>
     <string name="confidence_score">"Доверие: %.2f"</string>
     <string name="object_detection">"Обнаружение объекта"</string>
@@ -120,7 +120,7 @@
     <string name="not_scheduled">"Не планируется"</string>
     <string name="next_run_at">"Следующий запуск на %1 (<i>приблизительно</i>)"</string>
     <string name="next_run_time_info">
-        "Это первый момент, когда система рассматривает возможность запуска смены обоев. 
+        "Это первый момент, когда система рассматривает возможность запуска смены обоев.
 Смена обоев в настоящее время почти никогда не запускается. Это зависит от многих факторов, таких как базовый системный планировщик, режимы сна и энергосбережения ОС, а также соответствие любым настроенным ограничениям."
     </string>
     <string name="show_change_notification">"Показывать уведомление после изменения обоев"</string>
@@ -152,7 +152,7 @@
     <string name="included_tags_keywords">"Включённые теги/ключевые слова"</string>
     <string name="excluded_tags_keywords">"Исключённые теги/ключевые слова"</string>
     <string name="categories">"Категории"</string>
-    <string name="purity">Purity</string>
+    <string name="purity">"Чистота"</string>
     <string name="sorting">"Сортировка"</string>
     <string name="top_range">"Топ"</string>
     <string name="order">"Давние"</string>
@@ -195,7 +195,7 @@
     <string name="no_of_columns">"Кол-во столбцов"</string>
     <string name="grid_type">"Тип сетки"</string>
     <string name="staggered">"Мозаика"</string>
-    <string nname="fixed_size">"Фиксированная"</string>
+    <string name="fixed_size">"Фиксированная"</string>
     <string name="rounded_corners">"Закруглённые углы"</string>
     <string name="wallpaper_preview">"Предпросмотр обоев"</string>
     <string name="system">"Системная"</string>
@@ -249,10 +249,15 @@
     <string name="restore_failed">"Восстановление не удалось!"</string>
     <plurals name="every_x_hrs">
         <item quantity="one">"Каждый %d час"</item>
-        <item quantity="other">"Каждые %d часов"</item>
+        <item quantity="few">"Каждые %d часа"</item>
+        <item quantity="many">"Каждые %d часов"</item>
     </plurals>
     <plurals name="num_detected_objects">
         <item quantity="one">"%d объект"</item>
-        <item quantity="other">"%d объектов"</item>
+        <item quantity="few">"%d объекта"</item>
+        <item quantity="many">"%d объектов"</item>
     </plurals>
+    <string name="mark_as_favorite">"Отменить как избранное"</string>
+    <string name="auto_wallpaper_mark_as_favorite_desc">"Отметить обои как избранные при использовании для смены обоев"</string>
+    <string name="auto_wallpaper_download_desc">"Загрузка обоев при их использовании для смены обоев"</string>
 </resources>
