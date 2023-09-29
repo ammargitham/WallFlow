@@ -6,7 +6,8 @@ Features
 * Auto wallpaper changer
 * Save searches
 * Mark wallpapers as favorite
-* Use saved searches and favorites in auto wallpaper
+* Local Wallpapers
+* Use saved searches, favorites, and local wallpapers in auto wallpaper
 * Search history
 * Supports all filters provided by wallhaven.cc
 * Search results caching to reduce api calls

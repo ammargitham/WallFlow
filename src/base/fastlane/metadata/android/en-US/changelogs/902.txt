@@ -1,0 +1,13 @@
+What's New:
+* Added setting to automatically download wallpaper when applied via auto wallpaper changer
+* Added setting to mark wallpaper as favorite when applied via auto wallpaper changer
+* Added multiple ways to quickly change wallpapers
+  * Added a QuickSettings tile
+  * Added a launcher shortcut (long press icon on home screen to see shortcut)
+  * Added a broadcast receiver to allow triggering via automation (See README for details)
+* Added Russian locale (Thanks to Makar Razin)
+* Dropped support for Marshmallow (Android 6) (API 23)
+
+Bug Fixes:
+* Fix auto wallpaper bug when a saved search is deleted
+* Fix crash on Android 7
