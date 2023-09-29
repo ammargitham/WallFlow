@@ -51,6 +51,11 @@
                 <data android:pathPattern="/w/.*" />
                 <data android:pathPattern="/.*" />
             </intent-filter>
+
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
+
         </activity>
         <activity
             android:name=".activities.setwallpaper.SetWallpaperActivity"
@@ -64,18 +69,42 @@
                 <data android:mimeType="image/*" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".activities.changewallpaper.ChangeWallpaperActivity"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:icon="@mipmap/ic_change_wallpaper"
+            android:launchMode="singleTask"
+            android:theme="@style/Theme.WallFlow.Dialog" />
 
         <service
             android:name="androidx.work.impl.foreground.SystemForegroundService"
             android:directBootAware="false"
             android:enabled="@bool/enable_system_foreground_service_default"
             android:exported="false"
-            android:foregroundServiceType="dataSync|shortService"
-            tools:targetApi="n" />
+            android:foregroundServiceType="dataSync|shortService" />
 
         <service
             android:name=".services.DownloadSuccessActionsService"
             android:exported="false" />
+
+        <service
+            android:name=".services.ChangeWallpaperTileService"
+            android:exported="true"
+            android:icon="@drawable/outline_wallpaper_24"
+            android:label="@string/change_wallpaper_tile_label"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.service.quicksettings.ACTIVE_TILE"
+                android:value="true" />
+            <meta-data
+                android:name="android.service.quicksettings.TOGGLEABLE_TILE"
+                android:value="true" />
+        </service>
 
         <provider
             android:name="androidx.core.content.FileProvider"
@@ -96,5 +125,16 @@
                 android:value="androidx.startup"
                 tools:node="remove" />
         </provider>
+
+        <receiver
+            android:name=".receivers.ChangeWallpaperBroadcastReceiver"
+            android:enabled="true"
+            android:exported="true"
+            tools:ignore="ExportedReceiver">
+            <intent-filter>
+                <action android:name="com.ammar.wallflow.ACTION_CHANGE_WALLPAPER" />
+            </intent-filter>
+        </receiver>
+
     </application>
 </manifest>

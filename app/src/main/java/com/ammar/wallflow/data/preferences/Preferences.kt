@@ -49,4 +49,5 @@ object PreferencesKeys {
     val LAYOUT_GRID_COL_MIN_WIDTH_PCT = intPreferencesKey("layout_grid_col_min_width_pct")
     val LAYOUT_ROUNDED_CORNERS = booleanPreferencesKey("layout_rounded_corners")
     val SHOW_LOCAL_TAB = booleanPreferencesKey("show_local_tab")
+    val CHANGE_WALLPAPER_TILE_ADDED = booleanPreferencesKey("change_wallpaper_tile_added")
 }

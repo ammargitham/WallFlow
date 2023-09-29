@@ -137,6 +137,12 @@ class AppPreferencesRepository @Inject constructor(
         }
     }
 
+    suspend fun updateTileAdded(added: Boolean) {
+        dataStore.edit {
+            it[PreferencesKeys.CHANGE_WALLPAPER_TILE_ADDED] = added
+        }
+    }
+
     private fun mapAppPreferences(preferences: Preferences) = AppPreferences(
         wallhavenApiKey = preferences[PreferencesKeys.WALLHAVEN_API_KEY] ?: "",
         homeSearch = Search(
@@ -231,6 +237,8 @@ class AppPreferencesRepository @Inject constructor(
             ),
             showLocalTab = preferences[PreferencesKeys.SHOW_LOCAL_TAB] ?: true,
         ),
+        changeWallpaperTileAdded = preferences[PreferencesKeys.CHANGE_WALLPAPER_TILE_ADDED]
+            ?: false,
     )
 
     private fun parseFrequency(freqStr: String?) = try {

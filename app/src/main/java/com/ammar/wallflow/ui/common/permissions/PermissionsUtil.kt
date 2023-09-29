@@ -16,7 +16,6 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
-import com.ammar.wallflow.extensions.isSetWallpaperAllowedCompat
 import com.ammar.wallflow.extensions.wallpaperManager
 import com.google.modernstorage.permissions.StoragePermissions
 
@@ -114,8 +113,7 @@ internal fun Context.checkNotificationPermission() = NotificationManagerCompat.f
 
 internal fun Context.checkSetWallpaperPermission(): Boolean {
     val wallpaperManager = wallpaperManager
-    return wallpaperManager.isWallpaperSupported &&
-        wallpaperManager.isSetWallpaperAllowedCompat
+    return wallpaperManager.isWallpaperSupported && wallpaperManager.isSetWallpaperAllowed
 }
 
 @SuppressLint("InlinedApi")

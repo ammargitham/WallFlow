@@ -33,7 +33,7 @@ android {
 
     defaultConfig {
         applicationId = "com.ammar.wallflow"
-        minSdk = 23
+        minSdk = 24
         targetSdk = 34
         versionCode = 8
         versionName = "1.3.1"
@@ -46,11 +46,6 @@ android {
         }
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        // testInstrumentationRunnerArguments["useTestStorageService"] = "true"
-
-        vectorDrawables {
-            useSupportLibrary = true
-        }
 
         ksp {
             arg("room.generateKotlin", "true")
@@ -144,6 +139,7 @@ android {
     }
 
     compileOptions {
+        isCoreLibraryDesugaringEnabled = true
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
@@ -225,6 +221,8 @@ tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach 
 val plusImplementation by configurations
 
 dependencies {
+    coreLibraryDesugaring(libs.android.tools.desugar)
+
     // Core Android dependencies
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)

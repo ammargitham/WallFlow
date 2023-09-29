@@ -83,7 +83,6 @@ fun WallFlowTheme(
     val view = LocalView.current
     if (!view.isInEditMode) {
         val currentWindow = (view.context as? Activity)?.window
-            ?: throw Exception("Not in an activity - unable to get Window reference")
 
         val systemBarColor = colorScheme.surface
         val animatedStatusBarColor by animateColorAsState(
@@ -101,6 +100,9 @@ fun WallFlowTheme(
             darkTheme,
             statusBarVisible,
         ) {
+            if (currentWindow == null) {
+                return@LaunchedEffect
+            }
             currentWindow.statusBarColor = animatedStatusBarColor.toArgb()
             currentWindow.navigationBarColor = animatedNavigationBarColor.toArgb()
             val insetsController = WindowCompat.getInsetsController(currentWindow, view)

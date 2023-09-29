@@ -250,6 +250,11 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="mark_as_favorite">Mark as Favorite</string>
     <string name="auto_wallpaper_mark_as_favorite_desc">Mark wallpapers as favorite when used in auto wallpaper</string>
     <string name="auto_wallpaper_download_desc">Download wallpaper when used in auto wallpaper</string>
+    <string name="change_wallpaper_tile_label">Change Wallpaper</string>
+    <string name="no_sources_set">No sources set</string>
+    <string name="set_sources">Set Sources</string>
+    <string name="tap_to_change_wallpaper">Tap to change wallpaper</string>
+    <string name="changing">Changing…</string>
     <plurals name="every_x_hrs">
         <item quantity="one">Every %d hour</item>
         <item quantity="other">Every %d hours</item>

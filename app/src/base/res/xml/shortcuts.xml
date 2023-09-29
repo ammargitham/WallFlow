@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <shortcut
+        android:enabled="true"
+        android:icon="@mipmap/ic_change_wallpaper"
+        android:shortcutId="change_wallpaper"
+        android:shortcutLongLabel="@string/change_wallpaper_tile_label"
+        android:shortcutShortLabel="@string/change_wallpaper_tile_label"
+        tools:targetApi="n_mr1">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetClass="com.ammar.wallflow.activities.changewallpaper.ChangeWallpaperActivity"
+            android:targetPackage="com.ammar.wallflow" />
+    </shortcut>
+
+</shortcuts>

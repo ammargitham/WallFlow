@@ -25,6 +25,7 @@ import com.ammar.wallflow.extensions.workManager
 import com.ammar.wallflow.model.ObjectDetectionModel
 import com.ammar.wallflow.model.SavedSearch
 import com.ammar.wallflow.model.local.LocalDirectory
+import com.ammar.wallflow.services.ChangeWallpaperTileService
 import com.ammar.wallflow.utils.DownloadManager
 import com.ammar.wallflow.utils.DownloadStatus
 import com.ammar.wallflow.utils.combine
@@ -36,6 +37,7 @@ import com.github.materiiapps.partial.partial
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.File
 import javax.inject.Inject
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -69,6 +71,7 @@ class SettingsViewModel @Inject constructor(
                 )
             },
     )
+    private var changeNowJob: Job? = null
 
     val uiState = combine(
         appPreferencesRepository.appPreferencesFlow,
@@ -348,6 +351,10 @@ class SettingsViewModel @Inject constructor(
         }
         viewModelScope.launch {
             appPreferencesRepository.updateAutoWallpaperPrefs(prefs)
+            val tileAdded = uiState.value.appPreferences.changeWallpaperTileAdded
+            if (tileAdded) {
+                ChangeWallpaperTileService.requestListeningState(application)
+            }
             if (prefs.enabled) {
                 // only reschedule if enabled or frequency or constraints change
                 val currentPrefs = uiState.value.appPreferences.autoWallpaperPreferences
@@ -397,17 +404,19 @@ class SettingsViewModel @Inject constructor(
         }
 
     fun autoWallpaperChangeNow() {
-        AutoWallpaperWorker.triggerImmediate(application)
-        viewModelScope.launch {
+        changeNowJob?.cancel()
+        changeNowJob = viewModelScope.launch {
+            val requestId = AutoWallpaperWorker.triggerImmediate(application)
             AutoWallpaperWorker.getProgress(
-                application,
-                AutoWallpaperWorker.IMMEDIATE_WORK_NAME,
+                context = application,
+                requestId = requestId,
             ).collectLatest { status ->
                 localUiStateFlow.update { it.copy(autoWallpaperStatus = partial(status)) }
                 if (status.isSuccessOrFail()) {
                     // clear status after success or failure
                     delay(2000)
                     localUiStateFlow.update { it.copy(autoWallpaperStatus = partial(null)) }
+                    changeNowJob?.cancel()
                 }
             }
         }

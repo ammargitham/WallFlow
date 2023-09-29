@@ -2,7 +2,6 @@ package com.ammar.wallflow.ui.screens.crop
 
 import android.content.res.Configuration
 import android.graphics.Bitmap
-import android.os.Build
 import android.view.Display
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -138,7 +137,6 @@ internal fun Actions(
         Spacer(modifier = Modifier.requiredWidth(8.dp))
         Column {
             SetButton(
-                showTargetOptions = Build.VERSION.SDK_INT >= Build.VERSION_CODES.N,
                 onHomeScreenClick = { onSetClick(setOf(WallpaperTarget.HOME)) },
                 onLockScreenClick = { onSetClick(setOf(WallpaperTarget.LOCKSCREEN)) },
                 onBothClick = {

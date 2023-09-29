@@ -56,6 +56,7 @@ import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.local.LocalWallpaper
 import com.ammar.wallflow.model.toSearchQuery
 import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
+import com.ammar.wallflow.services.ChangeWallpaperTileService
 import com.ammar.wallflow.ui.common.permissions.checkNotificationPermission
 import com.ammar.wallflow.ui.screens.crop.getCropRect
 import com.ammar.wallflow.ui.screens.crop.getMaxCropSize
@@ -69,6 +70,7 @@ import com.ammar.wallflow.utils.objectdetection.detectObjects
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.io.File
+import java.util.UUID
 import java.util.concurrent.TimeUnit
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
@@ -129,7 +131,6 @@ class AutoWallpaperWorker @AssistedInject constructor(
     )
 
     override suspend fun doWork(): Result {
-        // get auto wallpaper preferences
         appPreferences = appPreferencesRepository.appPreferencesFlow.firstOrNull()
             ?: return Result.failure(
                 workDataOf(
@@ -137,18 +138,29 @@ class AutoWallpaperWorker @AssistedInject constructor(
                 ),
             )
         autoWallpaperPreferences = appPreferences.autoWallpaperPreferences
-        if (!autoWallpaperPreferences.enabled) {
+        val tileAdded = appPreferences.changeWallpaperTileAdded
+        try {
+            if (tileAdded) {
+                ChangeWallpaperTileService.requestListeningState(context)
+            }
+            return doWorkActual()
+        } finally {
+            if (tileAdded) {
+                ChangeWallpaperTileService.requestListeningState(context)
+            }
+        }
+    }
+
+    private suspend fun doWorkActual(): Result {
+        val forced = inputData.getBoolean(INPUT_FORCE, false)
+        if (!autoWallpaperPreferences.enabled && !forced) {
             return Result.failure(
                 workDataOf(
                     FAILURE_REASON to FailureReason.DISABLED.name,
                 ),
             )
         }
-        if (
-            !autoWallpaperPreferences.savedSearchEnabled &&
-            !autoWallpaperPreferences.favoritesEnabled &&
-            !autoWallpaperPreferences.localEnabled
-        ) {
+        if (!autoWallpaperPreferences.anySourceEnabled) {
             return Result.failure(
                 workDataOf(
                     FAILURE_REASON to FailureReason.NO_SOURCES_ENABLED.name,
@@ -510,8 +522,9 @@ class AutoWallpaperWorker @AssistedInject constructor(
     companion object {
         const val FAILURE_REASON = "failure_reason"
         const val SUCCESS_NEXT_WALLPAPER_ID = "success_wallpaper_id"
-        internal const val IMMEDIATE_WORK_NAME = "auto_wallpaper_immediate"
+        private const val IMMEDIATE_WORK_NAME = "auto_wallpaper_immediate"
         internal const val PERIODIC_WORK_NAME = "auto_wallpaper_periodic"
+        internal const val INPUT_FORCE = "auto_wallpaper_force"
 
         enum class FailureReason {
             APP_PREFS_NULL,
@@ -540,6 +553,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
                 request,
             )
             appPreferencesRepository.updateAutoWallpaperWorkRequestId(request.id)
+            Log.i(TAG, "Auto wallpaper worker scheduled!")
         }
 
         suspend fun stop(
@@ -549,17 +563,33 @@ class AutoWallpaperWorker @AssistedInject constructor(
             Log.i(TAG, "Stopping auto wallpaper worker...")
             context.workManager.cancelUniqueWork(PERIODIC_WORK_NAME)
             appPreferencesRepository.updateAutoWallpaperWorkRequestId(null)
+            Log.i(TAG, "Auto wallpaper worker cancelled!")
         }
 
-        fun triggerImmediate(context: Context) {
+        suspend fun triggerImmediate(
+            context: Context,
+            force: Boolean = false,
+        ): UUID {
+            val workInfosFlow = context.workManager.getWorkInfosForUniqueWorkFlow(
+                IMMEDIATE_WORK_NAME,
+            )
+            val workInfos = workInfosFlow.firstOrNull()
+            val workInfo = workInfos?.firstOrNull {
+                it.state == WorkInfo.State.RUNNING || it.state == WorkInfo.State.ENQUEUED
+            }
+            if (workInfo != null) {
+                return workInfo.id
+            }
             val request = OneTimeWorkRequestBuilder<AutoWallpaperWorker>().apply {
                 setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
+                setInputData(workDataOf(INPUT_FORCE to force))
             }.build()
             context.workManager.enqueueUniqueWork(
                 IMMEDIATE_WORK_NAME,
-                ExistingWorkPolicy.REPLACE,
+                ExistingWorkPolicy.KEEP,
                 request,
             )
+            return request.id
         }
 
         suspend fun checkIfScheduled(
@@ -580,10 +610,10 @@ class AutoWallpaperWorker @AssistedInject constructor(
 
         fun getProgress(
             context: Context,
-            workName: String,
-        ) = context.workManager.getWorkInfosForUniqueWorkFlow(workName).map {
-            val info = it.firstOrNull() ?: return@map Status.Failed(
-                IllegalArgumentException("No download request found with name $workName"),
+            requestId: UUID,
+        ) = context.workManager.getWorkInfoByIdFlow(requestId).map {
+            val info = it ?: return@map Status.Failed(
+                IllegalArgumentException("No work found for requestId $requestId"),
             )
             when (info.state) {
                 WorkInfo.State.ENQUEUED -> Status.Pending
