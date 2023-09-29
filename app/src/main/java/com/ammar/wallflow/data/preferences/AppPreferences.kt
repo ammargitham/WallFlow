@@ -41,6 +41,7 @@ data class AppPreferences(
     val objectDetectionPreferences: ObjectDetectionPreferences = ObjectDetectionPreferences(),
     val autoWallpaperPreferences: AutoWallpaperPreferences = AutoWallpaperPreferences(),
     val lookAndFeelPreferences: LookAndFeelPreferences = LookAndFeelPreferences(),
+    val changeWallpaperTileAdded: Boolean = false,
 )
 
 enum class ObjectDetectionDelegate {
@@ -76,7 +77,11 @@ data class AutoWallpaperPreferences(
     val targets: Set<WallpaperTarget> = setOf(WallpaperTarget.HOME, WallpaperTarget.LOCKSCREEN),
     val markFavorite: Boolean = false,
     val download: Boolean = false,
-)
+) {
+    val anySourceEnabled = (savedSearchEnabled && savedSearchId > 0) ||
+        favoritesEnabled ||
+        localEnabled
+}
 
 val MutableStateAutoWallpaperPreferencesSaver =
     Saver<MutableState<AutoWallpaperPreferences>, String>(

@@ -109,16 +109,12 @@ fun Context.setWallpaper(
 ): Boolean {
     if (!checkSetWallpaperPermission()) return false
     val wallpaperManager = wallpaperManager
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        wallpaperManager.setBitmap(
-            bitmap,
-            null,
-            true,
-            targets.toWhichInt(),
-        )
-        return true
-    }
-    wallpaperManager.setBitmap(bitmap)
+    wallpaperManager.setBitmap(
+        bitmap,
+        null,
+        true,
+        targets.toWhichInt(),
+    )
     return true
 }
 
@@ -227,13 +223,6 @@ fun Context.getUriForFile(file: File): Uri = FileProvider.getUriForFile(
 
 val Context.wallpaperManager: WallpaperManager
     get() = WallpaperManager.getInstance(this)
-
-val WallpaperManager.isSetWallpaperAllowedCompat
-    get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        this.isSetWallpaperAllowed
-    } else {
-        true
-    }
 
 fun Context.findActivity(): Activity {
     var context = this

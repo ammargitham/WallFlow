@@ -1,7 +1,8 @@
 [versions]
 aboutLibraries = "10.9.0-b02"
 accompanist = "0.33.1-alpha"
-androidGradlePlugin = "8.2.0-beta05"
+androidGradlePlugin = "8.2.0-beta06"
+androidToolsDesugar = "2.0.3"
 androidxActivity = "1.7.2"
 # @keep
 androidxComposeCompiler = "1.5.3"
@@ -56,6 +57,7 @@ about-libraries-core = { module = "com.mikepenz:aboutlibraries-core", version.re
 accompanist-adaptive = { module = "com.google.accompanist:accompanist-adaptive", version.ref = "accompanist" }
 #accompanist-permission = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
 accompanist-placeholder-material = { module = "com.google.accompanist:accompanist-placeholder-material", version.ref = "accompanist" }
+android-tools-desugar = { module = "com.android.tools:desugar_jdk_libs", version.ref = "androidToolsDesugar" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidxCore" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidxActivity" }
 #androidx-compose-compiler = { module = "androidx.compose.compiler:compiler", version.ref = "androidxComposeCompiler" }

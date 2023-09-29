@@ -46,7 +46,6 @@ import coil.size.Scale
 import com.ammar.wallflow.R
 import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.extensions.aspectRatio
-import com.ammar.wallflow.extensions.isSetWallpaperAllowedCompat
 import com.ammar.wallflow.extensions.openUrl
 import com.ammar.wallflow.extensions.toDp
 import com.ammar.wallflow.extensions.toast
@@ -194,7 +193,7 @@ fun WallpaperViewer(
     val applyWallpaperEnabled by remember(context) {
         val wallpaperManager = context.wallpaperManager
         derivedStateOf {
-            wallpaperManager.isWallpaperSupported && wallpaperManager.isSetWallpaperAllowedCompat
+            wallpaperManager.isWallpaperSupported && wallpaperManager.isSetWallpaperAllowed
         }
     }
     Box(

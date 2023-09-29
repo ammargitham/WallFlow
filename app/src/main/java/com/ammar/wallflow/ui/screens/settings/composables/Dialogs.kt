@@ -693,7 +693,14 @@ fun AutoWallpaperSourceOptionsDialog(
                     localEnabled = localPrefs.localEnabled,
                     localDirectories = localDirectories,
                     onChangeSavedSearchEnabled = {
-                        localPrefs = localPrefs.copy(savedSearchEnabled = it)
+                        localPrefs = localPrefs.copy(
+                            savedSearchEnabled = it,
+                            savedSearchId = if (localPrefs.savedSearchId <= 0) {
+                                savedSearches.firstOrNull()?.id ?: -1
+                            } else {
+                                localPrefs.savedSearchId
+                            },
+                        )
                     },
                     onChangeFavoritesEnabled = {
                         localPrefs = localPrefs.copy(favoritesEnabled = it)

@@ -1,8 +1,6 @@
 package com.ammar.wallflow.ui.screens.settings.composables
 
-import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider as CPPP
 import android.content.res.Configuration
-import android.os.Build
 import android.text.format.DateFormat
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateValueAsState
@@ -49,6 +47,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider as CPPP
 import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.DISABLED_ALPHA
 import com.ammar.wallflow.R
@@ -466,32 +465,29 @@ internal fun LazyListScope.autoWallpaperSection(
             },
         )
     }
-    // Below N, there is no api to set wallpaper target
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        item {
-            ListItem(
-                modifier = Modifier.clickable(
-                    enabled = enabled,
-                    onClick = onSetToClick,
-                ),
-                headlineContent = {
+    item {
+        ListItem(
+            modifier = Modifier.clickable(
+                enabled = enabled,
+                onClick = onSetToClick,
+            ),
+            headlineContent = {
+                Text(
+                    text = stringResource(R.string.set_to),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
+                )
+            },
+            supportingContent = if (targets.isNotEmpty()) {
+                {
                     Text(
-                        text = stringResource(R.string.set_to),
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
+                        text = getTargetsSummary(targets),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = alpha),
                     )
-                },
-                supportingContent = if (targets.isNotEmpty()) {
-                    {
-                        Text(
-                            text = getTargetsSummary(targets),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = alpha),
-                        )
-                    }
-                } else {
-                    null
-                },
-            )
-        }
+                }
+            } else {
+                null
+            },
+        )
     }
     item {
         ListItem(
