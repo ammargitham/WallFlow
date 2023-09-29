@@ -73,6 +73,16 @@ Two versions are provided (both free and open-source)
 
 **All other features are same in both versions.**
 
+### Details to change wallpaper via broadcast (using Tasker or similar apps)
+- Package:
+  - For Base: `com.ammar.wallflow`
+  - For Plus: `com.ammar.wallflow.plus`
+- Action: `com.ammar.wallflow.ACTION_CHANGE_WALLPAPER`
+
+ADB command:
+- For Base: `am broadcast --user 0 -a com.ammar.wallflow.ACTION_CHANGE_WALLPAPER com.ammar.wallflow`
+- For Plus: `am broadcast --user 0 -a com.ammar.wallflow.ACTION_CHANGE_WALLPAPER com.ammar.wallflow.plus`
+
 ## Roadmap
 
 - [ ] Add more sources
