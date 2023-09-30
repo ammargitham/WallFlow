@@ -4,7 +4,6 @@ import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.ammar.wallflow.data.db.automigrationspecs.AutoMigration3To4Spec
 import com.ammar.wallflow.data.db.converters.Converters
 import com.ammar.wallflow.data.db.dao.AutoWallpaperHistoryDao
 import com.ammar.wallflow.data.db.dao.FavoriteDao
@@ -54,7 +53,6 @@ import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperTagsEntity
     version = 4,
     autoMigrations = [
         AutoMigration(from = 2, to = 3),
-        AutoMigration(from = 3, to = 4, spec = AutoMigration3To4Spec::class),
     ],
 )
 @TypeConverters(Converters::class)

@@ -8,6 +8,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.ammar.wallflow.IoDispatcher
 import com.ammar.wallflow.data.db.AppDatabase
 import com.ammar.wallflow.data.db.di.ManualMigrations.MIGRATION_1_2
+import com.ammar.wallflow.data.db.di.ManualMigrations.MIGRATION_3_4
 import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.model.ObjectDetectionModel
 import com.ammar.wallflow.model.toEntity
@@ -86,6 +87,7 @@ class DatabaseModule {
         ).apply {
             addMigrations(
                 MIGRATION_1_2,
+                MIGRATION_3_4,
             )
             addCallback(
                 object : RoomDatabase.Callback() {
