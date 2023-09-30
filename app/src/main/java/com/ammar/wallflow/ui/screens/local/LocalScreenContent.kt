@@ -201,10 +201,10 @@ private fun Feed(
                 icon = {
                     Icon(
                         painter = painterResource(R.drawable.baseline_folder_cog_24),
-                        contentDescription = stringResource(R.string.manage_dirs),
+                        contentDescription = stringResource(R.string.manage),
                     )
                 },
-                text = { Text(text = stringResource(R.string.manage_dirs)) },
+                text = { Text(text = stringResource(R.string.manage)) },
             )
         } else {
             Column(

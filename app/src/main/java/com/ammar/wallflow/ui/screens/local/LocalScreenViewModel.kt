@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.ammar.wallflow.data.db.entity.toFavorite
 import com.ammar.wallflow.data.preferences.LayoutPreferences
+import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.FavoritesRepository
 import com.ammar.wallflow.data.repository.local.LocalWallpapersRepository
 import com.ammar.wallflow.extensions.accessibleFolders
@@ -39,26 +40,42 @@ class LocalScreenViewModel @Inject constructor(
     private val application: Application,
     private val localWallpapersRepository: LocalWallpapersRepository,
     private val favoritesRepository: FavoritesRepository,
+    private val appPreferencesRepository: AppPreferencesRepository,
 ) : AndroidViewModel(application) {
     private val localUiState = MutableStateFlow(LocalScreenUiStatePartial())
     private val foldersFlow = localUiState
         .map { it.folders.getOrElse { persistentListOf() } }
         .distinctUntilChanged()
+    private val appPreferencesFlow = appPreferencesRepository.appPreferencesFlow
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val wallpapers = foldersFlow.mapLatest {
+    private val foldersUriFlow = foldersFlow.mapLatest {
         it.map { dir -> dir.uri }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val wallpapers = combine(
+        foldersUriFlow,
+        appPreferencesFlow,
+    ) { folders, appPrefs ->
+        folders to appPrefs.localWallpapersPreferences.sort
     }.flatMapLatest {
-        localWallpapersRepository.wallpapersPager(application, it)
+        localWallpapersRepository.wallpapersPager(
+            context = application,
+            uris = it.first,
+            sort = it.second,
+        )
     }.cachedIn(viewModelScope)
 
     val uiState = combine(
         localUiState,
         favoritesRepository.observeAll(),
-    ) { local, favorites ->
+        appPreferencesFlow,
+    ) { local, favorites, appPrefs ->
         local.merge(
             LocalScreenUiState(
                 favorites = favorites.map { it.toFavorite() }.toImmutableList(),
+                sort = appPrefs.localWallpapersPreferences.sort,
             ),
         )
     }.stateIn(
@@ -102,6 +119,10 @@ class LocalScreenViewModel @Inject constructor(
             source = wallpaper.source,
         )
     }
+
+    fun updateSort(sort: LocalSort) = viewModelScope.launch {
+        appPreferencesRepository.updateLocalWallpapersSort(sort)
+    }
 }
 
 @Stable
@@ -112,4 +133,11 @@ data class LocalScreenUiState(
     val selectedWallpaper: Wallpaper? = null,
     val layoutPreferences: LayoutPreferences = LayoutPreferences(),
     val favorites: ImmutableList<Favorite> = persistentListOf(),
+    val sort: LocalSort = LocalSort.NO_SORT,
 )
+
+enum class LocalSort {
+    NO_SORT,
+    NAME,
+    LAST_MODIFIED,
+}

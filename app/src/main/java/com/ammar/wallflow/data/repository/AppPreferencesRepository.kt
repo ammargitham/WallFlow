@@ -11,6 +11,7 @@ import com.ammar.wallflow.data.preferences.AutoWallpaperPreferences
 import com.ammar.wallflow.data.preferences.GridColType
 import com.ammar.wallflow.data.preferences.GridType
 import com.ammar.wallflow.data.preferences.LayoutPreferences
+import com.ammar.wallflow.data.preferences.LocalWallpapersPreferences
 import com.ammar.wallflow.data.preferences.LookAndFeelPreferences
 import com.ammar.wallflow.data.preferences.ObjectDetectionDelegate
 import com.ammar.wallflow.data.preferences.ObjectDetectionPreferences
@@ -27,6 +28,7 @@ import com.ammar.wallflow.model.Sorting
 import com.ammar.wallflow.model.TopRange
 import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.model.serializers.constraintTypeMapSerializer
+import com.ammar.wallflow.ui.screens.local.LocalSort
 import com.ammar.wallflow.utils.objectdetection.objectsDetector
 import java.io.IOException
 import java.util.UUID
@@ -137,9 +139,15 @@ class AppPreferencesRepository @Inject constructor(
         }
     }
 
-    suspend fun updateTileAdded(added: Boolean) {
+    suspend fun updateTileAdded(added: Boolean) = withContext(ioDispatcher) {
         dataStore.edit {
             it[PreferencesKeys.CHANGE_WALLPAPER_TILE_ADDED] = added
+        }
+    }
+
+    suspend fun updateLocalWallpapersSort(sort: LocalSort) = withContext(ioDispatcher) {
+        dataStore.edit {
+            it[PreferencesKeys.LOCAL_WALLPAPERS_SORT] = sort.name
         }
     }
 
@@ -226,7 +234,9 @@ class AppPreferencesRepository @Inject constructor(
                     GridType.STAGGERED
                 },
                 gridColType = try {
-                    GridColType.valueOf(preferences[PreferencesKeys.LAYOUT_GRID_COL_TYPE] ?: "")
+                    GridColType.valueOf(
+                        preferences[PreferencesKeys.LAYOUT_GRID_COL_TYPE] ?: "",
+                    )
                 } catch (e: Exception) {
                     GridColType.ADAPTIVE
                 },
@@ -239,6 +249,13 @@ class AppPreferencesRepository @Inject constructor(
         ),
         changeWallpaperTileAdded = preferences[PreferencesKeys.CHANGE_WALLPAPER_TILE_ADDED]
             ?: false,
+        localWallpapersPreferences = LocalWallpapersPreferences(
+            sort = try {
+                LocalSort.valueOf(preferences[PreferencesKeys.LOCAL_WALLPAPERS_SORT] ?: "")
+            } catch (e: Exception) {
+                LocalSort.NO_SORT
+            },
+        ),
     )
 
     private fun parseFrequency(freqStr: String?) = try {
@@ -286,5 +303,6 @@ class AppPreferencesRepository @Inject constructor(
         updateObjectDetectionPrefs(appPreferences.objectDetectionPreferences)
         updateAutoWallpaperPrefs(appPreferences.autoWallpaperPreferences)
         updateLookAndFeelPreferences(appPreferences.lookAndFeelPreferences)
+        updateLocalWallpapersSort(appPreferences.localWallpapersPreferences.sort)
     }
 }

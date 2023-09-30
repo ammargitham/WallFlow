@@ -25,6 +25,7 @@ import com.ammar.wallflow.model.SearchQuery
 import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.local.LocalWallpaper
+import com.ammar.wallflow.ui.screens.local.LocalSort
 import kotlinx.coroutines.flow.Flow
 import okhttp3.Call
 import okhttp3.OkHttpClient
@@ -287,6 +288,7 @@ internal open class FakeLocalWallpapersRepository : LocalWallpapersRepository {
     override fun wallpapersPager(
         context: Context,
         uris: Collection<Uri>,
+        sort: LocalSort,
     ): Flow<PagingData<Wallpaper>> {
         throw RuntimeException()
     }

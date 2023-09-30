@@ -13,6 +13,7 @@ import com.ammar.wallflow.data.repository.utils.Resource
 import com.ammar.wallflow.extensions.deepListFiles
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.local.LocalWallpaper
+import com.ammar.wallflow.ui.screens.local.LocalSort
 import com.lazygeniouz.dfc.file.DocumentFileCompat
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -28,10 +29,11 @@ class DefaultLocalWallpapersRepository @Inject constructor(
     override fun wallpapersPager(
         context: Context,
         uris: Collection<Uri>,
+        sort: LocalSort,
     ) = flow {
         emit(
             PagingData.from(
-                getAllLocalWallpapers(context, uris),
+                getAllLocalWallpapers(context, uris, sort),
                 sourceLoadStates = LoadStates(
                     refresh = LoadState.NotLoading(endOfPaginationReached = true),
                     prepend = LoadState.NotLoading(endOfPaginationReached = true),
@@ -44,14 +46,25 @@ class DefaultLocalWallpapersRepository @Inject constructor(
     private fun getAllLocalWallpapers(
         context: Context,
         uris: Collection<Uri>,
+        sort: LocalSort = LocalSort.NO_SORT,
     ) = uris.fold(mutableListOf<Wallpaper>()) { acc, uri ->
-        val files = DocumentFileCompat.fromTreeUri(
+        var tempFiles = DocumentFileCompat.fromTreeUri(
             context = context,
             uri = uri,
         )
             ?.deepListFiles()
             ?.filter { it.getType() in SUPPORTED_MIME_TYPES }
             ?.distinctBy { it.uri }
+        if (sort != LocalSort.NO_SORT) {
+            tempFiles = tempFiles?.sortedWith(
+                when (sort) {
+                    LocalSort.NAME -> compareBy { it.name }
+                    LocalSort.LAST_MODIFIED -> compareBy { it.lastModified }
+                    else -> compareBy { null }
+                },
+            )
+        }
+        val files = tempFiles
             ?.map { dfcToLocalWallpaper(context, it) }
             ?: emptyList()
         acc.addAll(files)

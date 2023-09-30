@@ -20,6 +20,7 @@ import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.model.serializers.ConstraintsSerializer
 import com.ammar.wallflow.model.serializers.DateTimePeriodSerializer
 import com.ammar.wallflow.model.serializers.UUIDSerializer
+import com.ammar.wallflow.ui.screens.local.LocalSort
 import java.util.UUID
 import kotlinx.datetime.DateTimePeriod
 import kotlinx.serialization.Serializable
@@ -42,6 +43,7 @@ data class AppPreferences(
     val autoWallpaperPreferences: AutoWallpaperPreferences = AutoWallpaperPreferences(),
     val lookAndFeelPreferences: LookAndFeelPreferences = LookAndFeelPreferences(),
     val changeWallpaperTileAdded: Boolean = false,
+    val localWallpapersPreferences: LocalWallpapersPreferences = LocalWallpapersPreferences(),
 )
 
 enum class ObjectDetectionDelegate {
@@ -128,4 +130,9 @@ data class LayoutPreferences(
     @IntRange(minGridCols, maxGridCols) val gridColCount: Int = 2,
     @IntRange(minGridColWidthPct, maxGridColWidthPct) val gridColMinWidthPct: Int = 40,
     val roundedCorners: Boolean = true,
+)
+
+@Serializable
+data class LocalWallpapersPreferences(
+    val sort: LocalSort = LocalSort.NO_SORT,
 )

@@ -11,12 +11,14 @@ import com.ammar.wallflow.MIME_TYPE_WEBP
 import com.ammar.wallflow.data.repository.utils.Resource
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.local.LocalWallpaper
+import com.ammar.wallflow.ui.screens.local.LocalSort
 import kotlinx.coroutines.flow.Flow
 
 interface LocalWallpapersRepository {
     fun wallpapersPager(
         context: Context,
         uris: Collection<Uri>,
+        sort: LocalSort = LocalSort.NO_SORT,
     ): Flow<PagingData<Wallpaper>>
 
     fun wallpaper(

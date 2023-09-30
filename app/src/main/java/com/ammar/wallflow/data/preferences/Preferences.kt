@@ -50,4 +50,5 @@ object PreferencesKeys {
     val LAYOUT_ROUNDED_CORNERS = booleanPreferencesKey("layout_rounded_corners")
     val SHOW_LOCAL_TAB = booleanPreferencesKey("show_local_tab")
     val CHANGE_WALLPAPER_TILE_ADDED = booleanPreferencesKey("change_wallpaper_tile_added")
+    val LOCAL_WALLPAPERS_SORT = stringPreferencesKey("local_wallpapers_sort")
 }

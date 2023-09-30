@@ -170,6 +170,7 @@ fun LocalScreen(
     if (uiState.showManageFoldersSheet) {
         ManageFoldersBottomSheet(
             folders = uiState.folders,
+            sort = uiState.sort,
             onDismissRequest = { viewModel.showManageFoldersSheet(false) },
             onAddFolderClick = onAddFolderClick,
             onRemoveClick = {
@@ -179,6 +180,7 @@ fun LocalScreen(
                 )
                 viewModel.refreshFolders()
             },
+            onSortChange = viewModel::updateSort,
         )
     }
 }

@@ -255,6 +255,12 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="set_sources">Set Sources</string>
     <string name="tap_to_change_wallpaper">Tap to change wallpaper</string>
     <string name="changing">Changing…</string>
+    <string name="manage_local">Manage Local</string>
+    <string name="dirs">Directories</string>
+    <string name="sort">Sort</string>
+    <string name="no_sort">No sort</string>
+    <string name="last_modified">Last Modified</string>
+    <string name="manage">Manage</string>
     <plurals name="every_x_hrs">
         <item quantity="one">Every %d hour</item>
         <item quantity="other">Every %d hours</item>

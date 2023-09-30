@@ -39,7 +39,7 @@ kotlinxDatetime = "0.4.1"
 kotlinxSerializationJson = "1.6.0"
 ksp = "1.9.10-1.0.13"
 # @keep
-ktlint = "1.0.0"
+ktlint = "0.50.0"
 leakcanary = "2.12"
 mockk = "1.13.8"
 modernstorage = "1.0.0-alpha06"
