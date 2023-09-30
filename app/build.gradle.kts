@@ -334,7 +334,7 @@ dependencies {
     implementation(libs.documentfilecompat)
 
     // ExifInterface
-    implementation(libs.exifinterface)
+    implementation(libs.androidx.exifinterface)
 
     // LeakCanary
     debugImplementation(libs.leakcanary.android)
