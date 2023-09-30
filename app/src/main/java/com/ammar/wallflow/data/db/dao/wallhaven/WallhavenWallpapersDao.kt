@@ -1,4 +1,4 @@
-package com.ammar.wallflow.data.db.dao
+package com.ammar.wallflow.data.db.dao.wallhaven
 
 import androidx.paging.PagingSource
 import androidx.room.Dao

@@ -1,4 +1,4 @@
-package com.ammar.wallflow.data.db.dao
+package com.ammar.wallflow.data.db.dao.wallhaven
 
 import androidx.room.Dao
 import androidx.room.Insert

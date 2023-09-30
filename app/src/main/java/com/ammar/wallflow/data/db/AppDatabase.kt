@@ -14,11 +14,11 @@ import com.ammar.wallflow.data.db.dao.SavedSearchDao
 import com.ammar.wallflow.data.db.dao.SearchHistoryDao
 import com.ammar.wallflow.data.db.dao.SearchQueryDao
 import com.ammar.wallflow.data.db.dao.SearchQueryRemoteKeysDao
-import com.ammar.wallflow.data.db.dao.WallhavenPopularTagsDao
-import com.ammar.wallflow.data.db.dao.WallhavenSearchQueryWallpapersDao
-import com.ammar.wallflow.data.db.dao.WallhavenTagsDao
-import com.ammar.wallflow.data.db.dao.WallhavenUploadersDao
-import com.ammar.wallflow.data.db.dao.WallhavenWallpapersDao
+import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenPopularTagsDao
+import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenSearchQueryWallpapersDao
+import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenTagsDao
+import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenUploadersDao
+import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenWallpapersDao
 import com.ammar.wallflow.data.db.entity.AutoWallpaperHistoryEntity
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.LastUpdatedEntity

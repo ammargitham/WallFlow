@@ -7,8 +7,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.ammar.wallflow.data.db.dao.FavoriteDao
 import com.ammar.wallflow.data.db.dao.SavedSearchDao
-import com.ammar.wallflow.data.db.dao.WallhavenUploadersDao
-import com.ammar.wallflow.data.db.dao.WallhavenWallpapersDao
+import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenUploadersDao
+import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenWallpapersDao
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.FavoritesRepository
 import com.ammar.wallflow.data.repository.SavedSearchRepository
