@@ -1,4 +1,4 @@
-package com.ammar.wallflow.data.db.database
+package com.ammar.wallflow.data.db
 
 import androidx.room.AutoMigration
 import androidx.room.Database

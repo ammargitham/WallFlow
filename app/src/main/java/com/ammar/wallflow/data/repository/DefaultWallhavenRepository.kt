@@ -8,7 +8,7 @@ import androidx.paging.PagingData
 import androidx.paging.map
 import androidx.room.withTransaction
 import com.ammar.wallflow.IoDispatcher
-import com.ammar.wallflow.data.db.database.AppDatabase
+import com.ammar.wallflow.data.db.AppDatabase
 import com.ammar.wallflow.data.db.entity.LastUpdatedCategory
 import com.ammar.wallflow.data.db.entity.LastUpdatedEntity
 import com.ammar.wallflow.data.db.entity.PopularTagEntity

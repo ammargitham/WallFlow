@@ -12,7 +12,7 @@ import androidx.work.Data
 import androidx.work.WorkerFactory
 import androidx.work.WorkerParameters
 import com.ammar.wallflow.MockFactory
-import com.ammar.wallflow.data.db.database.AppDatabase
+import com.ammar.wallflow.data.db.AppDatabase
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.WallpaperEntity
 import com.ammar.wallflow.data.network.model.NetworkWallhavenMeta

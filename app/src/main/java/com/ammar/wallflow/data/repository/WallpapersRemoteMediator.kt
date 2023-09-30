@@ -5,7 +5,7 @@ import androidx.paging.LoadType
 import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
-import com.ammar.wallflow.data.db.database.AppDatabase
+import com.ammar.wallflow.data.db.AppDatabase
 import com.ammar.wallflow.data.db.entity.SearchQueryEntity
 import com.ammar.wallflow.data.db.entity.SearchQueryRemoteKeyEntity
 import com.ammar.wallflow.data.db.entity.SearchQueryWallpaperEntity

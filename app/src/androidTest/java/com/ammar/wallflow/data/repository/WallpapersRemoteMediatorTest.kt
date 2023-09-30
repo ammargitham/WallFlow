@@ -9,7 +9,7 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ammar.wallflow.MockFactory
-import com.ammar.wallflow.data.db.database.AppDatabase
+import com.ammar.wallflow.data.db.AppDatabase
 import com.ammar.wallflow.data.db.entity.WallpaperEntity
 import com.ammar.wallflow.data.network.model.NetworkWallhavenMeta
 import com.ammar.wallflow.data.network.model.StringNetworkWallhavenMetaQuery

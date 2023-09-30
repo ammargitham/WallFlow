@@ -14,7 +14,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import com.ammar.wallflow.IoDispatcher
 import com.ammar.wallflow.R
-import com.ammar.wallflow.data.db.database.AppDatabase
+import com.ammar.wallflow.data.db.AppDatabase
 import com.ammar.wallflow.data.db.entity.WallpaperEntity
 import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.extensions.getFileNameFromUrl

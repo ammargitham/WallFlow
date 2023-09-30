@@ -6,7 +6,7 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.ammar.wallflow.IoDispatcher
-import com.ammar.wallflow.data.db.database.AppDatabase
+import com.ammar.wallflow.data.db.AppDatabase
 import com.ammar.wallflow.data.db.di.ManualMigrations.MIGRATION_1_2
 import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.model.ObjectDetectionModel
