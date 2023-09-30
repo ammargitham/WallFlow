@@ -14,7 +14,7 @@ import androidx.work.WorkerParameters
 import com.ammar.wallflow.MockFactory
 import com.ammar.wallflow.data.db.AppDatabase
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
-import com.ammar.wallflow.data.db.entity.WallpaperEntity
+import com.ammar.wallflow.data.db.entity.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.network.model.NetworkWallhavenMeta
 import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpaper
 import com.ammar.wallflow.data.network.model.StringNetworkWallhavenMetaQuery
@@ -504,7 +504,7 @@ class CleanupWorkerTest {
             wallHavenNetworkDataSource,
             clock,
         )
-        val pagingState = PagingState<Int, WallpaperEntity>(
+        val pagingState = PagingState<Int, WallhavenWallpaperEntity>(
             listOf(),
             null,
             PagingConfig(10),
@@ -514,7 +514,7 @@ class CleanupWorkerTest {
     }
 
     private fun createTempFiles(
-        wallpapers: List<WallpaperEntity>,
+        wallpapers: List<WallhavenWallpaperEntity>,
         now: Instant,
     ) {
         val fileNames = wallpapers.map { it.path.getFileNameFromUrl() }

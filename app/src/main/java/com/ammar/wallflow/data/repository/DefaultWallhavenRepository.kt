@@ -11,11 +11,11 @@ import com.ammar.wallflow.IoDispatcher
 import com.ammar.wallflow.data.db.AppDatabase
 import com.ammar.wallflow.data.db.entity.LastUpdatedCategory
 import com.ammar.wallflow.data.db.entity.LastUpdatedEntity
-import com.ammar.wallflow.data.db.entity.PopularTagEntity
-import com.ammar.wallflow.data.db.entity.TagEntity
-import com.ammar.wallflow.data.db.entity.UploaderEntity
-import com.ammar.wallflow.data.db.entity.WallpaperEntity
-import com.ammar.wallflow.data.db.entity.WallpaperTagsEntity
+import com.ammar.wallflow.data.db.entity.WallhavenPopularTagEntity
+import com.ammar.wallflow.data.db.entity.WallhavenTagEntity
+import com.ammar.wallflow.data.db.entity.WallhavenUploaderEntity
+import com.ammar.wallflow.data.db.entity.WallhavenWallpaperEntity
+import com.ammar.wallflow.data.db.entity.WallhavenWallpaperTagsEntity
 import com.ammar.wallflow.data.db.entity.WallpaperWithUploaderAndTags
 import com.ammar.wallflow.data.db.entity.asTag
 import com.ammar.wallflow.data.db.entity.toWallpaper
@@ -59,18 +59,18 @@ class DefaultWallhavenRepository @Inject constructor(
 
     private val popularWallhavenTagNetworkResource =
         object : NetworkBoundResource<
-            List<TagEntity>,
+            List<WallhavenTagEntity>,
             List<WallhavenTag>,
             List<NetworkWallhavenTag>,
             >(
             initialValue = emptyList(),
             ioDispatcher = ioDispatcher,
         ) {
-            override suspend fun loadFromDb(): List<TagEntity> = popularTagsDao
+            override suspend fun loadFromDb(): List<WallhavenTagEntity> = popularTagsDao
                 .getAllWithDetails()
                 .map { it.tagEntity }
 
-            override suspend fun shouldFetchData(dbData: List<TagEntity>): Boolean {
+            override suspend fun shouldFetchData(dbData: List<WallhavenTagEntity>): Boolean {
                 return if (dbData.isEmpty()) {
                     true
                 } else {
@@ -83,7 +83,7 @@ class DefaultWallhavenRepository @Inject constructor(
             }
 
             override suspend fun fetchFromNetwork(
-                dbData: List<TagEntity>,
+                dbData: List<WallhavenTagEntity>,
             ): List<NetworkWallhavenTag> {
                 val doc = wallHavenNetwork.popularTags()
                 return doc?.let(::parsePopularTags) ?: emptyList()
@@ -95,12 +95,14 @@ class DefaultWallhavenRepository @Inject constructor(
                     // insert non-existing tags first
                     val tagIds = upsertTags(fetchResult, false).map { it.id }
                     // create and insert PopularTagEntities
-                    popularTagsDao.insert(tagIds.map { PopularTagEntity(0, it) })
+                    popularTagsDao.insert(tagIds.map { WallhavenPopularTagEntity(0, it) })
                     upsertLastUpdated(LastUpdatedCategory.POPULAR_TAGS)
                 }
             }
 
-            override fun entityConverter(dbData: List<TagEntity>) = dbData.map { it.asTag() }
+            override fun entityConverter(dbData: List<WallhavenTagEntity>) = dbData.map {
+                it.asTag()
+            }
 
             override fun onFetchFailed(throwable: Throwable) {
                 Log.e(TAG, "onFetchFailed: ", throwable)
@@ -192,7 +194,7 @@ class DefaultWallhavenRepository @Inject constructor(
                     // insert new wallpaper tag mappings
                     wallpapersDao.insertWallpaperTagMappings(
                         tagsIds.map {
-                            WallpaperTagsEntity(
+                            WallhavenWallpaperTagsEntity(
                                 wallpaperId = wallpaperDbId,
                                 tagId = it,
                             )
@@ -240,7 +242,7 @@ class DefaultWallhavenRepository @Inject constructor(
             wallpapersDao.pagingSource(queryString = searchQuery.toQueryString())
         },
     ).flow.map {
-        it.map<WallpaperEntity, Wallpaper> { entity ->
+        it.map<WallhavenWallpaperEntity, Wallpaper> { entity ->
             entity.toWallpaper()
         }
     }.flowOn(ioDispatcher)
@@ -281,7 +283,7 @@ class DefaultWallhavenRepository @Inject constructor(
     }
 
     override suspend fun insertTagEntities(
-        tags: Collection<TagEntity>,
+        tags: Collection<WallhavenTagEntity>,
     ): Unit = withContext(ioDispatcher) {
         val existingTags = tagsDao.getByWallhavenIds(tags.map { it.wallhavenId })
         val existingMap = existingTags.associateBy { it.wallhavenId }
@@ -296,7 +298,7 @@ class DefaultWallhavenRepository @Inject constructor(
     }
 
     override suspend fun insertUploaderEntities(
-        uploaders: Collection<UploaderEntity>,
+        uploaders: Collection<WallhavenUploaderEntity>,
     ): Unit = withContext(ioDispatcher) {
         val existingUploaders = uploadersDao.getByUsernames(uploaders.map { it.username })
         val existingMap = existingUploaders.associateBy { it.username }
@@ -311,7 +313,7 @@ class DefaultWallhavenRepository @Inject constructor(
     }
 
     override suspend fun insertWallpaperEntities(
-        entities: Collection<WallpaperEntity>,
+        entities: Collection<WallhavenWallpaperEntity>,
     ): Unit = withContext(ioDispatcher) {
         val wallhavenIds = entities.map { it.wallhavenId }
         val existingWallpapers = wallpapersDao.getAllByWallhavenIds(wallhavenIds)

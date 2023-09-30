@@ -9,7 +9,7 @@ import androidx.room.PrimaryKey
 import androidx.room.Relation
 
 @Entity(
-    tableName = "popular_tags",
+    tableName = "wallhaven_popular_tags",
     indices = [
         Index(
             value = ["tag_id"],
@@ -18,23 +18,23 @@ import androidx.room.Relation
     ],
     foreignKeys = [
         ForeignKey(
-            entity = TagEntity::class,
+            entity = WallhavenTagEntity::class,
             parentColumns = ["id"],
             childColumns = ["tag_id"],
             onDelete = ForeignKey.CASCADE,
         ),
     ],
 )
-data class PopularTagEntity(
+data class WallhavenPopularTagEntity(
     @PrimaryKey(autoGenerate = true) val id: Long,
     @ColumnInfo(name = "tag_id") val tagId: Long,
 )
 
-data class PopularTagWithDetails(
-    @Embedded val popularTagEntity: PopularTagEntity,
+data class WallhavenPopularTagWithDetails(
+    @Embedded val popularTagEntity: WallhavenPopularTagEntity,
     @Relation(
         parentColumn = "tag_id",
         entityColumn = "id",
     )
-    val tagEntity: TagEntity,
+    val tagEntity: WallhavenTagEntity,
 )

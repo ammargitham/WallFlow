@@ -7,9 +7,9 @@ import com.ammar.wallflow.data.db.dao.SavedSearchDao
 import com.ammar.wallflow.data.db.dao.UploadersDao
 import com.ammar.wallflow.data.db.dao.WallpapersDao
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
-import com.ammar.wallflow.data.db.entity.TagEntity
-import com.ammar.wallflow.data.db.entity.UploaderEntity
-import com.ammar.wallflow.data.db.entity.WallpaperEntity
+import com.ammar.wallflow.data.db.entity.WallhavenTagEntity
+import com.ammar.wallflow.data.db.entity.WallhavenUploaderEntity
+import com.ammar.wallflow.data.db.entity.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.db.entity.toSavedSearch
 import com.ammar.wallflow.data.preferences.AppPreferences
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
@@ -69,9 +69,9 @@ suspend fun getBackupV1Json(
         if (wallhavenWallpaperIds.isNotEmpty()) {
             val wallpapersWithUploaderAndTags = wallpapersDao
                 .getAllWithUploaderAndTagsByWallhavenIds(wallhavenWallpaperIds)
-            val wallpapers = mutableListOf<WallpaperEntity>()
-            val uploaders = mutableListOf<UploaderEntity>()
-            val tags = mutableSetOf<TagEntity>()
+            val wallpapers = mutableListOf<WallhavenWallpaperEntity>()
+            val uploaders = mutableListOf<WallhavenUploaderEntity>()
+            val tags = mutableSetOf<WallhavenTagEntity>()
             wallpapersWithUploaderAndTags.forEach {
                 wallpapers.add(it.wallpaper)
                 if (it.uploader != null) {

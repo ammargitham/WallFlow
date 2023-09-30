@@ -8,8 +8,8 @@ import androidx.room.withTransaction
 import com.ammar.wallflow.data.db.AppDatabase
 import com.ammar.wallflow.data.db.entity.SearchQueryEntity
 import com.ammar.wallflow.data.db.entity.SearchQueryRemoteKeyEntity
-import com.ammar.wallflow.data.db.entity.SearchQueryWallpaperEntity
-import com.ammar.wallflow.data.db.entity.WallpaperEntity
+import com.ammar.wallflow.data.db.entity.WallhavenSearchQueryWallpaperEntity
+import com.ammar.wallflow.data.db.entity.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
 import com.ammar.wallflow.data.network.model.toWallpaperEntity
 import com.ammar.wallflow.model.SearchQuery
@@ -23,7 +23,7 @@ class WallpapersRemoteMediator(
     private val appDatabase: AppDatabase,
     private val wallHavenNetwork: WallhavenNetworkDataSource,
     private val clock: Clock = Clock.System,
-) : RemoteMediator<Int, WallpaperEntity>() {
+) : RemoteMediator<Int, WallhavenWallpaperEntity>() {
     private val wallpapersDao = appDatabase.wallpapersDao()
     private val searchQueryDao = appDatabase.searchQueryDao()
     private val remoteKeysDao = appDatabase.searchQueryRemoteKeysDao()
@@ -48,7 +48,7 @@ class WallpapersRemoteMediator(
 
     override suspend fun load(
         loadType: LoadType,
-        state: PagingState<Int, WallpaperEntity>,
+        state: PagingState<Int, WallhavenWallpaperEntity>,
     ): MediatorResult {
         return try {
             val searchQueryEntity = searchQueryDao.getBySearchQuery(searchQuery.toQueryString())
@@ -105,7 +105,7 @@ class WallpapersRemoteMediator(
                 // update mapping table
                 searchQueryWallpapersDao.insert(
                     wallpaperEntities.map {
-                        SearchQueryWallpaperEntity(
+                        WallhavenSearchQueryWallpaperEntity(
                             searchQueryId = searchQueryId,
                             wallpaperId = it.id,
                         )

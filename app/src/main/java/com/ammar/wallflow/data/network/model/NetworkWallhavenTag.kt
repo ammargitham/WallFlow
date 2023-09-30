@@ -1,6 +1,6 @@
 package com.ammar.wallflow.data.network.model
 
-import com.ammar.wallflow.data.db.entity.TagEntity
+import com.ammar.wallflow.data.db.entity.WallhavenTagEntity
 import com.ammar.wallflow.data.network.model.util.InstantSerializer
 import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.model.Purity
@@ -21,7 +21,7 @@ data class NetworkWallhavenTag(
     val created_at: Instant,
 )
 
-fun NetworkWallhavenTag.toEntity(id: Long = 0) = TagEntity(
+fun NetworkWallhavenTag.toEntity(id: Long = 0) = WallhavenTagEntity(
     id = id,
     wallhavenId = this.id,
     name = name,

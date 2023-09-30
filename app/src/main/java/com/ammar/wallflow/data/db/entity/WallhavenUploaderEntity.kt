@@ -9,7 +9,7 @@ import com.ammar.wallflow.model.wallhaven.WallhavenUploader
 import kotlinx.serialization.Serializable
 
 @Entity(
-    tableName = "uploaders",
+    tableName = "wallhaven_uploaders",
     indices = [
         Index(
             value = ["username"],
@@ -18,28 +18,28 @@ import kotlinx.serialization.Serializable
     ],
 )
 @Serializable
-data class UploaderEntity(
+data class WallhavenUploaderEntity(
     @PrimaryKey(autoGenerate = true) val id: Long,
     val username: String,
     val group: String,
-    @Embedded("avatar_") val avatar: AvatarEntity,
+    @Embedded("avatar_") val avatar: WallhavenAvatarEntity,
 )
 
 @Serializable
-data class AvatarEntity(
+data class WallhavenAvatarEntity(
     val large: String,
     val medium: String,
     val small: String,
     val tiny: String,
 )
 
-fun UploaderEntity.asUploader() = WallhavenUploader(
+fun WallhavenUploaderEntity.asUploader() = WallhavenUploader(
     username = username,
     group = group,
     avatar = avatar.asAvatar(),
 )
 
-fun AvatarEntity.asAvatar() = WallhavenAvatar(
+fun WallhavenAvatarEntity.asAvatar() = WallhavenAvatar(
     large = large,
     medium = medium,
     small = small,

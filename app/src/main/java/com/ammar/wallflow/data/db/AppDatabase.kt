@@ -4,6 +4,7 @@ import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.ammar.wallflow.data.db.automigrationspecs.AutoMigration3To4Spec
 import com.ammar.wallflow.data.db.converters.Converters
 import com.ammar.wallflow.data.db.dao.AutoWallpaperHistoryDao
 import com.ammar.wallflow.data.db.dao.FavoriteDao
@@ -22,37 +23,38 @@ import com.ammar.wallflow.data.db.entity.AutoWallpaperHistoryEntity
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.LastUpdatedEntity
 import com.ammar.wallflow.data.db.entity.ObjectDetectionModelEntity
-import com.ammar.wallflow.data.db.entity.PopularTagEntity
 import com.ammar.wallflow.data.db.entity.SavedSearchEntity
 import com.ammar.wallflow.data.db.entity.SearchHistoryEntity
 import com.ammar.wallflow.data.db.entity.SearchQueryEntity
 import com.ammar.wallflow.data.db.entity.SearchQueryRemoteKeyEntity
-import com.ammar.wallflow.data.db.entity.SearchQueryWallpaperEntity
-import com.ammar.wallflow.data.db.entity.TagEntity
-import com.ammar.wallflow.data.db.entity.UploaderEntity
-import com.ammar.wallflow.data.db.entity.WallpaperEntity
-import com.ammar.wallflow.data.db.entity.WallpaperTagsEntity
+import com.ammar.wallflow.data.db.entity.WallhavenPopularTagEntity
+import com.ammar.wallflow.data.db.entity.WallhavenSearchQueryWallpaperEntity
+import com.ammar.wallflow.data.db.entity.WallhavenTagEntity
+import com.ammar.wallflow.data.db.entity.WallhavenUploaderEntity
+import com.ammar.wallflow.data.db.entity.WallhavenWallpaperEntity
+import com.ammar.wallflow.data.db.entity.WallhavenWallpaperTagsEntity
 
 @Database(
     entities = [
         LastUpdatedEntity::class,
-        PopularTagEntity::class,
+        WallhavenPopularTagEntity::class,
         SearchQueryEntity::class,
         SearchQueryRemoteKeyEntity::class,
-        SearchQueryWallpaperEntity::class,
-        WallpaperEntity::class,
-        UploaderEntity::class,
-        TagEntity::class,
-        WallpaperTagsEntity::class,
+        WallhavenSearchQueryWallpaperEntity::class,
+        WallhavenWallpaperEntity::class,
+        WallhavenUploaderEntity::class,
+        WallhavenTagEntity::class,
+        WallhavenWallpaperTagsEntity::class,
         SearchHistoryEntity::class,
         ObjectDetectionModelEntity::class,
         SavedSearchEntity::class,
         AutoWallpaperHistoryEntity::class,
         FavoriteEntity::class,
     ],
-    version = 3,
+    version = 4,
     autoMigrations = [
         AutoMigration(from = 2, to = 3),
+        AutoMigration(from = 3, to = 4, spec = AutoMigration3To4Spec::class),
     ],
 )
 @TypeConverters(Converters::class)

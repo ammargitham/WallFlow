@@ -10,7 +10,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ammar.wallflow.MockFactory
 import com.ammar.wallflow.data.db.AppDatabase
-import com.ammar.wallflow.data.db.entity.WallpaperEntity
+import com.ammar.wallflow.data.db.entity.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.network.model.NetworkWallhavenMeta
 import com.ammar.wallflow.data.network.model.StringNetworkWallhavenMetaQuery
 import com.ammar.wallflow.data.network.retrofit.RetrofitWallhavenNetwork
@@ -73,7 +73,7 @@ class WallpapersRemoteMediatorTest {
             mockDb,
             wallHavenNetworkDataSource,
         )
-        val pagingState = PagingState<Int, WallpaperEntity>(
+        val pagingState = PagingState<Int, WallhavenWallpaperEntity>(
             listOf(),
             null,
             PagingConfig(10),
@@ -104,7 +104,7 @@ class WallpapersRemoteMediatorTest {
             mockDb,
             wallHavenNetworkDataSource,
         )
-        val pagingState = PagingState<Int, WallpaperEntity>(
+        val pagingState = PagingState<Int, WallhavenWallpaperEntity>(
             listOf(),
             null,
             PagingConfig(10),
@@ -123,7 +123,7 @@ class WallpapersRemoteMediatorTest {
             mockDb,
             wallHavenNetworkDataSource,
         )
-        val pagingState = PagingState<Int, WallpaperEntity>(
+        val pagingState = PagingState<Int, WallhavenWallpaperEntity>(
             listOf(),
             null,
             PagingConfig(10),
@@ -141,7 +141,7 @@ class WallpapersRemoteMediatorTest {
             mockDb,
             wallHavenNetworkDataSource,
         )
-        val pagingState = PagingState<Int, WallpaperEntity>(
+        val pagingState = PagingState<Int, WallhavenWallpaperEntity>(
             listOf(),
             null,
             PagingConfig(10),
@@ -184,7 +184,7 @@ class WallpapersRemoteMediatorTest {
             mockDb,
             wallHavenNetworkDataSource,
         )
-        val pagingState = PagingState<Int, WallpaperEntity>(
+        val pagingState = PagingState<Int, WallhavenWallpaperEntity>(
             listOf(),
             null,
             PagingConfig(10),
@@ -242,7 +242,7 @@ class WallpapersRemoteMediatorTest {
             mockDb,
             wallHavenNetworkDataSource,
         )
-        val pagingState1 = PagingState<Int, WallpaperEntity>(
+        val pagingState1 = PagingState<Int, WallhavenWallpaperEntity>(
             listOf(),
             null,
             PagingConfig(10),
@@ -270,7 +270,7 @@ class WallpapersRemoteMediatorTest {
             mockDb,
             wallHavenNetworkDataSource,
         )
-        val pagingState2 = PagingState<Int, WallpaperEntity>(
+        val pagingState2 = PagingState<Int, WallhavenWallpaperEntity>(
             listOf(),
             null,
             PagingConfig(10),

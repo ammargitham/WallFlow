@@ -15,7 +15,7 @@ import androidx.work.WorkerParameters
 import com.ammar.wallflow.IoDispatcher
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.db.AppDatabase
-import com.ammar.wallflow.data.db.entity.WallpaperEntity
+import com.ammar.wallflow.data.db.entity.WallhavenWallpaperEntity
 import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.extensions.getFileNameFromUrl
 import com.ammar.wallflow.extensions.getTempDir
@@ -82,14 +82,14 @@ class CleanupWorker @AssistedInject constructor(
 
     private suspend fun cleanupOldSearchQueries(cutOff: Instant) {
         val ids = searchQueryDao.getAllIdsOlderThan(cutOff)
-        val deletedWallpapers = mutableSetOf<WallpaperEntity>()
+        val deletedWallpapers = mutableSetOf<WallhavenWallpaperEntity>()
         ids.forEach { deletedWallpapers.addAll(cleanupSearchQueryId(it)) }
         val deleteFileNamesFromTemp = deletedWallpapers.map { it.path.getFileNameFromUrl() }
         val tempDir = context.getTempDir()
         deleteFileNamesFromTemp.forEach { File(tempDir, it).delete() }
     }
 
-    private suspend fun cleanupSearchQueryId(searchQueryId: Long): List<WallpaperEntity> {
+    private suspend fun cleanupSearchQueryId(searchQueryId: Long): List<WallhavenWallpaperEntity> {
         remoteKeysDao.deleteBySearchQueryId(searchQueryId)
         val wallpapersToDelete = wallpapersDao.getAllUniqueToSearchQueryId(searchQueryId)
         wallpapersDao.deleteAllUniqueToSearchQueryId(searchQueryId)

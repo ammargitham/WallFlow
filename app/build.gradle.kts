@@ -187,6 +187,10 @@ android {
     lint {
         warning += "AutoboxingStateCreation"
     }
+
+    sourceSets {
+        getByName("androidTest").assets.srcDir("$projectDir/schemas")
+    }
 }
 
 room {
@@ -251,6 +255,7 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
+    androidTestImplementation(libs.androidx.room.testing)
 
     // Compose
     implementation(libs.androidx.compose.ui)

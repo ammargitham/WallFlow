@@ -13,8 +13,8 @@ import com.ammar.wallflow.data.db.entity.AutoWallpaperHistoryEntity
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.ObjectDetectionModelEntity
 import com.ammar.wallflow.data.db.entity.SavedSearchEntity
-import com.ammar.wallflow.data.db.entity.WallpaperEntity
-import com.ammar.wallflow.data.db.entity.WallpaperTagsEntity
+import com.ammar.wallflow.data.db.entity.WallhavenWallpaperEntity
+import com.ammar.wallflow.data.db.entity.WallhavenWallpaperTagsEntity
 import com.ammar.wallflow.data.db.entity.WallpaperWithUploaderAndTags
 import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
 import com.ammar.wallflow.data.network.model.NetworkResponse
@@ -184,11 +184,11 @@ internal open class FakeFavoriteDao : FavoriteDao {
 }
 
 internal open class FakeWallpapersDao : WallpapersDao {
-    override suspend fun getAll(): List<WallpaperEntity> {
+    override suspend fun getAll(): List<WallhavenWallpaperEntity> {
         throw RuntimeException()
     }
 
-    override suspend fun getByWallhavenId(wallhavenId: String): WallpaperEntity? {
+    override suspend fun getByWallhavenId(wallhavenId: String): WallhavenWallpaperEntity? {
         throw RuntimeException()
     }
 
@@ -208,11 +208,13 @@ internal open class FakeWallpapersDao : WallpapersDao {
         throw RuntimeException()
     }
 
-    override suspend fun getByWallhavenIds(wallhavenIds: List<String>): List<WallpaperEntity> {
+    override suspend fun getByWallhavenIds(
+        wallhavenIds: List<String>,
+    ): List<WallhavenWallpaperEntity> {
         throw RuntimeException()
     }
 
-    override fun pagingSource(queryString: String): PagingSource<Int, WallpaperEntity> {
+    override fun pagingSource(queryString: String): PagingSource<Int, WallhavenWallpaperEntity> {
         throw RuntimeException()
     }
 
@@ -224,33 +226,35 @@ internal open class FakeWallpapersDao : WallpapersDao {
         throw RuntimeException()
     }
 
-    override suspend fun insert(vararg wallpaper: WallpaperEntity): List<Long> {
+    override suspend fun insert(vararg wallpaper: WallhavenWallpaperEntity): List<Long> {
         throw RuntimeException()
     }
 
-    override suspend fun insert(wallpapers: Collection<WallpaperEntity>): List<Long> {
+    override suspend fun insert(wallpapers: Collection<WallhavenWallpaperEntity>): List<Long> {
         throw RuntimeException()
     }
 
-    override suspend fun update(vararg wallpaper: WallpaperEntity) {
+    override suspend fun update(vararg wallpaper: WallhavenWallpaperEntity) {
         throw RuntimeException()
     }
 
-    override suspend fun upsert(vararg wallpaper: WallpaperEntity): List<Long> {
+    override suspend fun upsert(vararg wallpaper: WallhavenWallpaperEntity): List<Long> {
         throw RuntimeException()
     }
 
-    override suspend fun upsert(wallpapers: Collection<WallpaperEntity>) {
+    override suspend fun upsert(wallpapers: Collection<WallhavenWallpaperEntity>) {
         throw RuntimeException()
     }
 
-    override suspend fun getAllUniqueToSearchQueryId(searchQueryId: Long): List<WallpaperEntity> {
+    override suspend fun getAllUniqueToSearchQueryId(
+        searchQueryId: Long,
+    ): List<WallhavenWallpaperEntity> {
         throw RuntimeException()
     }
 
     override suspend fun getAllByWallhavenIds(
         wallhavenIds: Collection<String>,
-    ): List<WallpaperEntity> {
+    ): List<WallhavenWallpaperEntity> {
         throw RuntimeException()
     }
 
@@ -262,12 +266,14 @@ internal open class FakeWallpapersDao : WallpapersDao {
         throw RuntimeException()
     }
 
-    override suspend fun insertWallpaperTagMappings(vararg wallpaperTag: WallpaperTagsEntity) {
+    override suspend fun insertWallpaperTagMappings(
+        vararg wallpaperTag: WallhavenWallpaperTagsEntity,
+    ) {
         throw RuntimeException()
     }
 
     override suspend fun insertWallpaperTagMappings(
-        wallpaperTags: Collection<WallpaperTagsEntity>,
+        wallpaperTags: Collection<WallhavenWallpaperTagsEntity>,
     ) {
         throw RuntimeException()
     }

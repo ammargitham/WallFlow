@@ -16,7 +16,7 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
 @Entity(
-    tableName = "wallpapers",
+    tableName = "wallhaven_wallpapers",
     indices = [
         Index(
             value = ["wallhaven_id"],
@@ -25,7 +25,7 @@ import kotlinx.serialization.Serializable
     ],
 )
 @Serializable
-data class WallpaperEntity(
+data class WallhavenWallpaperEntity(
     @PrimaryKey(autoGenerate = true) val id: Long,
     @ColumnInfo(name = "wallhaven_id") val wallhavenId: String,
     val url: String,
@@ -47,22 +47,22 @@ data class WallpaperEntity(
 )
 
 data class WallpaperWithUploaderAndTags(
-    @Embedded val wallpaper: WallpaperEntity,
+    @Embedded val wallpaper: WallhavenWallpaperEntity,
     @Relation(
         parentColumn = "uploader_id",
         entityColumn = "id",
     )
-    val uploader: UploaderEntity?,
+    val uploader: WallhavenUploaderEntity?,
     @Relation(
         parentColumn = "id",
         entityColumn = "id",
         associateBy = Junction(
-            value = WallpaperTagsEntity::class,
+            value = WallhavenWallpaperTagsEntity::class,
             parentColumn = "wallpaper_id",
             entityColumn = "tag_id",
         ),
     )
-    val tags: List<TagEntity>?,
+    val tags: List<WallhavenTagEntity>?,
 )
 
 @Serializable
@@ -72,9 +72,9 @@ data class ThumbsEntity(
     val small: String,
 )
 
-fun WallpaperEntity.toWallpaper(
-    uploader: UploaderEntity? = null,
-    tags: List<TagEntity>? = null,
+fun WallhavenWallpaperEntity.toWallpaper(
+    uploader: WallhavenUploaderEntity? = null,
+    tags: List<WallhavenTagEntity>? = null,
 ) = WallhavenWallpaper(
     id = wallhavenId,
     url = url,

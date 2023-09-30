@@ -6,7 +6,7 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 
 @Entity(
-    tableName = "search_query_wallpapers",
+    tableName = "wallhaven_search_query_wallpapers",
     primaryKeys = [
         "search_query_id",
         "wallpaper_id",
@@ -19,7 +19,7 @@ import androidx.room.Index
             onDelete = ForeignKey.CASCADE,
         ),
         ForeignKey(
-            entity = WallpaperEntity::class,
+            entity = WallhavenWallpaperEntity::class,
             parentColumns = ["id"],
             childColumns = ["wallpaper_id"],
             onDelete = ForeignKey.CASCADE,
@@ -29,7 +29,7 @@ import androidx.room.Index
         Index(value = ["wallpaper_id"]), // need extra to remove warning
     ],
 )
-data class SearchQueryWallpaperEntity(
+data class WallhavenSearchQueryWallpaperEntity(
     @ColumnInfo(name = "search_query_id") val searchQueryId: Long,
     @ColumnInfo(name = "wallpaper_id") val wallpaperId: Long,
 )

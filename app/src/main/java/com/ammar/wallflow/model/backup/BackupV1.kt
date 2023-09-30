@@ -3,9 +3,9 @@ package com.ammar.wallflow.model.backup
 import android.net.Uri
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.SavedSearchEntity
-import com.ammar.wallflow.data.db.entity.TagEntity
-import com.ammar.wallflow.data.db.entity.UploaderEntity
-import com.ammar.wallflow.data.db.entity.WallpaperEntity
+import com.ammar.wallflow.data.db.entity.WallhavenTagEntity
+import com.ammar.wallflow.data.db.entity.WallhavenUploaderEntity
+import com.ammar.wallflow.data.db.entity.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.preferences.AppPreferences
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -32,7 +32,7 @@ data class BackupV1(
 @Serializable
 data class WallhavenBackupV1(
     val savedSearches: List<SavedSearchEntity>?,
-    val wallpapers: List<WallpaperEntity>?,
-    val uploaders: List<UploaderEntity>?,
-    val tags: Set<TagEntity>?,
+    val wallpapers: List<WallhavenWallpaperEntity>?,
+    val uploaders: List<WallhavenUploaderEntity>?,
+    val tags: Set<WallhavenTagEntity>?,
 )

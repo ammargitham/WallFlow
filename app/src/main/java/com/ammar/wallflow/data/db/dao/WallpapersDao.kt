@@ -8,45 +8,45 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import androidx.room.Upsert
-import com.ammar.wallflow.data.db.entity.WallpaperEntity
-import com.ammar.wallflow.data.db.entity.WallpaperTagsEntity
+import com.ammar.wallflow.data.db.entity.WallhavenWallpaperEntity
+import com.ammar.wallflow.data.db.entity.WallhavenWallpaperTagsEntity
 import com.ammar.wallflow.data.db.entity.WallpaperWithUploaderAndTags
 
 @Dao
 interface WallpapersDao {
-    @Query("SELECT * FROM wallpapers")
-    suspend fun getAll(): List<WallpaperEntity>
+    @Query("SELECT * FROM wallhaven_wallpapers")
+    suspend fun getAll(): List<WallhavenWallpaperEntity>
 
-    @Query("SELECT * FROM wallpapers WHERE wallhaven_id = :wallhavenId")
-    suspend fun getByWallhavenId(wallhavenId: String): WallpaperEntity?
+    @Query("SELECT * FROM wallhaven_wallpapers WHERE wallhaven_id = :wallhavenId")
+    suspend fun getByWallhavenId(wallhavenId: String): WallhavenWallpaperEntity?
 
     @Transaction
-    @Query("SELECT * FROM wallpapers WHERE wallhaven_id = :wallhavenId")
+    @Query("SELECT * FROM wallhaven_wallpapers WHERE wallhaven_id = :wallhavenId")
     suspend fun getWithUploaderAndTagsByWallhavenId(
         wallhavenId: String,
     ): WallpaperWithUploaderAndTags?
 
     @Transaction
-    @Query("SELECT * FROM wallpapers WHERE wallhaven_id in (:wallhavenIds)")
+    @Query("SELECT * FROM wallhaven_wallpapers WHERE wallhaven_id in (:wallhavenIds)")
     suspend fun getAllWithUploaderAndTagsByWallhavenIds(
         wallhavenIds: Collection<String>,
     ): List<WallpaperWithUploaderAndTags>
 
     @Transaction
-    @Query("SELECT * FROM wallpapers")
+    @Query("SELECT * FROM wallhaven_wallpapers")
     suspend fun getAllWithUploaderAndTags(): List<WallpaperWithUploaderAndTags>
 
-    @Query("SELECT * FROM wallpapers WHERE wallhaven_id IN (:wallhavenIds)")
-    suspend fun getByWallhavenIds(wallhavenIds: List<String>): List<WallpaperEntity>
+    @Query("SELECT * FROM wallhaven_wallpapers WHERE wallhaven_id IN (:wallhavenIds)")
+    suspend fun getByWallhavenIds(wallhavenIds: List<String>): List<WallhavenWallpaperEntity>
 
     @Query(
         """
             SELECT *
-            FROM wallpapers
+            FROM wallhaven_wallpapers
             WHERE id IN (
-                SELECT sqw.wallpaper_id
-                FROM search_query_wallpapers sqw
-                WHERE sqw.search_query_id = (
+                SELECT wsqw.wallpaper_id
+                FROM wallhaven_search_query_wallpapers wsqw
+                WHERE wsqw.search_query_id = (
                     SELECT sq.id
                     FROM search_query sq
                     WHERE query_string = :queryString
@@ -54,82 +54,84 @@ interface WallpapersDao {
             )
         """,
     )
-    fun pagingSource(queryString: String): PagingSource<Int, WallpaperEntity>
+    fun pagingSource(queryString: String): PagingSource<Int, WallhavenWallpaperEntity>
 
-    @Query("SELECT COUNT(1) FROM wallpapers")
+    @Query("SELECT COUNT(1) FROM wallhaven_wallpapers")
     suspend fun count(): Int
 
-    @Query("DELETE FROM wallpapers")
+    @Query("DELETE FROM wallhaven_wallpapers")
     suspend fun deleteAll()
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(vararg wallpaper: WallpaperEntity): List<Long>
+    suspend fun insert(vararg wallpaper: WallhavenWallpaperEntity): List<Long>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insert(wallpapers: Collection<WallpaperEntity>): List<Long>
+    suspend fun insert(wallpapers: Collection<WallhavenWallpaperEntity>): List<Long>
 
     @Update
-    suspend fun update(vararg wallpaper: WallpaperEntity)
+    suspend fun update(vararg wallpaper: WallhavenWallpaperEntity)
 
     @Upsert
-    suspend fun upsert(vararg wallpaper: WallpaperEntity): List<Long>
+    suspend fun upsert(vararg wallpaper: WallhavenWallpaperEntity): List<Long>
 
     @Upsert
-    suspend fun upsert(wallpapers: Collection<WallpaperEntity>)
+    suspend fun upsert(wallpapers: Collection<WallhavenWallpaperEntity>)
 
     @Query(
         """
             SELECT
             *
-            FROM wallpapers
+            FROM wallhaven_wallpapers
             WHERE EXISTS (
                 SELECT 1
-                FROM search_query_wallpapers
-                WHERE wallpaper_id = wallpapers.id
+                FROM wallhaven_search_query_wallpapers
+                WHERE wallpaper_id = wallhaven_wallpapers.id
                 AND search_query_id = :searchQueryId
             )
             AND NOT EXISTS (
                 SELECT 1
-                FROM search_query_wallpapers
-                WHERE wallpaper_id = wallpapers.id
+                FROM wallhaven_search_query_wallpapers
+                WHERE wallpaper_id = wallhaven_wallpapers.id
                 AND search_query_id <> :searchQueryId
             )
             AND NOT EXISTS (
                 SELECT 1
                 FROM favorites
-                WHERE source_id = wallpapers.wallhaven_id
+                WHERE source_id = wallhaven_wallpapers.wallhaven_id
                 AND source = 'WALLHAVEN'
             );
         """,
     )
-    suspend fun getAllUniqueToSearchQueryId(searchQueryId: Long): List<WallpaperEntity>
+    suspend fun getAllUniqueToSearchQueryId(searchQueryId: Long): List<WallhavenWallpaperEntity>
 
-    @Query("SELECT * FROM wallpapers WHERE wallhaven_id in (:wallhavenIds)")
-    suspend fun getAllByWallhavenIds(wallhavenIds: Collection<String>): List<WallpaperEntity>
+    @Query("SELECT * FROM wallhaven_wallpapers WHERE wallhaven_id in (:wallhavenIds)")
+    suspend fun getAllByWallhavenIds(
+        wallhavenIds: Collection<String>,
+    ): List<WallhavenWallpaperEntity>
 
-    @Query("SELECT wallhaven_id FROM wallpapers")
+    @Query("SELECT wallhaven_id FROM wallhaven_wallpapers")
     suspend fun getAllWallhavenIds(): List<String>
 
     @Query(
         """
             DELETE
-            FROM wallpapers
+            FROM wallhaven_wallpapers
             WHERE EXISTS (
                 SELECT 1
-                FROM search_query_wallpapers
-                WHERE wallpaper_id = wallpapers.id
+                FROM wallhaven_search_query_wallpapers
+                WHERE wallpaper_id = wallhaven_wallpapers.id
                 AND search_query_id = :searchQueryId
             )
             AND NOT EXISTS (
                 SELECT 1
-                FROM search_query_wallpapers
-                WHERE wallpaper_id = wallpapers.id
+                FROM wallhaven_search_query_wallpapers
+                WHERE wallpaper_id = wallhaven_wallpapers.id
                 AND search_query_id <> :searchQueryId
             )
             AND NOT EXISTS (
                 SELECT 1
                 FROM favorites
-                WHERE source_id = wallpapers.wallhaven_id
+                WHERE source_id = wallhaven_wallpapers.wallhaven_id
                 AND source = 'WALLHAVEN'
             );
         """,
@@ -137,11 +139,11 @@ interface WallpapersDao {
     suspend fun deleteAllUniqueToSearchQueryId(searchQueryId: Long)
 
     @Insert
-    suspend fun insertWallpaperTagMappings(vararg wallpaperTag: WallpaperTagsEntity)
+    suspend fun insertWallpaperTagMappings(vararg wallpaperTag: WallhavenWallpaperTagsEntity)
 
     @Insert
-    suspend fun insertWallpaperTagMappings(wallpaperTags: Collection<WallpaperTagsEntity>)
+    suspend fun insertWallpaperTagMappings(wallpaperTags: Collection<WallhavenWallpaperTagsEntity>)
 
-    @Query("DELETE FROM wallpaper_tags WHERE wallpaper_id = :wallpaperId")
+    @Query("DELETE FROM wallhaven_wallpaper_tags WHERE wallpaper_id = :wallpaperId")
     suspend fun deleteWallpaperTagMappings(wallpaperId: Long)
 }

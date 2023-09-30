@@ -3,7 +3,7 @@ package com.ammar.wallflow.data.network.model
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntSize
 import androidx.core.graphics.toColorInt
-import com.ammar.wallflow.data.db.entity.WallpaperEntity
+import com.ammar.wallflow.data.db.entity.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.network.model.util.InstantSerializer
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
@@ -59,7 +59,7 @@ fun NetworkWallhavenWallpaper.toWallhavenWallpaper() = WallhavenWallpaper(
 fun NetworkWallhavenWallpaper.toWallpaperEntity(
     id: Long = 0,
     uploaderId: Long? = null,
-) = WallpaperEntity(
+) = WallhavenWallpaperEntity(
     id = id,
     wallhavenId = this.id,
     url = url,

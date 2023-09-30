@@ -11,7 +11,7 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
 @Entity(
-    tableName = "tags",
+    tableName = "wallhaven_tags",
     indices = [
         Index(
             value = ["wallhaven_id"],
@@ -20,7 +20,7 @@ import kotlinx.serialization.Serializable
     ],
 )
 @Serializable
-data class TagEntity(
+data class WallhavenTagEntity(
     @PrimaryKey(autoGenerate = true) val id: Long,
     @ColumnInfo(name = "wallhaven_id") val wallhavenId: Long,
     val name: String,
@@ -31,7 +31,7 @@ data class TagEntity(
     @ColumnInfo(name = "created_at") val createdAt: Instant,
 )
 
-fun TagEntity.asTag() = WallhavenTag(
+fun WallhavenTagEntity.asTag() = WallhavenTag(
     id = wallhavenId,
     name = name,
     alias = alias.split(",").map { it.trimAll() },

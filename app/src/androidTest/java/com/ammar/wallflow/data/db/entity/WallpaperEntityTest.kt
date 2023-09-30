@@ -12,7 +12,7 @@ import org.junit.Test
 class WallpaperEntityTest {
     @Test
     fun convert_WallpaperEntity_to_Wallpaper() {
-        val wallpaperEntity = WallpaperEntity(
+        val wallpaperEntity = WallhavenWallpaperEntity(
             id = 0,
             wallhavenId = "85k6eo",
             url = "https://wallhaven.cc/w/85k6eo",
