@@ -24,10 +24,10 @@ class WallpapersRemoteMediator(
     private val wallHavenNetwork: WallhavenNetworkDataSource,
     private val clock: Clock = Clock.System,
 ) : RemoteMediator<Int, WallhavenWallpaperEntity>() {
-    private val wallpapersDao = appDatabase.wallpapersDao()
+    private val wallpapersDao = appDatabase.wallhavenWallpapersDao()
     private val searchQueryDao = appDatabase.searchQueryDao()
     private val remoteKeysDao = appDatabase.searchQueryRemoteKeysDao()
-    private val searchQueryWallpapersDao = appDatabase.searchQueryWallpapersDao()
+    private val searchQueryWallpapersDao = appDatabase.wallhavenSearchQueryWallpapersDao()
 
     override suspend fun initialize(): InitializeAction {
         val searchQueryEntity = searchQueryDao.getBySearchQuery(searchQuery.toQueryString())

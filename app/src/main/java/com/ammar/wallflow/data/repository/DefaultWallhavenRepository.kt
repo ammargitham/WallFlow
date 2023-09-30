@@ -51,11 +51,11 @@ class DefaultWallhavenRepository @Inject constructor(
     private val wallHavenNetwork: WallhavenNetworkDataSource,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : WallhavenRepository {
-    private val popularTagsDao = appDatabase.popularTagsDao()
+    private val popularTagsDao = appDatabase.wallhavenPopularTagsDao()
     private val lastUpdatedDao = appDatabase.lastUpdatedDao()
-    private val wallpapersDao = appDatabase.wallpapersDao()
-    private val tagsDao = appDatabase.tagsDao()
-    private val uploadersDao = appDatabase.uploadersDao()
+    private val wallpapersDao = appDatabase.wallhavenWallpapersDao()
+    private val tagsDao = appDatabase.wallhavenTagsDao()
+    private val uploadersDao = appDatabase.wallhavenUploadersDao()
 
     private val popularWallhavenTagNetworkResource =
         object : NetworkBoundResource<

@@ -9,7 +9,7 @@ import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenPopularTagWithDetail
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface PopularTagsDao {
+interface WallhavenPopularTagsDao {
     @Query("SELECT * FROM wallhaven_popular_tags")
     fun observeAll(): Flow<List<WallhavenPopularTagEntity>>
 

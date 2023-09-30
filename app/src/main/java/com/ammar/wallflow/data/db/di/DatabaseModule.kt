@@ -29,7 +29,8 @@ class DatabaseModule {
     fun provideLastUpdatedDao(appDatabase: AppDatabase) = appDatabase.lastUpdatedDao()
 
     @Provides
-    fun providePopularTagsDao(appDatabase: AppDatabase) = appDatabase.popularTagsDao()
+    fun providesWallhavenPopularTagsDao(appDatabase: AppDatabase) =
+        appDatabase.wallhavenPopularTagsDao()
 
     @Provides
     fun provideSearchQueryDao(appDatabase: AppDatabase) = appDatabase.searchQueryDao()
@@ -39,14 +40,15 @@ class DatabaseModule {
         appDatabase.searchQueryRemoteKeysDao()
 
     @Provides
-    fun provideSearchQueryWallpapersDao(appDatabase: AppDatabase) =
-        appDatabase.searchQueryWallpapersDao()
+    fun providesWallhavenSearchQueryWallpapersDao(appDatabase: AppDatabase) =
+        appDatabase.wallhavenSearchQueryWallpapersDao()
 
     @Provides
-    fun provideWallpapersDao(appDatabase: AppDatabase) = appDatabase.wallpapersDao()
+    fun providesWallhavenWallpapersDao(appDatabase: AppDatabase) =
+        appDatabase.wallhavenWallpapersDao()
 
     @Provides
-    fun provideTagsDao(appDatabase: AppDatabase) = appDatabase.tagsDao()
+    fun providesWallhavenTagsDao(appDatabase: AppDatabase) = appDatabase.wallhavenTagsDao()
 
     @Provides
     fun providesSearchHistoryDao(appDatabase: AppDatabase) = appDatabase.searchHistoryDao()
@@ -66,7 +68,8 @@ class DatabaseModule {
     fun providesFavoritesDao(appDatabase: AppDatabase) = appDatabase.favoriteDao()
 
     @Provides
-    fun providesUploadersDao(appDatabase: AppDatabase) = appDatabase.uploadersDao()
+    fun providesWallhavenUploadersDao(appDatabase: AppDatabase) =
+        appDatabase.wallhavenUploadersDao()
 
     lateinit var appDatabase: AppDatabase
 

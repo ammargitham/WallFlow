@@ -21,7 +21,7 @@ import com.ammar.wallflow.data.db.dao.AutoWallpaperHistoryDao
 import com.ammar.wallflow.data.db.dao.FavoriteDao
 import com.ammar.wallflow.data.db.dao.ObjectDetectionModelDao
 import com.ammar.wallflow.data.db.dao.SavedSearchDao
-import com.ammar.wallflow.data.db.dao.WallpapersDao
+import com.ammar.wallflow.data.db.dao.WallhavenWallpapersDao
 import com.ammar.wallflow.data.db.entity.AutoWallpaperHistoryEntity
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.toWallpaper
@@ -552,7 +552,7 @@ class AutoWallpaperTest {
                         favoritedOn = Clock.System.now(),
                     )
                 },
-                wallpapersDao = object : FakeWallpapersDao() {
+                wallpapersDao = object : FakeWallhavenWallpapersDao() {
                     override suspend fun getByWallhavenId(wallhavenId: String) = wallpaperEntity
                 },
             )
@@ -713,7 +713,7 @@ class AutoWallpaperTest {
         objectDetectionModelDao: ObjectDetectionModelDao = FakeObjectDetectionModelDao(),
         wallHavenNetwork: WallhavenNetworkDataSource = FakeWallhavenNetworkDataSource(),
         favoriteDao: FavoriteDao = FakeFavoriteDao(),
-        wallpapersDao: WallpapersDao = FakeWallpapersDao(),
+        wallpapersDao: WallhavenWallpapersDao = FakeWallhavenWallpapersDao(),
         localWallpapersRepository: LocalWallpapersRepository = FakeLocalWallpapersRepository(),
     ): AutoWallpaperWorker {
         val workTaskExecutor = InstantWorkTaskExecutor()

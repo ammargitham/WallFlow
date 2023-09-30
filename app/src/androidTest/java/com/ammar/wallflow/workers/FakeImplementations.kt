@@ -8,7 +8,7 @@ import com.ammar.wallflow.data.db.dao.AutoWallpaperHistoryDao
 import com.ammar.wallflow.data.db.dao.FavoriteDao
 import com.ammar.wallflow.data.db.dao.ObjectDetectionModelDao
 import com.ammar.wallflow.data.db.dao.SavedSearchDao
-import com.ammar.wallflow.data.db.dao.WallpapersDao
+import com.ammar.wallflow.data.db.dao.WallhavenWallpapersDao
 import com.ammar.wallflow.data.db.entity.AutoWallpaperHistoryEntity
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.ObjectDetectionModelEntity
@@ -183,7 +183,7 @@ internal open class FakeFavoriteDao : FavoriteDao {
     }
 }
 
-internal open class FakeWallpapersDao : WallpapersDao {
+internal open class FakeWallhavenWallpapersDao : WallhavenWallpapersDao {
     override suspend fun getAll(): List<WallhavenWallpaperEntity> {
         throw RuntimeException()
     }

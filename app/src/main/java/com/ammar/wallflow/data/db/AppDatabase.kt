@@ -10,15 +10,15 @@ import com.ammar.wallflow.data.db.dao.AutoWallpaperHistoryDao
 import com.ammar.wallflow.data.db.dao.FavoriteDao
 import com.ammar.wallflow.data.db.dao.LastUpdatedDao
 import com.ammar.wallflow.data.db.dao.ObjectDetectionModelDao
-import com.ammar.wallflow.data.db.dao.PopularTagsDao
 import com.ammar.wallflow.data.db.dao.SavedSearchDao
 import com.ammar.wallflow.data.db.dao.SearchHistoryDao
 import com.ammar.wallflow.data.db.dao.SearchQueryDao
 import com.ammar.wallflow.data.db.dao.SearchQueryRemoteKeysDao
-import com.ammar.wallflow.data.db.dao.SearchQueryWallpapersDao
-import com.ammar.wallflow.data.db.dao.TagsDao
-import com.ammar.wallflow.data.db.dao.UploadersDao
-import com.ammar.wallflow.data.db.dao.WallpapersDao
+import com.ammar.wallflow.data.db.dao.WallhavenPopularTagsDao
+import com.ammar.wallflow.data.db.dao.WallhavenSearchQueryWallpapersDao
+import com.ammar.wallflow.data.db.dao.WallhavenTagsDao
+import com.ammar.wallflow.data.db.dao.WallhavenUploadersDao
+import com.ammar.wallflow.data.db.dao.WallhavenWallpapersDao
 import com.ammar.wallflow.data.db.entity.AutoWallpaperHistoryEntity
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.LastUpdatedEntity
@@ -60,13 +60,13 @@ import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperTagsEntity
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun lastUpdatedDao(): LastUpdatedDao
-    abstract fun popularTagsDao(): PopularTagsDao
+    abstract fun wallhavenPopularTagsDao(): WallhavenPopularTagsDao
     abstract fun searchQueryDao(): SearchQueryDao
     abstract fun searchQueryRemoteKeysDao(): SearchQueryRemoteKeysDao
-    abstract fun searchQueryWallpapersDao(): SearchQueryWallpapersDao
-    abstract fun wallpapersDao(): WallpapersDao
-    abstract fun tagsDao(): TagsDao
-    abstract fun uploadersDao(): UploadersDao
+    abstract fun wallhavenSearchQueryWallpapersDao(): WallhavenSearchQueryWallpapersDao
+    abstract fun wallhavenWallpapersDao(): WallhavenWallpapersDao
+    abstract fun wallhavenTagsDao(): WallhavenTagsDao
+    abstract fun wallhavenUploadersDao(): WallhavenUploadersDao
     abstract fun searchHistoryDao(): SearchHistoryDao
     abstract fun objectDetectionModelDao(): ObjectDetectionModelDao
     abstract fun savedSearchDao(): SavedSearchDao

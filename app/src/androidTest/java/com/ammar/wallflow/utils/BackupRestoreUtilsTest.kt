@@ -49,9 +49,9 @@ class BackupRestoreUtilsTest {
         context = ApplicationProvider.getApplicationContext(),
         klass = AppDatabase::class.java,
     ).build()
-    private val wallpapersDao = mockDb.wallpapersDao()
-    private val tagsDao = mockDb.tagsDao()
-    private val uploadersDao = mockDb.uploadersDao()
+    private val wallpapersDao = mockDb.wallhavenWallpapersDao()
+    private val tagsDao = mockDb.wallhavenTagsDao()
+    private val uploadersDao = mockDb.wallhavenUploadersDao()
     private val favoriteDao = mockDb.favoriteDao()
     private val savedSearchDao = mockDb.savedSearchDao()
     private val random = Random(1000)

@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.core.net.toUri
 import com.ammar.wallflow.data.db.dao.FavoriteDao
 import com.ammar.wallflow.data.db.dao.SavedSearchDao
-import com.ammar.wallflow.data.db.dao.UploadersDao
-import com.ammar.wallflow.data.db.dao.WallpapersDao
+import com.ammar.wallflow.data.db.dao.WallhavenUploadersDao
+import com.ammar.wallflow.data.db.dao.WallhavenWallpapersDao
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.toSavedSearch
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenTagEntity
@@ -41,7 +41,7 @@ suspend fun getBackupV1Json(
     options: BackupOptions,
     appPreferencesRepository: AppPreferencesRepository,
     favoriteDao: FavoriteDao,
-    wallpapersDao: WallpapersDao,
+    wallpapersDao: WallhavenWallpapersDao,
     savedSearchDao: SavedSearchDao,
 ): String? {
     if (!options.atleastOneChosen) {
@@ -139,8 +139,8 @@ suspend fun restoreBackup(
     savedSearchRepository: SavedSearchRepository,
     wallhavenRepository: WallhavenRepository,
     favoritesRepository: FavoritesRepository,
-    wallpapersDao: WallpapersDao,
-    uploadersDao: UploadersDao,
+    wallpapersDao: WallhavenWallpapersDao,
+    uploadersDao: WallhavenUploadersDao,
 ) {
     when (backup.version) {
         1 -> restoreBackupV1(
@@ -166,8 +166,8 @@ suspend fun restoreBackupV1(
     savedSearchRepository: SavedSearchRepository,
     wallhavenRepository: WallhavenRepository,
     favoritesRepository: FavoritesRepository,
-    wallpapersDao: WallpapersDao,
-    uploadersDao: UploadersDao,
+    wallpapersDao: WallhavenWallpapersDao,
+    uploadersDao: WallhavenUploadersDao,
 ) {
     if (!options.atleastOneChosen) {
         return

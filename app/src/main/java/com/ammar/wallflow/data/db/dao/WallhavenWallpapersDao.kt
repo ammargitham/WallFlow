@@ -13,7 +13,7 @@ import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperTagsEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallpaperWithUploaderAndTags
 
 @Dao
-interface WallpapersDao {
+interface WallhavenWallpapersDao {
     @Query("SELECT * FROM wallhaven_wallpapers")
     suspend fun getAll(): List<WallhavenWallpaperEntity>
 

@@ -40,9 +40,9 @@ class WallpapersRemoteMediatorTest {
         context = ApplicationProvider.getApplicationContext(),
         klass = AppDatabase::class.java,
     ).build()
-    private val wallpapersDao = mockDb.wallpapersDao()
+    private val wallpapersDao = mockDb.wallhavenWallpapersDao()
     private val searchQueryDao = mockDb.searchQueryDao()
-    private val searchQueryWallpapersDao = mockDb.searchQueryWallpapersDao()
+    private val searchQueryWallpapersDao = mockDb.wallhavenSearchQueryWallpapersDao()
 
     @After
     fun tearDown() {

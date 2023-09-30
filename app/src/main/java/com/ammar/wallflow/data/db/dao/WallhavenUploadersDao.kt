@@ -6,7 +6,7 @@ import androidx.room.Query
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenUploaderEntity
 
 @Dao
-interface UploadersDao {
+interface WallhavenUploadersDao {
     @Query("SELECT * FROM wallhaven_uploaders")
     suspend fun getAll(): List<WallhavenUploaderEntity>
 

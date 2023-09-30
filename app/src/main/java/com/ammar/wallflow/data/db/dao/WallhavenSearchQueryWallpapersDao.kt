@@ -7,7 +7,7 @@ import androidx.room.Query
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSearchQueryWallpaperEntity
 
 @Dao
-interface SearchQueryWallpapersDao {
+interface WallhavenSearchQueryWallpapersDao {
     @Query("SELECT * FROM wallhaven_search_query_wallpapers WHERE search_query_id = :searchQueryId")
     suspend fun getBySearchQueryId(searchQueryId: Long): List<WallhavenSearchQueryWallpaperEntity>
 
