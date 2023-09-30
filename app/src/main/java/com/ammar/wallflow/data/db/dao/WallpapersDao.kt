@@ -8,9 +8,9 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import androidx.room.Upsert
-import com.ammar.wallflow.data.db.entity.WallhavenWallpaperEntity
-import com.ammar.wallflow.data.db.entity.WallhavenWallpaperTagsEntity
-import com.ammar.wallflow.data.db.entity.WallpaperWithUploaderAndTags
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperTagsEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallpaperWithUploaderAndTags
 
 @Dao
 interface WallpapersDao {

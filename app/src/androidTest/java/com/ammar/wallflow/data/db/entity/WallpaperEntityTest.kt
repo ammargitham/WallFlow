@@ -3,6 +3,9 @@ package com.ammar.wallflow.data.db.entity
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntSize
 import androidx.core.graphics.toColorInt
+import com.ammar.wallflow.data.db.entity.wallhaven.ThumbsEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.toWallpaper
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import kotlin.test.assertEquals

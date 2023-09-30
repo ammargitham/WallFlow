@@ -4,8 +4,8 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
-import com.ammar.wallflow.data.db.entity.WallhavenPopularTagEntity
-import com.ammar.wallflow.data.db.entity.WallhavenPopularTagWithDetails
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenPopularTagEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenPopularTagWithDetails
 import kotlinx.coroutines.flow.Flow
 
 @Dao

@@ -13,7 +13,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ammar.wallflow.MockFactory
 import com.ammar.wallflow.data.db.AppDatabase
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
-import com.ammar.wallflow.data.db.entity.WallhavenWallpaperTagsEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperTagsEntity
 import com.ammar.wallflow.data.network.model.toEntity
 import com.ammar.wallflow.data.network.model.toWallpaperEntity
 import com.ammar.wallflow.data.repository.AppPreferencesRepository

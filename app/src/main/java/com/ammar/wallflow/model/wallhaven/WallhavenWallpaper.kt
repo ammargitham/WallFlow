@@ -6,8 +6,8 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntSize
 import androidx.core.graphics.toColorInt
-import com.ammar.wallflow.data.db.entity.ThumbsEntity
-import com.ammar.wallflow.data.db.entity.WallhavenWallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.ThumbsEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
 import com.ammar.wallflow.extensions.toHexString
 import com.ammar.wallflow.model.DownloadableWallpaper
 import com.ammar.wallflow.model.Purity

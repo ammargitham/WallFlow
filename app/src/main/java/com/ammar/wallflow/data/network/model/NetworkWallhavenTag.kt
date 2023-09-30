@@ -1,6 +1,6 @@
 package com.ammar.wallflow.data.network.model
 
-import com.ammar.wallflow.data.db.entity.WallhavenTagEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenTagEntity
 import com.ammar.wallflow.data.network.model.util.InstantSerializer
 import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.model.Purity

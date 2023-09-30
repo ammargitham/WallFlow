@@ -7,10 +7,10 @@ import com.ammar.wallflow.data.db.dao.SavedSearchDao
 import com.ammar.wallflow.data.db.dao.UploadersDao
 import com.ammar.wallflow.data.db.dao.WallpapersDao
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
-import com.ammar.wallflow.data.db.entity.WallhavenTagEntity
-import com.ammar.wallflow.data.db.entity.WallhavenUploaderEntity
-import com.ammar.wallflow.data.db.entity.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.db.entity.toSavedSearch
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenTagEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenUploaderEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.preferences.AppPreferences
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.FavoritesRepository

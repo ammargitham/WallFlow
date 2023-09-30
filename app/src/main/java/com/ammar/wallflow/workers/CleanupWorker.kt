@@ -15,7 +15,7 @@ import androidx.work.WorkerParameters
 import com.ammar.wallflow.IoDispatcher
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.db.AppDatabase
-import com.ammar.wallflow.data.db.entity.WallhavenWallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
 import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.extensions.getFileNameFromUrl
 import com.ammar.wallflow.extensions.getTempDir

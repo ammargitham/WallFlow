@@ -27,12 +27,12 @@ import com.ammar.wallflow.data.db.entity.SavedSearchEntity
 import com.ammar.wallflow.data.db.entity.SearchHistoryEntity
 import com.ammar.wallflow.data.db.entity.SearchQueryEntity
 import com.ammar.wallflow.data.db.entity.SearchQueryRemoteKeyEntity
-import com.ammar.wallflow.data.db.entity.WallhavenPopularTagEntity
-import com.ammar.wallflow.data.db.entity.WallhavenSearchQueryWallpaperEntity
-import com.ammar.wallflow.data.db.entity.WallhavenTagEntity
-import com.ammar.wallflow.data.db.entity.WallhavenUploaderEntity
-import com.ammar.wallflow.data.db.entity.WallhavenWallpaperEntity
-import com.ammar.wallflow.data.db.entity.WallhavenWallpaperTagsEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenPopularTagEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSearchQueryWallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenTagEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenUploaderEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperTagsEntity
 
 @Database(
     entities = [

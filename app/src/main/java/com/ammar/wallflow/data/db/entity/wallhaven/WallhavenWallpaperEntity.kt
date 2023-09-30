@@ -1,4 +1,4 @@
-package com.ammar.wallflow.data.db.entity
+package com.ammar.wallflow.data.db.entity.wallhaven
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntSize

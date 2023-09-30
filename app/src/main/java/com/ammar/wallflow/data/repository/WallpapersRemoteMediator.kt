@@ -8,8 +8,8 @@ import androidx.room.withTransaction
 import com.ammar.wallflow.data.db.AppDatabase
 import com.ammar.wallflow.data.db.entity.SearchQueryEntity
 import com.ammar.wallflow.data.db.entity.SearchQueryRemoteKeyEntity
-import com.ammar.wallflow.data.db.entity.WallhavenSearchQueryWallpaperEntity
-import com.ammar.wallflow.data.db.entity.WallhavenWallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSearchQueryWallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
 import com.ammar.wallflow.data.network.model.toWallpaperEntity
 import com.ammar.wallflow.model.SearchQuery

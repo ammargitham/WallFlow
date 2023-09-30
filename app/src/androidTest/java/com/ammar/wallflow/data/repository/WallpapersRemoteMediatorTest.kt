@@ -10,7 +10,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ammar.wallflow.MockFactory
 import com.ammar.wallflow.data.db.AppDatabase
-import com.ammar.wallflow.data.db.entity.WallhavenWallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.network.model.NetworkWallhavenMeta
 import com.ammar.wallflow.data.network.model.StringNetworkWallhavenMetaQuery
 import com.ammar.wallflow.data.network.retrofit.RetrofitWallhavenNetwork

@@ -3,7 +3,7 @@ package com.ammar.wallflow.data.db.dao
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
-import com.ammar.wallflow.data.db.entity.WallhavenUploaderEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenUploaderEntity
 
 @Dao
 interface UploadersDao {

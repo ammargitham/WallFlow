@@ -1,9 +1,10 @@
-package com.ammar.wallflow.data.db.entity
+package com.ammar.wallflow.data.db.entity.wallhaven
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
+import com.ammar.wallflow.data.db.entity.SearchQueryEntity
 
 @Entity(
     tableName = "wallhaven_search_query_wallpapers",

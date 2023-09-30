@@ -13,9 +13,9 @@ import com.ammar.wallflow.data.db.entity.AutoWallpaperHistoryEntity
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.ObjectDetectionModelEntity
 import com.ammar.wallflow.data.db.entity.SavedSearchEntity
-import com.ammar.wallflow.data.db.entity.WallhavenWallpaperEntity
-import com.ammar.wallflow.data.db.entity.WallhavenWallpaperTagsEntity
-import com.ammar.wallflow.data.db.entity.WallpaperWithUploaderAndTags
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperTagsEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallpaperWithUploaderAndTags
 import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
 import com.ammar.wallflow.data.network.model.NetworkResponse
 import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpaper
