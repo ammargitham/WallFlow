@@ -118,17 +118,17 @@ enum class GridColType {
     FIXED,
 }
 
-const val minGridCols = 1L
-const val maxGridCols = 5L
-const val minGridColWidthPct = 10L
-const val maxGridColWidthPct = 50L
+const val MIN_GRID_COLS = 1L
+const val MAX_GRID_COLS = 5L
+const val MIN_GRID_COL_WIDTH_PCT = 10L
+const val MAX_GRID_COL_WIDTH_PCT = 50L
 
 @Serializable
 data class LayoutPreferences(
     val gridType: GridType = GridType.STAGGERED,
     val gridColType: GridColType = GridColType.ADAPTIVE,
-    @IntRange(minGridCols, maxGridCols) val gridColCount: Int = 2,
-    @IntRange(minGridColWidthPct, maxGridColWidthPct) val gridColMinWidthPct: Int = 40,
+    @IntRange(MIN_GRID_COLS, MAX_GRID_COLS) val gridColCount: Int = 2,
+    @IntRange(MIN_GRID_COL_WIDTH_PCT, MAX_GRID_COL_WIDTH_PCT) val gridColMinWidthPct: Int = 40,
     val roundedCorners: Boolean = true,
 )
 

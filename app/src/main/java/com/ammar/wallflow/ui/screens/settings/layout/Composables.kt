@@ -69,10 +69,10 @@ import com.ammar.wallflow.R
 import com.ammar.wallflow.data.preferences.GridColType
 import com.ammar.wallflow.data.preferences.GridType
 import com.ammar.wallflow.data.preferences.LayoutPreferences
-import com.ammar.wallflow.data.preferences.maxGridColWidthPct
-import com.ammar.wallflow.data.preferences.maxGridCols
-import com.ammar.wallflow.data.preferences.minGridColWidthPct
-import com.ammar.wallflow.data.preferences.minGridCols
+import com.ammar.wallflow.data.preferences.MAX_GRID_COLS
+import com.ammar.wallflow.data.preferences.MAX_GRID_COL_WIDTH_PCT
+import com.ammar.wallflow.data.preferences.MIN_GRID_COLS
+import com.ammar.wallflow.data.preferences.MIN_GRID_COL_WIDTH_PCT
 import com.ammar.wallflow.extensions.aspectRatio
 import com.ammar.wallflow.extensions.getScreenResolution
 import com.ammar.wallflow.extensions.toDp
@@ -427,7 +427,7 @@ internal fun LazyListScope.noOfColumnsSection(
                 ) {
                     Text(
                         modifier = Modifier.widthIn(min = sliderPadding),
-                        text = minGridCols.toString(),
+                        text = MIN_GRID_COLS.toString(),
                         textAlign = TextAlign.Center,
                     )
                     Slider(
@@ -440,13 +440,13 @@ internal fun LazyListScope.noOfColumnsSection(
                             },
                         value = sliderPosition,
                         onValueChange = { tempCols = it.toInt() },
-                        valueRange = minGridCols.toFloat()..maxGridCols.toFloat(),
+                        valueRange = MIN_GRID_COLS.toFloat()..MAX_GRID_COLS.toFloat(),
                         onValueChangeFinished = { onNoOfColumnsChange(tempCols) },
-                        steps = (maxGridCols - minGridCols - 1).toInt(),
+                        steps = (MAX_GRID_COLS - MIN_GRID_COLS - 1).toInt(),
                     )
                     Text(
                         modifier = Modifier.widthIn(min = sliderPadding),
-                        text = maxGridCols.toString(),
+                        text = MAX_GRID_COLS.toString(),
                         textAlign = TextAlign.Center,
                     )
                 }
@@ -488,7 +488,7 @@ internal fun LazyListScope.adaptiveColMinWidthPctSection(
                 ) {
                     Text(
                         modifier = Modifier.widthIn(min = sliderPadding),
-                        text = minGridColWidthPct.toString(),
+                        text = MIN_GRID_COL_WIDTH_PCT.toString(),
                         textAlign = TextAlign.Center,
                     )
                     Slider(
@@ -501,13 +501,14 @@ internal fun LazyListScope.adaptiveColMinWidthPctSection(
                             },
                         value = sliderPosition,
                         onValueChange = { tempPct = it.toInt() },
-                        valueRange = minGridColWidthPct.toFloat()..maxGridColWidthPct.toFloat(),
+                        valueRange =
+                        MIN_GRID_COL_WIDTH_PCT.toFloat()..MAX_GRID_COL_WIDTH_PCT.toFloat(),
                         onValueChangeFinished = { onMinWidthPctChange(tempPct) },
-                        steps = ((maxGridColWidthPct - minGridColWidthPct) / 5 - 1).toInt(),
+                        steps = ((MAX_GRID_COL_WIDTH_PCT - MIN_GRID_COL_WIDTH_PCT) / 5 - 1).toInt(),
                     )
                     Text(
                         modifier = Modifier.widthIn(min = sliderPadding),
-                        text = maxGridColWidthPct.toString(),
+                        text = MAX_GRID_COL_WIDTH_PCT.toString(),
                         textAlign = TextAlign.Center,
                     )
                 }
