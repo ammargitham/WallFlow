@@ -7,9 +7,10 @@ import android.net.Uri
 import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
+import android.util.Log
 import androidx.core.provider.DocumentsContractCompat
 
-fun getRealPath(context: Context, uri: Uri): String? {
+fun getRealPath(context: Context, uri: Uri) = try {
     val docUri = if (DocumentsContractCompat.isTreeUri(uri)) {
         DocumentsContract.buildDocumentUriUsingTree(
             uri,
@@ -18,7 +19,10 @@ fun getRealPath(context: Context, uri: Uri): String? {
     } else {
         uri
     }
-    return getPath(context, docUri)
+    getPath(context, docUri)
+} catch (e: Exception) {
+    Log.e("getRealPath", "Error getting path", e)
+    null
 }
 
 fun getPath(context: Context, uri: Uri): String? {
