@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.unit.IntOffset
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -57,6 +58,7 @@ import com.ramcosta.composedestinations.navigation.navigate
 import com.ramcosta.composedestinations.utils.startDestination
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
+import kotlin.math.roundToInt
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
 
@@ -176,7 +178,9 @@ class MainActivity : ComponentActivity() {
                         globalErrors = uiState.globalErrors,
                         bottomBarVisible = bottomBarController.state.value.visible,
                         bottomBarSize = bottomBarController.state.value.size,
-                        searchBarOffsetHeightPx = searchBarOffsetHeightPx,
+                        searchBarOffset = {
+                            IntOffset(x = 0, y = searchBarOffsetHeightPx.roundToInt())
+                        },
                         searchBarVisible = searchBarControllerState.visible,
                         searchBarActive = uiState.searchBarActive,
                         searchBarSearch = uiState.searchBarSearch,

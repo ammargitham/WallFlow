@@ -52,7 +52,7 @@ fun MainNavigation(
         navController = navController,
         navGraph = NavGraphs.root,
         dependenciesContainerBuilder = {
-            dependency(nestedScrollConnection)
+            dependency { nestedScrollConnection }
         },
     )
 }

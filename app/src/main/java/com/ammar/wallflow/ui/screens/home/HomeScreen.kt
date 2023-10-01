@@ -71,7 +71,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeScreen(
     navController: NavController,
-    nestedScrollConnection: NestedScrollConnection,
+    nestedScrollConnectionGetter: () -> NestedScrollConnection,
     modifier: Modifier = Modifier,
     viewModel: HomeViewModel = hiltViewModel(),
     viewerViewModel: WallpaperViewerViewModel = hiltViewModel(),
@@ -150,7 +150,9 @@ fun HomeScreen(
         }
     }
 
-    val onTagClick: (wallhavenTag: WallhavenTag) -> Unit = remember {
+    val onTagClick: (wallhavenTag: WallhavenTag) -> Unit = remember(
+        searchBarController.state.value.search,
+    ) {
         fn@{
             val search = Search(
                 query = "id:${it.id}",
@@ -173,7 +175,7 @@ fun HomeScreen(
     ) {
         HomeScreenContent(
             modifier = Modifier.fillMaxSize(),
-            nestedScrollConnection = nestedScrollConnection,
+            nestedScrollConnectionGetter = nestedScrollConnectionGetter,
             isExpanded = systemState.isExpanded,
             gridState = gridState,
             contentPadding = PaddingValues(
