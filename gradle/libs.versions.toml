@@ -4,6 +4,7 @@ accompanist = "0.33.2-alpha"
 androidGradlePlugin = "8.2.0-beta06"
 androidToolsDesugar = "2.0.3"
 androidxActivity = "1.7.2"
+androidxBenchmark = "1.2.0-rc01"
 # @keep
 androidxComposeCompiler = "1.5.3"
 androidxComposeMaterial = "1.5.2"
@@ -18,9 +19,11 @@ androidxLifecycle = "2.6.2"
 androidxPaging = "3.2.1"
 androidxRoom = "2.6.0-rc01"
 androidxTest = "1.5.0"
+androidxTestEspresso = "3.5.1"
 androidxTestExt = "1.1.5"
 androidxTestRunner = "1.5.2"
 androidxTestServices = "1.4.2"
+androidxTestUiautomator = "2.3.0-alpha04"
 #androidXWindow = "1.2.0-beta01"
 androidxWork = "2.9.0-beta01"
 cloudy = "0.1.2"
@@ -58,6 +61,7 @@ accompanist-adaptive = { module = "com.google.accompanist:accompanist-adaptive",
 #accompanist-permission = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
 accompanist-placeholder-material = { module = "com.google.accompanist:accompanist-placeholder-material", version.ref = "accompanist" }
 android-tools-desugar = { module = "com.android.tools:desugar_jdk_libs", version.ref = "androidToolsDesugar" }
+androidx-benchmark-macro-junit4 = { module = "androidx.benchmark:benchmark-macro-junit4", version.ref = "androidxBenchmark" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidxCore" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidxActivity" }
 #androidx-compose-compiler = { module = "androidx.compose.compiler:compiler", version.ref = "androidxComposeCompiler" }
@@ -89,9 +93,11 @@ androidx-room-paging = { module = "androidx.room:room-paging", version.ref = "an
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidxRoom" }
 androidx-room-testing = { module = "androidx.room:room-testing", version.ref = "androidxRoom" }
 androidx-test-core = { module = "androidx.test:core", version.ref = "androidxTest" }
+androidx-test-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "androidxTestEspresso" }
 androidx-test-ext-junit = { module = "androidx.test.ext:junit", version.ref = "androidxTestExt" }
 androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidxTestRunner" }
 androidx-test-services = { module = "androidx.test.services:test-services", version.ref = "androidxTestServices" }
+androidx-test-uiautomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "androidxTestUiautomator" }
 #androidx-window = { module = "androidx.window:window", version.ref = "androidXWindow" }
 androidx-work-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "androidxWork" }
 androidx-work-testing = { module = "androidx.work:work-testing", version.ref = "androidxWork" }
@@ -131,6 +137,7 @@ tflite-task-vision = { module = "org.tensorflow:tensorflow-lite-task-vision", ve
 [plugins]
 about-libraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutLibraries" }
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
+android-test = { id = "com.android.test", version.ref = "androidGradlePlugin" }
 #android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 hilt-gradle = { id = "com.google.dagger.hilt.android", version.ref = "daggerHilt" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
