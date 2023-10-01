@@ -1,0 +1,6 @@
+What's New
+* Add option to sort local wallpapers
+
+Bug Fixes
+* Fix crash when trying to get a Uri's real path
+* Fix app unresponsive after closing bottom sheets
