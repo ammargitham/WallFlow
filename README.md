@@ -31,7 +31,7 @@
 |                     [<img height="80" alt="Get it on GitHub" title="Get it on GitHub" src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" />](https://f-droid.org/packages/com.ammar.wallflow/)                      | Coming Soon |
 | [<img height="80" alt="Get it on IzzyOnDroid" title="Get it on IzzyOnDroid" src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png" />](https://apt.izzysoft.de/fdroid/index/apk/com.ammar.wallflow/) | Coming Soon |
 
-\*[_What's the difference between Regular and Plus?_](#note)
+\*[_What's the difference between Regular and Plus?_](#regular-vs-plus)
 
 ## Screenshots
 
@@ -57,14 +57,15 @@
 - Use saved searches, favorites, and local wallpapers for auto wallpaper changer
 - Search history
 - Supports all filters provided by wallhaven.cc
-- [Optional] Smart wallpaper cropping using on-device object detection powered by [Tensorflow Lite](https://www.tensorflow.org/lite/). ([See note below](#note))
+- [Plus] Smart wallpaper cropping using on-device object detection powered by [Tensorflow Lite](https://www.tensorflow.org/lite/).
   - Supports adding your own TFLite models. You can find more models [here](https://tfhub.dev/s?deployment-format=lite&module-type=image-object-detection/).
 - Search results caching to reduce api calls
 - Options to tweak the wallpaper grid layout
+- QuickSettings tile, shortcut and broadcast to quickly change wallpaper
 - Dynamic theme (Material You)
 - Supports multi-display environments (eg. when connected to external monitors)
 
-### Note
+## Regular vs Plus
 
 Two versions are provided (both free and open-source)
 
@@ -73,14 +74,14 @@ Two versions are provided (both free and open-source)
 
 **All other features are same in both versions.**
 
-### Details to change wallpaper via broadcast (using Tasker or similar apps)
+## Broadcast details (for Tasker and similar apps)
 - Package:
-  - For Base: `com.ammar.wallflow`
+  - For Regular: `com.ammar.wallflow`
   - For Plus: `com.ammar.wallflow.plus`
 - Action: `com.ammar.wallflow.ACTION_CHANGE_WALLPAPER`
 
 ADB command:
-- For Base: `am broadcast --user 0 -a com.ammar.wallflow.ACTION_CHANGE_WALLPAPER com.ammar.wallflow`
+- For Regular: `am broadcast --user 0 -a com.ammar.wallflow.ACTION_CHANGE_WALLPAPER com.ammar.wallflow`
 - For Plus: `am broadcast --user 0 -a com.ammar.wallflow.ACTION_CHANGE_WALLPAPER com.ammar.wallflow.plus`
 
 ## Roadmap
