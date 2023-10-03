@@ -19,6 +19,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
     alias(libs.plugins.spotless)
+    alias(libs.plugins.baselineprofile)
 }
 
 fun getAbi() = if (hasProperty("abi")) {
@@ -71,13 +72,6 @@ android {
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-dev"
             isDebuggable = true
-        }
-
-        create("benchmark") {
-            initWith(buildTypes.getByName("release"))
-            signingConfig = signingConfigs.getByName("debug")
-            matchingFallbacks += listOf("release")
-            isDebuggable = false
         }
 
         getByName("release") {
@@ -204,29 +198,8 @@ room {
     schemaDirectory("$projectDir/schemas/")
 }
 
-spotless {
-    ratchetFrom = "origin/main"
-    kotlin {
-        target("src/**/*.kt")
-        ktlint(libs.versions.ktlint.get())
-    }
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    kotlinOptions {
-        if (project.findProperty("composeCompilerReports") == "true") {
-            freeCompilerArgs += listOf(
-                "-P",
-                "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=${project.buildDir.absolutePath}/compose_compiler",
-            )
-        }
-        if (project.findProperty("composeCompilerMetrics") == "true") {
-            freeCompilerArgs += listOf(
-                "-P",
-                "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=${project.buildDir.absolutePath}/compose_compiler",
-            )
-        }
-    }
+baselineProfile {
+    mergeIntoMain = true
 }
 
 val plusImplementation by configurations
@@ -350,6 +323,10 @@ dependencies {
 
     // LeakCanary
     debugImplementation(libs.leakcanary.android)
+
+    // Baseline Profiles
+    implementation(libs.androidx.profileinstaller)
+    baselineProfile(project(":benchmarks"))
 
     // Local tests: jUnit, coroutines, Android runner
     testImplementation(libs.junit)
