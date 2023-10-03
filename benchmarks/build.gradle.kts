@@ -57,3 +57,11 @@ dependencies {
     implementation(libs.androidx.test.uiautomator)
     implementation(libs.androidx.benchmark.macro.junit4)
 }
+
+spotless {
+    ratchetFrom = "origin/main"
+    kotlin {
+        target("src/**/*.kt")
+        ktlint(libs.versions.ktlint.get())
+    }
+}

@@ -26,14 +26,6 @@ plugins {
     alias(libs.plugins.baselineprofile) apply false
 }
 
-configure<com.diffplug.gradle.spotless.SpotlessExtension> {
-    ratchetFrom = "origin/main"
-    kotlin {
-        target("src/**/*.kt")
-        ktlint(libs.versions.ktlint.get())
-    }
-}
-
 subprojects {
     tasks.withType<KotlinCompile>().configureEach {
         kotlinOptions {

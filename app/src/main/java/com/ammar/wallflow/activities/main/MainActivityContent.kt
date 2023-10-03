@@ -111,9 +111,7 @@ fun MainActivityContent(
                 content(it)
             }
             MainSearchBar(
-                modifier = Modifier
-                    .windowInsetsPadding(topWindowInsets)
-                    .offset(searchBarOffset),
+                modifier = Modifier.offset(searchBarOffset),
                 useDocked = useDockedSearchBar,
                 visible = searchBarVisible,
                 active = searchBarActive,

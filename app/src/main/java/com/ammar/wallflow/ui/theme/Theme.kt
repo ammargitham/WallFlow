@@ -16,25 +16,17 @@
 
 package com.ammar.wallflow.ui.theme
 
-import android.app.Activity
 import android.os.Build
-import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.dynamicDarkColorScheme
 import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.takeOrElse
-import androidx.compose.ui.graphics.toArgb
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
@@ -61,71 +53,42 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun WallFlowTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
-    statusBarVisible: Boolean = true,
-    statusBarColor: Color = Color.Unspecified,
-    navigationBarVisible: Boolean = false,
-    navigationBarColor: Color = Color.Unspecified,
-    lightStatusBars: Boolean? = null,
-    lightNavigationBars: Boolean? = null,
     content: @Composable () -> Unit,
 ) {
-    val colorScheme = when {
-        dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-            val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-        }
-
-        darkTheme -> DarkColorScheme
-        else -> LightColorScheme
-    }
-    val view = LocalView.current
-    if (!view.isInEditMode) {
-        val currentWindow = (view.context as? Activity)?.window
-
-        val systemBarColor = colorScheme.surface
-        val animatedStatusBarColor by animateColorAsState(
-            statusBarColor.takeOrElse { systemBarColor },
-            label = "statusBarColor",
-        )
-        val animatedNavigationBarColor by animateColorAsState(
-            navigationBarColor.takeOrElse { systemBarColor },
-            label = "navigationBarColor",
-        )
-
-        LaunchedEffect(
-            animatedStatusBarColor,
-            animatedNavigationBarColor,
-            darkTheme,
-            statusBarVisible,
-        ) {
-            if (currentWindow == null) {
-                return@LaunchedEffect
-            }
-            currentWindow.statusBarColor = animatedStatusBarColor.toArgb()
-            currentWindow.navigationBarColor = animatedNavigationBarColor.toArgb()
-            val insetsController = WindowCompat.getInsetsController(currentWindow, view)
-            insetsController.apply {
-                isAppearanceLightStatusBars = lightStatusBars ?: !darkTheme
-                isAppearanceLightNavigationBars = lightNavigationBars ?: !darkTheme
-                if (statusBarVisible) {
-                    show(WindowInsetsCompat.Type.statusBars())
-                } else {
-                    hide(WindowInsetsCompat.Type.statusBars())
-                }
-                if (navigationBarVisible) {
-                    show(WindowInsetsCompat.Type.navigationBars())
-                } else {
-                    hide(WindowInsetsCompat.Type.navigationBars())
-                }
-            }
-        }
-    }
+    val colorScheme = rememberColorScheme(
+        darkTheme = darkTheme,
+        dynamicColor = dynamicColor,
+    )
 
     MaterialTheme(
         colorScheme = colorScheme,
         typography = Typography,
         content = content,
     )
+}
+
+@Composable
+fun rememberColorScheme(
+    darkTheme: Boolean = isSystemInDarkTheme(),
+    dynamicColor: Boolean = true,
+): ColorScheme {
+    val context = LocalContext.current
+    return remember(
+        context,
+        darkTheme,
+        dynamicColor,
+    ) {
+        when {
+            dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
+                if (darkTheme) {
+                    dynamicDarkColorScheme(context)
+                } else {
+                    dynamicLightColorScheme(context)
+                }
+            }
+            darkTheme -> DarkColorScheme
+            else -> LightColorScheme
+        }
+    }
 }

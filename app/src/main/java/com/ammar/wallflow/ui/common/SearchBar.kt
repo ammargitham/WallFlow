@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -216,7 +217,9 @@ object SearchBar {
     ) {
         if (useDocked) {
             DockedSearchBar(
-                modifier = modifier.align(Alignment.TopStart),
+                modifier = modifier
+                    .windowInsetsPadding(topWindowInsets)
+                    .align(Alignment.TopStart),
                 query = query,
                 onQueryChange = onQueryChange,
                 onSearch = onSearch,
@@ -262,7 +265,7 @@ data class Suggestion<T>(
     },
 )
 
-fun Modifier.searchBarContainer(
+internal fun Modifier.searchBarContainer(
     isDocked: Boolean = false,
 ) = composed {
     if (!isDocked) {
@@ -278,7 +281,7 @@ fun Modifier.searchBarContainer(
         )
 }
 
-fun Modifier.searchBar(
+internal fun Modifier.searchBar(
     isDocked: Boolean = false,
 ) = if (!isDocked) {
     this

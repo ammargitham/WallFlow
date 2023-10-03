@@ -97,8 +97,6 @@ fun CropScreen(
             it.copy(
                 statusBarColor = systemBarColor,
                 navigationBarColor = systemBarColor,
-                lightStatusBars = false,
-                lightNavigationBars = false,
             )
         }
     }

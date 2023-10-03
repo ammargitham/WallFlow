@@ -19,14 +19,12 @@ data class SystemState(
     val statusBarColor: Color = Color.Unspecified,
     val navigationBarVisible: Boolean = true,
     val navigationBarColor: Color = Color.Unspecified,
-    val lightStatusBars: Boolean? = null,
-    val lightNavigationBars: Boolean? = null,
     val isExpanded: Boolean = false,
     val size: IntSize = IntSize.Zero,
     val applyScaffoldPadding: Boolean = true,
 )
 
-private class DefaultSystemController(initialState: SystemState) : SystemController() {
+class DefaultSystemController(initialState: SystemState) : SystemController() {
     private var _state: MutableState<SystemState> = mutableStateOf(initialState)
     override val state: State<SystemState> = _state
 

@@ -57,11 +57,6 @@ fun WallpaperScreen(
     val sheetColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
         BottomSheetDefaults.Elevation,
     )
-    // TODO: Use Color.Transparent for nav bar
-    // fully transparent nav bar will require setting some extra flags,
-    // so setting alpha 0.01 as current workaround
-    val navigationBarColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.01f)
-    // val navigationBarColor = Color.Transparent
     val searchBarController = LocalMainSearchBarController.current
     val bottomBarController = LocalBottomBarController.current
     val systemController = LocalSystemController.current
@@ -76,8 +71,7 @@ fun WallpaperScreen(
             systemController.update {
                 it.copy(
                     statusBarColor = Color.Transparent,
-                    lightStatusBars = false,
-                    navigationBarColor = navigationBarColor,
+                    navigationBarColor = Color.Transparent,
                 )
             }
         }
@@ -98,7 +92,11 @@ fun WallpaperScreen(
             it.copy(
                 statusBarVisible = uiState.systemBarsVisible,
                 navigationBarVisible = uiState.systemBarsVisible,
-                navigationBarColor = if (viewerUiState.showInfo) sheetColor else navigationBarColor,
+                navigationBarColor = if (viewerUiState.showInfo) {
+                    sheetColor
+                } else {
+                    Color.Transparent
+                },
             )
         }
     }

@@ -8,15 +8,15 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.core.view.WindowCompat
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.DEFAULT_ARGS_KEY
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -30,10 +30,13 @@ import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.ObjectDetectionModelRepository
 import com.ammar.wallflow.extensions.getParcelExtra
 import com.ammar.wallflow.extensions.toast
+import com.ammar.wallflow.ui.common.DefaultSystemController
 import com.ammar.wallflow.ui.common.LocalSystemController
+import com.ammar.wallflow.ui.common.SystemState
 import com.ammar.wallflow.ui.screens.crop.CropScreen
 import com.ammar.wallflow.ui.screens.crop.CropViewModel
 import com.ammar.wallflow.ui.screens.crop.Result
+import com.ammar.wallflow.ui.theme.EdgeToEdge
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import com.ammar.wallflow.utils.DownloadManager
 import dagger.hilt.android.AndroidEntryPoint
@@ -60,13 +63,14 @@ class SetWallpaperActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
 
-        onBackPressedDispatcher.addCallback(object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                finishAndRemoveTask()
-            }
-        })
+        onBackPressedDispatcher.addCallback(
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    finishAndRemoveTask()
+                }
+            },
+        )
 
         val uri = getUri()
         if (uri == null) {
@@ -104,32 +108,42 @@ class SetWallpaperActivity : ComponentActivity() {
         }
 
         setContent {
-            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-            val systemController = LocalSystemController.current
-            val systemState by systemController.state
-
-            WallFlowTheme(
-                darkTheme = when (uiState.theme) {
-                    Theme.SYSTEM -> isSystemInDarkTheme()
-                    Theme.LIGHT -> false
-                    Theme.DARK -> true
-                },
-                statusBarVisible = systemState.statusBarVisible,
-                statusBarColor = systemState.statusBarColor,
-                navigationBarVisible = systemState.navigationBarVisible,
-                navigationBarColor = systemState.navigationBarColor,
-                lightStatusBars = systemState.lightStatusBars,
-                lightNavigationBars = systemState.lightNavigationBars,
+            CompositionLocalProvider(
+                LocalSystemController provides DefaultSystemController(SystemState()),
             ) {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background,
-                ) {
-                    CropScreen(
-                        modifier = Modifier.windowInsetsPadding(WindowInsets.systemBars),
-                        viewModel = viewModel,
-                    )
-                }
+                Content(viewModel)
+            }
+        }
+    }
+
+    @Composable
+    private fun Content(viewModel: CropViewModel) {
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        val systemController = LocalSystemController.current
+        val systemState by systemController.state
+        val darkTheme = when (uiState.theme) {
+            Theme.SYSTEM -> isSystemInDarkTheme()
+            Theme.LIGHT -> false
+            Theme.DARK -> true
+        }
+        EdgeToEdge(
+            darkTheme = darkTheme,
+            statusBarVisible = systemState.statusBarVisible,
+            statusBarColor = systemState.statusBarColor,
+            navigationBarVisible = systemState.navigationBarVisible,
+            navigationBarColor = systemState.navigationBarColor,
+        )
+        WallFlowTheme(darkTheme = darkTheme) {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = Color.Black,
+            ) {
+                CropScreen(
+                    modifier = Modifier.windowInsetsPadding(
+                        ScaffoldDefaults.contentWindowInsets,
+                    ),
+                    viewModel = viewModel,
+                )
             }
         }
     }

@@ -344,6 +344,14 @@ dependencies {
     androidTestImplementation(libs.mockk.android)
 }
 
+spotless {
+    ratchetFrom = "origin/main"
+    kotlin {
+        target("src/**/*.kt")
+        ktlint(libs.versions.ktlint.get())
+    }
+}
+
 aboutLibraries {
     registerAndroidTasks = false
     excludeFields = arrayOf(
