@@ -1,4 +1,4 @@
-package com.ammar.wallflow.data.repository
+package com.ammar.wallflow.data.repository.wallhaven
 
 import android.util.Log
 import androidx.paging.ExperimentalPagingApi
@@ -25,6 +25,7 @@ import com.ammar.wallflow.data.network.model.NetworkWallhavenUploader
 import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpaper
 import com.ammar.wallflow.data.network.model.toEntity
 import com.ammar.wallflow.data.network.model.toWallpaperEntity
+import com.ammar.wallflow.data.repository.WallpapersRemoteMediator
 import com.ammar.wallflow.data.repository.utils.NetworkBoundResource
 import com.ammar.wallflow.data.repository.utils.Resource
 import com.ammar.wallflow.data.repository.utils.WallhavenTagsDocumentParser.parsePopularTags

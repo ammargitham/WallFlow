@@ -12,7 +12,7 @@ import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenWallpapersDao
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.FavoritesRepository
 import com.ammar.wallflow.data.repository.SavedSearchRepository
-import com.ammar.wallflow.data.repository.WallhavenRepository
+import com.ammar.wallflow.data.repository.wallhaven.WallhavenRepository
 import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.extensions.readFromUri
 import com.ammar.wallflow.extensions.writeToUri

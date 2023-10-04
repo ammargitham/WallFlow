@@ -17,9 +17,9 @@ import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperTagsEntity
 import com.ammar.wallflow.data.network.model.toEntity
 import com.ammar.wallflow.data.network.model.toWallpaperEntity
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
-import com.ammar.wallflow.data.repository.DefaultWallhavenRepository
 import com.ammar.wallflow.data.repository.FavoritesRepository
 import com.ammar.wallflow.data.repository.SavedSearchRepository
+import com.ammar.wallflow.data.repository.wallhaven.DefaultWallhavenRepository
 import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.model.backup.BackupOptions
 import com.ammar.wallflow.model.backup.BackupV1

@@ -1,4 +1,4 @@
-package com.ammar.wallflow.data.repository
+package com.ammar.wallflow.data.repository.wallhaven
 
 import androidx.paging.PagingData
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenTagEntity

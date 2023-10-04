@@ -15,7 +15,7 @@ import com.ammar.wallflow.data.preferences.AppPreferences
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.FavoritesRepository
 import com.ammar.wallflow.data.repository.SavedSearchRepository
-import com.ammar.wallflow.data.repository.WallhavenRepository
+import com.ammar.wallflow.data.repository.wallhaven.WallhavenRepository
 import com.ammar.wallflow.extensions.format
 import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.model.backup.Backup

@@ -1,9 +1,9 @@
 package com.ammar.wallflow.data.di
 
-import com.ammar.wallflow.data.repository.DefaultWallhavenRepository
-import com.ammar.wallflow.data.repository.WallhavenRepository
 import com.ammar.wallflow.data.repository.local.DefaultLocalWallpapersRepository
 import com.ammar.wallflow.data.repository.local.LocalWallpapersRepository
+import com.ammar.wallflow.data.repository.wallhaven.DefaultWallhavenRepository
+import com.ammar.wallflow.data.repository.wallhaven.WallhavenRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
