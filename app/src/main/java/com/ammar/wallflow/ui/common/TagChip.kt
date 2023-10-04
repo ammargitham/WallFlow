@@ -24,8 +24,8 @@ import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import com.google.accompanist.placeholder.PlaceholderHighlight
-import com.google.accompanist.placeholder.material.fade
-import com.google.accompanist.placeholder.material.placeholder
+import com.google.accompanist.placeholder.material3.fade
+import com.google.accompanist.placeholder.material3.placeholder
 import kotlinx.datetime.Clock
 
 @Composable

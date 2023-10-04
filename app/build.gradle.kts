@@ -273,7 +273,6 @@ dependencies {
 
     // Accompanist
     implementation(libs.accompanist.adaptive)
-    implementation(libs.accompanist.placeholder.material)
 
     // jsoup
     implementation(libs.jsoup)
