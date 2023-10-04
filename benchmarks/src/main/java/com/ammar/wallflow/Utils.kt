@@ -27,7 +27,6 @@ fun UiDevice.flingElementDownUp(element: UiObject2) {
     element.fling(Direction.UP)
 }
 
-
 /**
  * Condition will be satisfied if given element has specified count of children
  */
