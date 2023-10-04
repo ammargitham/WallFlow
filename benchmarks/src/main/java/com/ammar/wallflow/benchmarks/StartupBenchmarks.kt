@@ -7,6 +7,7 @@ import androidx.benchmark.macro.StartupTimingMetric
 import androidx.benchmark.macro.junit4.MacrobenchmarkRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.LargeTest
+import com.ammar.wallflow.benchmarks.home.homeWaitForContent
 import com.ammar.wallflow.test.benchmarks.PACKAGE_NAME
 import org.junit.Rule
 import org.junit.Test
@@ -20,26 +21,37 @@ class StartupBenchmarks {
     val rule = MacrobenchmarkRule()
 
     @Test
-    fun startupCompilationNone() =
-        benchmark(CompilationMode.None())
+    fun startupCompilationNone() = benchmark(CompilationMode.None())
 
     @Test
-    fun startupCompilationBaselineProfiles() =
-        benchmark(CompilationMode.Partial(BaselineProfileMode.Require))
+    fun startupBaselineProfileDisabled() = benchmark(
+        CompilationMode.Partial(
+            baselineProfileMode = BaselineProfileMode.Disable,
+            warmupIterations = 1,
+        ),
+    )
 
-    private fun benchmark(compilationMode: CompilationMode) {
-        rule.measureRepeated(
-            packageName = PACKAGE_NAME,
-            metrics = listOf(StartupTimingMetric()),
-            compilationMode = compilationMode,
-            startupMode = StartupMode.COLD,
-            iterations = 10,
-            setupBlock = {
-                pressHome()
-            },
-            measureBlock = {
-                startActivityAndWait()
-            },
-        )
+    @Test
+    fun startupCompilationBaselineProfiles() = benchmark(
+        CompilationMode.Partial(
+            baselineProfileMode = BaselineProfileMode.Require,
+        ),
+    )
+
+    @Test
+    fun startupCompilationFull() = benchmark(CompilationMode.Full())
+
+    private fun benchmark(compilationMode: CompilationMode) = rule.measureRepeated(
+        packageName = PACKAGE_NAME,
+        metrics = listOf(StartupTimingMetric()),
+        compilationMode = compilationMode,
+        startupMode = StartupMode.COLD,
+        iterations = 10,
+        setupBlock = {
+            pressHome()
+        },
+    ) {
+        startActivityAndWait()
+        homeWaitForContent()
     }
 }

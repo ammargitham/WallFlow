@@ -19,12 +19,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.compose.ui.unit.IntOffset
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -98,8 +101,11 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    @OptIn(
+        ExperimentalMaterial3WindowSizeClassApi::class,
+        ExperimentalComposeUiApi::class,
+    )
     @Composable
-    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     private fun Content() {
         val windowSizeClass = calculateWindowSizeClass(this)
         val useNavRail = windowSizeClass.widthSizeClass > WindowWidthSizeClass.Compact
@@ -193,7 +199,8 @@ class MainActivity : ComponentActivity() {
             Surface(
                 modifier = Modifier
                     .fillMaxSize()
-                    .onSizeChanged { size -> systemController.update { it.copy(size = size) } },
+                    .onSizeChanged { size -> systemController.update { it.copy(size = size) } }
+                    .semantics { testTagsAsResourceId = true },
                 color = MaterialTheme.colorScheme.background,
             ) {
                 MainActivityContent(

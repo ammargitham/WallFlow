@@ -25,6 +25,7 @@ import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -51,10 +52,10 @@ import kotlinx.coroutines.flow.flowOf
 
 @Composable
 internal fun HomeScreenContent(
+    gridState: LazyStaggeredGridState,
     wallpapers: LazyPagingItems<Wallpaper>,
     nestedScrollConnectionGetter: () -> NestedScrollConnection,
     modifier: Modifier = Modifier,
-    gridState: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
     contentPadding: PaddingValues = PaddingValues(8.dp),
     isExpanded: Boolean = false,
     favorites: ImmutableList<Favorite> = persistentListOf(),
@@ -171,9 +172,9 @@ private fun HomeScreenContent(
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 private fun Feed(
+    gridState: LazyStaggeredGridState,
     wallpapers: LazyPagingItems<Wallpaper>,
     modifier: Modifier = Modifier,
-    gridState: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
     contentPadding: PaddingValues = PaddingValues(8.dp),
     layoutPreferences: LayoutPreferences = LayoutPreferences(),
     favorites: ImmutableList<Favorite> = persistentListOf(),
@@ -192,32 +193,6 @@ private fun Feed(
     Scaffold(
         modifier = modifier,
         contentWindowInsets = WindowInsets(0.dp),
-        content = {
-            WallpaperStaggeredGrid(
-                state = gridState,
-                contentPadding = contentPadding,
-                wallpapers = wallpapers,
-                favorites = favorites,
-                blurSketchy = blurSketchy,
-                blurNsfw = blurNsfw,
-                header = {
-                    header(
-                        wallhavenTags = wallhavenTags,
-                        isTagsLoading = isTagsLoading,
-                        onTagClick = onTagClick,
-                    )
-                },
-                selectedWallpaper = selectedWallpaper,
-                showSelection = showSelection,
-                gridType = layoutPreferences.gridType,
-                gridColType = layoutPreferences.gridColType,
-                gridColCount = layoutPreferences.gridColCount,
-                gridColMinWidthPct = layoutPreferences.gridColMinWidthPct,
-                roundedCorners = layoutPreferences.roundedCorners,
-                onWallpaperClick = onWallpaperClick,
-                onWallpaperFavoriteClick = onWallpaperFavoriteClick,
-            )
-        },
         floatingActionButton = {
             if (showFAB) {
                 val isFabExpanded by remember(gridState) {
@@ -238,7 +213,33 @@ private fun Feed(
                 )
             }
         },
-    )
+    ) {
+        WallpaperStaggeredGrid(
+            modifier = Modifier.testTag("home:feed"),
+            state = gridState,
+            contentPadding = contentPadding,
+            wallpapers = wallpapers,
+            favorites = favorites,
+            blurSketchy = blurSketchy,
+            blurNsfw = blurNsfw,
+            header = {
+                header(
+                    wallhavenTags = wallhavenTags,
+                    isTagsLoading = isTagsLoading,
+                    onTagClick = onTagClick,
+                )
+            },
+            selectedWallpaper = selectedWallpaper,
+            showSelection = showSelection,
+            gridType = layoutPreferences.gridType,
+            gridColType = layoutPreferences.gridColType,
+            gridColCount = layoutPreferences.gridColCount,
+            gridColMinWidthPct = layoutPreferences.gridColMinWidthPct,
+            roundedCorners = layoutPreferences.roundedCorners,
+            onWallpaperClick = onWallpaperClick,
+            onWallpaperFavoriteClick = onWallpaperFavoriteClick,
+        )
+    }
 }
 
 private fun LazyStaggeredGridScope.header(
@@ -275,7 +276,9 @@ private fun DefaultPreview() {
             val nestedScrollConnection = remember {
                 object : NestedScrollConnection {}
             }
+            val gridState = rememberLazyStaggeredGridState()
             HomeScreenContent(
+                gridState = gridState,
                 wallhavenTags = persistentListOf(),
                 wallpapers = pagingItems,
                 nestedScrollConnectionGetter = { nestedScrollConnection },

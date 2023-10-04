@@ -30,7 +30,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.ammar.wallflow.extensions.rememberLazyStaggeredGridState
 import com.ammar.wallflow.extensions.search
@@ -72,15 +71,13 @@ import kotlinx.coroutines.launch
 fun HomeScreen(
     navController: NavController,
     nestedScrollConnectionGetter: () -> NestedScrollConnection,
-    modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = hiltViewModel(),
-    viewerViewModel: WallpaperViewerViewModel = hiltViewModel(),
 ) {
+    val viewModel: HomeViewModel = hiltViewModel()
+    val viewerViewModel: WallpaperViewerViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val viewerUiState by viewerViewModel.uiState.collectAsStateWithLifecycle()
     val wallpapers = viewModel.wallpapers.collectAsLazyPagingItems()
     val gridState = wallpapers.rememberLazyStaggeredGridState()
-    val refreshing = wallpapers.loadState.refresh == LoadState.Loading
     val refreshState = rememberPullRefreshState(
         refreshing = false,
         onRefresh = {
@@ -95,24 +92,13 @@ fun HomeScreen(
     val context = LocalContext.current
     val bottomWindowInsets = bottomWindowInsets
     val navigationBarsInsets = WindowInsets.navigationBars
-    val bottomPadding = remember(
-        bottomBarController.state.value,
+    val bottomPadding = getStartBottomPadding(
         density,
-        bottomWindowInsets.getBottom(density),
-        navigationBarsInsets.getBottom(density),
-    ) {
-        getStartBottomPadding(
-            density,
-            bottomBarController,
-            bottomWindowInsets,
-            navigationBarsInsets,
-        )
-    }
+        bottomBarController,
+        bottomWindowInsets,
+        navigationBarsInsets,
+    )
     val systemState by systemController.state
-
-    LaunchedEffect(refreshing) {
-        viewModel.setWallpapersLoading(refreshing)
-    }
 
     LaunchedEffect(Unit) {
         systemController.resetBarsState()
@@ -168,7 +154,7 @@ fun HomeScreen(
     val onFilterFABClick = remember { { viewModel.showFilters(true) } }
 
     Box(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .windowInsetsPadding(topWindowInsets)
             .pullRefresh(state = refreshState),
@@ -247,63 +233,64 @@ fun HomeScreen(
             refreshing = false,
             state = refreshState,
         )
+    }
 
-        if (uiState.showFilters) {
-            val state = rememberModalBottomSheetState()
-            val scope = rememberCoroutineScope()
-            var localSearch by rememberSaveable(
-                uiState.homeSearch,
-                stateSaver = SearchSaver,
-            ) { mutableStateOf(uiState.homeSearch) }
+    if (uiState.showFilters) {
+        val state = rememberModalBottomSheetState()
+        val scope = rememberCoroutineScope()
+        var localSearch by rememberSaveable(
+            uiState.homeSearch,
+            stateSaver = SearchSaver,
+        ) { mutableStateOf(uiState.homeSearch) }
 
-            EditSearchModalBottomSheet(
-                state = state,
-                search = localSearch,
-                header = {
-                    HomeFiltersBottomSheetHeader(
-                        modifier = Modifier.padding(
-                            start = 22.dp,
-                            end = 22.dp,
-                            bottom = 16.dp,
-                        ),
-                        saveEnabled = localSearch != uiState.homeSearch,
-                        onSaveClick = {
-                            viewModel.updateHomeSearch(localSearch)
-                            scope.launch { state.hide() }.invokeOnCompletion {
-                                if (!state.isVisible) {
-                                    viewModel.showFilters(false)
-                                }
+        EditSearchModalBottomSheet(
+            state = state,
+            search = localSearch,
+            header = {
+                HomeFiltersBottomSheetHeader(
+                    modifier = Modifier.padding(
+                        start = 22.dp,
+                        end = 22.dp,
+                        bottom = 16.dp,
+                    ),
+                    saveEnabled = localSearch != uiState.homeSearch,
+                    onSaveClick = {
+                        viewModel.updateHomeSearch(localSearch)
+                        scope.launch { state.hide() }.invokeOnCompletion {
+                            if (!state.isVisible) {
+                                viewModel.showFilters(false)
                             }
-                        },
-                        onSaveAsClick = { viewModel.showSaveSearchAsDialog(localSearch) },
-                        onLoadClick = viewModel::showSavedSearches,
-                    )
-                },
-                showNSFW = uiState.showNSFW,
-                onChange = { localSearch = it },
-                onDismissRequest = { viewModel.showFilters(false) },
-            )
-        }
+                        }
+                    },
+                    onSaveAsClick = { viewModel.showSaveSearchAsDialog(localSearch) },
+                    onLoadClick = viewModel::showSavedSearches,
+                )
+            },
+            showNSFW = uiState.showNSFW,
+            onChange = { localSearch = it },
+            onDismissRequest = { viewModel.showFilters(false) },
+        )
+    }
 
-        uiState.saveSearchAsSearch?.run {
-            SaveAsDialog(
-                onSave = {
-                    viewModel.saveSearchAs(it, this)
-                    viewModel.showSaveSearchAsDialog(null)
-                },
-                onDismissRequest = { viewModel.showSaveSearchAsDialog(null) },
-            )
-        }
+    if (uiState.showSaveAsDialog) {
+        SaveAsDialog(
+            onSave = {
+                val search = uiState.saveSearchAsSearch ?: return@SaveAsDialog
+                viewModel.saveSearchAs(it, search)
+                viewModel.showSaveSearchAsDialog(null)
+            },
+            onDismissRequest = { viewModel.showSaveSearchAsDialog(null) },
+        )
+    }
 
-        if (uiState.showSavedSearchesDialog) {
-            SavedSearchesDialog(
-                savedSearches = uiState.savedSearches,
-                onSelect = {
-                    viewModel.updateHomeSearch(it.search)
-                    viewModel.showSavedSearches(false)
-                },
-                onDismissRequest = { viewModel.showSavedSearches(false) },
-            )
-        }
+    if (uiState.showSavedSearchesDialog) {
+        SavedSearchesDialog(
+            savedSearches = uiState.savedSearches,
+            onSelect = {
+                viewModel.updateHomeSearch(it.search)
+                viewModel.showSavedSearches(false)
+            },
+            onDismissRequest = { viewModel.showSavedSearches(false) },
+        )
     }
 }

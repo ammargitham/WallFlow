@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -120,7 +121,8 @@ fun WallpaperCard(
                 }
             }
             .clip(if (roundedCorners) CardDefaults.shape else RectangleShape)
-            .clickable(onClick = onClick),
+            .clickable(onClick = onClick)
+            .testTag("wallpaper"),
     ) {
         AsyncImage(
             modifier = Modifier

@@ -25,7 +25,6 @@ import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.toSearchQuery
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.ui.screens.navArgs
-import com.ammar.wallflow.utils.combine
 import com.github.materiiapps.partial.Partialize
 import com.github.materiiapps.partial.partial
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -37,7 +36,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapLatest
@@ -65,10 +64,6 @@ class HomeViewModel @Inject constructor(
     private val homeSearchFlow = appPreferencesRepository.appPreferencesFlow.mapLatest {
         it.homeSearch
     }.distinctUntilChanged()
-    private val wallpapersLoadingFlow = MutableStateFlow(false)
-    private val debouncedWallpapersLoadingFlow = wallpapersLoadingFlow
-        .debounce { if (it) 1000 else 0 }
-        .distinctUntilChanged()
 
     val wallpapers = if (mainSearch != null) {
         wallHavenRepository.wallpapersPager(mainSearch.toSearchQuery())
@@ -82,14 +77,12 @@ class HomeViewModel @Inject constructor(
         popularTags,
         appPreferencesRepository.appPreferencesFlow,
         localUiState,
-        debouncedWallpapersLoadingFlow,
         savedSearchRepository.observeAll(),
         favoritesRepository.observeAll(),
     ) {
             tags,
             appPreferences,
             local,
-            wallpapersLoading,
             savedSearchEntities,
             favorites,
         ->
@@ -107,7 +100,6 @@ class HomeViewModel @Inject constructor(
                 areTagsLoading = tags is Resource.Loading,
                 mainSearch = mainSearch,
                 homeSearch = appPreferences.homeSearch,
-                wallpapersLoading = wallpapersLoading,
                 blurSketchy = appPreferences.blurSketchy,
                 blurNsfw = appPreferences.blurNsfw,
                 showNSFW = appPreferences.wallhavenApiKey.isNotBlank(),
@@ -137,8 +129,6 @@ class HomeViewModel @Inject constructor(
     fun showFilters(show: Boolean) = localUiState.update {
         it.copy(showFilters = partial(show))
     }
-
-    fun setWallpapersLoading(refreshing: Boolean) = wallpapersLoadingFlow.update { refreshing }
 
     fun setSelectedWallpaper(wallpaper: Wallpaper) = localUiState.update {
         it.copy(selectedWallpaper = partial(wallpaper))
@@ -194,7 +184,6 @@ data class HomeUiState(
         ),
     ),
     val showFilters: Boolean = false,
-    val wallpapersLoading: Boolean = false,
     val blurSketchy: Boolean = false,
     val blurNsfw: Boolean = false,
     val showNSFW: Boolean = false,
@@ -206,4 +195,5 @@ data class HomeUiState(
     val favorites: ImmutableList<Favorite> = persistentListOf(),
 ) {
     val isHome = mainSearch == null
+    val showSaveAsDialog = saveSearchAsSearch != null
 }
