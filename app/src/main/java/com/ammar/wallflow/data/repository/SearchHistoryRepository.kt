@@ -1,7 +1,7 @@
 package com.ammar.wallflow.data.repository
 
 import com.ammar.wallflow.IoDispatcher
-import com.ammar.wallflow.data.db.dao.SearchHistoryDao
+import com.ammar.wallflow.data.db.dao.WallhavenSearchHistoryDao
 import com.ammar.wallflow.model.search.WallhavenSearch
 import com.ammar.wallflow.model.search.toSearchHistoryEntity
 import javax.inject.Inject
@@ -13,7 +13,7 @@ import kotlinx.datetime.Clock
 
 @Singleton
 class SearchHistoryRepository @Inject constructor(
-    private val searchHistoryDao: SearchHistoryDao,
+    private val searchHistoryDao: WallhavenSearchHistoryDao,
     @IoDispatcher val ioDispatcher: CoroutineDispatcher,
 ) {
     fun getAll() = searchHistoryDao.getAll().flowOn(ioDispatcher)

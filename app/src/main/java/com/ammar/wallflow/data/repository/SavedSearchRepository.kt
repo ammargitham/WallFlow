@@ -1,7 +1,7 @@
 package com.ammar.wallflow.data.repository
 
 import com.ammar.wallflow.IoDispatcher
-import com.ammar.wallflow.data.db.dao.SavedSearchDao
+import com.ammar.wallflow.data.db.dao.WallhavenSavedSearchDao
 import com.ammar.wallflow.data.db.entity.WallhavenSavedSearchEntity
 import com.ammar.wallflow.model.search.WallhavenSavedSearch
 import com.ammar.wallflow.model.search.toEntity
@@ -13,7 +13,7 @@ import kotlinx.coroutines.withContext
 
 @Singleton
 class SavedSearchRepository @Inject constructor(
-    private val savedSearchDao: SavedSearchDao,
+    private val savedSearchDao: WallhavenSavedSearchDao,
     @IoDispatcher val ioDispatcher: CoroutineDispatcher,
 ) {
     fun observeAll() = savedSearchDao.observeAll().flowOn(ioDispatcher)

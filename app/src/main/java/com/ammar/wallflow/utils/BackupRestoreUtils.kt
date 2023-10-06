@@ -3,7 +3,7 @@ package com.ammar.wallflow.utils
 import android.content.Context
 import androidx.core.net.toUri
 import com.ammar.wallflow.data.db.dao.FavoriteDao
-import com.ammar.wallflow.data.db.dao.SavedSearchDao
+import com.ammar.wallflow.data.db.dao.WallhavenSavedSearchDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenUploadersDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenWallpapersDao
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
@@ -42,7 +42,7 @@ suspend fun getBackupV1Json(
     appPreferencesRepository: AppPreferencesRepository,
     favoriteDao: FavoriteDao,
     wallpapersDao: WallhavenWallpapersDao,
-    savedSearchDao: SavedSearchDao,
+    savedSearchDao: WallhavenSavedSearchDao,
 ): String? {
     if (!options.atleastOneChosen) {
         return null

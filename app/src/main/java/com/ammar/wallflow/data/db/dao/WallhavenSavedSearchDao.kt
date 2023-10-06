@@ -7,7 +7,7 @@ import com.ammar.wallflow.data.db.entity.WallhavenSavedSearchEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface SavedSearchDao {
+interface WallhavenSavedSearchDao {
     @Query("SELECT * FROM wallhaven_saved_searches ORDER BY name")
     fun observeAll(): Flow<List<WallhavenSavedSearchEntity>>
 

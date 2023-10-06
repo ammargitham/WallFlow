@@ -6,7 +6,7 @@ import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.ammar.wallflow.data.db.dao.FavoriteDao
-import com.ammar.wallflow.data.db.dao.SavedSearchDao
+import com.ammar.wallflow.data.db.dao.WallhavenSavedSearchDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenUploadersDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenWallpapersDao
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
@@ -40,7 +40,7 @@ class BackupRestoreViewModel @Inject constructor(
     private val appPreferencesRepository: AppPreferencesRepository,
     private val favoriteDao: FavoriteDao,
     private val wallpapersDao: WallhavenWallpapersDao,
-    private val savedSearchDao: SavedSearchDao,
+    private val savedSearchDao: WallhavenSavedSearchDao,
     private val savedSearchRepository: SavedSearchRepository,
     private val wallhavenRepository: WallhavenRepository,
     private val favoritesRepository: FavoritesRepository,

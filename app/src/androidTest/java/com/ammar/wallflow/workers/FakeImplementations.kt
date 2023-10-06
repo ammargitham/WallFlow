@@ -7,7 +7,7 @@ import androidx.paging.PagingSource
 import com.ammar.wallflow.data.db.dao.AutoWallpaperHistoryDao
 import com.ammar.wallflow.data.db.dao.FavoriteDao
 import com.ammar.wallflow.data.db.dao.ObjectDetectionModelDao
-import com.ammar.wallflow.data.db.dao.SavedSearchDao
+import com.ammar.wallflow.data.db.dao.WallhavenSavedSearchDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenWallpapersDao
 import com.ammar.wallflow.data.db.entity.AutoWallpaperHistoryEntity
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
@@ -32,7 +32,7 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.jsoup.nodes.Document
 
-internal open class FakeSavedSearchDao : SavedSearchDao {
+internal open class FakeSavedSearchDao : WallhavenSavedSearchDao {
     override fun observeAll(): Flow<List<WallhavenSavedSearchEntity>> {
         throw RuntimeException()
     }

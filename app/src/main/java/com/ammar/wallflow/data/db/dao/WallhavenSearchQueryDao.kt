@@ -7,7 +7,7 @@ import com.ammar.wallflow.data.db.entity.WallhavenSearchQueryEntity
 import kotlinx.datetime.Instant
 
 @Dao
-interface SearchQueryDao {
+interface WallhavenSearchQueryDao {
     @Query("SELECT * FROM wallhaven_search_query WHERE id = :id")
     suspend fun getById(id: Long): WallhavenSearchQueryEntity?
 

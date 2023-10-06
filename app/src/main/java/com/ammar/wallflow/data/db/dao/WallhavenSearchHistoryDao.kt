@@ -7,7 +7,7 @@ import com.ammar.wallflow.data.db.entity.WallhavenSearchHistoryEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface SearchHistoryDao {
+interface WallhavenSearchHistoryDao {
     @Query("SELECT * FROM wallhaven_search_history ORDER BY last_updated_on DESC")
     fun getAll(): Flow<List<WallhavenSearchHistoryEntity>>
 

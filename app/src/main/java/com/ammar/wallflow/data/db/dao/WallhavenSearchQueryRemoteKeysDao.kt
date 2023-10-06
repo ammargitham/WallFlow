@@ -8,7 +8,7 @@ import androidx.room.Upsert
 import com.ammar.wallflow.data.db.entity.WallhavenSearchQueryRemoteKeyEntity
 
 @Dao
-interface SearchQueryRemoteKeysDao {
+interface WallhavenSearchQueryRemoteKeysDao {
     @Query(
         "SELECT * FROM wallhaven_search_query_remote_keys WHERE search_query_id = :searchQueryId",
     )

@@ -20,7 +20,7 @@ import com.ammar.wallflow.MIME_TYPE_JPEG
 import com.ammar.wallflow.data.db.dao.AutoWallpaperHistoryDao
 import com.ammar.wallflow.data.db.dao.FavoriteDao
 import com.ammar.wallflow.data.db.dao.ObjectDetectionModelDao
-import com.ammar.wallflow.data.db.dao.SavedSearchDao
+import com.ammar.wallflow.data.db.dao.WallhavenSavedSearchDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenWallpapersDao
 import com.ammar.wallflow.data.db.entity.AutoWallpaperHistoryEntity
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
@@ -708,7 +708,7 @@ class AutoWallpaperTest {
     private fun getWorker(
         dataStore: DataStore<Preferences>,
         appPreferencesRepository: AppPreferencesRepository = dataStore.appPreferencesRepository,
-        savedSearchDao: SavedSearchDao = FakeSavedSearchDao(),
+        savedSearchDao: WallhavenSavedSearchDao = FakeSavedSearchDao(),
         autoWallpaperHistoryDao: AutoWallpaperHistoryDao = FakeAutoWallpaperHistoryDao(),
         objectDetectionModelDao: ObjectDetectionModelDao = FakeObjectDetectionModelDao(),
         wallHavenNetwork: WallhavenNetworkDataSource = FakeWallhavenNetworkDataSource(),

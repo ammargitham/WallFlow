@@ -10,10 +10,10 @@ import com.ammar.wallflow.data.db.dao.AutoWallpaperHistoryDao
 import com.ammar.wallflow.data.db.dao.FavoriteDao
 import com.ammar.wallflow.data.db.dao.LastUpdatedDao
 import com.ammar.wallflow.data.db.dao.ObjectDetectionModelDao
-import com.ammar.wallflow.data.db.dao.SavedSearchDao
-import com.ammar.wallflow.data.db.dao.SearchHistoryDao
-import com.ammar.wallflow.data.db.dao.SearchQueryDao
-import com.ammar.wallflow.data.db.dao.SearchQueryRemoteKeysDao
+import com.ammar.wallflow.data.db.dao.WallhavenSavedSearchDao
+import com.ammar.wallflow.data.db.dao.WallhavenSearchHistoryDao
+import com.ammar.wallflow.data.db.dao.WallhavenSearchQueryDao
+import com.ammar.wallflow.data.db.dao.WallhavenSearchQueryRemoteKeysDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenPopularTagsDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenSearchQueryWallpapersDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenTagsDao
@@ -61,15 +61,15 @@ import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperTagsEntity
 abstract class AppDatabase : RoomDatabase() {
     abstract fun lastUpdatedDao(): LastUpdatedDao
     abstract fun wallhavenPopularTagsDao(): WallhavenPopularTagsDao
-    abstract fun searchQueryDao(): SearchQueryDao
-    abstract fun searchQueryRemoteKeysDao(): SearchQueryRemoteKeysDao
+    abstract fun searchQueryDao(): WallhavenSearchQueryDao
+    abstract fun searchQueryRemoteKeysDao(): WallhavenSearchQueryRemoteKeysDao
     abstract fun wallhavenSearchQueryWallpapersDao(): WallhavenSearchQueryWallpapersDao
     abstract fun wallhavenWallpapersDao(): WallhavenWallpapersDao
     abstract fun wallhavenTagsDao(): WallhavenTagsDao
     abstract fun wallhavenUploadersDao(): WallhavenUploadersDao
-    abstract fun searchHistoryDao(): SearchHistoryDao
+    abstract fun searchHistoryDao(): WallhavenSearchHistoryDao
     abstract fun objectDetectionModelDao(): ObjectDetectionModelDao
-    abstract fun savedSearchDao(): SavedSearchDao
+    abstract fun savedSearchDao(): WallhavenSavedSearchDao
     abstract fun autoWallpaperHistoryDao(): AutoWallpaperHistoryDao
     abstract fun favoriteDao(): FavoriteDao
 }
