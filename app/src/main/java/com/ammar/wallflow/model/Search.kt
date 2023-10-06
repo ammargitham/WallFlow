@@ -6,8 +6,6 @@ import com.ammar.wallflow.R
 import com.ammar.wallflow.data.db.entity.SearchHistoryEntity
 import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.model.wallhaven.WallhavenSearchQuery
-import com.ammar.wallflow.model.wallhaven.WallhavenTag
-import com.ammar.wallflow.model.wallhaven.WallhavenUploader
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
@@ -17,16 +15,6 @@ data class Search(
     val filters: WallhavenSearchQuery = WallhavenSearchQuery(),
     val meta: SearchMeta? = null,
 )
-
-@Serializable
-data class WallhavenTagSearchMeta(
-    val wallhavenTag: WallhavenTag,
-) : SearchMeta()
-
-@Serializable
-data class WallhavenUploaderSearchMeta(
-    val wallhavenUploader: WallhavenUploader,
-) : SearchMeta()
 
 fun Search.toSearchHistoryEntity(
     id: Long = 0,
