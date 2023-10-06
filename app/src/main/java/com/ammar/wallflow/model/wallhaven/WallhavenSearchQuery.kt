@@ -1,6 +1,6 @@
 @file:UseSerializers(ColorSerializer::class, IntSizeSerializer::class)
 
-package com.ammar.wallflow.model
+package com.ammar.wallflow.model.wallhaven
 
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
@@ -13,9 +13,11 @@ import com.ammar.wallflow.extensions.quoteIfSpaced
 import com.ammar.wallflow.extensions.toHexString
 import com.ammar.wallflow.extensions.toQueryString
 import com.ammar.wallflow.extensions.urlDecoded
-import com.ammar.wallflow.model.WallhavenRatio.CategoryWallhavenRatio
+import com.ammar.wallflow.model.Order
+import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.serializers.ColorSerializer
 import com.ammar.wallflow.model.serializers.IntSizeSerializer
+import com.ammar.wallflow.model.wallhaven.WallhavenRatio.CategoryWallhavenRatio
 import java.util.regex.Pattern
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers

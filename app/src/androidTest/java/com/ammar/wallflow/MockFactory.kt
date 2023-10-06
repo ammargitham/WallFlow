@@ -7,7 +7,7 @@ import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpaper
 import com.ammar.wallflow.extensions.toHexString
 import com.ammar.wallflow.model.SavedSearch
 import com.ammar.wallflow.model.Search
-import com.ammar.wallflow.model.WallhavenSearchQuery
+import com.ammar.wallflow.model.wallhaven.WallhavenSearchQuery
 import kotlin.math.absoluteValue
 import kotlin.random.Random
 import kotlinx.datetime.Clock

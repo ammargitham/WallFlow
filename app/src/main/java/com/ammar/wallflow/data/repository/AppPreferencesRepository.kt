@@ -23,11 +23,11 @@ import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.extensions.toConstraintTypeMap
 import com.ammar.wallflow.extensions.toConstraints
 import com.ammar.wallflow.model.Search
-import com.ammar.wallflow.model.WallhavenSearchQuery
-import com.ammar.wallflow.model.WallhavenSorting
-import com.ammar.wallflow.model.WallhavenTopRange
 import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.model.serializers.constraintTypeMapSerializer
+import com.ammar.wallflow.model.wallhaven.WallhavenSearchQuery
+import com.ammar.wallflow.model.wallhaven.WallhavenSorting
+import com.ammar.wallflow.model.wallhaven.WallhavenTopRange
 import com.ammar.wallflow.ui.screens.local.LocalSort
 import com.ammar.wallflow.utils.objectdetection.objectsDetector
 import java.io.IOException

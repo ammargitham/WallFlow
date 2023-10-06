@@ -13,13 +13,13 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.work.Constraints
 import androidx.work.NetworkType
 import com.ammar.wallflow.model.Search
-import com.ammar.wallflow.model.WallhavenSearchQuery
-import com.ammar.wallflow.model.WallhavenSorting
-import com.ammar.wallflow.model.WallhavenTopRange
 import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.model.serializers.ConstraintsSerializer
 import com.ammar.wallflow.model.serializers.DateTimePeriodSerializer
 import com.ammar.wallflow.model.serializers.UUIDSerializer
+import com.ammar.wallflow.model.wallhaven.WallhavenSearchQuery
+import com.ammar.wallflow.model.wallhaven.WallhavenSorting
+import com.ammar.wallflow.model.wallhaven.WallhavenTopRange
 import com.ammar.wallflow.ui.screens.local.LocalSort
 import java.util.UUID
 import kotlinx.datetime.DateTimePeriod

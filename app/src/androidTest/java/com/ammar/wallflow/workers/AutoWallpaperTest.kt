@@ -46,9 +46,9 @@ import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.SavedSearch
 import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.Source
-import com.ammar.wallflow.model.WallhavenSearchQuery
 import com.ammar.wallflow.model.local.LocalWallpaper
 import com.ammar.wallflow.model.toEntity
+import com.ammar.wallflow.model.wallhaven.WallhavenSearchQuery
 import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.FAILURE_REASON
 import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.FailureReason
 import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.FailureReason.SAVED_SEARCH_NOT_SET

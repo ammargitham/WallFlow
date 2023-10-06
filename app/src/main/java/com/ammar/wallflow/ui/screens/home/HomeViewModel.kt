@@ -18,12 +18,12 @@ import com.ammar.wallflow.model.Favorite
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.SavedSearch
 import com.ammar.wallflow.model.Search
-import com.ammar.wallflow.model.WallhavenSearchQuery
-import com.ammar.wallflow.model.WallhavenSorting
-import com.ammar.wallflow.model.WallhavenTopRange
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.toSearchQuery
+import com.ammar.wallflow.model.wallhaven.WallhavenSearchQuery
+import com.ammar.wallflow.model.wallhaven.WallhavenSorting
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
+import com.ammar.wallflow.model.wallhaven.WallhavenTopRange
 import com.ammar.wallflow.ui.screens.navArgs
 import com.github.materiiapps.partial.Partialize
 import com.github.materiiapps.partial.partial

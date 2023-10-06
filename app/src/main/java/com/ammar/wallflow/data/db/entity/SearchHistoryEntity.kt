@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.ammar.wallflow.model.Search
-import com.ammar.wallflow.model.WallhavenSearchQuery
+import com.ammar.wallflow.model.wallhaven.WallhavenSearchQuery
 import kotlinx.datetime.Instant
 
 @Entity(

@@ -5,6 +5,7 @@ import androidx.compose.runtime.saveable.Saver
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.db.entity.SearchHistoryEntity
 import com.ammar.wallflow.extensions.trimAll
+import com.ammar.wallflow.model.wallhaven.WallhavenSearchQuery
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.model.wallhaven.WallhavenUploader
 import kotlinx.datetime.Instant

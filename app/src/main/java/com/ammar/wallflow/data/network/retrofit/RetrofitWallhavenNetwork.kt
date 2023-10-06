@@ -3,9 +3,9 @@ package com.ammar.wallflow.data.network.retrofit
 import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
 import com.ammar.wallflow.data.network.retrofit.api.WallhavenNetworkApi
 import com.ammar.wallflow.extensions.toHexString
-import com.ammar.wallflow.model.WallhavenSearchQuery
-import com.ammar.wallflow.model.toCategoryInt
 import com.ammar.wallflow.model.toWallhavenPurityInt
+import com.ammar.wallflow.model.wallhaven.WallhavenSearchQuery
+import com.ammar.wallflow.model.wallhaven.toCategoryInt
 
 class RetrofitWallhavenNetwork(
     private val wallHavenNetworkApi: WallhavenNetworkApi,

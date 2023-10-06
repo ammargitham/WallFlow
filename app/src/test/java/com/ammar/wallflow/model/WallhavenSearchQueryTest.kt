@@ -1,5 +1,6 @@
 package com.ammar.wallflow.model
 
+import com.ammar.wallflow.model.wallhaven.WallhavenSearchQuery
 import kotlin.test.assertEquals
 import org.junit.Test
 

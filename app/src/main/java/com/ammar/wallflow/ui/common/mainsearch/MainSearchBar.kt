@@ -33,8 +33,8 @@ import com.ammar.wallflow.model.MenuItem
 import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.TagSearchMeta
 import com.ammar.wallflow.model.UploaderSearchMeta
-import com.ammar.wallflow.model.WallhavenSearchQuery
-import com.ammar.wallflow.model.WallhavenSorting
+import com.ammar.wallflow.model.wallhaven.WallhavenSearchQuery
+import com.ammar.wallflow.model.wallhaven.WallhavenSorting
 import com.ammar.wallflow.ui.common.OverflowMenu
 import com.ammar.wallflow.ui.common.SearchBar
 import com.ammar.wallflow.ui.common.Suggestion

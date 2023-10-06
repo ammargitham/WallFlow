@@ -12,7 +12,7 @@ import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSearchQueryWallpaper
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
 import com.ammar.wallflow.data.network.model.toWallpaperEntity
-import com.ammar.wallflow.model.WallhavenSearchQuery
+import com.ammar.wallflow.model.wallhaven.WallhavenSearchQuery
 import java.io.IOException
 import kotlinx.datetime.Clock
 import retrofit2.HttpException

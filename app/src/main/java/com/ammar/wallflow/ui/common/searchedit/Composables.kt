@@ -82,11 +82,11 @@ import com.ammar.wallflow.model.Order
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.SavedSearch
 import com.ammar.wallflow.model.Search
-import com.ammar.wallflow.model.WallhavenCategory
-import com.ammar.wallflow.model.WallhavenRatio
-import com.ammar.wallflow.model.WallhavenRatio.CategoryWallhavenRatio
-import com.ammar.wallflow.model.WallhavenSorting
-import com.ammar.wallflow.model.WallhavenTopRange
+import com.ammar.wallflow.model.wallhaven.WallhavenCategory
+import com.ammar.wallflow.model.wallhaven.WallhavenRatio
+import com.ammar.wallflow.model.wallhaven.WallhavenRatio.CategoryWallhavenRatio
+import com.ammar.wallflow.model.wallhaven.WallhavenSorting
+import com.ammar.wallflow.model.wallhaven.WallhavenTopRange
 import com.ammar.wallflow.ui.common.ClearableChip
 import com.ammar.wallflow.ui.common.IntState
 import com.ammar.wallflow.ui.common.NameState

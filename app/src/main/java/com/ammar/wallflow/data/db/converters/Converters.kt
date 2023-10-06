@@ -8,9 +8,9 @@ import com.ammar.wallflow.extensions.toHexString
 import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.model.Order
 import com.ammar.wallflow.model.Purity
-import com.ammar.wallflow.model.WallhavenCategory
-import com.ammar.wallflow.model.WallhavenSorting
-import com.ammar.wallflow.model.WallhavenTopRange
+import com.ammar.wallflow.model.wallhaven.WallhavenCategory
+import com.ammar.wallflow.model.wallhaven.WallhavenSorting
+import com.ammar.wallflow.model.wallhaven.WallhavenTopRange
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
