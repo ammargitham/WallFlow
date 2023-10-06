@@ -43,8 +43,8 @@ import com.ammar.wallflow.data.repository.SavedSearchRepository
 import com.ammar.wallflow.data.repository.local.LocalWallpapersRepository
 import com.ammar.wallflow.extensions.getTempFile
 import com.ammar.wallflow.model.Purity
-import com.ammar.wallflow.model.SavedSearch
 import com.ammar.wallflow.model.Source
+import com.ammar.wallflow.model.WallhavenSavedSearch
 import com.ammar.wallflow.model.WallhavenSearch
 import com.ammar.wallflow.model.local.LocalWallpaper
 import com.ammar.wallflow.model.toEntity
@@ -182,7 +182,7 @@ class AutoWallpaperTest {
                     useObjectDetection = false,
                 ),
             )
-            val savedSearch = SavedSearch(
+            val savedSearch = WallhavenSavedSearch(
                 id = 1,
                 name = "Test",
                 search = WallhavenSearch(
@@ -274,7 +274,7 @@ class AutoWallpaperTest {
                     savedSearchId = 1,
                 ),
             )
-            val savedSearch = SavedSearch(
+            val savedSearch = WallhavenSavedSearch(
                 id = 1,
                 name = "Test",
                 search = WallhavenSearch(
@@ -376,7 +376,7 @@ class AutoWallpaperTest {
                     savedSearchId = 1,
                 ),
             )
-            val savedSearch = SavedSearch(
+            val savedSearch = WallhavenSavedSearch(
                 id = 1,
                 name = "Test",
                 search = WallhavenSearch(

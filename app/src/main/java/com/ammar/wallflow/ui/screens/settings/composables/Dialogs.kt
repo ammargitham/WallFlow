@@ -73,7 +73,7 @@ import com.ammar.wallflow.extensions.toConstraintTypeMap
 import com.ammar.wallflow.extensions.toConstraints
 import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.model.ConstraintType
-import com.ammar.wallflow.model.SavedSearch
+import com.ammar.wallflow.model.WallhavenSavedSearch
 import com.ammar.wallflow.model.WallhavenSearch
 import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.model.local.LocalDirectory
@@ -605,7 +605,7 @@ private fun PreviewOObjectDetectionModelDeleteConfirmDialog() {
 @Composable
 fun DeleteSavedSearchConfirmDialog(
     modifier: Modifier = Modifier,
-    savedSearch: SavedSearch,
+    savedSearch: WallhavenSavedSearch,
     onConfirmClick: () -> Unit = {},
     onDismissRequest: () -> Unit = {},
 ) {
@@ -640,7 +640,7 @@ private fun PreviewDeleteSavedSearchConfirmDialog() {
     WallFlowTheme {
         Surface {
             DeleteSavedSearchConfirmDialog(
-                savedSearch = SavedSearch(
+                savedSearch = WallhavenSavedSearch(
                     name = "test",
                 ),
             )
@@ -653,7 +653,7 @@ private fun PreviewDeleteSavedSearchConfirmDialog() {
 fun AutoWallpaperSourceOptionsDialog(
     modifier: Modifier = Modifier,
     autoWallpaperPreferences: AutoWallpaperPreferences = AutoWallpaperPreferences(),
-    savedSearches: List<SavedSearch> = emptyList(),
+    savedSearches: List<WallhavenSavedSearch> = emptyList(),
     localDirectories: List<LocalDirectory> = emptyList(),
     onSaveClick: (AutoWallpaperPreferences) -> Unit = {},
     onDismissRequest: () -> Unit = {},
@@ -737,7 +737,7 @@ private fun AutoWallpaperSourceOptionsDialogContent(
     modifier: Modifier = Modifier,
     savedSearchEnabled: Boolean = false,
     favoritesEnabled: Boolean = false,
-    savedSearches: List<SavedSearch> = emptyList(),
+    savedSearches: List<WallhavenSavedSearch> = emptyList(),
     selectedSavedSearchId: Long? = null,
     localEnabled: Boolean = false,
     localDirectories: List<LocalDirectory> = emptyList(),
@@ -853,7 +853,7 @@ private fun AutoWallpaperSourceOptionsDialogContent(
 }
 
 private data class AutoWallSrcOptsDialogParameters(
-    val savedSearches: List<SavedSearch> = emptyList(),
+    val savedSearches: List<WallhavenSavedSearch> = emptyList(),
     val prefs: AutoWallpaperPreferences = AutoWallpaperPreferences(),
 )
 
@@ -866,7 +866,7 @@ private class AutoWallSrcOptsDialogPP : CPPP<AutoWallSrcOptsDialogParameters>(
                 savedSearchEnabled = true,
             ),
             savedSearches = List(3) {
-                SavedSearch(
+                WallhavenSavedSearch(
                     id = it.toLong(),
                     name = "Saved search $it",
                     search = WallhavenSearch(),

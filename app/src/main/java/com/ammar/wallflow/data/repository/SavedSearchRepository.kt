@@ -3,7 +3,7 @@ package com.ammar.wallflow.data.repository
 import com.ammar.wallflow.IoDispatcher
 import com.ammar.wallflow.data.db.dao.SavedSearchDao
 import com.ammar.wallflow.data.db.entity.SavedSearchEntity
-import com.ammar.wallflow.model.SavedSearch
+import com.ammar.wallflow.model.WallhavenSavedSearch
 import com.ammar.wallflow.model.toEntity
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -22,7 +22,7 @@ class SavedSearchRepository @Inject constructor(
         savedSearchDao.getById(id)
     }
 
-    suspend fun upsert(savedSearch: SavedSearch) = withContext(ioDispatcher) {
+    suspend fun upsert(savedSearch: WallhavenSavedSearch) = withContext(ioDispatcher) {
         val existing = if (savedSearch.id != 0L) {
             savedSearchDao.getById(savedSearch.id)
         } else {
@@ -33,7 +33,7 @@ class SavedSearchRepository @Inject constructor(
     }
 
     suspend fun upsertAll(
-        savedSearches: Collection<SavedSearch>,
+        savedSearches: Collection<WallhavenSavedSearch>,
     ) = withContext(ioDispatcher) {
         val allNames = savedSearches.map { it.name }
         val existingEntities = savedSearchDao.getAllByNames(allNames)
@@ -46,14 +46,14 @@ class SavedSearchRepository @Inject constructor(
 
     private fun updateExisting(
         existing: SavedSearchEntity?,
-        savedSearch: SavedSearch,
+        savedSearch: WallhavenSavedSearch,
     ) = existing?.copy(
         name = savedSearch.name,
         query = savedSearch.search.query,
         filters = savedSearch.search.filters.toQueryString(),
     ) ?: savedSearch.toEntity(0)
 
-    suspend fun delete(savedSearch: SavedSearch) = withContext(ioDispatcher) {
+    suspend fun delete(savedSearch: WallhavenSavedSearch) = withContext(ioDispatcher) {
         savedSearchDao.deleteByName(savedSearch.name)
     }
 }

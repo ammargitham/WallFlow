@@ -16,7 +16,7 @@ import com.ammar.wallflow.data.repository.utils.successOr
 import com.ammar.wallflow.data.repository.wallhaven.WallhavenRepository
 import com.ammar.wallflow.model.Favorite
 import com.ammar.wallflow.model.Purity
-import com.ammar.wallflow.model.SavedSearch
+import com.ammar.wallflow.model.WallhavenSavedSearch
 import com.ammar.wallflow.model.WallhavenSearch
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.toSearchQuery
@@ -140,7 +140,7 @@ class HomeViewModel @Inject constructor(
 
     fun saveSearchAs(name: String, search: WallhavenSearch) = viewModelScope.launch {
         savedSearchRepository.upsert(
-            SavedSearch(
+            WallhavenSavedSearch(
                 name = name,
                 search = search,
             ),
@@ -190,7 +190,7 @@ data class HomeUiState(
     val selectedWallpaper: Wallpaper? = null,
     val saveSearchAsSearch: WallhavenSearch? = null,
     val showSavedSearchesDialog: Boolean = false,
-    val savedSearches: List<SavedSearch> = emptyList(),
+    val savedSearches: List<WallhavenSavedSearch> = emptyList(),
     val layoutPreferences: LayoutPreferences = LayoutPreferences(),
     val favorites: ImmutableList<Favorite> = persistentListOf(),
 ) {

@@ -12,7 +12,7 @@ import com.ammar.wallflow.data.repository.GlobalErrorsRepository.GlobalError
 import com.ammar.wallflow.data.repository.SavedSearchRepository
 import com.ammar.wallflow.data.repository.SearchHistoryRepository
 import com.ammar.wallflow.extensions.trimAll
-import com.ammar.wallflow.model.SavedSearch
+import com.ammar.wallflow.model.WallhavenSavedSearch
 import com.ammar.wallflow.model.WallhavenSearch
 import com.ammar.wallflow.model.getSupportingText
 import com.ammar.wallflow.ui.common.Suggestion
@@ -119,7 +119,7 @@ class MainActivityViewModel @Inject constructor(
 
     fun saveSearchAs(name: String, search: WallhavenSearch) = viewModelScope.launch {
         savedSearchRepository.upsert(
-            SavedSearch(
+            WallhavenSavedSearch(
                 name = name,
                 search = search,
             ),
@@ -141,7 +141,7 @@ data class MainUiState(
     val searchBarDeleteSuggestion: WallhavenSearch? = null,
     val saveSearchAsSearch: WallhavenSearch? = null,
     val showSavedSearchesDialog: Boolean = false,
-    val savedSearches: List<SavedSearch> = emptyList(),
+    val savedSearches: List<WallhavenSavedSearch> = emptyList(),
     val theme: Theme = Theme.SYSTEM,
     val searchBarShowNSFW: Boolean = false,
     val showLocalTab: Boolean = true,

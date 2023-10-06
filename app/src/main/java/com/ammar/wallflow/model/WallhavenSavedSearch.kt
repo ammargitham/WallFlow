@@ -4,23 +4,23 @@ import androidx.compose.runtime.saveable.Saver
 import com.ammar.wallflow.data.db.entity.SavedSearchEntity
 import com.ammar.wallflow.model.wallhaven.WallhavenSearchQuery
 
-data class SavedSearch(
+data class WallhavenSavedSearch(
     val id: Long = 0,
     val name: String = "",
     val search: WallhavenSearch = WallhavenSearch(),
 )
 
-fun SavedSearch.toEntity(id: Long? = null) = SavedSearchEntity(
+fun WallhavenSavedSearch.toEntity(id: Long? = null) = SavedSearchEntity(
     id = id ?: this.id,
     name = name,
     query = search.query,
     filters = search.filters.toQueryString(),
 )
 
-val SavedWallhavenSearchSaver = Saver<SavedSearch, List<Any>>(
+val WallhavenSavedSearchSaver = Saver<WallhavenSavedSearch, List<Any>>(
     save = { listOf(it.id, it.name, it.search.query, it.search.filters.toQueryString()) },
     restore = {
-        SavedSearch(
+        WallhavenSavedSearch(
             id = it[0] as Long,
             name = it[1] as String,
             search = WallhavenSearch(

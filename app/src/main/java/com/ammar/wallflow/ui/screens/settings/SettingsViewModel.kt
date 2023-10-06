@@ -23,7 +23,7 @@ import com.ammar.wallflow.extensions.accessibleFolders
 import com.ammar.wallflow.extensions.getMLModelsFileIfExists
 import com.ammar.wallflow.extensions.workManager
 import com.ammar.wallflow.model.ObjectDetectionModel
-import com.ammar.wallflow.model.SavedSearch
+import com.ammar.wallflow.model.WallhavenSavedSearch
 import com.ammar.wallflow.model.local.LocalDirectory
 import com.ammar.wallflow.services.ChangeWallpaperTileService
 import com.ammar.wallflow.utils.DownloadManager
@@ -282,21 +282,21 @@ class SettingsViewModel @Inject constructor(
         it.copy(showSavedSearches = partial(show))
     }
 
-    fun editSavedSearch(savedSearch: SavedSearch?) = localUiStateFlow.update {
+    fun editSavedSearch(savedSearch: WallhavenSavedSearch?) = localUiStateFlow.update {
         it.copy(
             editSavedSearch = partial(savedSearch),
             showSavedSearches = partial(false),
         )
     }
 
-    fun updateSavedSearch(savedSearch: SavedSearch) {
+    fun updateSavedSearch(savedSearch: WallhavenSavedSearch) {
         viewModelScope.launch {
             savedSearchRepository.upsert(savedSearch)
         }
     }
 
     fun deleteSavedSearch(
-        savedSearch: SavedSearch?,
+        savedSearch: WallhavenSavedSearch?,
         confirmed: Boolean = false,
     ) {
         if (savedSearch == null) {
@@ -465,10 +465,10 @@ data class SettingsUiState(
     val modelDownloadStatus: DownloadStatus? = null,
     val deleteModel: ObjectDetectionModelEntity? = null,
     val showSavedSearches: Boolean = false,
-    val savedSearches: List<SavedSearch> = emptyList(),
-    val editSavedSearch: SavedSearch? = null,
-    val deleteSavedSearch: SavedSearch? = null,
-    val autoWallpaperSavedSearch: SavedSearch? = null,
+    val savedSearches: List<WallhavenSavedSearch> = emptyList(),
+    val editSavedSearch: WallhavenSavedSearch? = null,
+    val deleteSavedSearch: WallhavenSavedSearch? = null,
+    val autoWallpaperSavedSearch: WallhavenSavedSearch? = null,
     val showAutoWallpaperSourcesDialog: Boolean = false,
     val showAutoWallpaperFrequencyDialog: Boolean = false,
     val showAutoWallpaperConstraintsDialog: Boolean = false,
