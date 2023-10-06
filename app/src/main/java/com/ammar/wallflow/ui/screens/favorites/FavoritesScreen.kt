@@ -22,8 +22,8 @@ import com.ammar.wallflow.data.preferences.LayoutPreferences
 import com.ammar.wallflow.extensions.search
 import com.ammar.wallflow.model.Favorite
 import com.ammar.wallflow.model.Search
-import com.ammar.wallflow.model.UploaderSearchMeta
 import com.ammar.wallflow.model.WallhavenTagSearchMeta
+import com.ammar.wallflow.model.WallhavenUploaderSearchMeta
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.model.wallhaven.WallhavenUploader
@@ -153,7 +153,7 @@ fun FavoritesScreen(
             onFullWallpaperUploaderClick = {
                 val search = Search(
                     query = "@${it.username}",
-                    meta = UploaderSearchMeta(wallhavenUploader = it),
+                    meta = WallhavenUploaderSearchMeta(wallhavenUploader = it),
                 )
                 if (searchBarController.state.value.search == search) {
                     return@FavoritesScreenContent

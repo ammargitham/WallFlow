@@ -22,8 +22,8 @@ import androidx.navigation.NavController
 import com.ammar.wallflow.extensions.search
 import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.Source
-import com.ammar.wallflow.model.UploaderSearchMeta
 import com.ammar.wallflow.model.WallhavenTagSearchMeta
+import com.ammar.wallflow.model.WallhavenUploaderSearchMeta
 import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.TopBar
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
@@ -146,7 +146,7 @@ fun WallpaperScreen(
             onUploaderClick = {
                 val search = Search(
                     query = "@${it.username}",
-                    meta = UploaderSearchMeta(wallhavenUploader = it),
+                    meta = WallhavenUploaderSearchMeta(wallhavenUploader = it),
                 )
                 if (searchBarController.state.value.search == search) {
                     return@WallpaperViewer

@@ -24,7 +24,7 @@ data class WallhavenTagSearchMeta(
 ) : SearchMeta()
 
 @Serializable
-data class UploaderSearchMeta(
+data class WallhavenUploaderSearchMeta(
     val wallhavenUploader: WallhavenUploader,
 ) : SearchMeta()
 

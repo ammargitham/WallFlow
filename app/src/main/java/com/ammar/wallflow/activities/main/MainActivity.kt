@@ -42,8 +42,8 @@ import com.ammar.wallflow.extensions.toPxF
 import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.Source
-import com.ammar.wallflow.model.UploaderSearchMeta
 import com.ammar.wallflow.model.WallhavenTagSearchMeta
+import com.ammar.wallflow.model.WallhavenUploaderSearchMeta
 import com.ammar.wallflow.ui.common.DefaultSystemController
 import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.SearchBar
@@ -136,7 +136,7 @@ class MainActivity : ComponentActivity() {
         val searchBarQuery by remember {
             derivedStateOf {
                 when (uiState.searchBarSearch.meta) {
-                    is WallhavenTagSearchMeta, is UploaderSearchMeta -> {
+                    is WallhavenTagSearchMeta, is WallhavenUploaderSearchMeta -> {
                         if (uiState.searchBarActive) uiState.searchBarSearch.query else ""
                     }
                     else -> uiState.searchBarSearch.query
