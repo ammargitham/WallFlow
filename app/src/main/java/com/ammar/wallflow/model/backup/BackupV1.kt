@@ -2,7 +2,7 @@ package com.ammar.wallflow.model.backup
 
 import android.net.Uri
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
-import com.ammar.wallflow.data.db.entity.SavedSearchEntity
+import com.ammar.wallflow.data.db.entity.WallhavenSavedSearchEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenTagEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenUploaderEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
@@ -31,7 +31,7 @@ data class BackupV1(
 
 @Serializable
 data class WallhavenBackupV1(
-    val savedSearches: List<SavedSearchEntity>?,
+    val savedSearches: List<WallhavenSavedSearchEntity>?,
     val wallpapers: List<WallhavenWallpaperEntity>?,
     val uploaders: List<WallhavenUploaderEntity>?,
     val tags: Set<WallhavenTagEntity>?,

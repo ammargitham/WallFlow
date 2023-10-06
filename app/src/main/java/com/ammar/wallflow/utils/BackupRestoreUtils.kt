@@ -7,7 +7,7 @@ import com.ammar.wallflow.data.db.dao.SavedSearchDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenUploadersDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenWallpapersDao
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
-import com.ammar.wallflow.data.db.entity.toSavedSearch
+import com.ammar.wallflow.data.db.entity.toWallhavenSavedSearch
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenTagEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenUploaderEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
@@ -180,7 +180,7 @@ suspend fun restoreBackupV1(
         val savedSearches = backup.wallhaven?.savedSearches
         if (savedSearches != null) {
             savedSearchRepository.upsertAll(
-                savedSearches.map { it.toSavedSearch() },
+                savedSearches.map { it.toWallhavenSavedSearch() },
             )
         }
     }

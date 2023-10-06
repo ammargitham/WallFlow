@@ -10,7 +10,7 @@ import com.ammar.wallflow.EFFICIENT_DET_LITE_0_MODEL_NAME
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.db.entity.ObjectDetectionModelEntity
 import com.ammar.wallflow.data.db.entity.toModel
-import com.ammar.wallflow.data.db.entity.toSavedSearch
+import com.ammar.wallflow.data.db.entity.toWallhavenSavedSearch
 import com.ammar.wallflow.data.preferences.AppPreferences
 import com.ammar.wallflow.data.preferences.AutoWallpaperPreferences
 import com.ammar.wallflow.data.preferences.LookAndFeelPreferences
@@ -97,7 +97,7 @@ class SettingsViewModel @Inject constructor(
                 ?.toModel()
                 ?: ObjectDetectionModel.DEFAULT
         }
-        val allSavedSearches = savedSearches.map { entity -> entity.toSavedSearch() }
+        val allSavedSearches = savedSearches.map { entity -> entity.toWallhavenSavedSearch() }
         localUiState.merge(
             SettingsUiState(
                 appPreferences = appPreferences,

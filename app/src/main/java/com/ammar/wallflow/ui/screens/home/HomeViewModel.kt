@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.ammar.wallflow.data.db.entity.toFavorite
-import com.ammar.wallflow.data.db.entity.toSavedSearch
+import com.ammar.wallflow.data.db.entity.toWallhavenSavedSearch
 import com.ammar.wallflow.data.preferences.LayoutPreferences
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.FavoritesRepository
@@ -33,7 +33,6 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
@@ -45,10 +44,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 
-@OptIn(
-    ExperimentalCoroutinesApi::class,
-    FlowPreview::class,
-)
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val wallHavenRepository: WallhavenRepository,
@@ -103,7 +99,9 @@ class HomeViewModel @Inject constructor(
                 blurSketchy = appPreferences.blurSketchy,
                 blurNsfw = appPreferences.blurNsfw,
                 showNSFW = appPreferences.wallhavenApiKey.isNotBlank(),
-                savedSearches = savedSearchEntities.map { entity -> entity.toSavedSearch() },
+                savedSearches = savedSearchEntities.map { entity ->
+                    entity.toWallhavenSavedSearch()
+                },
                 layoutPreferences = appPreferences.lookAndFeelPreferences.layoutPreferences,
                 favorites = favorites.map { it.toFavorite() }.toImmutableList(),
             ),

@@ -23,7 +23,7 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.db.entity.toModel
-import com.ammar.wallflow.data.db.entity.toSavedSearch
+import com.ammar.wallflow.data.db.entity.toWallhavenSavedSearch
 import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
 import com.ammar.wallflow.data.network.model.toWallhavenWallpaper
 import com.ammar.wallflow.data.preferences.AppPreferences
@@ -206,7 +206,10 @@ class AutoWallpaperWorker @AssistedInject constructor(
             SourceChoice.SAVED_SEARCH -> {
                 val savedSearchId = autoWallpaperPreferences.savedSearchId
                 val savedSearch = savedSearchRepository.getById(savedSearchId)
-                val savedSearchQuery = savedSearch?.toSavedSearch()?.search?.toSearchQuery()
+                val savedSearchQuery = savedSearch
+                    ?.toWallhavenSavedSearch()
+                    ?.search
+                    ?.toSearchQuery()
                     ?: return null to null
                 // get a fresh wallpaper, ignoring the history initially
                 getNextSavedSearchWallpaper(savedSearchQuery)

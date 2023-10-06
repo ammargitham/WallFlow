@@ -3,8 +3,8 @@ package com.ammar.wallflow.activities.main
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.ammar.wallflow.data.db.entity.toSavedSearch
 import com.ammar.wallflow.data.db.entity.toSearch
+import com.ammar.wallflow.data.db.entity.toWallhavenSavedSearch
 import com.ammar.wallflow.data.preferences.Theme
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.GlobalErrorsRepository
@@ -65,7 +65,9 @@ class MainActivityViewModel @Inject constructor(
                         )
                     },
                 globalErrors = errors,
-                savedSearches = savedSearchEntities.map { entity -> entity.toSavedSearch() },
+                savedSearches = savedSearchEntities.map { entity ->
+                    entity.toWallhavenSavedSearch()
+                },
                 theme = appPreferences.lookAndFeelPreferences.theme,
                 searchBarShowNSFW = appPreferences.wallhavenApiKey.isNotBlank(),
                 showLocalTab = appPreferences.lookAndFeelPreferences.showLocalTab,

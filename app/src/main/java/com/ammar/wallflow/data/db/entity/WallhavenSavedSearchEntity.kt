@@ -18,14 +18,14 @@ import kotlinx.serialization.Serializable
     ],
 )
 @Serializable
-data class SavedSearchEntity(
+data class WallhavenSavedSearchEntity(
     @PrimaryKey(autoGenerate = true) val id: Long,
     val name: String,
     val query: String,
     val filters: String,
 )
 
-fun SavedSearchEntity.toSavedSearch() = WallhavenSavedSearch(
+fun WallhavenSavedSearchEntity.toWallhavenSavedSearch() = WallhavenSavedSearch(
     id = id,
     name = name,
     search = WallhavenSearch(

@@ -2,7 +2,7 @@ package com.ammar.wallflow.data.repository
 
 import com.ammar.wallflow.IoDispatcher
 import com.ammar.wallflow.data.db.dao.SavedSearchDao
-import com.ammar.wallflow.data.db.entity.SavedSearchEntity
+import com.ammar.wallflow.data.db.entity.WallhavenSavedSearchEntity
 import com.ammar.wallflow.model.search.WallhavenSavedSearch
 import com.ammar.wallflow.model.search.toEntity
 import javax.inject.Inject
@@ -45,7 +45,7 @@ class SavedSearchRepository @Inject constructor(
     }
 
     private fun updateExisting(
-        existing: SavedSearchEntity?,
+        existing: WallhavenSavedSearchEntity?,
         savedSearch: WallhavenSavedSearch,
     ) = existing?.copy(
         name = savedSearch.name,

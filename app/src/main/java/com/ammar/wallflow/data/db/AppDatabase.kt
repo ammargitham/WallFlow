@@ -22,10 +22,10 @@ import com.ammar.wallflow.data.db.entity.AutoWallpaperHistoryEntity
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.LastUpdatedEntity
 import com.ammar.wallflow.data.db.entity.ObjectDetectionModelEntity
-import com.ammar.wallflow.data.db.entity.SavedSearchEntity
 import com.ammar.wallflow.data.db.entity.SearchHistoryEntity
 import com.ammar.wallflow.data.db.entity.SearchQueryEntity
 import com.ammar.wallflow.data.db.entity.SearchQueryRemoteKeyEntity
+import com.ammar.wallflow.data.db.entity.WallhavenSavedSearchEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenPopularTagEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSearchQueryWallpaperEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenTagEntity
@@ -46,7 +46,7 @@ import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperTagsEntity
         WallhavenWallpaperTagsEntity::class,
         SearchHistoryEntity::class,
         ObjectDetectionModelEntity::class,
-        SavedSearchEntity::class,
+        WallhavenSavedSearchEntity::class,
         AutoWallpaperHistoryEntity::class,
         FavoriteEntity::class,
     ],
