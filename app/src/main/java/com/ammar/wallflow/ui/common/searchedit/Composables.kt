@@ -81,7 +81,7 @@ import com.ammar.wallflow.extensions.getScreenResolution
 import com.ammar.wallflow.model.Order
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.SavedSearch
-import com.ammar.wallflow.model.Search
+import com.ammar.wallflow.model.WallhavenSearch
 import com.ammar.wallflow.model.wallhaven.WallhavenCategory
 import com.ammar.wallflow.model.wallhaven.WallhavenRatio
 import com.ammar.wallflow.model.wallhaven.WallhavenRatio.CategoryWallhavenRatio
@@ -971,7 +971,7 @@ private fun SavedSearchItem(
 private val tempSavedSearches = List(3) {
     SavedSearch(
         name = "Saved search $it",
-        search = Search(),
+        search = WallhavenSearch(),
     )
 }
 

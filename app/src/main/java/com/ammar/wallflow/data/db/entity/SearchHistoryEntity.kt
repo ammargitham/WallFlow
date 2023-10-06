@@ -4,7 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.ammar.wallflow.model.Search
+import com.ammar.wallflow.model.WallhavenSearch
 import com.ammar.wallflow.model.wallhaven.WallhavenSearchQuery
 import kotlinx.datetime.Instant
 
@@ -24,7 +24,7 @@ data class SearchHistoryEntity(
     @ColumnInfo(name = "last_updated_on") val lastUpdatedOn: Instant,
 )
 
-fun SearchHistoryEntity.toSearch() = Search(
+fun SearchHistoryEntity.toSearch() = WallhavenSearch(
     query = query,
     filters = WallhavenSearchQuery.fromQueryString(filters),
 )

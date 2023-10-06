@@ -30,7 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.R
 import com.ammar.wallflow.model.MenuItem
-import com.ammar.wallflow.model.Search
+import com.ammar.wallflow.model.WallhavenSearch
 import com.ammar.wallflow.model.WallhavenTagSearchMeta
 import com.ammar.wallflow.model.WallhavenUploaderSearchMeta
 import com.ammar.wallflow.model.wallhaven.WallhavenSearchQuery
@@ -51,20 +51,20 @@ object MainSearchBar {
         useDocked: Boolean = false,
         visible: Boolean = true,
         active: Boolean = false,
-        search: Search = Defaults.search,
+        search: WallhavenSearch = Defaults.search,
         query: String = "",
-        suggestions: List<Suggestion<Search>> = emptyList(),
+        suggestions: List<Suggestion<WallhavenSearch>> = emptyList(),
         showFilters: Boolean = false,
-        deleteSuggestion: Search? = null,
+        deleteSuggestion: WallhavenSearch? = null,
         overflowIcon: @Composable (() -> Unit)? = null,
         showNSFW: Boolean = false,
         showQuery: Boolean = true,
         onQueryChange: (String) -> Unit = {},
         onBackClick: (() -> Unit)? = null,
         onSearch: (query: String) -> Unit = {},
-        onSuggestionClick: (suggestion: Suggestion<Search>) -> Unit = {},
-        onSuggestionInsert: (suggestion: Suggestion<Search>) -> Unit = {},
-        onSuggestionDeleteRequest: (suggestion: Suggestion<Search>) -> Unit = {},
+        onSuggestionClick: (suggestion: Suggestion<WallhavenSearch>) -> Unit = {},
+        onSuggestionInsert: (suggestion: Suggestion<WallhavenSearch>) -> Unit = {},
+        onSuggestionDeleteRequest: (suggestion: Suggestion<WallhavenSearch>) -> Unit = {},
         onActiveChange: (active: Boolean) -> Unit = {},
         onShowFiltersChange: (show: Boolean) -> Unit = {},
         onFiltersChange: (searchQuery: WallhavenSearchQuery) -> Unit = {},
@@ -184,7 +184,7 @@ object MainSearchBar {
     }
 
     object Defaults {
-        val search = Search(
+        val search = WallhavenSearch(
             filters = WallhavenSearchQuery(
                 sorting = WallhavenSorting.RELEVANCE,
             ),

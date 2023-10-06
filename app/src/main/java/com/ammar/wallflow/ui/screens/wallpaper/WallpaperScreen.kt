@@ -20,8 +20,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import com.ammar.wallflow.extensions.search
-import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.Source
+import com.ammar.wallflow.model.WallhavenSearch
 import com.ammar.wallflow.model.WallhavenTagSearchMeta
 import com.ammar.wallflow.model.WallhavenUploaderSearchMeta
 import com.ammar.wallflow.ui.common.LocalSystemController
@@ -134,7 +134,7 @@ fun WallpaperScreen(
                 applyWallpaper(context, viewerViewModel, wallpaper)
             },
             onTagClick = {
-                val search = Search(
+                val search = WallhavenSearch(
                     query = "id:${it.id}",
                     meta = WallhavenTagSearchMeta(wallhavenTag = it),
                 )
@@ -144,7 +144,7 @@ fun WallpaperScreen(
                 navController.search(search)
             },
             onUploaderClick = {
-                val search = Search(
+                val search = WallhavenSearch(
                     query = "@${it.username}",
                     meta = WallhavenUploaderSearchMeta(wallhavenUploader = it),
                 )

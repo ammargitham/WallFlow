@@ -13,7 +13,7 @@ import com.ammar.wallflow.data.repository.SavedSearchRepository
 import com.ammar.wallflow.data.repository.SearchHistoryRepository
 import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.model.SavedSearch
-import com.ammar.wallflow.model.Search
+import com.ammar.wallflow.model.WallhavenSearch
 import com.ammar.wallflow.model.getSupportingText
 import com.ammar.wallflow.ui.common.Suggestion
 import com.ammar.wallflow.ui.common.mainsearch.MainSearchBar
@@ -83,11 +83,11 @@ class MainActivityViewModel @Inject constructor(
         it.copy(searchBarActive = partial(active))
     }
 
-    fun setSearchBarSearch(search: Search) = localUiState.update {
+    fun setSearchBarSearch(search: WallhavenSearch) = localUiState.update {
         it.copy(searchBarSearch = partial(search))
     }
 
-    fun onSearch(search: Search) {
+    fun onSearch(search: WallhavenSearch) {
         localUiState.update { it.copy(searchBarSearch = partial(search)) }
         viewModelScope.launch {
             delay(1000) // delay for better ux
@@ -99,7 +99,7 @@ class MainActivityViewModel @Inject constructor(
         it.copy(showSearchBarFilters = partial(show))
     }
 
-    fun setShowSearchBarSuggestionDeleteRequest(search: Search?) = localUiState.update {
+    fun setShowSearchBarSuggestionDeleteRequest(search: WallhavenSearch?) = localUiState.update {
         it.copy(searchBarDeleteSuggestion = partial(search))
     }
 
@@ -108,16 +108,16 @@ class MainActivityViewModel @Inject constructor(
         it.copy(searchBarSearch = partial(currentSearch.copy(query = query)))
     }
 
-    fun deleteSearch(search: Search) = viewModelScope.launch {
+    fun deleteSearch(search: WallhavenSearch) = viewModelScope.launch {
         searchHistoryRepository.deleteSearch(search)
         localUiState.update { it.copy(searchBarDeleteSuggestion = partial(null)) }
     }
 
-    fun showSaveSearchAsDialog(search: Search? = null) = localUiState.update {
+    fun showSaveSearchAsDialog(search: WallhavenSearch? = null) = localUiState.update {
         it.copy(saveSearchAsSearch = partial(search))
     }
 
-    fun saveSearchAs(name: String, search: Search) = viewModelScope.launch {
+    fun saveSearchAs(name: String, search: WallhavenSearch) = viewModelScope.launch {
         savedSearchRepository.upsert(
             SavedSearch(
                 name = name,
@@ -135,11 +135,11 @@ class MainActivityViewModel @Inject constructor(
 data class MainUiState(
     val globalErrors: List<GlobalError> = emptyList(),
     val searchBarActive: Boolean = false,
-    val searchBarSearch: Search = MainSearchBar.Defaults.search,
-    val searchBarSuggestions: List<Suggestion<Search>> = emptyList(),
+    val searchBarSearch: WallhavenSearch = MainSearchBar.Defaults.search,
+    val searchBarSuggestions: List<Suggestion<WallhavenSearch>> = emptyList(),
     val showSearchBarFilters: Boolean = false,
-    val searchBarDeleteSuggestion: Search? = null,
-    val saveSearchAsSearch: Search? = null,
+    val searchBarDeleteSuggestion: WallhavenSearch? = null,
+    val saveSearchAsSearch: WallhavenSearch? = null,
     val showSavedSearchesDialog: Boolean = false,
     val savedSearches: List<SavedSearch> = emptyList(),
     val theme: Theme = Theme.SYSTEM,

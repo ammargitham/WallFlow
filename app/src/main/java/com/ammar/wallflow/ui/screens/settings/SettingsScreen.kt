@@ -43,7 +43,7 @@ import com.ammar.wallflow.data.preferences.AutoWallpaperPreferences
 import com.ammar.wallflow.data.preferences.ObjectDetectionPreferences
 import com.ammar.wallflow.model.ObjectDetectionModel
 import com.ammar.wallflow.model.SavedSearch
-import com.ammar.wallflow.model.SavedSearchSaver
+import com.ammar.wallflow.model.SavedWallhavenSearchSaver
 import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.TopBar
 import com.ammar.wallflow.ui.common.bottomWindowInsets
@@ -280,7 +280,7 @@ fun SettingsScreen(
         val scope = rememberCoroutineScope()
         var localSavedSearch by rememberSaveable(
             this,
-            stateSaver = SavedSearchSaver,
+            stateSaver = SavedWallhavenSearchSaver,
         ) { mutableStateOf(this) }
 
         EditSearchModalBottomSheet(

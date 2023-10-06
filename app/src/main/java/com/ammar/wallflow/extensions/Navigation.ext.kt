@@ -1,16 +1,16 @@
 package com.ammar.wallflow.extensions
 
 import androidx.navigation.NavController
-import com.ammar.wallflow.model.Search
+import com.ammar.wallflow.model.WallhavenSearch
 import com.ammar.wallflow.ui.screens.destinations.HomeScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.navigate
 
-fun NavController.search(search: Search) = this.navigate(
+fun NavController.search(search: WallhavenSearch) = this.navigate(
     HomeScreenDestination(search = search),
 )
 
-fun DestinationsNavigator.search(search: Search) = this.navigate(
+fun DestinationsNavigator.search(search: WallhavenSearch) = this.navigate(
     HomeScreenDestination(search = search),
 )
 

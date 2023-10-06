@@ -40,8 +40,8 @@ import com.ammar.wallflow.data.preferences.Theme
 import com.ammar.wallflow.extensions.search
 import com.ammar.wallflow.extensions.toPxF
 import com.ammar.wallflow.extensions.trimAll
-import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.Source
+import com.ammar.wallflow.model.WallhavenSearch
 import com.ammar.wallflow.model.WallhavenTagSearchMeta
 import com.ammar.wallflow.model.WallhavenUploaderSearchMeta
 import com.ammar.wallflow.ui.common.DefaultSystemController
@@ -238,7 +238,7 @@ class MainActivity : ComponentActivity() {
                                 filters = uiState.searchBarSearch.filters,
                             )
                         } else {
-                            Search(
+                            WallhavenSearch(
                                 query = it,
                                 filters = uiState.searchBarSearch.filters,
                             )
@@ -379,7 +379,7 @@ class MainActivity : ComponentActivity() {
         viewModel: MainActivityViewModel,
         navController: NavHostController,
         searchBarController: MainSearchBarController,
-        search: Search,
+        search: WallhavenSearch,
     ) {
         if (searchBarController.state.value.search == search) {
             return

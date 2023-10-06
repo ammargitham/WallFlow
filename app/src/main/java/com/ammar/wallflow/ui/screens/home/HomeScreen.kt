@@ -33,8 +33,8 @@ import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.ammar.wallflow.extensions.rememberLazyStaggeredGridState
 import com.ammar.wallflow.extensions.search
-import com.ammar.wallflow.model.Search
-import com.ammar.wallflow.model.SearchSaver
+import com.ammar.wallflow.model.WallhavenSearch
+import com.ammar.wallflow.model.WallhavenSearchSaver
 import com.ammar.wallflow.model.WallhavenTagSearchMeta
 import com.ammar.wallflow.model.WallhavenUploaderSearchMeta
 import com.ammar.wallflow.model.Wallpaper
@@ -140,7 +140,7 @@ fun HomeScreen(
         searchBarController.state.value.search,
     ) {
         fn@{
-            val search = Search(
+            val search = WallhavenSearch(
                 query = "id:${it.id}",
                 meta = WallhavenTagSearchMeta(it),
             )
@@ -216,7 +216,7 @@ fun HomeScreen(
                 }
             },
             onFullWallpaperUploaderClick = {
-                val search = Search(
+                val search = WallhavenSearch(
                     query = "@${it.username}",
                     meta = WallhavenUploaderSearchMeta(wallhavenUploader = it),
                 )
@@ -240,7 +240,7 @@ fun HomeScreen(
         val scope = rememberCoroutineScope()
         var localSearch by rememberSaveable(
             uiState.homeSearch,
-            stateSaver = SearchSaver,
+            stateSaver = WallhavenSearchSaver,
         ) { mutableStateOf(uiState.homeSearch) }
 
         EditSearchModalBottomSheet(

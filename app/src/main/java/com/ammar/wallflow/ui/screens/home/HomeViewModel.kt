@@ -17,7 +17,7 @@ import com.ammar.wallflow.data.repository.wallhaven.WallhavenRepository
 import com.ammar.wallflow.model.Favorite
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.SavedSearch
-import com.ammar.wallflow.model.Search
+import com.ammar.wallflow.model.WallhavenSearch
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.toSearchQuery
 import com.ammar.wallflow.model.wallhaven.WallhavenSearchQuery
@@ -120,7 +120,7 @@ class HomeViewModel @Inject constructor(
         }
     }
 
-    fun updateHomeSearch(search: Search) {
+    fun updateHomeSearch(search: WallhavenSearch) {
         viewModelScope.launch {
             appPreferencesRepository.updateHomeSearch(search)
         }
@@ -134,11 +134,11 @@ class HomeViewModel @Inject constructor(
         it.copy(selectedWallpaper = partial(wallpaper))
     }
 
-    fun showSaveSearchAsDialog(search: Search? = null) = localUiState.update {
+    fun showSaveSearchAsDialog(search: WallhavenSearch? = null) = localUiState.update {
         it.copy(saveSearchAsSearch = partial(search))
     }
 
-    fun saveSearchAs(name: String, search: Search) = viewModelScope.launch {
+    fun saveSearchAs(name: String, search: WallhavenSearch) = viewModelScope.launch {
         savedSearchRepository.upsert(
             SavedSearch(
                 name = name,
@@ -176,8 +176,8 @@ private val tempWallhavenTags = List(3) {
 data class HomeUiState(
     val wallhavenTags: ImmutableList<WallhavenTag> = persistentListOf(),
     val areTagsLoading: Boolean = true,
-    val mainSearch: Search? = null,
-    val homeSearch: Search = Search(
+    val mainSearch: WallhavenSearch? = null,
+    val homeSearch: WallhavenSearch = WallhavenSearch(
         filters = WallhavenSearchQuery(
             sorting = WallhavenSorting.TOPLIST,
             topRange = WallhavenTopRange.ONE_DAY,
@@ -188,7 +188,7 @@ data class HomeUiState(
     val blurNsfw: Boolean = false,
     val showNSFW: Boolean = false,
     val selectedWallpaper: Wallpaper? = null,
-    val saveSearchAsSearch: Search? = null,
+    val saveSearchAsSearch: WallhavenSearch? = null,
     val showSavedSearchesDialog: Boolean = false,
     val savedSearches: List<SavedSearch> = emptyList(),
     val layoutPreferences: LayoutPreferences = LayoutPreferences(),

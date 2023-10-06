@@ -10,13 +10,13 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Search(
+data class WallhavenSearch(
     val query: String = "",
     val filters: WallhavenSearchQuery = WallhavenSearchQuery(),
     val meta: SearchMeta? = null,
 )
 
-fun Search.toSearchHistoryEntity(
+fun WallhavenSearch.toSearchHistoryEntity(
     id: Long = 0,
     lastUpdatedOn: Instant,
 ) = SearchHistoryEntity(
@@ -26,7 +26,7 @@ fun Search.toSearchHistoryEntity(
     lastUpdatedOn = lastUpdatedOn,
 )
 
-fun Search.toSearchQuery(): WallhavenSearchQuery {
+fun WallhavenSearch.toSearchQuery(): WallhavenSearchQuery {
     if (query.isBlank()) return filters
     val q = query.trimAll()
     if (q.startsWith("id:")) {
@@ -55,7 +55,7 @@ fun Search.toSearchQuery(): WallhavenSearchQuery {
     )
 }
 
-fun Search.getSupportingText(
+fun WallhavenSearch.getSupportingText(
     context: Context,
 ) = mutableListOf<String>().apply {
     if (filters.includedTags.isNotEmpty()) {
@@ -103,10 +103,10 @@ fun Search.getSupportingText(
     }
 }.joinToString(", ").ifBlank { null }
 
-val SearchSaver = Saver<Search, List<String>>(
+val WallhavenSearchSaver = Saver<WallhavenSearch, List<String>>(
     save = { listOf(it.query, it.filters.toQueryString()) },
     restore = {
-        Search(
+        WallhavenSearch(
             query = it[0],
             filters = WallhavenSearchQuery.fromQueryString(it[1]),
         )

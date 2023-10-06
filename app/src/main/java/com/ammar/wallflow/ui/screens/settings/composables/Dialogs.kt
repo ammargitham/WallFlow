@@ -74,7 +74,7 @@ import com.ammar.wallflow.extensions.toConstraints
 import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.model.ConstraintType
 import com.ammar.wallflow.model.SavedSearch
-import com.ammar.wallflow.model.Search
+import com.ammar.wallflow.model.WallhavenSearch
 import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.model.local.LocalDirectory
 import com.ammar.wallflow.ui.common.Dropdown
@@ -869,7 +869,7 @@ private class AutoWallSrcOptsDialogPP : CPPP<AutoWallSrcOptsDialogParameters>(
                 SavedSearch(
                     id = it.toLong(),
                     name = "Saved search $it",
-                    search = Search(),
+                    search = WallhavenSearch(),
                 )
             },
         ),

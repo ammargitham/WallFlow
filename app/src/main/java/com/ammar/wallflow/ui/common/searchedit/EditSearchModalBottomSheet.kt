@@ -32,7 +32,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.R
 import com.ammar.wallflow.extensions.toDp
-import com.ammar.wallflow.model.Search
+import com.ammar.wallflow.model.WallhavenSearch
 import com.ammar.wallflow.model.wallhaven.WallhavenSearchQuery
 import com.ammar.wallflow.model.wallhaven.WallhavenSorting
 import com.ammar.wallflow.ui.theme.WallFlowTheme
@@ -45,10 +45,10 @@ fun EditSearchModalBottomSheet(
     modifier: Modifier = Modifier,
     contentModifier: Modifier = Modifier,
     state: SheetState = rememberModalBottomSheetState(),
-    search: Search = Search(),
+    search: WallhavenSearch = WallhavenSearch(),
     header: @Composable (ColumnScope.() -> Unit)? = null,
     showNSFW: Boolean = false,
-    onChange: (Search) -> Unit = {},
+    onChange: (WallhavenSearch) -> Unit = {},
     onDismissRequest: () -> Unit = {},
 ) {
     val imePadding = WindowInsets.ime.getBottom(LocalDensity.current).toDp()
@@ -127,10 +127,10 @@ fun EditSearchModalBottomSheet(
 @Composable
 fun EditSearchContent(
     modifier: Modifier = Modifier,
-    search: Search = Search(),
+    search: WallhavenSearch = WallhavenSearch(),
     showQueryField: Boolean = true,
     showNSFW: Boolean = false,
-    onChange: (Search) -> Unit = {},
+    onChange: (WallhavenSearch) -> Unit = {},
     onMinResAddCustomResClick: () -> Unit = {},
     onResolutionsAddCustomResClick: () -> Unit = {},
 ) {
@@ -207,7 +207,7 @@ private fun PreviewFiltersContent() {
         Surface {
             EditSearchContent(
                 modifier = Modifier.padding(16.dp),
-                search = Search(
+                search = WallhavenSearch(
                     filters = WallhavenSearchQuery(
                         sorting = WallhavenSorting.TOPLIST,
                     ),

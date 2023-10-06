@@ -7,7 +7,7 @@ import com.ammar.wallflow.model.wallhaven.WallhavenSearchQuery
 data class SavedSearch(
     val id: Long = 0,
     val name: String = "",
-    val search: Search = Search(),
+    val search: WallhavenSearch = WallhavenSearch(),
 )
 
 fun SavedSearch.toEntity(id: Long? = null) = SavedSearchEntity(
@@ -17,13 +17,13 @@ fun SavedSearch.toEntity(id: Long? = null) = SavedSearchEntity(
     filters = search.filters.toQueryString(),
 )
 
-val SavedSearchSaver = Saver<SavedSearch, List<Any>>(
+val SavedWallhavenSearchSaver = Saver<SavedSearch, List<Any>>(
     save = { listOf(it.id, it.name, it.search.query, it.search.filters.toQueryString()) },
     restore = {
         SavedSearch(
             id = it[0] as Long,
             name = it[1] as String,
-            search = Search(
+            search = WallhavenSearch(
                 query = it[2] as String,
                 filters = WallhavenSearchQuery.fromQueryString(it[3] as String),
             ),

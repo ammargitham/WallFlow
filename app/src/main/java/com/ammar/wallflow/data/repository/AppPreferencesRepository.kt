@@ -22,7 +22,7 @@ import com.ammar.wallflow.data.preferences.defaultAutoWallpaperFreq
 import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.extensions.toConstraintTypeMap
 import com.ammar.wallflow.extensions.toConstraints
-import com.ammar.wallflow.model.Search
+import com.ammar.wallflow.model.WallhavenSearch
 import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.model.serializers.constraintTypeMapSerializer
 import com.ammar.wallflow.model.wallhaven.WallhavenSearchQuery
@@ -66,7 +66,7 @@ class AppPreferencesRepository @Inject constructor(
         dataStore.edit { it[PreferencesKeys.WALLHAVEN_API_KEY] = wallhavenApiKey }
     }
 
-    suspend fun updateHomeSearch(search: Search) = withContext(ioDispatcher) {
+    suspend fun updateHomeSearch(search: WallhavenSearch) = withContext(ioDispatcher) {
         dataStore.edit {
             it[PreferencesKeys.HOME_SEARCH_QUERY] = search.query
             it[PreferencesKeys.HOME_FILTERS] = search.filters.toQueryString()
@@ -153,7 +153,7 @@ class AppPreferencesRepository @Inject constructor(
 
     private fun mapAppPreferences(preferences: Preferences) = AppPreferences(
         wallhavenApiKey = preferences[PreferencesKeys.WALLHAVEN_API_KEY] ?: "",
-        homeSearch = Search(
+        homeSearch = WallhavenSearch(
             query = preferences[PreferencesKeys.HOME_SEARCH_QUERY] ?: "",
             filters = preferences[PreferencesKeys.HOME_FILTERS]?.let {
                 WallhavenSearchQuery.fromQueryString(it)

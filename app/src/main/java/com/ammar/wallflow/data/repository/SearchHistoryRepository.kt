@@ -2,7 +2,7 @@ package com.ammar.wallflow.data.repository
 
 import com.ammar.wallflow.IoDispatcher
 import com.ammar.wallflow.data.db.dao.SearchHistoryDao
-import com.ammar.wallflow.model.Search
+import com.ammar.wallflow.model.WallhavenSearch
 import com.ammar.wallflow.model.toSearchHistoryEntity
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -18,7 +18,7 @@ class SearchHistoryRepository @Inject constructor(
 ) {
     fun getAll() = searchHistoryDao.getAll().flowOn(ioDispatcher)
 
-    suspend fun addSearch(search: Search) = withContext(ioDispatcher) {
+    suspend fun addSearch(search: WallhavenSearch) = withContext(ioDispatcher) {
         val lastUpdatedOn = Clock.System.now()
         val searchHistory = searchHistoryDao.getByQuery(search.query)?.copy(
             filters = search.filters.toQueryString(),
@@ -27,7 +27,7 @@ class SearchHistoryRepository @Inject constructor(
         searchHistoryDao.upsert(searchHistory)
     }
 
-    suspend fun deleteSearch(search: Search) = withContext(ioDispatcher) {
+    suspend fun deleteSearch(search: WallhavenSearch) = withContext(ioDispatcher) {
         searchHistoryDao.deleteByQuery(search.query)
     }
 }
