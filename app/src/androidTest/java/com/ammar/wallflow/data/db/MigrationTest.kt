@@ -142,6 +142,29 @@ class MigrationTest {
                         );
                 """.trimIndent(),
             )
+            // insert into search_query for FK values in search_query_remote_keys
+            execSQL(
+                // language=sql
+                """
+                    INSERT INTO search_query
+                        ("id", "query_string", "last_updated_on")
+                    VALUES
+                        ('1', 'test', '12345'),
+                        ('2', 'test1', '12345'),
+                        ('3', 'test2', '12345');
+                """.trimIndent(),
+            )
+            execSQL(
+                // language=sql
+                """
+                    INSERT INTO search_query_remote_keys
+                        ("id", "search_query_id", "next_page_number")
+                    VALUES
+                        ('11', '2', '5'),
+                        ('12', '1', NULL),
+                        ('13', '3', '5');
+                """.trimIndent(),
+            )
             close()
         }
         helper.runMigrationsAndValidate(
@@ -170,6 +193,26 @@ class MigrationTest {
                 assertEquals("nature", name)
                 val lastUpdatedOn = it.getLong(3)
                 assertEquals(1696591975735, lastUpdatedOn)
+            }
+            db.query(
+                // language=sql
+                "SELECT COUNT(*) from wallhaven_search_query_remote_keys",
+            ).use {
+                it.moveToFirst()
+                val count = it.getInt(0)
+                assertEquals(3, count)
+            }
+            db.query(
+                // language=sql
+                "SELECT * from wallhaven_search_query_remote_keys",
+            ).use {
+                it.moveToFirst()
+                val id = it.getInt(0)
+                assertEquals(11, id)
+                val searchQueryId = it.getInt(1)
+                assertEquals(2, searchQueryId)
+                val nextPageNumber = it.getInt(2)
+                assertEquals(5, nextPageNumber)
             }
         }
     }

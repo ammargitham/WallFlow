@@ -7,7 +7,7 @@ import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import com.ammar.wallflow.data.db.AppDatabase
 import com.ammar.wallflow.data.db.entity.SearchQueryEntity
-import com.ammar.wallflow.data.db.entity.SearchQueryRemoteKeyEntity
+import com.ammar.wallflow.data.db.entity.WallhavenSearchQueryRemoteKeyEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSearchQueryWallpaperEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
@@ -89,7 +89,7 @@ class WallpapersRemoteMediator(
                 // Update RemoteKey for this query.
                 val remoteKey = remoteKeysDao.getBySearchQueryId(searchQueryId)
                 val updatedRemoteKey = remoteKey?.copy(nextPageNumber = nextPageNumber)
-                    ?: SearchQueryRemoteKeyEntity(
+                    ?: WallhavenSearchQueryRemoteKeyEntity(
                         id = 0,
                         searchQueryId = searchQueryId,
                         nextPageNumber = nextPageNumber,

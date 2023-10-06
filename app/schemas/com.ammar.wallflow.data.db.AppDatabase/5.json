@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 5,
-    "identityHash": "0fb49c7731732df863780f61aa77ab14",
+    "identityHash": "6b81972f73ce40c736d5ee367bcad11f",
     "entities": [
       {
         "tableName": "last_updated",
@@ -127,7 +127,7 @@
         "foreignKeys": []
       },
       {
-        "tableName": "search_query_remote_keys",
+        "tableName": "wallhaven_search_query_remote_keys",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `search_query_id` INTEGER NOT NULL, `next_page_number` INTEGER, FOREIGN KEY(`search_query_id`) REFERENCES `search_query`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
@@ -157,13 +157,13 @@
         },
         "indices": [
           {
-            "name": "index_search_query_remote_keys_search_query_id",
+            "name": "index_wallhaven_search_query_remote_keys_search_query_id",
             "unique": true,
             "columnNames": [
               "search_query_id"
             ],
             "orders": [],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_search_query_remote_keys_search_query_id` ON `${TABLE_NAME}` (`search_query_id`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_wallhaven_search_query_remote_keys_search_query_id` ON `${TABLE_NAME}` (`search_query_id`)"
           }
         ],
         "foreignKeys": [
@@ -820,7 +820,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0fb49c7731732df863780f61aa77ab14')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6b81972f73ce40c736d5ee367bcad11f')"
     ]
   }
 }
