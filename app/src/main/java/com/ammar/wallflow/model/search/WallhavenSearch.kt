@@ -3,7 +3,7 @@ package com.ammar.wallflow.model.search
 import android.content.Context
 import androidx.compose.runtime.saveable.Saver
 import com.ammar.wallflow.R
-import com.ammar.wallflow.data.db.entity.WallhavenSearchHistoryEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSearchHistoryEntity
 import com.ammar.wallflow.extensions.trimAll
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable

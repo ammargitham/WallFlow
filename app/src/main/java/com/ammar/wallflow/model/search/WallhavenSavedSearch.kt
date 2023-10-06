@@ -1,7 +1,7 @@
 package com.ammar.wallflow.model.search
 
 import androidx.compose.runtime.saveable.Saver
-import com.ammar.wallflow.data.db.entity.WallhavenSavedSearchEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSavedSearchEntity
 
 data class WallhavenSavedSearch(
     val id: Long = 0,

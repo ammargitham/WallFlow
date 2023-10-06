@@ -2,7 +2,7 @@ package com.ammar.wallflow.model.backup
 
 import android.net.Uri
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
-import com.ammar.wallflow.data.db.entity.WallhavenSavedSearchEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSavedSearchEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenTagEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenUploaderEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity

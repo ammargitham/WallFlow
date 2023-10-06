@@ -6,8 +6,8 @@ import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import com.ammar.wallflow.data.db.AppDatabase
-import com.ammar.wallflow.data.db.entity.WallhavenSearchQueryEntity
-import com.ammar.wallflow.data.db.entity.WallhavenSearchQueryRemoteKeyEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSearchQueryEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSearchQueryRemoteKeyEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSearchQueryWallpaperEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
