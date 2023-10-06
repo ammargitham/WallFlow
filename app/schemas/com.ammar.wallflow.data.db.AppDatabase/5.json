@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 5,
-    "identityHash": "6b81972f73ce40c736d5ee367bcad11f",
+    "identityHash": "382f5418ebd259510c0c59f5f343ce29",
     "entities": [
       {
         "tableName": "last_updated",
@@ -85,7 +85,7 @@
         ]
       },
       {
-        "tableName": "search_query",
+        "tableName": "wallhaven_search_query",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `query_string` TEXT NOT NULL, `last_updated_on` INTEGER NOT NULL)",
         "fields": [
           {
@@ -115,20 +115,20 @@
         },
         "indices": [
           {
-            "name": "index_search_query_query_string",
+            "name": "index_wallhaven_search_query_query_string",
             "unique": true,
             "columnNames": [
               "query_string"
             ],
             "orders": [],
-            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_search_query_query_string` ON `${TABLE_NAME}` (`query_string`)"
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_wallhaven_search_query_query_string` ON `${TABLE_NAME}` (`query_string`)"
           }
         ],
         "foreignKeys": []
       },
       {
         "tableName": "wallhaven_search_query_remote_keys",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `search_query_id` INTEGER NOT NULL, `next_page_number` INTEGER, FOREIGN KEY(`search_query_id`) REFERENCES `search_query`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `search_query_id` INTEGER NOT NULL, `next_page_number` INTEGER, FOREIGN KEY(`search_query_id`) REFERENCES `wallhaven_search_query`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "id",
@@ -168,7 +168,7 @@
         ],
         "foreignKeys": [
           {
-            "table": "search_query",
+            "table": "wallhaven_search_query",
             "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
@@ -182,7 +182,7 @@
       },
       {
         "tableName": "wallhaven_search_query_wallpapers",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`search_query_id` INTEGER NOT NULL, `wallpaper_id` INTEGER NOT NULL, PRIMARY KEY(`search_query_id`, `wallpaper_id`), FOREIGN KEY(`search_query_id`) REFERENCES `search_query`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`wallpaper_id`) REFERENCES `wallhaven_wallpapers`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`search_query_id` INTEGER NOT NULL, `wallpaper_id` INTEGER NOT NULL, PRIMARY KEY(`search_query_id`, `wallpaper_id`), FOREIGN KEY(`search_query_id`) REFERENCES `wallhaven_search_query`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`wallpaper_id`) REFERENCES `wallhaven_wallpapers`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "searchQueryId",
@@ -217,7 +217,7 @@
         ],
         "foreignKeys": [
           {
-            "table": "search_query",
+            "table": "wallhaven_search_query",
             "onDelete": "CASCADE",
             "onUpdate": "NO ACTION",
             "columns": [
@@ -820,7 +820,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6b81972f73ce40c736d5ee367bcad11f')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '382f5418ebd259510c0c59f5f343ce29')"
     ]
   }
 }

@@ -16,5 +16,9 @@ import androidx.room.migration.AutoMigrationSpec
         fromTableName = "search_query_remote_keys",
         toTableName = "wallhaven_search_query_remote_keys",
     ),
+    RenameTable(
+        fromTableName = "search_query",
+        toTableName = "wallhaven_search_query",
+    ),
 )
 class AutoMigration4To5Spec : AutoMigrationSpec

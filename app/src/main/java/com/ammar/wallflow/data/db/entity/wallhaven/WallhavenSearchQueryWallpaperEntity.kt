@@ -4,7 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
-import com.ammar.wallflow.data.db.entity.SearchQueryEntity
+import com.ammar.wallflow.data.db.entity.WallhavenSearchQueryEntity
 
 @Entity(
     tableName = "wallhaven_search_query_wallpapers",
@@ -14,7 +14,7 @@ import com.ammar.wallflow.data.db.entity.SearchQueryEntity
     ],
     foreignKeys = [
         ForeignKey(
-            entity = SearchQueryEntity::class,
+            entity = WallhavenSearchQueryEntity::class,
             parentColumns = ["id"],
             childColumns = ["search_query_id"],
             onDelete = ForeignKey.CASCADE,

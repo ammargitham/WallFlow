@@ -142,7 +142,6 @@ class MigrationTest {
                         );
                 """.trimIndent(),
             )
-            // insert into search_query for FK values in search_query_remote_keys
             execSQL(
                 // language=sql
                 """
@@ -213,6 +212,26 @@ class MigrationTest {
                 assertEquals(2, searchQueryId)
                 val nextPageNumber = it.getInt(2)
                 assertEquals(5, nextPageNumber)
+            }
+            db.query(
+                // language=sql
+                "SELECT COUNT(*) from wallhaven_search_query",
+            ).use {
+                it.moveToFirst()
+                val count = it.getInt(0)
+                assertEquals(3, count)
+            }
+            db.query(
+                // language=sql
+                "SELECT * from wallhaven_search_query",
+            ).use {
+                it.moveToFirst()
+                val id = it.getInt(0)
+                assertEquals(1, id)
+                val queryString = it.getString(1)
+                assertEquals("test", queryString)
+                val lastUpdatedOn = it.getLong(2)
+                assertEquals(12345, lastUpdatedOn)
             }
         }
     }

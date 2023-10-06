@@ -6,7 +6,7 @@ import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import com.ammar.wallflow.data.db.AppDatabase
-import com.ammar.wallflow.data.db.entity.SearchQueryEntity
+import com.ammar.wallflow.data.db.entity.WallhavenSearchQueryEntity
 import com.ammar.wallflow.data.db.entity.WallhavenSearchQueryRemoteKeyEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSearchQueryWallpaperEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
@@ -69,7 +69,7 @@ class WallpapersRemoteMediator(
             appDatabase.withTransaction {
                 val now = clock.now()
                 val searchQueryId = searchQueryEntity?.id ?: searchQueryDao.upsert(
-                    SearchQueryEntity(
+                    WallhavenSearchQueryEntity(
                         id = 0,
                         queryString = searchQuery.toQueryString(),
                         lastUpdatedOn = now,

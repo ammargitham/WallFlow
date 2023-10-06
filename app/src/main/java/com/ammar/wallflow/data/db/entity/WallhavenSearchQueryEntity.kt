@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 import kotlinx.datetime.Instant
 
 @Entity(
-    tableName = "search_query",
+    tableName = "wallhaven_search_query",
     indices = [
         Index(
             value = ["query_string"],
@@ -15,7 +15,7 @@ import kotlinx.datetime.Instant
         ),
     ],
 )
-data class SearchQueryEntity(
+data class WallhavenSearchQueryEntity(
     @PrimaryKey(autoGenerate = true) val id: Long,
     @ColumnInfo(name = "query_string") val queryString: String,
     @ColumnInfo(name = "last_updated_on") val lastUpdatedOn: Instant,

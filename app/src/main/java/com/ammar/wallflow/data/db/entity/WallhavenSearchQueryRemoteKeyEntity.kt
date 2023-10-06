@@ -16,7 +16,7 @@ import androidx.room.PrimaryKey
     ],
     foreignKeys = [
         ForeignKey(
-            SearchQueryEntity::class,
+            WallhavenSearchQueryEntity::class,
             parentColumns = ["id"],
             childColumns = ["search_query_id"],
             onDelete = ForeignKey.CASCADE,
