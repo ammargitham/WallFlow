@@ -3,8 +3,8 @@ package com.ammar.wallflow.activities.main
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.ammar.wallflow.data.db.entity.toSearch
 import com.ammar.wallflow.data.db.entity.toWallhavenSavedSearch
+import com.ammar.wallflow.data.db.entity.toWallhavenSearch
 import com.ammar.wallflow.data.preferences.Theme
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.GlobalErrorsRepository
@@ -57,7 +57,7 @@ class MainActivityViewModel @Inject constructor(
                             it.query.trimAll().lowercase().contains(localQuery)
                     }
                     .map { s ->
-                        val search = s.toSearch()
+                        val search = s.toWallhavenSearch()
                         Suggestion(
                             value = search,
                             headline = s.query,

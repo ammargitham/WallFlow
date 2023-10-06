@@ -3,7 +3,7 @@ package com.ammar.wallflow.model.search
 import android.content.Context
 import androidx.compose.runtime.saveable.Saver
 import com.ammar.wallflow.R
-import com.ammar.wallflow.data.db.entity.SearchHistoryEntity
+import com.ammar.wallflow.data.db.entity.WallhavenSearchHistoryEntity
 import com.ammar.wallflow.extensions.trimAll
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
@@ -18,7 +18,7 @@ data class WallhavenSearch(
 fun WallhavenSearch.toSearchHistoryEntity(
     id: Long = 0,
     lastUpdatedOn: Instant,
-) = SearchHistoryEntity(
+) = WallhavenSearchHistoryEntity(
     id = id,
     query = query.trimAll().lowercase(),
     filters = filters.toQueryString(),

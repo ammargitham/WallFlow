@@ -120,7 +120,26 @@ class MigrationTest {
                     INSERT INTO saved_searches
                         ("id", "name", "query", "filters")
                     VALUES
-                        ('1', 'Home', '', 'includedTags=&excludedTags=&username=&tagId=&wallpaperId=&categories=anime%2Cgeneral%2Cpeople&purity=sfw&sorting=toplist&order=desc&topRange=1d&atleast=&resolutions=&ratios=&colors=&seed=');
+                        (
+                            '1',
+                            'Home',
+                            '',
+                            'includedTags=&excludedTags=&username=&tagId=&wallpaperId=&categories=anime%2Cgeneral%2Cpeople&purity=sfw&sorting=toplist&order=desc&topRange=1d&atleast=&resolutions=&ratios=&colors=&seed='
+                        );
+                """.trimIndent(),
+            )
+            execSQL(
+                // language=sql
+                """
+                    INSERT INTO search_history
+                        ("id", "query", "filters", "last_updated_on")
+                    VALUES
+                        (
+                            '1',
+                            'nature',
+                            'includedTags=&excludedTags=&username=&tagId=&wallpaperId=&categories=anime%2Cgeneral%2Cpeople&purity=sfw&sorting=relevance&order=desc&topRange=1M&atleast=&resolutions=&ratios=&colors=&seed=',
+                            '1696591975735'
+                        );
                 """.trimIndent(),
             )
             close()
@@ -139,6 +158,18 @@ class MigrationTest {
                 assertEquals(1, id)
                 val name = it.getString(1)
                 assertEquals("Home", name)
+            }
+            db.query(
+                // language=sql
+                "SELECT * from wallhaven_search_history",
+            ).use {
+                it.moveToFirst()
+                val id = it.getInt(0)
+                assertEquals(1, id)
+                val name = it.getString(1)
+                assertEquals("nature", name)
+                val lastUpdatedOn = it.getLong(3)
+                assertEquals(1696591975735, lastUpdatedOn)
             }
         }
     }

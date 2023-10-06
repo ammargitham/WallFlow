@@ -9,7 +9,7 @@ import com.ammar.wallflow.model.search.WallhavenSearchQuery
 import kotlinx.datetime.Instant
 
 @Entity(
-    tableName = "search_history",
+    tableName = "wallhaven_search_history",
     indices = [
         Index(
             value = ["query"],
@@ -17,14 +17,14 @@ import kotlinx.datetime.Instant
         ),
     ],
 )
-data class SearchHistoryEntity(
+data class WallhavenSearchHistoryEntity(
     @PrimaryKey(autoGenerate = true) val id: Long,
     @ColumnInfo(collate = ColumnInfo.NOCASE) val query: String,
     val filters: String,
     @ColumnInfo(name = "last_updated_on") val lastUpdatedOn: Instant,
 )
 
-fun SearchHistoryEntity.toSearch() = WallhavenSearch(
+fun WallhavenSearchHistoryEntity.toWallhavenSearch() = WallhavenSearch(
     query = query,
     filters = WallhavenSearchQuery.fromQueryString(filters),
 )

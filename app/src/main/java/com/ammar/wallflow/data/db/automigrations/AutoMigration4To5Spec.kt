@@ -7,4 +7,8 @@ import androidx.room.migration.AutoMigrationSpec
     fromTableName = "saved_searches",
     toTableName = "wallhaven_saved_searches",
 )
+@RenameTable(
+    fromTableName = "search_history",
+    toTableName = "wallhaven_search_history",
+)
 class AutoMigration4To5Spec : AutoMigrationSpec
