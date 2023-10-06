@@ -23,9 +23,9 @@ import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.extensions.toConstraintTypeMap
 import com.ammar.wallflow.extensions.toConstraints
 import com.ammar.wallflow.model.Search
-import com.ammar.wallflow.model.Sorting
-import com.ammar.wallflow.model.TopRange
 import com.ammar.wallflow.model.WallhavenSearchQuery
+import com.ammar.wallflow.model.WallhavenSorting
+import com.ammar.wallflow.model.WallhavenTopRange
 import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.model.serializers.constraintTypeMapSerializer
 import com.ammar.wallflow.ui.screens.local.LocalSort
@@ -158,8 +158,8 @@ class AppPreferencesRepository @Inject constructor(
             filters = preferences[PreferencesKeys.HOME_FILTERS]?.let {
                 WallhavenSearchQuery.fromQueryString(it)
             } ?: WallhavenSearchQuery(
-                sorting = Sorting.TOPLIST,
-                topRange = TopRange.ONE_DAY,
+                sorting = WallhavenSorting.TOPLIST,
+                topRange = WallhavenTopRange.ONE_DAY,
             ),
         ),
         blurSketchy = preferences[PreferencesKeys.BLUR_SKETCHY] ?: false,

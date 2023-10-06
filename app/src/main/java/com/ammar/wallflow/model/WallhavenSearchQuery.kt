@@ -13,7 +13,7 @@ import com.ammar.wallflow.extensions.quoteIfSpaced
 import com.ammar.wallflow.extensions.toHexString
 import com.ammar.wallflow.extensions.toQueryString
 import com.ammar.wallflow.extensions.urlDecoded
-import com.ammar.wallflow.model.Ratio.CategoryRatio
+import com.ammar.wallflow.model.WallhavenRatio.CategoryWallhavenRatio
 import com.ammar.wallflow.model.serializers.ColorSerializer
 import com.ammar.wallflow.model.serializers.IntSizeSerializer
 import java.util.regex.Pattern
@@ -27,16 +27,16 @@ data class WallhavenSearchQuery(
     val username: String? = null,
     val tagId: Long? = null,
     val wallpaperId: String? = null,
-    val categories: Set<Category> = defaultCategories,
+    val categories: Set<WallhavenCategory> = defaultCategories,
     val purity: Set<Purity> = defaultPurities,
-    val sorting: Sorting = Sorting.DATE_ADDED,
+    val sorting: WallhavenSorting = WallhavenSorting.DATE_ADDED,
     val order: Order = Order.DESC,
-    val topRange: TopRange = TopRange.ONE_MONTH,
+    val topRange: WallhavenTopRange = WallhavenTopRange.ONE_MONTH,
     val atleast: IntSize? = null,
     val resolutions: Set<IntSize> = emptySet(),
     val colors: Color? = null,
     val seed: String? = null,
-    val ratios: Set<Ratio> = emptySet(),
+    val ratios: Set<WallhavenRatio> = emptySet(),
 ) {
     private fun toStringMap() = mapOf(
         "includedTags" to includedTags
@@ -95,7 +95,8 @@ data class WallhavenSearchQuery(
     fun toQueryString() = toStringMap().toQueryString()
 
     companion object {
-        val defaultCategories = setOf(Category.GENERAL, Category.ANIME, Category.PEOPLE)
+        val defaultCategories =
+            setOf(WallhavenCategory.GENERAL, WallhavenCategory.ANIME, WallhavenCategory.PEOPLE)
         val defaultPurities = setOf(Purity.SFW)
 
         fun fromQueryString(string: String): WallhavenSearchQuery {
@@ -124,7 +125,7 @@ data class WallhavenSearchQuery(
                 wallpaperId = map["tagId"]?.ifBlank { null },
                 categories = map["categories"]
                     ?.split(",")
-                    ?.map { Category.fromValue(it) }
+                    ?.map { WallhavenCategory.fromValue(it) }
                     ?.toSet()
                     ?: emptySet(),
                 purity = map["purity"]
@@ -133,14 +134,14 @@ data class WallhavenSearchQuery(
                     ?.toSet()
                     ?: emptySet(),
                 sorting = map["sorting"]
-                    ?.let { Sorting.fromValue(it) }
-                    ?: Sorting.DATE_ADDED,
+                    ?.let { WallhavenSorting.fromValue(it) }
+                    ?: WallhavenSorting.DATE_ADDED,
                 order = map["order"]
                     ?.let { Order.fromValue(it) }
                     ?: Order.DESC,
                 topRange = map["topRange"]
-                    ?.let { TopRange.fromValue(it) }
-                    ?: TopRange.ONE_MONTH,
+                    ?.let { WallhavenTopRange.fromValue(it) }
+                    ?: WallhavenTopRange.ONE_MONTH,
                 atleast = map["atleast"]
                     ?.let {
                         if (it.isBlank()) {
@@ -159,14 +160,18 @@ data class WallhavenSearchQuery(
                     ?.filter { it.isNotBlank() }
                     ?.map {
                         when (it) {
-                            CategoryRatio.Category.LANDSCAPE.categoryName -> {
-                                Ratio.fromCategory(CategoryRatio.Category.LANDSCAPE)
+                            CategoryWallhavenRatio.Category.LANDSCAPE.categoryName -> {
+                                WallhavenRatio.fromCategory(
+                                    CategoryWallhavenRatio.Category.LANDSCAPE,
+                                )
                             }
-                            CategoryRatio.Category.PORTRAIT.categoryName -> {
-                                Ratio.fromCategory(CategoryRatio.Category.PORTRAIT)
+                            CategoryWallhavenRatio.Category.PORTRAIT.categoryName -> {
+                                WallhavenRatio.fromCategory(
+                                    CategoryWallhavenRatio.Category.PORTRAIT,
+                                )
                             }
                             else -> {
-                                Ratio.fromSize(fromIntSizeStr(it))
+                                WallhavenRatio.fromSize(fromIntSizeStr(it))
                             }
                         }
                     }
@@ -184,7 +189,7 @@ data class WallhavenSearchQuery(
     }
 }
 
-enum class Category(
+enum class WallhavenCategory(
     val flag: Int,
     val value: String,
 ) {
@@ -202,7 +207,7 @@ enum class Category(
     }
 }
 
-fun Set<Category>.toCategoryInt() = this.fold(0) { p, f -> p + f.flag }
+fun Set<WallhavenCategory>.toCategoryInt() = this.fold(0) { p, f -> p + f.flag }
 
 enum class Purity(
     val purityName: String,
@@ -224,7 +229,7 @@ enum class Purity(
 
 fun Set<Purity>.toPurityInt() = this.fold(0) { p, f -> p + f.flag }
 
-enum class Sorting(
+enum class WallhavenSorting(
     val value: String,
 ) {
     TOPLIST("toplist"),
@@ -259,7 +264,7 @@ enum class Order(
     }
 }
 
-enum class TopRange(
+enum class WallhavenTopRange(
     val value: String,
 ) {
     ONE_DAY("1d"),
@@ -285,13 +290,13 @@ enum class TopRange(
 }
 
 @Serializable
-sealed class Ratio {
+sealed class WallhavenRatio {
     abstract fun toRatioString(): String
 
     @Serializable
-    data class CategoryRatio(
+    data class CategoryWallhavenRatio(
         val category: Category,
-    ) : Ratio() {
+    ) : WallhavenRatio() {
         enum class Category(val categoryName: String) {
             LANDSCAPE("landscape"),
             PORTRAIT("portrait"),
@@ -301,15 +306,16 @@ sealed class Ratio {
     }
 
     @Serializable
-    data class SizeRatio(
+    data class SizeWallhavenRatio(
         val size: IntSize,
-    ) : Ratio() {
+    ) : WallhavenRatio() {
         override fun toRatioString() = this.size.toString()
     }
 
     companion object {
-        fun fromSize(size: IntSize): Ratio = SizeRatio(size)
-        fun fromCategory(category: CategoryRatio.Category): Ratio = CategoryRatio(category)
+        fun fromSize(size: IntSize): WallhavenRatio = SizeWallhavenRatio(size)
+        fun fromCategory(category: CategoryWallhavenRatio.Category): WallhavenRatio =
+            CategoryWallhavenRatio(category)
     }
 }
 

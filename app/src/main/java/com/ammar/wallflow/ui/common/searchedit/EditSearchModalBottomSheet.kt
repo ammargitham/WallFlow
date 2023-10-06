@@ -33,8 +33,8 @@ import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.R
 import com.ammar.wallflow.extensions.toDp
 import com.ammar.wallflow.model.Search
-import com.ammar.wallflow.model.Sorting
 import com.ammar.wallflow.model.WallhavenSearchQuery
+import com.ammar.wallflow.model.WallhavenSorting
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
@@ -167,7 +167,7 @@ fun EditSearchContent(
             sorting = search.filters.sorting,
             onChange = { onChange(search.copy(filters = search.filters.copy(sorting = it))) },
         )
-        AnimatedVisibility(search.filters.sorting == Sorting.TOPLIST) {
+        AnimatedVisibility(search.filters.sorting == WallhavenSorting.TOPLIST) {
             TopRangeFilter(
                 topRange = search.filters.topRange,
                 onChange = { onChange(search.copy(filters = search.filters.copy(topRange = it))) },
@@ -209,7 +209,7 @@ private fun PreviewFiltersContent() {
                 modifier = Modifier.padding(16.dp),
                 search = Search(
                     filters = WallhavenSearchQuery(
-                        sorting = Sorting.TOPLIST,
+                        sorting = WallhavenSorting.TOPLIST,
                     ),
                 ),
             )

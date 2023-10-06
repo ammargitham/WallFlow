@@ -78,15 +78,15 @@ import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.COMMON_RESOLUTIONS
 import com.ammar.wallflow.R
 import com.ammar.wallflow.extensions.getScreenResolution
-import com.ammar.wallflow.model.Category
 import com.ammar.wallflow.model.Order
 import com.ammar.wallflow.model.Purity
-import com.ammar.wallflow.model.Ratio
-import com.ammar.wallflow.model.Ratio.CategoryRatio
 import com.ammar.wallflow.model.SavedSearch
 import com.ammar.wallflow.model.Search
-import com.ammar.wallflow.model.Sorting
-import com.ammar.wallflow.model.TopRange
+import com.ammar.wallflow.model.WallhavenCategory
+import com.ammar.wallflow.model.WallhavenRatio
+import com.ammar.wallflow.model.WallhavenRatio.CategoryWallhavenRatio
+import com.ammar.wallflow.model.WallhavenSorting
+import com.ammar.wallflow.model.WallhavenTopRange
 import com.ammar.wallflow.ui.common.ClearableChip
 import com.ammar.wallflow.ui.common.IntState
 import com.ammar.wallflow.ui.common.NameState
@@ -131,8 +131,8 @@ internal fun ExcludedTagsFilter(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun CategoriesFilter(
-    categories: Set<Category> = setOf(Category.PEOPLE),
-    onChange: (categories: Set<Category>) -> Unit = {},
+    categories: Set<WallhavenCategory> = setOf(WallhavenCategory.PEOPLE),
+    onChange: (categories: Set<WallhavenCategory>) -> Unit = {},
 ) {
     Column {
         Text(
@@ -143,7 +143,7 @@ internal fun CategoriesFilter(
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Category.entries.map {
+            WallhavenCategory.entries.map {
                 val selected = it in categories
 
                 FilterChip(
@@ -234,8 +234,8 @@ private fun PreviewPurityFilter() {
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 internal fun SortingFilter(
-    sorting: Sorting = Sorting.DATE_ADDED,
-    onChange: (sorting: Sorting) -> Unit = {},
+    sorting: WallhavenSorting = WallhavenSorting.DATE_ADDED,
+    onChange: (sorting: WallhavenSorting) -> Unit = {},
 ) {
     Column {
         Text(
@@ -246,7 +246,7 @@ internal fun SortingFilter(
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            Sorting.entries.map {
+            WallhavenSorting.entries.map {
                 val selected = it == sorting
 
                 FilterChip(
@@ -274,8 +274,8 @@ internal fun SortingFilter(
 )
 @Composable
 internal fun TopRangeFilter(
-    topRange: TopRange = TopRange.ONE_MONTH,
-    onChange: (topRange: TopRange) -> Unit,
+    topRange: WallhavenTopRange = WallhavenTopRange.ONE_MONTH,
+    onChange: (topRange: WallhavenTopRange) -> Unit,
 ) {
     Column {
         Text(
@@ -286,7 +286,7 @@ internal fun TopRangeFilter(
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            TopRange.entries.map {
+            WallhavenTopRange.entries.map {
                 val selected = it == topRange
 
                 FilterChip(
@@ -526,8 +526,8 @@ private fun AddResolutionButton(
 @Composable
 internal fun RatioFilter(
     modifier: Modifier = Modifier,
-    ratios: Set<Ratio> = emptySet(),
-    onChange: (Set<Ratio>) -> Unit = {},
+    ratios: Set<WallhavenRatio> = emptySet(),
+    onChange: (Set<WallhavenRatio>) -> Unit = {},
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -548,7 +548,7 @@ internal fun RatioFilter(
             label = { Text(text = stringResource(R.string.ratio)) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             colors = ExposedDropdownMenuDefaults.textFieldColors(),
-            tagFromInputString = { Ratio.fromSize(IntSize(1, 1)) }, // dummy method
+            tagFromInputString = { WallhavenRatio.fromSize(IntSize(1, 1)) }, // dummy method
             getTagString = { it.toRatioString().capitalize(Locale.current) },
         )
         ExposedDropdownMenu(
@@ -587,7 +587,7 @@ private fun PreviewRatioFilter() {
 }
 
 private data class RatioOption(
-    val ratio: Ratio? = null,
+    val ratio: WallhavenRatio? = null,
     val span: Int,
 )
 
@@ -609,7 +609,7 @@ private val ratioOptions = listOf(
 ).map {
     RatioOption(
         ratio = it.first?.let { sizePair ->
-            Ratio.fromSize(IntSize(sizePair.first, sizePair.second))
+            WallhavenRatio.fromSize(IntSize(sizePair.first, sizePair.second))
         },
         span = it.second,
     )
@@ -625,8 +625,8 @@ private fun getRatioGridHeaders(context: Context) = listOf(
 @Composable
 private fun RatioMenuContent(
     modifier: Modifier = Modifier,
-    selectedRatios: Set<Ratio> = emptySet(),
-    onOptionClick: (Ratio) -> Unit = {},
+    selectedRatios: Set<WallhavenRatio> = emptySet(),
+    onOptionClick: (WallhavenRatio) -> Unit = {},
 ) {
     val context = LocalContext.current
 
@@ -634,8 +634,12 @@ private fun RatioMenuContent(
         Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            val landscapeRatio = Ratio.fromCategory(CategoryRatio.Category.LANDSCAPE)
-            val portraitRatio = Ratio.fromCategory(CategoryRatio.Category.PORTRAIT)
+            val landscapeRatio = WallhavenRatio.fromCategory(
+                CategoryWallhavenRatio.Category.LANDSCAPE,
+            )
+            val portraitRatio = WallhavenRatio.fromCategory(
+                CategoryWallhavenRatio.Category.PORTRAIT,
+            )
 
             LandscapeChip(
                 selected = landscapeRatio in selectedRatios,
@@ -684,8 +688,8 @@ private fun GridHeader(
 @OptIn(ExperimentalMaterial3Api::class)
 private fun RatioOptionGrid(
     modifier: Modifier = Modifier,
-    selectedRatios: Set<Ratio> = emptySet(),
-    onOptionClick: (Ratio) -> Unit = {},
+    selectedRatios: Set<WallhavenRatio> = emptySet(),
+    onOptionClick: (WallhavenRatio) -> Unit = {},
 ) {
     Column(
         modifier = modifier,
@@ -765,11 +769,11 @@ private fun PreviewRatioMenuContent() {
 }
 
 @Composable
-private fun getCategoryString(category: Category) = stringResource(
+private fun getCategoryString(category: WallhavenCategory) = stringResource(
     when (category) {
-        Category.GENERAL -> R.string.general
-        Category.ANIME -> R.string.anime
-        Category.PEOPLE -> R.string.people
+        WallhavenCategory.GENERAL -> R.string.general
+        WallhavenCategory.ANIME -> R.string.anime
+        WallhavenCategory.PEOPLE -> R.string.people
     },
 )
 
@@ -783,27 +787,27 @@ private fun getPurityString(purity: Purity) = stringResource(
 )
 
 @Composable
-private fun getSortingString(sorting: Sorting) = stringResource(
+private fun getSortingString(sorting: WallhavenSorting) = stringResource(
     when (sorting) {
-        Sorting.DATE_ADDED -> R.string.date_added
-        Sorting.RELEVANCE -> R.string.relevance
-        Sorting.RANDOM -> R.string.random
-        Sorting.VIEWS -> R.string.views
-        Sorting.FAVORITES -> R.string.favorites
-        Sorting.TOPLIST -> R.string.top
+        WallhavenSorting.DATE_ADDED -> R.string.date_added
+        WallhavenSorting.RELEVANCE -> R.string.relevance
+        WallhavenSorting.RANDOM -> R.string.random
+        WallhavenSorting.VIEWS -> R.string.views
+        WallhavenSorting.FAVORITES -> R.string.favorites
+        WallhavenSorting.TOPLIST -> R.string.top
     },
 )
 
 @Composable
-private fun getTopRangeString(topRange: TopRange) = stringResource(
+private fun getTopRangeString(topRange: WallhavenTopRange) = stringResource(
     when (topRange) {
-        TopRange.ONE_DAY -> R.string.one_day
-        TopRange.THREE_DAYS -> R.string.three_days
-        TopRange.ONE_WEEK -> R.string.one_week
-        TopRange.ONE_MONTH -> R.string.one_month
-        TopRange.THREE_MONTHS -> R.string.three_months
-        TopRange.SIX_MONTHS -> R.string.six_months
-        TopRange.ONE_YEAR -> R.string.one_year
+        WallhavenTopRange.ONE_DAY -> R.string.one_day
+        WallhavenTopRange.THREE_DAYS -> R.string.three_days
+        WallhavenTopRange.ONE_WEEK -> R.string.one_week
+        WallhavenTopRange.ONE_MONTH -> R.string.one_month
+        WallhavenTopRange.THREE_MONTHS -> R.string.three_months
+        WallhavenTopRange.SIX_MONTHS -> R.string.six_months
+        WallhavenTopRange.ONE_YEAR -> R.string.one_year
     },
 )
 
