@@ -31,8 +31,8 @@ import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.R
 import com.ammar.wallflow.model.MenuItem
 import com.ammar.wallflow.model.Search
-import com.ammar.wallflow.model.TagSearchMeta
 import com.ammar.wallflow.model.UploaderSearchMeta
+import com.ammar.wallflow.model.WallhavenTagSearchMeta
 import com.ammar.wallflow.model.wallhaven.WallhavenSearchQuery
 import com.ammar.wallflow.model.wallhaven.WallhavenSorting
 import com.ammar.wallflow.ui.common.OverflowMenu
@@ -91,7 +91,7 @@ object MainSearchBar {
                 placeholder = when {
                     active -> placeholder
                     else -> when (search.meta) {
-                        is TagSearchMeta, is UploaderSearchMeta -> null
+                        is WallhavenTagSearchMeta, is UploaderSearchMeta -> null
                         else -> placeholder
                     }
                 },
@@ -100,7 +100,7 @@ object MainSearchBar {
                 extraLeadingContent = when {
                     active -> null
                     else -> when (search.meta) {
-                        is TagSearchMeta -> {
+                        is WallhavenTagSearchMeta -> {
                             { TagChip(wallhavenTag = search.meta.wallhavenTag) }
                         }
                         is UploaderSearchMeta -> {

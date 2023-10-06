@@ -19,7 +19,7 @@ data class Search(
 )
 
 @Serializable
-data class TagSearchMeta(
+data class WallhavenTagSearchMeta(
     val wallhavenTag: WallhavenTag,
 ) : SearchMeta()
 

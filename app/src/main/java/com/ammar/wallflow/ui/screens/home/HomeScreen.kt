@@ -35,8 +35,8 @@ import com.ammar.wallflow.extensions.rememberLazyStaggeredGridState
 import com.ammar.wallflow.extensions.search
 import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.SearchSaver
-import com.ammar.wallflow.model.TagSearchMeta
 import com.ammar.wallflow.model.UploaderSearchMeta
+import com.ammar.wallflow.model.WallhavenTagSearchMeta
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.ui.common.LocalSystemController
@@ -142,7 +142,7 @@ fun HomeScreen(
         fn@{
             val search = Search(
                 query = "id:${it.id}",
-                meta = TagSearchMeta(it),
+                meta = WallhavenTagSearchMeta(it),
             )
             if (searchBarController.state.value.search == search) {
                 return@fn
