@@ -42,8 +42,8 @@ import com.ammar.wallflow.data.preferences.AppPreferences
 import com.ammar.wallflow.data.preferences.AutoWallpaperPreferences
 import com.ammar.wallflow.data.preferences.ObjectDetectionPreferences
 import com.ammar.wallflow.model.ObjectDetectionModel
-import com.ammar.wallflow.model.WallhavenSavedSearch
-import com.ammar.wallflow.model.WallhavenSavedSearchSaver
+import com.ammar.wallflow.model.search.WallhavenSavedSearch
+import com.ammar.wallflow.model.search.WallhavenSavedSearchSaver
 import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.TopBar
 import com.ammar.wallflow.ui.common.bottomWindowInsets

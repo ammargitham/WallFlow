@@ -44,11 +44,11 @@ import com.ammar.wallflow.data.repository.local.LocalWallpapersRepository
 import com.ammar.wallflow.extensions.getTempFile
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.Source
-import com.ammar.wallflow.model.WallhavenSavedSearch
-import com.ammar.wallflow.model.WallhavenSearch
 import com.ammar.wallflow.model.local.LocalWallpaper
-import com.ammar.wallflow.model.toEntity
-import com.ammar.wallflow.model.wallhaven.WallhavenSearchQuery
+import com.ammar.wallflow.model.search.WallhavenSavedSearch
+import com.ammar.wallflow.model.search.WallhavenSearch
+import com.ammar.wallflow.model.search.WallhavenSearchQuery
+import com.ammar.wallflow.model.search.toEntity
 import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.FAILURE_REASON
 import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.FailureReason
 import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.FailureReason.SAVED_SEARCH_NOT_SET

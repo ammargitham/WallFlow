@@ -73,10 +73,10 @@ import com.ammar.wallflow.extensions.toConstraintTypeMap
 import com.ammar.wallflow.extensions.toConstraints
 import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.model.ConstraintType
-import com.ammar.wallflow.model.WallhavenSavedSearch
-import com.ammar.wallflow.model.WallhavenSearch
 import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.model.local.LocalDirectory
+import com.ammar.wallflow.model.search.WallhavenSavedSearch
+import com.ammar.wallflow.model.search.WallhavenSearch
 import com.ammar.wallflow.ui.common.Dropdown
 import com.ammar.wallflow.ui.common.DropdownOption
 import com.ammar.wallflow.ui.common.NameState

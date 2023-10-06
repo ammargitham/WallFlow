@@ -2,8 +2,8 @@ package com.ammar.wallflow.data.repository
 
 import com.ammar.wallflow.IoDispatcher
 import com.ammar.wallflow.data.db.dao.SearchHistoryDao
-import com.ammar.wallflow.model.WallhavenSearch
-import com.ammar.wallflow.model.toSearchHistoryEntity
+import com.ammar.wallflow.model.search.WallhavenSearch
+import com.ammar.wallflow.model.search.toSearchHistoryEntity
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher

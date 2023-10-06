@@ -23,8 +23,8 @@ import com.ammar.wallflow.extensions.accessibleFolders
 import com.ammar.wallflow.extensions.getMLModelsFileIfExists
 import com.ammar.wallflow.extensions.workManager
 import com.ammar.wallflow.model.ObjectDetectionModel
-import com.ammar.wallflow.model.WallhavenSavedSearch
 import com.ammar.wallflow.model.local.LocalDirectory
+import com.ammar.wallflow.model.search.WallhavenSavedSearch
 import com.ammar.wallflow.services.ChangeWallpaperTileService
 import com.ammar.wallflow.utils.DownloadManager
 import com.ammar.wallflow.utils.DownloadStatus

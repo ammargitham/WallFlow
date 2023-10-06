@@ -30,11 +30,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.R
 import com.ammar.wallflow.model.MenuItem
-import com.ammar.wallflow.model.WallhavenSearch
-import com.ammar.wallflow.model.WallhavenTagSearchMeta
-import com.ammar.wallflow.model.WallhavenUploaderSearchMeta
-import com.ammar.wallflow.model.wallhaven.WallhavenSearchQuery
-import com.ammar.wallflow.model.wallhaven.WallhavenSorting
+import com.ammar.wallflow.model.search.WallhavenSearch
+import com.ammar.wallflow.model.search.WallhavenSearchQuery
+import com.ammar.wallflow.model.search.WallhavenSorting
+import com.ammar.wallflow.model.search.WallhavenTagSearchMeta
+import com.ammar.wallflow.model.search.WallhavenUploaderSearchMeta
 import com.ammar.wallflow.ui.common.OverflowMenu
 import com.ammar.wallflow.ui.common.SearchBar
 import com.ammar.wallflow.ui.common.Suggestion

@@ -6,7 +6,7 @@ import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenUploaderEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.repository.utils.Resource
 import com.ammar.wallflow.model.Wallpaper
-import com.ammar.wallflow.model.wallhaven.WallhavenSearchQuery
+import com.ammar.wallflow.model.search.WallhavenSearchQuery
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import kotlinx.coroutines.flow.Flow

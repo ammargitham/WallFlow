@@ -32,9 +32,9 @@ import com.ammar.wallflow.data.repository.GlobalErrorsRepository.GlobalError
 import com.ammar.wallflow.extensions.toDp
 import com.ammar.wallflow.extensions.toPx
 import com.ammar.wallflow.model.Purity
-import com.ammar.wallflow.model.WallhavenSearch
 import com.ammar.wallflow.model.Wallpaper
-import com.ammar.wallflow.model.wallhaven.WallhavenSearchQuery
+import com.ammar.wallflow.model.search.WallhavenSearch
+import com.ammar.wallflow.model.search.WallhavenSearchQuery
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.model.wallhaven.wallhavenWallpaper1
 import com.ammar.wallflow.model.wallhaven.wallhavenWallpaper2

@@ -41,9 +41,9 @@ import com.ammar.wallflow.extensions.search
 import com.ammar.wallflow.extensions.toPxF
 import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.model.Source
-import com.ammar.wallflow.model.WallhavenSearch
-import com.ammar.wallflow.model.WallhavenTagSearchMeta
-import com.ammar.wallflow.model.WallhavenUploaderSearchMeta
+import com.ammar.wallflow.model.search.WallhavenSearch
+import com.ammar.wallflow.model.search.WallhavenTagSearchMeta
+import com.ammar.wallflow.model.search.WallhavenUploaderSearchMeta
 import com.ammar.wallflow.ui.common.DefaultSystemController
 import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.SearchBar

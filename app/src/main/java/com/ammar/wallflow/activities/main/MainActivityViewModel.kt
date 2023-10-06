@@ -12,9 +12,9 @@ import com.ammar.wallflow.data.repository.GlobalErrorsRepository.GlobalError
 import com.ammar.wallflow.data.repository.SavedSearchRepository
 import com.ammar.wallflow.data.repository.SearchHistoryRepository
 import com.ammar.wallflow.extensions.trimAll
-import com.ammar.wallflow.model.WallhavenSavedSearch
-import com.ammar.wallflow.model.WallhavenSearch
-import com.ammar.wallflow.model.getSupportingText
+import com.ammar.wallflow.model.search.WallhavenSavedSearch
+import com.ammar.wallflow.model.search.WallhavenSearch
+import com.ammar.wallflow.model.search.getSupportingText
 import com.ammar.wallflow.ui.common.Suggestion
 import com.ammar.wallflow.ui.common.mainsearch.MainSearchBar
 import com.github.materiiapps.partial.Partialize

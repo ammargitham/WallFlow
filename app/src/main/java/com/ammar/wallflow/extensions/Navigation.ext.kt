@@ -1,7 +1,7 @@
 package com.ammar.wallflow.extensions
 
 import androidx.navigation.NavController
-import com.ammar.wallflow.model.WallhavenSearch
+import com.ammar.wallflow.model.search.WallhavenSearch
 import com.ammar.wallflow.ui.screens.destinations.HomeScreenDestination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.navigation.navigate

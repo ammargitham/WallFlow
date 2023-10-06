@@ -21,9 +21,9 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import com.ammar.wallflow.extensions.search
 import com.ammar.wallflow.model.Source
-import com.ammar.wallflow.model.WallhavenSearch
-import com.ammar.wallflow.model.WallhavenTagSearchMeta
-import com.ammar.wallflow.model.WallhavenUploaderSearchMeta
+import com.ammar.wallflow.model.search.WallhavenSearch
+import com.ammar.wallflow.model.search.WallhavenTagSearchMeta
+import com.ammar.wallflow.model.search.WallhavenUploaderSearchMeta
 import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.TopBar
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController

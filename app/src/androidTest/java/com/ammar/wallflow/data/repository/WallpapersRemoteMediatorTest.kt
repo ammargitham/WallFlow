@@ -15,7 +15,7 @@ import com.ammar.wallflow.data.network.model.NetworkWallhavenMeta
 import com.ammar.wallflow.data.network.model.StringNetworkWallhavenMetaQuery
 import com.ammar.wallflow.data.network.retrofit.RetrofitWallhavenNetwork
 import com.ammar.wallflow.extensions.randomList
-import com.ammar.wallflow.model.wallhaven.WallhavenSearchQuery
+import com.ammar.wallflow.model.search.WallhavenSearchQuery
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull

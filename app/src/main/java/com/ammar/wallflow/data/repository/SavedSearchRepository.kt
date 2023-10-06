@@ -3,8 +3,8 @@ package com.ammar.wallflow.data.repository
 import com.ammar.wallflow.IoDispatcher
 import com.ammar.wallflow.data.db.dao.SavedSearchDao
 import com.ammar.wallflow.data.db.entity.SavedSearchEntity
-import com.ammar.wallflow.model.WallhavenSavedSearch
-import com.ammar.wallflow.model.toEntity
+import com.ammar.wallflow.model.search.WallhavenSavedSearch
+import com.ammar.wallflow.model.search.toEntity
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher

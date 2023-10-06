@@ -26,7 +26,7 @@ import com.ammar.wallflow.extensions.getFileNameFromUrl
 import com.ammar.wallflow.extensions.getTempDir
 import com.ammar.wallflow.extensions.getTempFile
 import com.ammar.wallflow.model.Source
-import com.ammar.wallflow.model.wallhaven.WallhavenSearchQuery
+import com.ammar.wallflow.model.search.WallhavenSearchQuery
 import io.mockk.every
 import io.mockk.mockkStatic
 import io.mockk.slot

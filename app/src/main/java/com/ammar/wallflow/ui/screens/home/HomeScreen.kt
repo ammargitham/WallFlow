@@ -33,11 +33,11 @@ import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.ammar.wallflow.extensions.rememberLazyStaggeredGridState
 import com.ammar.wallflow.extensions.search
-import com.ammar.wallflow.model.WallhavenSearch
-import com.ammar.wallflow.model.WallhavenSearchSaver
-import com.ammar.wallflow.model.WallhavenTagSearchMeta
-import com.ammar.wallflow.model.WallhavenUploaderSearchMeta
 import com.ammar.wallflow.model.Wallpaper
+import com.ammar.wallflow.model.search.WallhavenSearch
+import com.ammar.wallflow.model.search.WallhavenSearchSaver
+import com.ammar.wallflow.model.search.WallhavenTagSearchMeta
+import com.ammar.wallflow.model.search.WallhavenUploaderSearchMeta
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.SearchBar

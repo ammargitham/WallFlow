@@ -6,7 +6,7 @@ import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.staticCompositionLocalOf
-import com.ammar.wallflow.model.WallhavenSearch
+import com.ammar.wallflow.model.search.WallhavenSearch
 
 abstract class MainSearchBarController {
     abstract val state: State<MainSearchBarState>

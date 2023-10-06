@@ -23,7 +23,7 @@ import com.ammar.wallflow.data.repository.wallhaven.DefaultWallhavenRepository
 import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.model.backup.BackupOptions
 import com.ammar.wallflow.model.backup.BackupV1
-import com.ammar.wallflow.model.toEntity
+import com.ammar.wallflow.model.search.toEntity
 import com.ammar.wallflow.workers.FakeLocalWallpapersRepository
 import com.ammar.wallflow.workers.FakeWallhavenNetworkDataSource
 import com.ammar.wallflow.workers.TestClock

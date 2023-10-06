@@ -5,9 +5,9 @@ import com.ammar.wallflow.data.network.model.NetworkWallhavenThumbs
 import com.ammar.wallflow.data.network.model.NetworkWallhavenUploader
 import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpaper
 import com.ammar.wallflow.extensions.toHexString
-import com.ammar.wallflow.model.WallhavenSavedSearch
-import com.ammar.wallflow.model.WallhavenSearch
-import com.ammar.wallflow.model.wallhaven.WallhavenSearchQuery
+import com.ammar.wallflow.model.search.WallhavenSavedSearch
+import com.ammar.wallflow.model.search.WallhavenSearch
+import com.ammar.wallflow.model.search.WallhavenSearchQuery
 import kotlin.math.absoluteValue
 import kotlin.random.Random
 import kotlinx.datetime.Clock

@@ -53,8 +53,8 @@ import com.ammar.wallflow.model.ObjectDetectionModel
 import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.local.LocalWallpaper
-import com.ammar.wallflow.model.toSearchQuery
-import com.ammar.wallflow.model.wallhaven.WallhavenSearchQuery
+import com.ammar.wallflow.model.search.WallhavenSearchQuery
+import com.ammar.wallflow.model.search.toSearchQuery
 import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import com.ammar.wallflow.services.ChangeWallpaperTileService
 import com.ammar.wallflow.ui.common.permissions.checkNotificationPermission
