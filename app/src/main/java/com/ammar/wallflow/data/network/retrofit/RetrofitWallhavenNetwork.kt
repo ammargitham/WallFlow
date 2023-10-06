@@ -5,7 +5,7 @@ import com.ammar.wallflow.data.network.retrofit.api.WallhavenNetworkApi
 import com.ammar.wallflow.extensions.toHexString
 import com.ammar.wallflow.model.WallhavenSearchQuery
 import com.ammar.wallflow.model.toCategoryInt
-import com.ammar.wallflow.model.toPurityInt
+import com.ammar.wallflow.model.toWallhavenPurityInt
 
 class RetrofitWallhavenNetwork(
     private val wallHavenNetworkApi: WallhavenNetworkApi,
@@ -15,7 +15,7 @@ class RetrofitWallhavenNetwork(
         wallHavenNetworkApi.search(
             query = searchQuery.getQString(),
             categories = categories.toCategoryInt().toString().padStart(3, '0'),
-            purity = purity.toPurityInt().toString().padStart(3, '0'),
+            purity = purity.toWallhavenPurityInt().toString().padStart(3, '0'),
             sorting = sorting.value,
             order = order.value,
             topRange = topRange.value,

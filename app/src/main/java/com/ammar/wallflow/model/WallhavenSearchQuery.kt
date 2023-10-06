@@ -209,26 +209,6 @@ enum class WallhavenCategory(
 
 fun Set<WallhavenCategory>.toCategoryInt() = this.fold(0) { p, f -> p + f.flag }
 
-enum class Purity(
-    val purityName: String,
-    val flag: Int,
-) {
-    SFW("sfw", 100),
-    SKETCHY("sketchy", 10),
-    NSFW("nsfw", 1),
-    ;
-
-    companion object {
-        fun fromName(name: String) = when (name) {
-            "nsfw" -> NSFW
-            "sketchy" -> SKETCHY
-            else -> SFW
-        }
-    }
-}
-
-fun Set<Purity>.toPurityInt() = this.fold(0) { p, f -> p + f.flag }
-
 enum class WallhavenSorting(
     val value: String,
 ) {
