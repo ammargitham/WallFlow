@@ -1,4 +1,4 @@
-package com.ammar.wallflow.data.db.automigrationspecs
+package com.ammar.wallflow.data.db.automigrations
 
 import androidx.room.RenameTable
 import androidx.room.migration.AutoMigrationSpec

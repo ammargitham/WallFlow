@@ -4,7 +4,7 @@ import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import com.ammar.wallflow.data.db.automigrationspecs.AutoMigration4To5Spec
+import com.ammar.wallflow.data.db.automigrations.AutoMigration4To5Spec
 import com.ammar.wallflow.data.db.converters.Converters
 import com.ammar.wallflow.data.db.dao.AutoWallpaperHistoryDao
 import com.ammar.wallflow.data.db.dao.FavoriteDao

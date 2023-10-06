@@ -5,7 +5,7 @@ import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.ammar.wallflow.data.db.automigrationspecs.AutoMigration4To5Spec
+import com.ammar.wallflow.data.db.automigrations.AutoMigration4To5Spec
 import com.ammar.wallflow.data.db.manualmigrations.MIGRATION_1_2
 import com.ammar.wallflow.data.db.manualmigrations.MIGRATION_3_4
 import java.io.IOException
