@@ -5,9 +5,16 @@
     <a href="https://github.com/ammargitham/WallFlow/releases/latest">
       <img src="https://img.shields.io/github/v/release/ammargitham/wallflow.svg?style=for-the-badge&logo=GitHub&labelColor=black&label=Github&color=black" alt="Github">
     </a>
+  </div>
+  <div align="center">
     <a href="https://f-droid.org/packages/com.ammar.wallflow/">
-      <img src="https://img.shields.io/f-droid/v/com.ammar.wallflow?style=for-the-badge&logo=fdroid&logoColor=%23b1eb0b&label=f-droid&labelColor=%23217ad3&color=%23217ad3" alt="F-Droid">
+      <img src="https://img.shields.io/f-droid/v/com.ammar.wallflow?style=for-the-badge&logo=fdroid&logoColor=%23b1eb0b&label=f-droid (Regular)&labelColor=%23217ad3&color=%23217ad3" alt="F-Droid">
     </a>
+    <a href="https://f-droid.org/packages/com.ammar.wallflow.plus/">
+      <img src="https://img.shields.io/f-droid/v/com.ammar.wallflow.plus?style=for-the-badge&logo=fdroid&logoColor=%23b1eb0b&label=f-droid (Plus)&labelColor=%23217ad3&color=%23217ad3" alt="F-Droid">
+    </a>
+  </div>
+  <div align="center">
     <a href="https://github.com/ammargitham/WallFlow/actions/workflows/codeql.yml">
       <img src="https://img.shields.io/github/actions/workflow/status/ammargitham/wallflow/codeql.yml?style=for-the-badge&label=CodeQL" alt="CodeQL" title="CodeQL">
     </a>
@@ -26,10 +33,10 @@
 
 [<img height="80" alt="Get it on GitHub" title="Get it on GitHub" src="./.github/assets/get-it-on-github.png" />](https://github.com/ammargitham/WallFlow/releases/latest)
 
-|                                                                                                           Regular                                                                                                           |    Plus     |
-|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:-----------:|
-|                     [<img height="80" alt="Get it on GitHub" title="Get it on GitHub" src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" />](https://f-droid.org/packages/com.ammar.wallflow/)                      | Coming Soon |
-| [<img height="80" alt="Get it on IzzyOnDroid" title="Get it on IzzyOnDroid" src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png" />](https://apt.izzysoft.de/fdroid/index/apk/com.ammar.wallflow/) | Coming Soon |
+|                                                                                                           Regular                                                                                                           |                                                                                                               Plus                                                                                                               |
+|:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
+|                     [<img height="80" alt="Get it on GitHub" title="Get it on GitHub" src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" />](https://f-droid.org/packages/com.ammar.wallflow/)                      |                     [<img height="80" alt="Get it on GitHub" title="Get it on GitHub" src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png" />](https://f-droid.org/packages/com.ammar.wallflow.plus/)                      |
+| [<img height="80" alt="Get it on IzzyOnDroid" title="Get it on IzzyOnDroid" src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png" />](https://apt.izzysoft.de/fdroid/index/apk/com.ammar.wallflow/) | [<img height="80" alt="Get it on IzzyOnDroid" title="Get it on IzzyOnDroid" src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png" />](https://apt.izzysoft.de/fdroid/index/apk/com.ammar.wallflow.plus/) |
 
 \*[_What's the difference between Regular and Plus?_](#regular-vs-plus)
 
@@ -75,12 +82,14 @@ Two versions are provided (both free and open-source)
 **All other features are same in both versions.**
 
 ## Broadcast details (for Tasker and similar apps)
+
 - Package:
   - For Regular: `com.ammar.wallflow`
   - For Plus: `com.ammar.wallflow.plus`
 - Action: `com.ammar.wallflow.ACTION_CHANGE_WALLPAPER`
 
 ADB command:
+
 - For Regular: `am broadcast --user 0 -a com.ammar.wallflow.ACTION_CHANGE_WALLPAPER com.ammar.wallflow`
 - For Plus: `am broadcast --user 0 -a com.ammar.wallflow.ACTION_CHANGE_WALLPAPER com.ammar.wallflow.plus`
 

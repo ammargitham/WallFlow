@@ -247,6 +247,20 @@
     <string name="backup_failed">"Резервное копирование не удалось!"</string>
     <string name="restore_done">"Восстановление выполнено!"</string>
     <string name="restore_failed">"Восстановление не удалось!"</string>
+    <string name="mark_as_favorite">"Отменить как избранное"</string>
+    <string name="auto_wallpaper_mark_as_favorite_desc">"Отметить обои как избранные при использовании для смены обоев"</string>
+    <string name="auto_wallpaper_download_desc">"Загрузка обоев при их использовании для смены обоев"</string>
+    <string name="change_wallpaper_tile_label">"Изменить обои"</string>
+    <string name="no_sources_set">"Нет заданных источников"</string>
+    <string name="set_sources">"Задать источники"</string>
+    <string name="tap_to_change_wallpaper">"Нажмите, чтобы изменить обои"</string>
+    <string name="changing">"Изменение…"</string>
+    <string name="manage_local">"Управление локальными"</string>
+    <string name="dirs">"Каталоги"</string>
+    <string name="sort">"Сортировка"</string>
+    <string name="no_sort">"Без сортировки"</string>
+    <string name="last_modified">"Последнее изменение"</string>
+    <string name="manage">"Управление"</string>
     <plurals name="every_x_hrs">
         <item quantity="one">"Каждый %d час"</item>
         <item quantity="few">"Каждые %d часа"</item>
@@ -257,7 +271,4 @@
         <item quantity="few">"%d объекта"</item>
         <item quantity="many">"%d объектов"</item>
     </plurals>
-    <string name="mark_as_favorite">"Отменить как избранное"</string>
-    <string name="auto_wallpaper_mark_as_favorite_desc">"Отметить обои как избранные при использовании для смены обоев"</string>
-    <string name="auto_wallpaper_download_desc">"Загрузка обоев при их использовании для смены обоев"</string>
 </resources>
