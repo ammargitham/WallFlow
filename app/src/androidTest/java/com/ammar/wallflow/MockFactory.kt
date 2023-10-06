@@ -7,7 +7,7 @@ import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpaper
 import com.ammar.wallflow.extensions.toHexString
 import com.ammar.wallflow.model.SavedSearch
 import com.ammar.wallflow.model.Search
-import com.ammar.wallflow.model.SearchQuery
+import com.ammar.wallflow.model.WallhavenSearchQuery
 import kotlin.math.absoluteValue
 import kotlin.random.Random
 import kotlinx.datetime.Clock
@@ -96,7 +96,7 @@ object MockFactory {
             name = "saved_search_$id",
             search = Search(
                 query = "test_q_$id",
-                filters = SearchQuery(),
+                filters = WallhavenSearchQuery(),
             ),
         )
     }

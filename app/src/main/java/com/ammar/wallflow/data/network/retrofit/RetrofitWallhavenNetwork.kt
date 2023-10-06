@@ -3,7 +3,7 @@ package com.ammar.wallflow.data.network.retrofit
 import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
 import com.ammar.wallflow.data.network.retrofit.api.WallhavenNetworkApi
 import com.ammar.wallflow.extensions.toHexString
-import com.ammar.wallflow.model.SearchQuery
+import com.ammar.wallflow.model.WallhavenSearchQuery
 import com.ammar.wallflow.model.toCategoryInt
 import com.ammar.wallflow.model.toPurityInt
 
@@ -11,7 +11,7 @@ class RetrofitWallhavenNetwork(
     private val wallHavenNetworkApi: WallhavenNetworkApi,
 ) : WallhavenNetworkDataSource {
 
-    override suspend fun search(searchQuery: SearchQuery, page: Int?) = with(searchQuery) {
+    override suspend fun search(searchQuery: WallhavenSearchQuery, page: Int?) = with(searchQuery) {
         wallHavenNetworkApi.search(
             query = searchQuery.getQString(),
             categories = categories.toCategoryInt().toString().padStart(3, '0'),

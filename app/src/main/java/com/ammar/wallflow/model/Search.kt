@@ -16,7 +16,7 @@ sealed class SearchMeta
 @Serializable
 data class Search(
     val query: String = "",
-    val filters: SearchQuery = SearchQuery(),
+    val filters: WallhavenSearchQuery = WallhavenSearchQuery(),
     val meta: SearchMeta? = null,
 )
 
@@ -40,7 +40,7 @@ fun Search.toSearchHistoryEntity(
     lastUpdatedOn = lastUpdatedOn,
 )
 
-fun Search.toSearchQuery(): SearchQuery {
+fun Search.toSearchQuery(): WallhavenSearchQuery {
     if (query.isBlank()) return filters
     val q = query.trimAll()
     if (q.startsWith("id:")) {
@@ -88,7 +88,7 @@ fun Search.getSupportingText(
             ),
         )
     }
-    if (filters.categories != SearchQuery.defaultCategories) {
+    if (filters.categories != WallhavenSearchQuery.defaultCategories) {
         add(
             context.getString(
                 R.string.categories_supp,
@@ -96,7 +96,7 @@ fun Search.getSupportingText(
             ),
         )
     }
-    if (filters.purity != SearchQuery.defaultPurities) {
+    if (filters.purity != WallhavenSearchQuery.defaultPurities) {
         add(
             context.getString(
                 R.string.purities_supp,
@@ -122,7 +122,7 @@ val SearchSaver = Saver<Search, List<String>>(
     restore = {
         Search(
             query = it[0],
-            filters = SearchQuery.fromQueryString(it[1]),
+            filters = WallhavenSearchQuery.fromQueryString(it[1]),
         )
     },
 )

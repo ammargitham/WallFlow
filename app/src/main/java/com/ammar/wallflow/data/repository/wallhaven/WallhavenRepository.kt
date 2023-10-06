@@ -5,7 +5,7 @@ import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenTagEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenUploaderEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.repository.utils.Resource
-import com.ammar.wallflow.model.SearchQuery
+import com.ammar.wallflow.model.WallhavenSearchQuery
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface WallhavenRepository {
     fun wallpapersPager(
-        searchQuery: SearchQuery,
+        searchQuery: WallhavenSearchQuery,
         pageSize: Int = 24,
         prefetchDistance: Int = pageSize,
         initialLoadSize: Int = pageSize * 3,

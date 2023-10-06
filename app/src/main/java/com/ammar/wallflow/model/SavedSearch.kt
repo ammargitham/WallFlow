@@ -24,7 +24,7 @@ val SavedSearchSaver = Saver<SavedSearch, List<Any>>(
             name = it[1] as String,
             search = Search(
                 query = it[2] as String,
-                filters = SearchQuery.fromQueryString(it[3] as String),
+                filters = WallhavenSearchQuery.fromQueryString(it[3] as String),
             ),
         )
     },

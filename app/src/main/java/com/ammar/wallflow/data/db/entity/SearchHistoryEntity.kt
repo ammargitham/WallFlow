@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.ammar.wallflow.model.Search
-import com.ammar.wallflow.model.SearchQuery
+import com.ammar.wallflow.model.WallhavenSearchQuery
 import kotlinx.datetime.Instant
 
 @Entity(
@@ -26,5 +26,5 @@ data class SearchHistoryEntity(
 
 fun SearchHistoryEntity.toSearch() = Search(
     query = query,
-    filters = SearchQuery.fromQueryString(filters),
+    filters = WallhavenSearchQuery.fromQueryString(filters),
 )

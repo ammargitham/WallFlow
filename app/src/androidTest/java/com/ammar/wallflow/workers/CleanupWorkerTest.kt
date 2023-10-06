@@ -25,8 +25,8 @@ import com.ammar.wallflow.data.repository.WallpapersRemoteMediator
 import com.ammar.wallflow.extensions.getFileNameFromUrl
 import com.ammar.wallflow.extensions.getTempDir
 import com.ammar.wallflow.extensions.getTempFile
-import com.ammar.wallflow.model.SearchQuery
 import com.ammar.wallflow.model.Source
+import com.ammar.wallflow.model.WallhavenSearchQuery
 import io.mockk.every
 import io.mockk.mockkStatic
 import io.mockk.slot
@@ -486,7 +486,7 @@ class CleanupWorkerTest {
         mockNetworkWallhavenWallpapers: List<NetworkWallhavenWallpaper> =
             MockFactory.generateNetworkWallpapers(20),
     ) {
-        val searchQuery = SearchQuery(includedTags = setOf(query))
+        val searchQuery = WallhavenSearchQuery(includedTags = setOf(query))
         mockNetworkApi.setWallpapersForQuery(
             query = searchQuery.getQString(),
             networkWallhavenWallpapers = mockNetworkWallhavenWallpapers,

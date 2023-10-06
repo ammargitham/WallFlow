@@ -50,8 +50,8 @@ import com.ammar.wallflow.extensions.workManager
 import com.ammar.wallflow.model.AutoWallpaperHistory
 import com.ammar.wallflow.model.DownloadableWallpaper
 import com.ammar.wallflow.model.ObjectDetectionModel
-import com.ammar.wallflow.model.SearchQuery
 import com.ammar.wallflow.model.Source
+import com.ammar.wallflow.model.WallhavenSearchQuery
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.local.LocalWallpaper
 import com.ammar.wallflow.model.toSearchQuery
@@ -387,7 +387,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
     }
 
     private suspend fun getNextSavedSearchWallpaper(
-        searchQuery: SearchQuery,
+        searchQuery: WallhavenSearchQuery,
         excludeHistory: Boolean = true,
     ): WallhavenWallpaper? {
         val historyIds = if (excludeHistory) {
@@ -439,7 +439,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
     )
 
     private suspend fun loadWallpapers(
-        searchQuery: SearchQuery,
+        searchQuery: WallhavenSearchQuery,
         pageNum: Int? = null,
     ): Pair<List<WallhavenWallpaper>, Int?> {
         val response = wallHavenNetwork.search(searchQuery, pageNum)

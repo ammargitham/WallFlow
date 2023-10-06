@@ -31,10 +31,10 @@ import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.R
 import com.ammar.wallflow.model.MenuItem
 import com.ammar.wallflow.model.Search
-import com.ammar.wallflow.model.SearchQuery
 import com.ammar.wallflow.model.Sorting
 import com.ammar.wallflow.model.TagSearchMeta
 import com.ammar.wallflow.model.UploaderSearchMeta
+import com.ammar.wallflow.model.WallhavenSearchQuery
 import com.ammar.wallflow.ui.common.OverflowMenu
 import com.ammar.wallflow.ui.common.SearchBar
 import com.ammar.wallflow.ui.common.Suggestion
@@ -67,7 +67,7 @@ object MainSearchBar {
         onSuggestionDeleteRequest: (suggestion: Suggestion<Search>) -> Unit = {},
         onActiveChange: (active: Boolean) -> Unit = {},
         onShowFiltersChange: (show: Boolean) -> Unit = {},
-        onFiltersChange: (searchQuery: SearchQuery) -> Unit = {},
+        onFiltersChange: (searchQuery: WallhavenSearchQuery) -> Unit = {},
         onDeleteSuggestionConfirmClick: () -> Unit = {},
         onDeleteSuggestionDismissRequest: () -> Unit = {},
         onSaveAsClick: () -> Unit = {},
@@ -185,7 +185,7 @@ object MainSearchBar {
 
     object Defaults {
         val search = Search(
-            filters = SearchQuery(
+            filters = WallhavenSearchQuery(
                 sorting = Sorting.RELEVANCE,
             ),
         )

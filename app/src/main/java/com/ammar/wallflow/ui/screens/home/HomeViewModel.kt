@@ -18,9 +18,9 @@ import com.ammar.wallflow.model.Favorite
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.SavedSearch
 import com.ammar.wallflow.model.Search
-import com.ammar.wallflow.model.SearchQuery
 import com.ammar.wallflow.model.Sorting
 import com.ammar.wallflow.model.TopRange
+import com.ammar.wallflow.model.WallhavenSearchQuery
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.toSearchQuery
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
@@ -178,7 +178,7 @@ data class HomeUiState(
     val areTagsLoading: Boolean = true,
     val mainSearch: Search? = null,
     val homeSearch: Search = Search(
-        filters = SearchQuery(
+        filters = WallhavenSearchQuery(
             sorting = Sorting.TOPLIST,
             topRange = TopRange.ONE_DAY,
         ),

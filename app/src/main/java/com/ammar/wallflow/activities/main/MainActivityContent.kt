@@ -33,7 +33,7 @@ import com.ammar.wallflow.extensions.toDp
 import com.ammar.wallflow.extensions.toPx
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.Search
-import com.ammar.wallflow.model.SearchQuery
+import com.ammar.wallflow.model.WallhavenSearchQuery
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.model.wallhaven.wallhavenWallpaper1
@@ -85,7 +85,7 @@ fun MainActivityContent(
     onSearchBarSuggestionInsert: (suggestion: Suggestion<Search>) -> Unit = {},
     onSearchBarSuggestionDeleteRequest: (suggestion: Suggestion<Search>) -> Unit = {},
     onSearchBarShowFiltersChange: (show: Boolean) -> Unit = {},
-    onSearchBarFiltersChange: (searchQuery: SearchQuery) -> Unit = {},
+    onSearchBarFiltersChange: (searchQuery: WallhavenSearchQuery) -> Unit = {},
     onDeleteSearchBarSuggestionConfirmClick: () -> Unit = {},
     onDeleteSearchBarSuggestionDismissRequest: () -> Unit = {},
     onSearchBarSaveAsClick: () -> Unit = {},

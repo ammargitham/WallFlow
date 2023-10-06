@@ -45,8 +45,8 @@ import com.ammar.wallflow.extensions.getTempFile
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.SavedSearch
 import com.ammar.wallflow.model.Search
-import com.ammar.wallflow.model.SearchQuery
 import com.ammar.wallflow.model.Source
+import com.ammar.wallflow.model.WallhavenSearchQuery
 import com.ammar.wallflow.model.local.LocalWallpaper
 import com.ammar.wallflow.model.toEntity
 import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.FAILURE_REASON
@@ -187,7 +187,7 @@ class AutoWallpaperTest {
                 name = "Test",
                 search = Search(
                     query = "test",
-                    filters = SearchQuery(),
+                    filters = WallhavenSearchQuery(),
                 ),
             )
             val networkWallpapers = List(30) { testNetworkWallhavenWallpaper }
@@ -219,7 +219,7 @@ class AutoWallpaperTest {
                 autoWallpaperHistoryDao = autoWallpaperHistoryDao,
                 wallHavenNetwork = object : FakeWallhavenNetworkDataSource() {
                     override suspend fun search(
-                        searchQuery: SearchQuery,
+                        searchQuery: WallhavenSearchQuery,
                         page: Int?,
                     ): NetworkResponse<List<NetworkWallhavenWallpaper>> {
                         return NetworkResponse(
@@ -279,7 +279,7 @@ class AutoWallpaperTest {
                 name = "Test",
                 search = Search(
                     query = "test",
-                    filters = SearchQuery(),
+                    filters = WallhavenSearchQuery(),
                 ),
             )
             val networkWallpapers = List(30) { testNetworkWallhavenWallpaper }
@@ -321,7 +321,7 @@ class AutoWallpaperTest {
                 autoWallpaperHistoryDao = autoWallpaperHistoryDao,
                 wallHavenNetwork = object : FakeWallhavenNetworkDataSource() {
                     override suspend fun search(
-                        searchQuery: SearchQuery,
+                        searchQuery: WallhavenSearchQuery,
                         page: Int?,
                     ): NetworkResponse<List<NetworkWallhavenWallpaper>> {
                         return NetworkResponse(
@@ -381,7 +381,7 @@ class AutoWallpaperTest {
                 name = "Test",
                 search = Search(
                     query = "test",
-                    filters = SearchQuery(),
+                    filters = WallhavenSearchQuery(),
                 ),
             )
             val networkWallpapers = List(30) { testNetworkWallhavenWallpaper }
@@ -426,7 +426,7 @@ class AutoWallpaperTest {
                 autoWallpaperHistoryDao = autoWallpaperHistoryDao,
                 wallHavenNetwork = object : FakeWallhavenNetworkDataSource() {
                     override suspend fun search(
-                        searchQuery: SearchQuery,
+                        searchQuery: WallhavenSearchQuery,
                         page: Int?,
                     ): NetworkResponse<List<NetworkWallhavenWallpaper>> {
                         return NetworkResponse(

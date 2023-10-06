@@ -21,8 +21,8 @@ import com.ammar.wallflow.data.network.model.NetworkResponse
 import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpaper
 import com.ammar.wallflow.data.repository.local.LocalWallpapersRepository
 import com.ammar.wallflow.data.repository.utils.Resource
-import com.ammar.wallflow.model.SearchQuery
 import com.ammar.wallflow.model.Source
+import com.ammar.wallflow.model.WallhavenSearchQuery
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.local.LocalWallpaper
 import com.ammar.wallflow.ui.screens.local.LocalSort
@@ -125,7 +125,7 @@ internal open class FakeObjectDetectionModelDao : ObjectDetectionModelDao {
 
 internal open class FakeWallhavenNetworkDataSource : WallhavenNetworkDataSource {
     override suspend fun search(
-        searchQuery: SearchQuery,
+        searchQuery: WallhavenSearchQuery,
         page: Int?,
     ): NetworkResponse<List<NetworkWallhavenWallpaper>> {
         throw RuntimeException()
