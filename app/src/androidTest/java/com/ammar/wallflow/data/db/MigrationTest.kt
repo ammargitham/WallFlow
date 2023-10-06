@@ -5,6 +5,7 @@ import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
+import com.ammar.wallflow.data.db.automigrationspecs.AutoMigration4To5Spec
 import com.ammar.wallflow.data.db.di.ManualMigrations.MIGRATION_1_2
 import com.ammar.wallflow.data.db.di.ManualMigrations.MIGRATION_3_4
 import java.io.IOException
@@ -25,7 +26,9 @@ class MigrationTest {
     val helper: MigrationTestHelper = MigrationTestHelper(
         instrumentation = InstrumentationRegistry.getInstrumentation(),
         databaseClass = AppDatabase::class.java,
-        specs = emptyList(),
+        specs = listOf(
+            AutoMigration4To5Spec(),
+        ),
         openFactory = FrameworkSQLiteOpenHelperFactory(),
     )
 
@@ -98,10 +101,44 @@ class MigrationTest {
                 val count = it.getInt(0)
                 assertEquals(10, count)
             }
+            // language=sql
             db.query("SELECT COUNT(*) from wallhaven_tags").use {
                 it.moveToFirst()
                 val count = it.getInt(0)
                 assertEquals(10, count)
+            }
+        }
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun migrate4To5() {
+        helper.createDatabase(testDbName, 4).apply {
+            execSQL(
+                // language=sql
+                """
+                    INSERT INTO saved_searches
+                        ("id", "name", "query", "filters")
+                    VALUES
+                        ('1', 'Home', '', 'includedTags=&excludedTags=&username=&tagId=&wallpaperId=&categories=anime%2Cgeneral%2Cpeople&purity=sfw&sorting=toplist&order=desc&topRange=1d&atleast=&resolutions=&ratios=&colors=&seed=');
+                """.trimIndent(),
+            )
+            close()
+        }
+        helper.runMigrationsAndValidate(
+            testDbName,
+            5,
+            true,
+        ).use { db ->
+            db.query(
+                // language=sql
+                "SELECT * from wallhaven_saved_searches",
+            ).use {
+                it.moveToFirst()
+                val id = it.getInt(0)
+                assertEquals(1, id)
+                val name = it.getString(1)
+                assertEquals("Home", name)
             }
         }
     }

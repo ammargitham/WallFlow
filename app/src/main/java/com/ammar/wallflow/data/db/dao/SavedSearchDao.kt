@@ -8,27 +8,27 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SavedSearchDao {
-    @Query("SELECT * FROM saved_searches ORDER BY name")
+    @Query("SELECT * FROM wallhaven_saved_searches ORDER BY name")
     fun observeAll(): Flow<List<WallhavenSavedSearchEntity>>
 
-    @Query("SELECT * FROM saved_searches ORDER BY name")
+    @Query("SELECT * FROM wallhaven_saved_searches ORDER BY name")
     suspend fun getAll(): List<WallhavenSavedSearchEntity>
 
-    @Query("SELECT * FROM saved_searches WHERE id = :id")
+    @Query("SELECT * FROM wallhaven_saved_searches WHERE id = :id")
     suspend fun getById(id: Long): WallhavenSavedSearchEntity?
 
-    @Query("SELECT * FROM saved_searches WHERE name = :name")
+    @Query("SELECT * FROM wallhaven_saved_searches WHERE name = :name")
     suspend fun getByName(name: String): WallhavenSavedSearchEntity?
 
-    @Query("SELECT * FROM saved_searches WHERE name in (:names)")
+    @Query("SELECT * FROM wallhaven_saved_searches WHERE name in (:names)")
     suspend fun getAllByNames(names: Collection<String>): List<WallhavenSavedSearchEntity>
 
     @Upsert
-    suspend fun upsert(savedSearchDao: WallhavenSavedSearchEntity)
+    suspend fun upsert(savedSearch: WallhavenSavedSearchEntity)
 
     @Upsert
     suspend fun upsert(savedSearchDaos: Collection<WallhavenSavedSearchEntity>)
 
-    @Query("DELETE FROM saved_searches WHERE name = :name")
+    @Query("DELETE FROM wallhaven_saved_searches WHERE name = :name")
     suspend fun deleteByName(name: String)
 }

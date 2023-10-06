@@ -9,7 +9,7 @@ import com.ammar.wallflow.model.search.WallhavenSearchQuery
 import kotlinx.serialization.Serializable
 
 @Entity(
-    tableName = "saved_searches",
+    tableName = "wallhaven_saved_searches",
     indices = [
         Index(
             value = ["name"],

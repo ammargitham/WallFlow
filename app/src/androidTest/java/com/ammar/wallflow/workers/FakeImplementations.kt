@@ -12,7 +12,7 @@ import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenWallpapersDao
 import com.ammar.wallflow.data.db.entity.AutoWallpaperHistoryEntity
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.ObjectDetectionModelEntity
-import com.ammar.wallflow.data.db.entity.SavedSearchEntity
+import com.ammar.wallflow.data.db.entity.WallhavenSavedSearchEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperTagsEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallpaperWithUploaderAndTags
@@ -33,31 +33,33 @@ import okhttp3.Request
 import org.jsoup.nodes.Document
 
 internal open class FakeSavedSearchDao : SavedSearchDao {
-    override fun observeAll(): Flow<List<SavedSearchEntity>> {
+    override fun observeAll(): Flow<List<WallhavenSavedSearchEntity>> {
         throw RuntimeException()
     }
 
-    override suspend fun getAll(): List<SavedSearchEntity> {
+    override suspend fun getAll(): List<WallhavenSavedSearchEntity> {
         throw RuntimeException()
     }
 
-    override suspend fun getAllByNames(names: Collection<String>): List<SavedSearchEntity> {
+    override suspend fun getAllByNames(
+        names: Collection<String>,
+    ): List<WallhavenSavedSearchEntity> {
         throw RuntimeException()
     }
 
-    override suspend fun getById(id: Long): SavedSearchEntity? {
+    override suspend fun getById(id: Long): WallhavenSavedSearchEntity? {
         throw RuntimeException()
     }
 
-    override suspend fun getByName(name: String): SavedSearchEntity? {
+    override suspend fun getByName(name: String): WallhavenSavedSearchEntity? {
         throw RuntimeException()
     }
 
-    override suspend fun upsert(savedSearchDao: SavedSearchEntity) {
+    override suspend fun upsert(savedSearch: WallhavenSavedSearchEntity) {
         throw RuntimeException()
     }
 
-    override suspend fun upsert(savedSearchDaos: Collection<SavedSearchEntity>) {
+    override suspend fun upsert(savedSearchDaos: Collection<WallhavenSavedSearchEntity>) {
         throw RuntimeException()
     }
 
