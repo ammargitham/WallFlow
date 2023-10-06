@@ -12,9 +12,6 @@ import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
 
 @Serializable
-sealed class SearchMeta
-
-@Serializable
 data class Search(
     val query: String = "",
     val filters: WallhavenSearchQuery = WallhavenSearchQuery(),
