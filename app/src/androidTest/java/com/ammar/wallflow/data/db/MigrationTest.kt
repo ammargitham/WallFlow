@@ -6,8 +6,8 @@ import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.ammar.wallflow.data.db.automigrationspecs.AutoMigration4To5Spec
-import com.ammar.wallflow.data.db.di.ManualMigrations.MIGRATION_1_2
-import com.ammar.wallflow.data.db.di.ManualMigrations.MIGRATION_3_4
+import com.ammar.wallflow.data.db.manualmigrations.MIGRATION_1_2
+import com.ammar.wallflow.data.db.manualmigrations.MIGRATION_3_4
 import java.io.IOException
 import kotlin.test.assertEquals
 import org.junit.Rule
