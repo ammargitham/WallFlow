@@ -1,6 +1,6 @@
 package com.ammar.wallflow.data.network.model.wallhaven
 
-import com.ammar.wallflow.data.network.model.serializers.NetworkMetaQuerySerializer
+import com.ammar.wallflow.data.network.model.serializers.NetworkWallhavenMetaQuerySerializer
 import kotlinx.serialization.Serializable
 
 interface NetworkWallhavenMetaQuery
@@ -12,7 +12,7 @@ data class NetworkWallhavenMeta(
     val last_page: Int,
     val per_page: Int,
     val total: Int,
-    @Serializable(NetworkMetaQuerySerializer::class)
+    @Serializable(NetworkWallhavenMetaQuerySerializer::class)
     val query: NetworkWallhavenMetaQuery,
     val seed: String? = null,
 )
