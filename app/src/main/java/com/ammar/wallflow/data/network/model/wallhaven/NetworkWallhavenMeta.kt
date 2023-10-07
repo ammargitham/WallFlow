@@ -1,6 +1,6 @@
 package com.ammar.wallflow.data.network.model.wallhaven
 
-import com.ammar.wallflow.data.network.model.util.NetworkMetaQuerySerializer
+import com.ammar.wallflow.data.network.model.serializers.NetworkMetaQuerySerializer
 import kotlinx.serialization.Serializable
 
 interface NetworkWallhavenMetaQuery

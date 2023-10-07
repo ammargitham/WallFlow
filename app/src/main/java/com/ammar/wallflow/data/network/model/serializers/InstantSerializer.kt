@@ -1,4 +1,4 @@
-package com.ammar.wallflow.data.network.model.util
+package com.ammar.wallflow.data.network.model.serializers
 
 import kotlinx.datetime.Instant
 import kotlinx.datetime.toInstant

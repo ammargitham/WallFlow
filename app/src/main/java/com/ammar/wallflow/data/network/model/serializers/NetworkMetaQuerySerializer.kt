@@ -1,4 +1,4 @@
-package com.ammar.wallflow.data.network.model.util
+package com.ammar.wallflow.data.network.model.serializers
 
 import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenMetaQuery
 import com.ammar.wallflow.data.network.model.wallhaven.StringNetworkWallhavenMetaQuery
