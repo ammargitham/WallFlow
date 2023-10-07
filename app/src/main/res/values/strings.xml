@@ -168,8 +168,8 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="delete_model_dialog_text">Downloaded model will by permanently removed from local storage.</string>
     <string name="delete_saved_search_dialog_title">Delete saved search \'%1s\'?</string>
     <string name="permission_is_required">%1s is required</string>
-    <string name="invalid_api_key_provided">Invalid API key provided.</string>
-    <string name="rate_limited_please_try_again_after_some_time">Rate limited. Please try again after some time.</string>
+    <string name="invalid_api_key_provided">Invalid wallhaven.cc API key provided.</string>
+    <string name="rate_limited_please_try_again_after_some_time">%s: Rate limited. Please try again after some time.</string>
     <string name="error">Error</string>
     <string name="fix">Fix</string>
     <string name="delete_suggestion_dialog_text">Remove from history?</string>

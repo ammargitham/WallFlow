@@ -10,6 +10,7 @@ import com.ammar.wallflow.data.db.dao.AutoWallpaperHistoryDao
 import com.ammar.wallflow.data.db.dao.FavoriteDao
 import com.ammar.wallflow.data.db.dao.LastUpdatedDao
 import com.ammar.wallflow.data.db.dao.ObjectDetectionModelDao
+import com.ammar.wallflow.data.db.dao.RateLimitDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenPopularTagsDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenSavedSearchDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenSearchHistoryDao
@@ -23,6 +24,7 @@ import com.ammar.wallflow.data.db.entity.AutoWallpaperHistoryEntity
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.LastUpdatedEntity
 import com.ammar.wallflow.data.db.entity.ObjectDetectionModelEntity
+import com.ammar.wallflow.data.db.entity.RateLimitEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenPopularTagEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSavedSearchEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSearchHistoryEntity
@@ -50,11 +52,13 @@ import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperTagsEntity
         WallhavenSavedSearchEntity::class,
         AutoWallpaperHistoryEntity::class,
         FavoriteEntity::class,
+        RateLimitEntity::class,
     ],
-    version = 5,
+    version = 6,
     autoMigrations = [
         AutoMigration(from = 2, to = 3),
         AutoMigration(from = 4, to = 5, spec = AutoMigration4To5Spec::class),
+        AutoMigration(from = 5, to = 6),
     ],
 )
 @TypeConverters(Converters::class)
@@ -72,4 +76,5 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun savedSearchDao(): WallhavenSavedSearchDao
     abstract fun autoWallpaperHistoryDao(): AutoWallpaperHistoryDao
     abstract fun favoriteDao(): FavoriteDao
+    abstract fun rateLimitDao(): RateLimitDao
 }

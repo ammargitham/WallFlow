@@ -72,6 +72,9 @@ class DatabaseModule {
     fun providesWallhavenUploadersDao(appDatabase: AppDatabase) =
         appDatabase.wallhavenUploadersDao()
 
+    @Provides
+    fun providesRateLimitDao(appDatabase: AppDatabase) = appDatabase.rateLimitDao()
+
     lateinit var appDatabase: AppDatabase
 
     @Provides
