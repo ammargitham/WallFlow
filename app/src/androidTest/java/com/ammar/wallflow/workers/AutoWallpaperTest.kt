@@ -26,11 +26,11 @@ import com.ammar.wallflow.data.db.entity.AutoWallpaperHistoryEntity
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.toWallpaper
 import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
-import com.ammar.wallflow.data.network.model.NetworkResponse
 import com.ammar.wallflow.data.network.model.NetworkWallhavenMeta
 import com.ammar.wallflow.data.network.model.NetworkWallhavenTag
 import com.ammar.wallflow.data.network.model.NetworkWallhavenThumbs
 import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpaper
+import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpapersResponse
 import com.ammar.wallflow.data.network.model.StringNetworkWallhavenMetaQuery
 import com.ammar.wallflow.data.network.model.toWallhavenWallpaper
 import com.ammar.wallflow.data.network.model.toWallpaperEntity
@@ -221,21 +221,19 @@ class AutoWallpaperTest {
                     override suspend fun search(
                         searchQuery: WallhavenSearchQuery,
                         page: Int?,
-                    ): NetworkResponse<List<NetworkWallhavenWallpaper>> {
-                        return NetworkResponse(
-                            data = networkWallpapers,
-                            meta = NetworkWallhavenMeta(
-                                current_page = 1,
-                                last_page = 1,
-                                per_page = networkWallpapers.size,
-                                total = networkWallpapers.size,
-                                query = StringNetworkWallhavenMetaQuery(
-                                    value = "",
-                                ),
-                                seed = null,
+                    ) = NetworkWallhavenWallpapersResponse(
+                        data = networkWallpapers,
+                        meta = NetworkWallhavenMeta(
+                            current_page = 1,
+                            last_page = 1,
+                            per_page = networkWallpapers.size,
+                            total = networkWallpapers.size,
+                            query = StringNetworkWallhavenMetaQuery(
+                                value = "",
                             ),
-                        )
-                    }
+                            seed = null,
+                        ),
+                    )
                 },
             )
 
@@ -323,21 +321,19 @@ class AutoWallpaperTest {
                     override suspend fun search(
                         searchQuery: WallhavenSearchQuery,
                         page: Int?,
-                    ): NetworkResponse<List<NetworkWallhavenWallpaper>> {
-                        return NetworkResponse(
-                            data = networkWallpapers,
-                            meta = NetworkWallhavenMeta(
-                                current_page = 1,
-                                last_page = 1,
-                                per_page = networkWallpapers.size,
-                                total = networkWallpapers.size,
-                                query = StringNetworkWallhavenMetaQuery(
-                                    value = "",
-                                ),
-                                seed = null,
+                    ) = NetworkWallhavenWallpapersResponse(
+                        data = networkWallpapers,
+                        meta = NetworkWallhavenMeta(
+                            current_page = 1,
+                            last_page = 1,
+                            per_page = networkWallpapers.size,
+                            total = networkWallpapers.size,
+                            query = StringNetworkWallhavenMetaQuery(
+                                value = "",
                             ),
-                        )
-                    }
+                            seed = null,
+                        ),
+                    )
                 },
             )
 
@@ -428,21 +424,19 @@ class AutoWallpaperTest {
                     override suspend fun search(
                         searchQuery: WallhavenSearchQuery,
                         page: Int?,
-                    ): NetworkResponse<List<NetworkWallhavenWallpaper>> {
-                        return NetworkResponse(
-                            data = networkWallpapers,
-                            meta = NetworkWallhavenMeta(
-                                current_page = 1,
-                                last_page = 1,
-                                per_page = networkWallpapers.size,
-                                total = networkWallpapers.size,
-                                query = StringNetworkWallhavenMetaQuery(
-                                    value = "",
-                                ),
-                                seed = null,
+                    ) = NetworkWallhavenWallpapersResponse(
+                        data = networkWallpapers,
+                        meta = NetworkWallhavenMeta(
+                            current_page = 1,
+                            last_page = 1,
+                            per_page = networkWallpapers.size,
+                            total = networkWallpapers.size,
+                            query = StringNetworkWallhavenMetaQuery(
+                                value = "",
                             ),
-                        )
-                    }
+                            seed = null,
+                        ),
+                    )
                 },
             )
 

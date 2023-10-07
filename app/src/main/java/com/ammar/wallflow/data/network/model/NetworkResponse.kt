@@ -3,7 +3,12 @@ package com.ammar.wallflow.data.network.model
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class NetworkResponse<T>(
-    val data: T,
+data class NetworkWallhavenWallpapersResponse(
+    val data: List<NetworkWallhavenWallpaper>,
     val meta: NetworkWallhavenMeta? = null,
+)
+
+@Serializable
+data class NetworkWallhavenWallpaperResponse(
+    val data: NetworkWallhavenWallpaper,
 )

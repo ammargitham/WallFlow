@@ -17,8 +17,8 @@ import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperTagsEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallpaperWithUploaderAndTags
 import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
-import com.ammar.wallflow.data.network.model.NetworkResponse
-import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpaper
+import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpaperResponse
+import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpapersResponse
 import com.ammar.wallflow.data.repository.local.LocalWallpapersRepository
 import com.ammar.wallflow.data.repository.utils.Resource
 import com.ammar.wallflow.model.Source
@@ -129,13 +129,13 @@ internal open class FakeWallhavenNetworkDataSource : WallhavenNetworkDataSource 
     override suspend fun search(
         searchQuery: WallhavenSearchQuery,
         page: Int?,
-    ): NetworkResponse<List<NetworkWallhavenWallpaper>> {
+    ): NetworkWallhavenWallpapersResponse {
         throw RuntimeException()
     }
 
     override suspend fun wallpaper(
         wallpaperWallhavenId: String,
-    ): NetworkResponse<NetworkWallhavenWallpaper> {
+    ): NetworkWallhavenWallpaperResponse {
         throw RuntimeException()
     }
 

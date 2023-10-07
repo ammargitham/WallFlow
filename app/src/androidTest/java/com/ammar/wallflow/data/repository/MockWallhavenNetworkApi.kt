@@ -1,8 +1,8 @@
 package com.ammar.wallflow.data.repository
 
-import com.ammar.wallflow.data.network.model.NetworkResponse
 import com.ammar.wallflow.data.network.model.NetworkWallhavenMeta
 import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpaper
+import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpapersResponse
 import com.ammar.wallflow.data.network.retrofit.api.WallhavenNetworkApi
 import java.io.IOException
 
@@ -24,9 +24,9 @@ class MockWallhavenNetworkApi : WallhavenNetworkApi {
         ratios: String?,
         page: Int?,
         seed: String?,
-    ): NetworkResponse<List<NetworkWallhavenWallpaper>> {
+    ): NetworkWallhavenWallpapersResponse {
         failureMsg?.run { throw IOException(this) }
-        return NetworkResponse(
+        return NetworkWallhavenWallpapersResponse(
             data = wallpaperMap.getOrDefault(query, emptyList()),
             meta = metaMap[query],
         )
