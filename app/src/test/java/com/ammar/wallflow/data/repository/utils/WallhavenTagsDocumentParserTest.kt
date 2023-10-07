@@ -1,6 +1,6 @@
 package com.ammar.wallflow.data.repository.utils
 
-import com.ammar.wallflow.data.network.model.NetworkWallhavenTag
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenTag
 import com.ammar.wallflow.data.repository.utils.WallhavenTagsDocumentParser.parsePopularTags
 import kotlin.test.assertContentEquals
 import kotlinx.datetime.Instant

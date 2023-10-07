@@ -1,4 +1,4 @@
-package com.ammar.wallflow.data.network.model
+package com.ammar.wallflow.data.network.model.wallhaven
 
 import com.ammar.wallflow.data.network.model.util.NetworkMetaQuerySerializer
 import kotlinx.serialization.Serializable

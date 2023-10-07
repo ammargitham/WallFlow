@@ -11,7 +11,7 @@ import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSearchQueryRemoteKey
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSearchQueryWallpaperEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
-import com.ammar.wallflow.data.network.model.toWallpaperEntity
+import com.ammar.wallflow.data.network.model.wallhaven.toWallpaperEntity
 import com.ammar.wallflow.model.search.WallhavenSearchQuery
 import java.io.IOException
 import kotlinx.datetime.Clock

@@ -20,11 +20,11 @@ import com.ammar.wallflow.data.db.entity.wallhaven.WallpaperWithUploaderAndTags
 import com.ammar.wallflow.data.db.entity.wallhaven.asTag
 import com.ammar.wallflow.data.db.entity.wallhaven.toWallpaper
 import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
-import com.ammar.wallflow.data.network.model.NetworkWallhavenTag
-import com.ammar.wallflow.data.network.model.NetworkWallhavenUploader
-import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpaper
-import com.ammar.wallflow.data.network.model.toEntity
-import com.ammar.wallflow.data.network.model.toWallpaperEntity
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenTag
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenUploader
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenWallpaper
+import com.ammar.wallflow.data.network.model.wallhaven.toEntity
+import com.ammar.wallflow.data.network.model.wallhaven.toWallpaperEntity
 import com.ammar.wallflow.data.repository.WallpapersRemoteMediator
 import com.ammar.wallflow.data.repository.utils.NetworkBoundResource
 import com.ammar.wallflow.data.repository.utils.Resource

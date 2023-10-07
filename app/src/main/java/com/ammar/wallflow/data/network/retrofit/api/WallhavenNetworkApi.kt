@@ -1,7 +1,7 @@
 package com.ammar.wallflow.data.network.retrofit.api
 
-import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpaperResponse
-import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpapersResponse
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenWallpaperResponse
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenWallpapersResponse
 import org.jsoup.nodes.Document
 import retrofit2.http.GET
 import retrofit2.http.Path

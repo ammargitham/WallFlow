@@ -1,7 +1,7 @@
 package com.ammar.wallflow.data.network
 
-import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpaperResponse
-import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpapersResponse
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenWallpaperResponse
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenWallpapersResponse
 import com.ammar.wallflow.model.search.WallhavenSearchQuery
 import org.jsoup.nodes.Document
 

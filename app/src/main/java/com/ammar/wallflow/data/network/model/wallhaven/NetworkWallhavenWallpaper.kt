@@ -1,4 +1,4 @@
-package com.ammar.wallflow.data.network.model
+package com.ammar.wallflow.data.network.model.wallhaven
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntSize

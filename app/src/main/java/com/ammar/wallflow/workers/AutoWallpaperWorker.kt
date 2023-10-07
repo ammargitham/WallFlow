@@ -25,7 +25,7 @@ import com.ammar.wallflow.R
 import com.ammar.wallflow.data.db.entity.toModel
 import com.ammar.wallflow.data.db.entity.wallhaven.toWallhavenSavedSearch
 import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
-import com.ammar.wallflow.data.network.model.toWallhavenWallpaper
+import com.ammar.wallflow.data.network.model.wallhaven.toWallhavenWallpaper
 import com.ammar.wallflow.data.preferences.AppPreferences
 import com.ammar.wallflow.data.preferences.AutoWallpaperPreferences
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
