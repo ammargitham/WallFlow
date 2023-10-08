@@ -46,6 +46,7 @@ import com.ammar.wallflow.ui.common.mainsearch.MainSearchBar
 import com.ammar.wallflow.ui.common.topWindowInsets
 import com.ammar.wallflow.ui.screens.NavGraph
 import com.ammar.wallflow.ui.screens.home.HomeScreenContent
+import com.ammar.wallflow.ui.screens.home.header
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.flowOf
@@ -298,7 +299,13 @@ private fun PreviewContent(
                 HomeScreenContent(
                     modifier = Modifier.windowInsetsPadding(topWindowInsets),
                     gridState = gridState,
-                    wallhavenTags = previewWallhavenTags,
+                    header = {
+                        header(
+                            wallhavenTags = previewWallhavenTags,
+                            isTagsLoading = false,
+                            onTagClick = {},
+                        )
+                    },
                     wallpapers = pagingItems,
                     nestedScrollConnectionGetter = { nestedScrollConnection },
                     contentPadding = PaddingValues(

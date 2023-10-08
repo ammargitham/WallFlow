@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridScope
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
-import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
@@ -36,6 +35,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.preferences.LayoutPreferences
 import com.ammar.wallflow.model.Favorite
+import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.model.wallhaven.WallhavenUploader
@@ -48,7 +48,9 @@ import com.ammar.wallflow.ui.wallpaperviewer.WallpaperViewer
 import com.ammar.wallflow.utils.DownloadStatus
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.datetime.Clock
 
 @Composable
 internal fun HomeScreenContent(
@@ -59,8 +61,6 @@ internal fun HomeScreenContent(
     contentPadding: PaddingValues = PaddingValues(8.dp),
     isExpanded: Boolean = false,
     favorites: ImmutableList<Favorite> = persistentListOf(),
-    wallhavenTags: ImmutableList<WallhavenTag> = persistentListOf(),
-    isTagsLoading: Boolean = false,
     blurSketchy: Boolean = false,
     blurNsfw: Boolean = false,
     selectedWallpaper: Wallpaper? = null,
@@ -71,6 +71,7 @@ internal fun HomeScreenContent(
     fullWallpaperDownloadStatus: DownloadStatus? = null,
     fullWallpaperLoading: Boolean = false,
     showFullWallpaperInfo: Boolean = false,
+    header: (LazyStaggeredGridScope.() -> Unit)? = null,
     onWallpaperClick: (wallpaper: Wallpaper) -> Unit = {},
     onWallpaperFavoriteClick: (wallpaper: Wallpaper) -> Unit = {},
     onTagClick: (wallhavenTag: WallhavenTag) -> Unit = {},
@@ -100,9 +101,7 @@ internal fun HomeScreenContent(
                 favorites = favorites,
                 blurSketchy = blurSketchy,
                 blurNsfw = blurNsfw,
-                wallhavenTags = wallhavenTags,
-                isTagsLoading = isTagsLoading,
-                onTagClick = onTagClick,
+                header = header,
                 selectedWallpaper = selectedWallpaper,
                 showSelection = isExpanded,
                 layoutPreferences = layoutPreferences,
@@ -178,14 +177,12 @@ private fun Feed(
     contentPadding: PaddingValues = PaddingValues(8.dp),
     layoutPreferences: LayoutPreferences = LayoutPreferences(),
     favorites: ImmutableList<Favorite> = persistentListOf(),
-    wallhavenTags: ImmutableList<WallhavenTag> = persistentListOf(),
     blurSketchy: Boolean = false,
     blurNsfw: Boolean = false,
-    isTagsLoading: Boolean = false,
     showSelection: Boolean = false,
     selectedWallpaper: Wallpaper? = null,
     showFAB: Boolean = true,
-    onTagClick: (wallhavenTag: WallhavenTag) -> Unit = {},
+    header: (LazyStaggeredGridScope.() -> Unit)? = null,
     onWallpaperClick: (wallpaper: Wallpaper) -> Unit = {},
     onWallpaperFavoriteClick: (wallpaper: Wallpaper) -> Unit = {},
     onFABClick: () -> Unit = {},
@@ -222,13 +219,7 @@ private fun Feed(
             favorites = favorites,
             blurSketchy = blurSketchy,
             blurNsfw = blurNsfw,
-            header = {
-                header(
-                    wallhavenTags = wallhavenTags,
-                    isTagsLoading = isTagsLoading,
-                    onTagClick = onTagClick,
-                )
-            },
+            header = header,
             selectedWallpaper = selectedWallpaper,
             showSelection = showSelection,
             gridType = layoutPreferences.gridType,
@@ -239,22 +230,6 @@ private fun Feed(
             onWallpaperClick = onWallpaperClick,
             onWallpaperFavoriteClick = onWallpaperFavoriteClick,
         )
-    }
-}
-
-private fun LazyStaggeredGridScope.header(
-    wallhavenTags: ImmutableList<WallhavenTag>,
-    isTagsLoading: Boolean,
-    onTagClick: (wallhavenTag: WallhavenTag) -> Unit,
-) {
-    if (wallhavenTags.isNotEmpty()) {
-        item(span = StaggeredGridItemSpan.FullLine) {
-            PopularTagsRow(
-                wallhavenTags = wallhavenTags,
-                loading = isTagsLoading,
-                onTagClick = onTagClick,
-            )
-        }
     }
 }
 
@@ -279,7 +254,23 @@ private fun DefaultPreview() {
             val gridState = rememberLazyStaggeredGridState()
             HomeScreenContent(
                 gridState = gridState,
-                wallhavenTags = persistentListOf(),
+                header = {
+                    header(
+                        wallhavenTags = List(5) {
+                            WallhavenTag(
+                                id = it.toLong(),
+                                name = "tag$it",
+                                alias = emptyList(),
+                                categoryId = it.toLong(),
+                                category = "",
+                                purity = Purity.SFW,
+                                createdAt = Clock.System.now(),
+                            )
+                        }.toImmutableList(),
+                        isTagsLoading = false,
+                        onTagClick = {},
+                    )
+                },
                 wallpapers = pagingItems,
                 nestedScrollConnectionGetter = { nestedScrollConnection },
             )

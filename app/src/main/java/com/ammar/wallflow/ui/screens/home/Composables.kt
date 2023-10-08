@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridScope
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
@@ -38,6 +40,22 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.datetime.Clock
+
+internal fun LazyStaggeredGridScope.header(
+    wallhavenTags: ImmutableList<WallhavenTag>,
+    isTagsLoading: Boolean,
+    onTagClick: (wallhavenTag: WallhavenTag) -> Unit,
+) {
+    if (wallhavenTags.isNotEmpty()) {
+        item(span = StaggeredGridItemSpan.FullLine) {
+            PopularTagsRow(
+                wallhavenTags = wallhavenTags,
+                loading = isTagsLoading,
+                onTagClick = onTagClick,
+            )
+        }
+    }
+}
 
 @Composable
 fun PopularTagsRow(

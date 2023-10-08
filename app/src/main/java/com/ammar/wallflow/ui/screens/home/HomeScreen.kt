@@ -170,9 +170,18 @@ fun HomeScreen(
                 top = SearchBar.Defaults.height,
                 bottom = bottomPadding + 8.dp,
             ),
-            wallhavenTags = if (uiState.isHome) uiState.wallhavenTags else persistentListOf(),
-            isTagsLoading = uiState.areTagsLoading,
             wallpapers = wallpapers,
+            header = {
+                header(
+                    wallhavenTags = if (uiState.isHome) {
+                        uiState.wallhavenTags
+                    } else {
+                        persistentListOf()
+                    },
+                    isTagsLoading = uiState.areTagsLoading,
+                    onTagClick = onTagClick,
+                )
+            },
             favorites = uiState.favorites,
             blurSketchy = uiState.blurSketchy,
             blurNsfw = uiState.blurNsfw,
