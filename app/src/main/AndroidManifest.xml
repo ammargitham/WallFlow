@@ -11,6 +11,11 @@
         android:maxSdkVersion="32"
         tools:ignore="ScopedStorage" />
 
+    <!-- Remove READ_PHONE_STATE added by Tensorflow in Plus -->
+    <uses-permission
+        android:name="android.permission.READ_PHONE_STATE"
+        tools:node="remove" />
+
     <queries>
         <intent>
             <action android:name="android.intent.action.VIEW" />
