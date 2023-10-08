@@ -34,11 +34,12 @@ class DatabaseModule {
         appDatabase.wallhavenPopularTagsDao()
 
     @Provides
-    fun provideSearchQueryDao(appDatabase: AppDatabase) = appDatabase.searchQueryDao()
+    fun providesWallhavenSearchQueryDao(appDatabase: AppDatabase) =
+        appDatabase.wallhavenSearchQueryDao()
 
     @Provides
-    fun provideSearchQueryRemoteKeysDao(appDatabase: AppDatabase) =
-        appDatabase.searchQueryRemoteKeysDao()
+    fun providesWallhavenSearchQueryRemoteKeysDao(appDatabase: AppDatabase) =
+        appDatabase.wallhavenSearchQueryRemoteKeysDao()
 
     @Provides
     fun providesWallhavenSearchQueryWallpapersDao(appDatabase: AppDatabase) =
@@ -52,14 +53,16 @@ class DatabaseModule {
     fun providesWallhavenTagsDao(appDatabase: AppDatabase) = appDatabase.wallhavenTagsDao()
 
     @Provides
-    fun providesSearchHistoryDao(appDatabase: AppDatabase) = appDatabase.searchHistoryDao()
+    fun providesWallhavenSearchHistoryDao(appDatabase: AppDatabase) =
+        appDatabase.wallhavenSearchHistoryDao()
 
     @Provides
     fun providesObjectDetectionModelDao(appDatabase: AppDatabase) =
         appDatabase.objectDetectionModelDao()
 
     @Provides
-    fun providesSavedSearchDao(appDatabase: AppDatabase) = appDatabase.savedSearchDao()
+    fun providesWallhavenSavedSearchDao(appDatabase: AppDatabase) =
+        appDatabase.wallhavenSavedSearchDao()
 
     @Provides
     fun providesAutoWallpaperHistoryDao(appDatabase: AppDatabase) =

@@ -65,15 +65,15 @@ import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperTagsEntity
 abstract class AppDatabase : RoomDatabase() {
     abstract fun lastUpdatedDao(): LastUpdatedDao
     abstract fun wallhavenPopularTagsDao(): WallhavenPopularTagsDao
-    abstract fun searchQueryDao(): WallhavenSearchQueryDao
-    abstract fun searchQueryRemoteKeysDao(): WallhavenSearchQueryRemoteKeysDao
+    abstract fun wallhavenSearchQueryDao(): WallhavenSearchQueryDao
+    abstract fun wallhavenSearchQueryRemoteKeysDao(): WallhavenSearchQueryRemoteKeysDao
     abstract fun wallhavenSearchQueryWallpapersDao(): WallhavenSearchQueryWallpapersDao
     abstract fun wallhavenWallpapersDao(): WallhavenWallpapersDao
     abstract fun wallhavenTagsDao(): WallhavenTagsDao
     abstract fun wallhavenUploadersDao(): WallhavenUploadersDao
-    abstract fun searchHistoryDao(): WallhavenSearchHistoryDao
+    abstract fun wallhavenSearchHistoryDao(): WallhavenSearchHistoryDao
     abstract fun objectDetectionModelDao(): ObjectDetectionModelDao
-    abstract fun savedSearchDao(): WallhavenSavedSearchDao
+    abstract fun wallhavenSavedSearchDao(): WallhavenSavedSearchDao
     abstract fun autoWallpaperHistoryDao(): AutoWallpaperHistoryDao
     abstract fun favoriteDao(): FavoriteDao
     abstract fun rateLimitDao(): RateLimitDao

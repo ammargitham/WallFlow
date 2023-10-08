@@ -25,8 +25,8 @@ class WallpapersRemoteMediator(
     private val clock: Clock = Clock.System,
 ) : RemoteMediator<Int, WallhavenWallpaperEntity>() {
     private val wallpapersDao = appDatabase.wallhavenWallpapersDao()
-    private val searchQueryDao = appDatabase.searchQueryDao()
-    private val remoteKeysDao = appDatabase.searchQueryRemoteKeysDao()
+    private val searchQueryDao = appDatabase.wallhavenSearchQueryDao()
+    private val remoteKeysDao = appDatabase.wallhavenSearchQueryRemoteKeysDao()
     private val searchQueryWallpapersDao = appDatabase.wallhavenSearchQueryWallpapersDao()
 
     override suspend fun initialize(): InitializeAction {
