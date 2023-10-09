@@ -3,9 +3,9 @@ package com.ammar.wallflow.data.db.entity.wallhaven
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.ammar.wallflow.model.search.WallhavenFilters
 import com.ammar.wallflow.model.search.WallhavenSavedSearch
 import com.ammar.wallflow.model.search.WallhavenSearch
-import com.ammar.wallflow.model.search.WallhavenSearchQuery
 import kotlinx.serialization.Serializable
 
 @Entity(
@@ -30,6 +30,6 @@ fun WallhavenSavedSearchEntity.toWallhavenSavedSearch() = WallhavenSavedSearch(
     name = name,
     search = WallhavenSearch(
         query = query,
-        filters = WallhavenSearchQuery.fromQueryString(filters),
+        filters = WallhavenFilters.fromQueryString(filters),
     ),
 )

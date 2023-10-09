@@ -2,12 +2,12 @@ package com.ammar.wallflow.data.network
 
 import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenWallpaperResponse
 import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenWallpapersResponse
-import com.ammar.wallflow.model.search.WallhavenSearchQuery
+import com.ammar.wallflow.model.search.WallhavenFilters
 import org.jsoup.nodes.Document
 
 interface WallhavenNetworkDataSource {
     suspend fun search(
-        searchQuery: WallhavenSearchQuery,
+        searchQuery: WallhavenFilters,
         page: Int? = null,
     ): NetworkWallhavenWallpapersResponse
 

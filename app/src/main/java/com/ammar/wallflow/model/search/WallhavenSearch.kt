@@ -11,7 +11,7 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class WallhavenSearch(
     val query: String = "",
-    val filters: WallhavenSearchQuery = WallhavenSearchQuery(),
+    val filters: WallhavenFilters = WallhavenFilters(),
     val meta: SearchMeta? = null,
 )
 
@@ -25,7 +25,7 @@ fun WallhavenSearch.toSearchHistoryEntity(
     lastUpdatedOn = lastUpdatedOn,
 )
 
-fun WallhavenSearch.toSearchQuery(): WallhavenSearchQuery {
+fun WallhavenSearch.toSearchQuery(): WallhavenFilters {
     if (query.isBlank()) return filters
     val q = query.trimAll()
     if (q.startsWith("id:")) {
@@ -73,7 +73,7 @@ fun WallhavenSearch.getSupportingText(
             ),
         )
     }
-    if (filters.categories != WallhavenSearchQuery.defaultCategories) {
+    if (filters.categories != WallhavenFilters.defaultCategories) {
         add(
             context.getString(
                 R.string.categories_supp,
@@ -81,7 +81,7 @@ fun WallhavenSearch.getSupportingText(
             ),
         )
     }
-    if (filters.purity != WallhavenSearchQuery.defaultPurities) {
+    if (filters.purity != WallhavenFilters.defaultPurities) {
         add(
             context.getString(
                 R.string.purities_supp,
@@ -107,7 +107,7 @@ val WallhavenSearchSaver = Saver<WallhavenSearch, List<String>>(
     restore = {
         WallhavenSearch(
             query = it[0],
-            filters = WallhavenSearchQuery.fromQueryString(it[1]),
+            filters = WallhavenFilters.fromQueryString(it[1]),
         )
     },
 )

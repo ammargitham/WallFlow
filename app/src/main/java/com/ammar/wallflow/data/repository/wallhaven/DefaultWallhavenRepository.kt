@@ -32,7 +32,7 @@ import com.ammar.wallflow.data.repository.utils.WallhavenTagsDocumentParser.pars
 import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.Wallpaper
-import com.ammar.wallflow.model.search.WallhavenSearchQuery
+import com.ammar.wallflow.model.search.WallhavenFilters
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import javax.inject.Inject
@@ -224,7 +224,7 @@ class DefaultWallhavenRepository @Inject constructor(
     }
 
     override fun wallpapersPager(
-        searchQuery: WallhavenSearchQuery,
+        searchQuery: WallhavenFilters,
         pageSize: Int,
         prefetchDistance: Int,
         initialLoadSize: Int,

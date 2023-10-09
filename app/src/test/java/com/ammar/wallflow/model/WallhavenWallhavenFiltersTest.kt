@@ -1,25 +1,25 @@
 package com.ammar.wallflow.model
 
-import com.ammar.wallflow.model.search.WallhavenSearchQuery
+import com.ammar.wallflow.model.search.WallhavenFilters
 import kotlin.test.assertEquals
 import org.junit.Test
 
-class WallhavenWallhavenSearchQueryTest {
+class WallhavenWallhavenFiltersTest {
     @Test
     fun `convert tags, tagId, etc to qString`() {
-        var searchQuery = WallhavenSearchQuery(
+        var searchQuery = WallhavenFilters(
             includedTags = setOf("i1", "i2"),
             excludedTags = setOf("e1", "e2"),
         )
         assertEquals("+i1 +i2 -e1 -e2", searchQuery.getQString())
 
-        searchQuery = WallhavenSearchQuery(
+        searchQuery = WallhavenFilters(
             includedTags = setOf("i 1", "i 2"),
             excludedTags = setOf("e 1", "e 2"),
         )
         assertEquals("+\"i 1\" +\"i 2\" -\"e 1\" -\"e 2\"", searchQuery.getQString())
 
-        searchQuery = WallhavenSearchQuery(
+        searchQuery = WallhavenFilters(
             includedTags = setOf("i1", "i2"),
             excludedTags = setOf("e1", "e2"),
             username = "test",

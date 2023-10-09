@@ -32,8 +32,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.R
 import com.ammar.wallflow.extensions.toDp
+import com.ammar.wallflow.model.search.WallhavenFilters
 import com.ammar.wallflow.model.search.WallhavenSearch
-import com.ammar.wallflow.model.search.WallhavenSearchQuery
 import com.ammar.wallflow.model.search.WallhavenSorting
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import kotlinx.coroutines.delay
@@ -208,7 +208,7 @@ private fun PreviewFiltersContent() {
             EditSearchContent(
                 modifier = Modifier.padding(16.dp),
                 search = WallhavenSearch(
-                    filters = WallhavenSearchQuery(
+                    filters = WallhavenFilters(
                         sorting = WallhavenSorting.TOPLIST,
                     ),
                 ),

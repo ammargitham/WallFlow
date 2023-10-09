@@ -12,14 +12,14 @@ import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSearchQueryWallpaper
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
 import com.ammar.wallflow.data.network.model.wallhaven.toWallpaperEntity
-import com.ammar.wallflow.model.search.WallhavenSearchQuery
+import com.ammar.wallflow.model.search.WallhavenFilters
 import java.io.IOException
 import kotlinx.datetime.Clock
 import retrofit2.HttpException
 
 @OptIn(ExperimentalPagingApi::class)
 class WallpapersRemoteMediator(
-    private val searchQuery: WallhavenSearchQuery,
+    private val searchQuery: WallhavenFilters,
     private val appDatabase: AppDatabase,
     private val wallHavenNetwork: WallhavenNetworkDataSource,
     private val clock: Clock = Clock.System,

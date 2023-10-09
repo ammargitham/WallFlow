@@ -13,8 +13,8 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.work.Constraints
 import androidx.work.NetworkType
 import com.ammar.wallflow.model.WallpaperTarget
+import com.ammar.wallflow.model.search.WallhavenFilters
 import com.ammar.wallflow.model.search.WallhavenSearch
-import com.ammar.wallflow.model.search.WallhavenSearchQuery
 import com.ammar.wallflow.model.search.WallhavenSorting
 import com.ammar.wallflow.model.search.WallhavenTopRange
 import com.ammar.wallflow.model.serializers.ConstraintsSerializer
@@ -32,7 +32,7 @@ import kotlinx.serialization.json.Json
 data class AppPreferences(
     val wallhavenApiKey: String = "",
     val homeSearch: WallhavenSearch = WallhavenSearch(
-        filters = WallhavenSearchQuery(
+        filters = WallhavenFilters(
             sorting = WallhavenSorting.TOPLIST,
             topRange = WallhavenTopRange.ONE_DAY,
         ),

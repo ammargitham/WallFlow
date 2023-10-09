@@ -23,7 +23,7 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 
 @Serializable
-data class WallhavenSearchQuery(
+data class WallhavenFilters(
     val includedTags: Set<String> = emptySet(),
     val excludedTags: Set<String> = emptySet(),
     val username: String? = null,
@@ -101,7 +101,7 @@ data class WallhavenSearchQuery(
             setOf(WallhavenCategory.GENERAL, WallhavenCategory.ANIME, WallhavenCategory.PEOPLE)
         val defaultPurities = setOf(Purity.SFW)
 
-        fun fromQueryString(string: String): WallhavenSearchQuery {
+        fun fromQueryString(string: String): WallhavenFilters {
             val map = string
                 .split("&")
                 .map { it.split(Pattern.compile("="), 2) }
@@ -111,7 +111,7 @@ data class WallhavenSearchQuery(
                         if (it.size > 1) it[1].urlDecoded() else null,
                     )
                 }
-            return WallhavenSearchQuery(
+            return WallhavenFilters(
                 includedTags = map["includedTags"]
                     ?.split(",")
                     ?.filter { it.isNotBlank() }
@@ -289,12 +289,12 @@ sealed class WallhavenRatio {
     }
 }
 
-val WallhavenSearchQuerySaver = Saver<WallhavenSearchQuery, String>(
+val WallhavenFiltersSaver = Saver<WallhavenFilters, String>(
     save = { it.toQueryString() },
-    restore = { WallhavenSearchQuery.fromQueryString(it) },
+    restore = { WallhavenFilters.fromQueryString(it) },
 )
 
-val MutableStateWallhavenSearchQuerySaver = Saver<MutableState<WallhavenSearchQuery>, String>(
+val MutableStateWallhavenFiltersSaver = Saver<MutableState<WallhavenFilters>, String>(
     save = { it.value.toQueryString() },
-    restore = { mutableStateOf(WallhavenSearchQuery.fromQueryString(it)) },
+    restore = { mutableStateOf(WallhavenFilters.fromQueryString(it)) },
 )
