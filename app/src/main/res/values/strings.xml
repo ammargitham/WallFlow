@@ -261,6 +261,14 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="no_sort">No sort</string>
     <string name="last_modified">Last Modified</string>
     <string name="manage">Manage</string>
+    <string name="manage_sources">Manage sources</string>
+    <string name="reddit">Reddit</string>
+    <string name="new_sources">New sources</string>
+    <string name="current_sources">Current sources</string>
+    <string name="subreddits">Subreddits</string>
+    <string name="subreddit_input_support_text">Hit space, comma or enter to confirm</string>
+    <string name="subreddit_input_error_support_text">One of the subreddits contains an invalid name</string>
+    <string name="configure_reddit">Configure reddit</string>
     <plurals name="every_x_hrs">
         <item quantity="one">Every %d hour</item>
         <item quantity="other">Every %d hours</item>

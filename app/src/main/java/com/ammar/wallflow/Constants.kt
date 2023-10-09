@@ -49,3 +49,5 @@ const val MIME_TYPE_JPEG = "image/jpeg"
 const val MIME_TYPE_PNG = "image/png"
 const val MIME_TYPE_WEBP = "image/webp"
 const val MIME_TYPE_JSON = "application/json"
+
+val SUBREDDIT_REGEX = "(?>/?r/)?([a-z0-9][_a-z0-9]{2,20})(?>\\Z|\\s)".toRegex()

@@ -8,6 +8,7 @@ import com.ammar.wallflow.data.repository.GlobalErrorsRepository.WallHavenUnauth
 import com.ammar.wallflow.data.repository.RateLimitRepository
 import com.ammar.wallflow.model.HEADER_RATELIMIT_LIMIT
 import com.ammar.wallflow.model.HEADER_RATELIMIT_REMAINING
+import com.ammar.wallflow.model.OnlineSource
 import com.ammar.wallflow.model.RateLimit
 import com.ammar.wallflow.model.Source
 import javax.inject.Inject
@@ -59,7 +60,7 @@ class WallhavenInterceptor @Inject constructor(
         }
         rateLimitRepository.upsert(
             RateLimit(
-                source = Source.WALLHAVEN,
+                source = OnlineSource.WALLHAVEN,
                 limit = limitHeader?.second?.toIntOrNull(),
                 remaining = remainingHeader?.second?.toIntOrNull(),
                 reset = null,

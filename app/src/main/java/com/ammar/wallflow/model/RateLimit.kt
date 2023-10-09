@@ -4,7 +4,7 @@ import com.ammar.wallflow.data.db.entity.RateLimitEntity
 import kotlinx.datetime.Instant
 
 data class RateLimit(
-    val source: Source,
+    val source: OnlineSource,
     val limit: Int? = null,
     val remaining: Int? = null,
     val reset: Instant? = null,

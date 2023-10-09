@@ -256,19 +256,21 @@ private fun DefaultPreview() {
                 gridState = gridState,
                 header = {
                     header(
-                        wallhavenTags = List(5) {
-                            WallhavenTag(
-                                id = it.toLong(),
-                                name = "tag$it",
-                                alias = emptyList(),
-                                categoryId = it.toLong(),
-                                category = "",
-                                purity = Purity.SFW,
-                                createdAt = Clock.System.now(),
+                        sourceHeader = {
+                            wallhavenHeader(
+                                wallhavenTags = List(5) {
+                                    WallhavenTag(
+                                        id = it.toLong(),
+                                        name = "tag$it",
+                                        alias = emptyList(),
+                                        categoryId = it.toLong(),
+                                        category = "",
+                                        purity = Purity.SFW,
+                                        createdAt = Clock.System.now(),
+                                    )
+                                }.toImmutableList(),
                             )
-                        }.toImmutableList(),
-                        isTagsLoading = false,
-                        onTagClick = {},
+                        },
                     )
                 },
                 wallpapers = pagingItems,

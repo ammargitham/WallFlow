@@ -368,6 +368,7 @@ internal fun OrderFilter(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun MinResolutionFilter(
     modifier: Modifier = Modifier,
@@ -395,7 +396,7 @@ internal fun MinResolutionFilter(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class)
+@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 internal fun ResolutionsFilter(
     modifier: Modifier = Modifier,

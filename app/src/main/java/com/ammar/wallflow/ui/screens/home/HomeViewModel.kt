@@ -5,7 +5,9 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
+import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.toFavorite
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSavedSearchEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.toWallhavenSavedSearch
 import com.ammar.wallflow.data.preferences.LayoutPreferences
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
@@ -15,6 +17,7 @@ import com.ammar.wallflow.data.repository.utils.Resource
 import com.ammar.wallflow.data.repository.utils.successOr
 import com.ammar.wallflow.data.repository.wallhaven.WallhavenRepository
 import com.ammar.wallflow.model.Favorite
+import com.ammar.wallflow.model.OnlineSource
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.search.WallhavenSavedSearch
@@ -30,7 +33,9 @@ import com.github.materiiapps.partial.partial
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -99,11 +104,14 @@ class HomeViewModel @Inject constructor(
                 blurSketchy = appPreferences.blurSketchy,
                 blurNsfw = appPreferences.blurNsfw,
                 showNSFW = appPreferences.wallhavenApiKey.isNotBlank(),
-                savedSearches = savedSearchEntities.map { entity ->
-                    entity.toWallhavenSavedSearch()
-                },
+                savedSearches = savedSearchEntities.map(
+                    WallhavenSavedSearchEntity::toWallhavenSavedSearch,
+                ),
                 layoutPreferences = appPreferences.lookAndFeelPreferences.layoutPreferences,
-                favorites = favorites.map { it.toFavorite() }.toImmutableList(),
+                favorites = favorites.map(FavoriteEntity::toFavorite).toImmutableList(),
+                sources = persistentMapOf(
+                    OnlineSource.WALLHAVEN to true,
+                ),
             ),
         )
     }.stateIn(
@@ -155,6 +163,28 @@ class HomeViewModel @Inject constructor(
             source = wallpaper.source,
         )
     }
+
+    fun showManageSourcesDialog(show: Boolean) = localUiState.update {
+        it.copy(showManageSourcesDialog = partial(show))
+    }
+
+    fun addSource(source: OnlineSource) = localUiState.update {
+        when (source) {
+            OnlineSource.WALLHAVEN -> it // will never be called
+            OnlineSource.REDDIT -> it.copy(
+                showManageSourcesDialog = partial(false),
+                showRedditInitDialog = partial(true),
+            )
+        }
+    }
+
+    fun showRedditInitDialog(show: Boolean) = localUiState.update {
+        it.copy(showRedditInitDialog = partial(show))
+    }
+
+    fun updateRedditConfigAndCloseDialog(subreddits: Set<String>) = localUiState.update {
+        it.copy(showRedditInitDialog = partial(false))
+    }
 }
 
 private val tempWallhavenTags = List(3) {
@@ -191,6 +221,9 @@ data class HomeUiState(
     val savedSearches: List<WallhavenSavedSearch> = emptyList(),
     val layoutPreferences: LayoutPreferences = LayoutPreferences(),
     val favorites: ImmutableList<Favorite> = persistentListOf(),
+    val sources: ImmutableMap<OnlineSource, Boolean> = persistentMapOf(),
+    val showManageSourcesDialog: Boolean = false,
+    val showRedditInitDialog: Boolean = false,
 ) {
     val isHome = mainSearch == null
     val showSaveAsDialog = saveSearchAsSearch != null

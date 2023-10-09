@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
@@ -33,6 +34,7 @@ import androidx.compose.ui.input.key.Key
 import androidx.compose.ui.input.key.NativeKeyEvent
 import androidx.compose.ui.input.key.key
 import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.VisualTransformation
@@ -40,6 +42,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
 import androidx.compose.ui.unit.dp
+import com.ammar.wallflow.R
 import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.ui.common.ClearableChip
 import com.ammar.wallflow.ui.theme.WallFlowTheme
@@ -50,6 +53,7 @@ import com.ammar.wallflow.ui.theme.WallFlowTheme
 )
 @Composable
 fun <T> TagInputField(
+    tagFromInputString: (String) -> T,
     modifier: Modifier = Modifier,
     label: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
@@ -59,10 +63,11 @@ fun <T> TagInputField(
     readOnly: Boolean = false,
     trailingIcon: @Composable (() -> Unit)? = null,
     showTagClearAction: Boolean = true,
-    tagFromInputString: (String) -> T,
+    separatorRegex: Regex = TAG_INPUT_DEFAULT_SEP_REGEX,
     getTagString: (tag: T) -> String = { "#$it" },
     onAddTag: (tag: T) -> Unit = {},
     onRemoveTag: (tag: T) -> Unit = {},
+    validateTag: (tag: T) -> Boolean = { true },
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val localStyle = LocalTextStyle.current
@@ -74,8 +79,8 @@ fun <T> TagInputField(
         }
         tags.joinToString(",")
     }
-    val regex = remember { "[,\\r\\n]+".toRegex() }
     var selectLastTag by remember { mutableStateOf(false) }
+    val isError = remember(tags) { !tags.all(validateTag) }
 
     Box(
         modifier = modifier,
@@ -104,11 +109,11 @@ fun <T> TagInputField(
                 .padding(top = 8.dp),
             value = fieldValue,
             onValueChange = {
-                if (!it.contains(regex)) {
+                if (!it.contains(separatorRegex)) {
                     fieldValue = it
                     return@BasicTextField
                 }
-                val parts = it.split(regex)
+                val parts = it.split(separatorRegex)
                 val tagString = parts[0].trimAll()
                 if (tagString.isBlank()) return@BasicTextField
                 onAddTag(tagFromInputString(tagString))
@@ -132,8 +137,21 @@ fun <T> TagInputField(
                             tags.mapIndexed { i, tag ->
                                 val isLast = i == tags.size - 1
                                 val selected = isLast && selectLastTag
-
+                                val isValid = validateTag(tag)
                                 ClearableChip(
+                                    isError = !isValid,
+                                    leadingIcon = if (isValid) {
+                                        null
+                                    } else {
+                                        {
+                                            Icon(
+                                                painter = painterResource(
+                                                    R.drawable.baseline_error_24,
+                                                ),
+                                                contentDescription = null,
+                                            )
+                                        }
+                                    },
                                     label = { Text(text = getTagString(tag)) },
                                     selected = selected,
                                     showClearIcon = showTagClearAction,
@@ -165,6 +183,7 @@ fun <T> TagInputField(
                     label = label,
                     placeholder = placeholder,
                     trailingIcon = trailingIcon,
+                    isError = isError,
                     contentPadding = OutlinedTextFieldDefaults.contentPadding(
                         top = if (tags.isNotEmpty()) 0.dp else 16.dp,
                         bottom = if (tags.isNotEmpty()) 0.dp else 16.dp,
@@ -172,7 +191,7 @@ fun <T> TagInputField(
                     container = {
                         OutlinedTextFieldDefaults.ContainerBox(
                             enabled = enabled,
-                            isError = false,
+                            isError = isError,
                             interactionSource = interactionSource,
                             colors = colors,
                         )
@@ -183,10 +202,14 @@ fun <T> TagInputField(
     }
 }
 
-private class TagsParameterProvider : CollectionPreviewParameterProvider<Set<String>>(
+private val TAG_INPUT_DEFAULT_SEP_REGEX = "[,\\r\\n]+".toRegex()
+
+private class TagsParameterProvider : CollectionPreviewParameterProvider<
+    Set<Pair<String, Boolean>>,
+    >(
     listOf(
         emptySet(),
-        setOf("test", "test1"),
+        setOf("test" to true, "test1" to false),
     ),
 )
 
@@ -194,7 +217,7 @@ private class TagsParameterProvider : CollectionPreviewParameterProvider<Set<Str
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun PreviewTagInputField(
-    @PreviewParameter(TagsParameterProvider::class) tags: Set<String>,
+    @PreviewParameter(TagsParameterProvider::class) tags: Set<Pair<String, Boolean>>,
 ) {
     var localTags by remember { mutableStateOf(tags) }
 
@@ -207,7 +230,9 @@ private fun PreviewTagInputField(
                 label = { Text(text = "Chip Input") },
                 placeholder = { Text(text = "Placeholder") },
                 tags = localTags,
-                tagFromInputString = { it },
+                getTagString = { "#${it.first}" },
+                tagFromInputString = { it to true },
+                validateTag = { it.second },
                 onAddTag = { localTags = localTags + it },
                 onRemoveTag = { localTags = localTags - it },
             )

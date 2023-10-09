@@ -50,6 +50,8 @@ import com.ammar.wallflow.ui.common.searchedit.SaveAsDialog
 import com.ammar.wallflow.ui.common.searchedit.SavedSearchesDialog
 import com.ammar.wallflow.ui.common.topWindowInsets
 import com.ammar.wallflow.ui.screens.destinations.WallpaperScreenDestination
+import com.ammar.wallflow.ui.screens.home.composables.ManageSourcesDialog
+import com.ammar.wallflow.ui.screens.home.composables.RedditInitDialog
 import com.ammar.wallflow.ui.wallpaperviewer.WallpaperViewerViewModel
 import com.ammar.wallflow.utils.applyWallpaper
 import com.ammar.wallflow.utils.getStartBottomPadding
@@ -173,13 +175,20 @@ fun HomeScreen(
             wallpapers = wallpapers,
             header = {
                 header(
-                    wallhavenTags = if (uiState.isHome) {
-                        uiState.wallhavenTags
-                    } else {
-                        persistentListOf()
+                    sourceHeader = {
+                        wallhavenHeader(
+                            wallhavenTags = if (uiState.isHome) {
+                                uiState.wallhavenTags
+                            } else {
+                                persistentListOf()
+                            },
+                            isTagsLoading = uiState.areTagsLoading,
+                            onTagClick = onTagClick,
+                        )
                     },
-                    isTagsLoading = uiState.areTagsLoading,
-                    onTagClick = onTagClick,
+                    onSourceAddClick = {
+                        viewModel.showManageSourcesDialog(true)
+                    },
                 )
             },
             favorites = uiState.favorites,
@@ -300,6 +309,23 @@ fun HomeScreen(
                 viewModel.showSavedSearches(false)
             },
             onDismissRequest = { viewModel.showSavedSearches(false) },
+        )
+    }
+
+    if (uiState.showManageSourcesDialog) {
+        ManageSourcesDialog(
+            currentSources = uiState.sources,
+            onAddSourceClick = viewModel::addSource,
+            onDismissRequest = {
+                viewModel.showManageSourcesDialog(false)
+            },
+        )
+    }
+
+    if (uiState.showRedditInitDialog) {
+        RedditInitDialog(
+            onSaveClick = { viewModel.updateRedditConfigAndCloseDialog(it) },
+            onDismissRequest = { viewModel.showRedditInitDialog(false) },
         )
     }
 }

@@ -4,12 +4,12 @@ import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
 import com.ammar.wallflow.data.db.entity.RateLimitEntity
-import com.ammar.wallflow.model.Source
+import com.ammar.wallflow.model.OnlineSource
 
 @Dao
 interface RateLimitDao {
     @Query("SELECT * FROM rate_limits WHERE source = :source")
-    suspend fun getBySource(source: Source): RateLimitEntity?
+    suspend fun getBySource(source: OnlineSource): RateLimitEntity?
 
     @Upsert
     fun upsert(entity: RateLimitEntity)
