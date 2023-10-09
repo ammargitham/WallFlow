@@ -97,26 +97,26 @@ private data class ClearableChipParams(
     val selected: Boolean,
 )
 
-private class ClearableChipParamsProvider
-    : CollectionPreviewParameterProvider<ClearableChipParams>(
-    listOf(
-        ClearableChipParams(
-            label = "test",
-            isError = false,
-            selected = false,
+private class ClearableChipParamsProvider :
+    CollectionPreviewParameterProvider<ClearableChipParams>(
+        listOf(
+            ClearableChipParams(
+                label = "test",
+                isError = false,
+                selected = false,
+            ),
+            ClearableChipParams(
+                label = "test1",
+                isError = true,
+                selected = false,
+            ),
+            ClearableChipParams(
+                label = "test2",
+                isError = true,
+                selected = true,
+            ),
         ),
-        ClearableChipParams(
-            label = "test1",
-            isError = true,
-            selected = false,
-        ),
-        ClearableChipParams(
-            label = "test2",
-            isError = true,
-            selected = true,
-        ),
-    ),
-)
+    )
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview

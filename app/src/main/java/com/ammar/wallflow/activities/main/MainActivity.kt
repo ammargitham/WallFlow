@@ -199,7 +199,11 @@ class MainActivity : ComponentActivity() {
             Surface(
                 modifier = Modifier
                     .fillMaxSize()
-                    .onSizeChanged { size -> systemController.update { it.copy(size = size) } }
+                    .onSizeChanged { size ->
+                        systemController.update {
+                            it.copy(size = size)
+                        }
+                    }
                     .semantics { testTagsAsResourceId = true },
                 color = MaterialTheme.colorScheme.background,
             ) {
