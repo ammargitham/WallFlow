@@ -34,21 +34,21 @@ import org.junit.runner.RunWith
 )
 @RunWith(AndroidJUnit4::class)
 class WallpapersRemoteMediatorTest {
-    private val mockNetworkApi = MockWallhavenNetworkApi()
-    private val wallHavenNetworkDataSource = RetrofitWallhavenNetwork(mockNetworkApi)
+    private val fakeWallhavenNetworkApi = FakeWallhavenNetworkApi()
+    private val wallHavenNetworkDataSource = RetrofitWallhavenNetwork(fakeWallhavenNetworkApi)
     private val mockDb = Room.inMemoryDatabaseBuilder(
         context = ApplicationProvider.getApplicationContext(),
         klass = AppDatabase::class.java,
     ).build()
-    private val wallpapersDao = mockDb.wallhavenWallpapersDao()
-    private val searchQueryDao = mockDb.wallhavenSearchQueryDao()
-    private val searchQueryWallpapersDao = mockDb.wallhavenSearchQueryWallpapersDao()
+    private val wallhavenWallpapersDao = mockDb.wallhavenWallpapersDao()
+    private val wallhavenSearchQueryDao = mockDb.wallhavenSearchQueryDao()
+    private val wallhavenSearchQueryWallpapersDao = mockDb.wallhavenSearchQueryWallpapersDao()
 
     @After
     fun tearDown() {
         mockDb.clearAllTables()
-        mockNetworkApi.failureMsg = null
-        mockNetworkApi.clearMockData()
+        fakeWallhavenNetworkApi.failureMsg = null
+        fakeWallhavenNetworkApi.clearMockData()
     }
 
     @Test
@@ -56,7 +56,7 @@ class WallpapersRemoteMediatorTest {
         val query = "test"
         val searchQuery = WallhavenFilters(includedTags = setOf(query))
         val mockNetworkWallpapers = MockFactory.generateNetworkWallpapers(20)
-        mockNetworkApi.setWallpapersForQuery(
+        fakeWallhavenNetworkApi.setWallpapersForQuery(
             query = searchQuery.getQString(),
             networkWallhavenWallpapers = mockNetworkWallpapers,
             meta = NetworkWallhavenMeta(
@@ -80,17 +80,20 @@ class WallpapersRemoteMediatorTest {
             10,
         )
         val result = remoteMediator.load(LoadType.REFRESH, pagingState)
-        val wallpaperCount = wallpapersDao.count()
-        val searchQueryCount = searchQueryDao.count()
+        val wallpaperCount = wallhavenWallpapersDao.count()
+        val searchQueryCount = wallhavenSearchQueryDao.count()
 
         assertEquals(20, wallpaperCount)
         assertEquals(1, searchQueryCount)
 
-        val searchQueryEntity = searchQueryDao.getBySearchQuery(searchQuery.toQueryString())
+        val searchQueryEntity = wallhavenSearchQueryDao.getBySearchQuery(
+            searchQuery.toQueryString(),
+        )
         assertNotNull(searchQueryEntity)
 
-        val queryWallpaperEntities =
-            searchQueryWallpapersDao.getBySearchQueryId(searchQueryEntity.id)
+        val queryWallpaperEntities = wallhavenSearchQueryWallpapersDao.getBySearchQueryId(
+            searchQueryEntity.id,
+        )
         assertEquals(20, queryWallpaperEntities.size)
 
         assertTrue { result is MediatorResult.Success }
@@ -117,7 +120,7 @@ class WallpapersRemoteMediatorTest {
 
     @Test
     fun refreshLoadReturnsErrorResultWhenErrorOccurs() = runTest {
-        mockNetworkApi.failureMsg = "Throw test failure"
+        fakeWallhavenNetworkApi.failureMsg = "Throw test failure"
         val remoteMediator = WallpapersRemoteMediator(
             WallhavenFilters(includedTags = setOf("test")),
             mockDb,
@@ -149,13 +152,17 @@ class WallpapersRemoteMediatorTest {
         )
         val result = remoteMediator.load(LoadType.REFRESH, pagingState)
         assertTrue { result is MediatorResult.Success }
-        val searchQueryEntity = searchQueryDao.getBySearchQuery(searchQuery.toQueryString())
+        val searchQueryEntity = wallhavenSearchQueryDao.getBySearchQuery(
+            searchQuery.toQueryString(),
+        )
         assertNotNull(searchQueryEntity)
         val lastUpdated = searchQueryEntity.lastUpdatedOn
         // refresh again
         val refreshResult = remoteMediator.load(LoadType.REFRESH, pagingState)
         assertTrue { refreshResult is MediatorResult.Success }
-        val refreshSearchQueryEntity = searchQueryDao.getBySearchQuery(searchQuery.toQueryString())
+        val refreshSearchQueryEntity = wallhavenSearchQueryDao.getBySearchQuery(
+            searchQuery.toQueryString(),
+        )
         assertNotNull(refreshSearchQueryEntity)
         val refreshLastUpdated = refreshSearchQueryEntity.lastUpdatedOn
         assertTrue { refreshLastUpdated > lastUpdated }
@@ -168,7 +175,7 @@ class WallpapersRemoteMediatorTest {
 
         val queryWallpapers1 = MockFactory.generateNetworkWallpapers(20)
         val queryWallpaperWallhavenIds = queryWallpapers1.map { it.id }
-        mockNetworkApi.setWallpapersForQuery(
+        fakeWallhavenNetworkApi.setWallpapersForQuery(
             query = searchQuery.getQString(),
             networkWallhavenWallpapers = queryWallpapers1,
             meta = NetworkWallhavenMeta(
@@ -192,16 +199,16 @@ class WallpapersRemoteMediatorTest {
         )
         remoteMediator.load(LoadType.REFRESH, pagingState)
 
-        var wallpaperCount = wallpapersDao.count()
+        var wallpaperCount = wallhavenWallpapersDao.count()
         assertEquals(20, wallpaperCount)
 
-        val dbWallpapers = wallpapersDao.getAll()
+        val dbWallpapers = wallhavenWallpapersDao.getAll()
         val dbWallpaperWallhavenIds = dbWallpapers.map { it.wallhavenId }
 
         assertEquals(queryWallpaperWallhavenIds, dbWallpaperWallhavenIds)
 
         val queryWallpapers2 = MockFactory.generateNetworkWallpapers(10)
-        mockNetworkApi.setWallpapersForQuery(
+        fakeWallhavenNetworkApi.setWallpapersForQuery(
             query = searchQuery.getQString(),
             networkWallhavenWallpapers = queryWallpapers2,
             meta = NetworkWallhavenMeta(
@@ -214,7 +221,7 @@ class WallpapersRemoteMediatorTest {
         )
         remoteMediator.load(LoadType.REFRESH, pagingState)
 
-        wallpaperCount = wallpapersDao.count()
+        wallpaperCount = wallhavenWallpapersDao.count()
         assertEquals(10, wallpaperCount)
     }
 
@@ -226,7 +233,7 @@ class WallpapersRemoteMediatorTest {
         val searchQuery2 = WallhavenFilters(includedTags = setOf(queryStr2))
 
         val query1Wallpapers = MockFactory.generateNetworkWallpapers(20)
-        mockNetworkApi.setWallpapersForQuery(
+        fakeWallhavenNetworkApi.setWallpapersForQuery(
             query = searchQuery1.getQString(),
             networkWallhavenWallpapers = query1Wallpapers,
             meta = NetworkWallhavenMeta(
@@ -254,7 +261,7 @@ class WallpapersRemoteMediatorTest {
             query1Wallpapers.randomList(5) + MockFactory.generateNetworkWallpaper(
                 idNumber = 21,
             )
-        mockNetworkApi.setWallpapersForQuery(
+        fakeWallhavenNetworkApi.setWallpapersForQuery(
             query = searchQuery2.getQString(),
             networkWallhavenWallpapers = query2Wallpapers,
             meta = NetworkWallhavenMeta(
@@ -278,23 +285,29 @@ class WallpapersRemoteMediatorTest {
         )
         remoteMediator2.load(LoadType.REFRESH, pagingState2)
 
-        val wallpaperCount = wallpapersDao.count()
-        val searchQueryCount = searchQueryDao.count()
+        val wallpaperCount = wallhavenWallpapersDao.count()
+        val searchQueryCount = wallhavenSearchQueryDao.count()
 
         assertEquals(21, wallpaperCount)
         assertEquals(2, searchQueryCount)
 
-        val searchQueryEntity1 = searchQueryDao.getBySearchQuery(searchQuery1.toQueryString())
+        val searchQueryEntity1 = wallhavenSearchQueryDao.getBySearchQuery(
+            searchQuery1.toQueryString(),
+        )
         assertNotNull(searchQueryEntity1)
-        val searchQueryEntity2 = searchQueryDao.getBySearchQuery(searchQuery2.toQueryString())
+        val searchQueryEntity2 = wallhavenSearchQueryDao.getBySearchQuery(
+            searchQuery2.toQueryString(),
+        )
         assertNotNull(searchQueryEntity2)
 
-        val query1WallpaperEntities =
-            searchQueryWallpapersDao.getBySearchQueryId(searchQueryEntity1.id)
+        val query1WallpaperEntities = wallhavenSearchQueryWallpapersDao.getBySearchQueryId(
+            searchQueryEntity1.id,
+        )
         assertEquals(20, query1WallpaperEntities.size)
 
-        val query2WallpaperEntities =
-            searchQueryWallpapersDao.getBySearchQueryId(searchQueryEntity2.id)
+        val query2WallpaperEntities = wallhavenSearchQueryWallpapersDao.getBySearchQueryId(
+            searchQueryEntity2.id,
+        )
         assertEquals(6, query2WallpaperEntities.size)
     }
 }

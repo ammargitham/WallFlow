@@ -6,7 +6,7 @@ import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenWallpaper
 import com.ammar.wallflow.data.network.retrofit.api.WallhavenNetworkApi
 import java.io.IOException
 
-class MockWallhavenNetworkApi : WallhavenNetworkApi {
+class FakeWallhavenNetworkApi : WallhavenNetworkApi {
     var failureMsg: String? = null
     private val wallpaperMap = mutableMapOf<String, List<NetworkWallhavenWallpaper>>()
     private val metaMap = mutableMapOf<String, NetworkWallhavenMeta?>()

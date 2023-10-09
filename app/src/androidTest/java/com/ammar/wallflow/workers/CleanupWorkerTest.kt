@@ -20,7 +20,7 @@ import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenWallpaper
 import com.ammar.wallflow.data.network.model.wallhaven.StringNetworkWallhavenMetaQuery
 import com.ammar.wallflow.data.network.model.wallhaven.toWallpaperEntity
 import com.ammar.wallflow.data.network.retrofit.RetrofitWallhavenNetwork
-import com.ammar.wallflow.data.repository.MockWallhavenNetworkApi
+import com.ammar.wallflow.data.repository.FakeWallhavenNetworkApi
 import com.ammar.wallflow.data.repository.WallpapersRemoteMediator
 import com.ammar.wallflow.extensions.getFileNameFromUrl
 import com.ammar.wallflow.extensions.getTempDir
@@ -49,8 +49,8 @@ class CleanupWorkerTest {
     private lateinit var context: Context
     private lateinit var db: AppDatabase
     private lateinit var tempDir: File
-    private val mockNetworkApi = MockWallhavenNetworkApi()
-    private val wallHavenNetworkDataSource = RetrofitWallhavenNetwork(mockNetworkApi)
+    private val fakeWallhavenNetworkApi = FakeWallhavenNetworkApi()
+    private val wallHavenNetworkDataSource = RetrofitWallhavenNetwork(fakeWallhavenNetworkApi)
     private val testDispatcher = StandardTestDispatcher()
 
     @Before
@@ -81,8 +81,8 @@ class CleanupWorkerTest {
     @After
     fun tearDown() {
         db.clearAllTables()
-        mockNetworkApi.failureMsg = null
-        mockNetworkApi.clearMockData()
+        fakeWallhavenNetworkApi.failureMsg = null
+        fakeWallhavenNetworkApi.clearMockData()
         tempDir.listFiles()?.forEach {
             println(it.lastModified())
             it.delete()
@@ -487,7 +487,7 @@ class CleanupWorkerTest {
             MockFactory.generateNetworkWallpapers(20),
     ) {
         val searchQuery = WallhavenFilters(includedTags = setOf(query))
-        mockNetworkApi.setWallpapersForQuery(
+        fakeWallhavenNetworkApi.setWallpapersForQuery(
             query = searchQuery.getQString(),
             networkWallhavenWallpapers = mockNetworkWallhavenWallpapers,
             meta = NetworkWallhavenMeta(
