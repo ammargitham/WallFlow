@@ -236,7 +236,7 @@ fun HomeScreen(
             onFullWallpaperUploaderClick = {
                 val search = WallhavenSearch(
                     query = "@${it.username}",
-                    meta = WallhavenUploaderSearchMeta(wallhavenUploader = it),
+                    meta = WallhavenUploaderSearchMeta(uploader = it),
                 )
                 if (searchBarController.state.value.search == search) {
                     return@HomeScreenContent

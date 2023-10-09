@@ -136,7 +136,7 @@ fun WallpaperScreen(
             onTagClick = {
                 val search = WallhavenSearch(
                     query = "id:${it.id}",
-                    meta = WallhavenTagSearchMeta(wallhavenTag = it),
+                    meta = WallhavenTagSearchMeta(tag = it),
                 )
                 if (searchBarController.state.value.search == search) {
                     return@WallpaperViewer
@@ -146,7 +146,7 @@ fun WallpaperScreen(
             onUploaderClick = {
                 val search = WallhavenSearch(
                     query = "@${it.username}",
-                    meta = WallhavenUploaderSearchMeta(wallhavenUploader = it),
+                    meta = WallhavenUploaderSearchMeta(uploader = it),
                 )
                 if (searchBarController.state.value.search == search) {
                     return@WallpaperViewer

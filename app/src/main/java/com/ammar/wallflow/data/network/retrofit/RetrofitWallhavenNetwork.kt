@@ -28,8 +28,9 @@ class RetrofitWallhavenNetwork(
         )
     }
 
-    override suspend fun wallpaper(wallpaperWallhavenId: String) =
-        wallHavenNetworkApi.wallpaper(wallpaperWallhavenId)
+    override suspend fun wallpaper(wallpaperWallhavenId: String) = wallHavenNetworkApi.wallpaper(
+        wallpaperWallhavenId,
+    )
 
     override suspend fun popularTags() = wallHavenNetworkApi.popularTags()
 }
