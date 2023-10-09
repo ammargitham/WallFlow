@@ -1,11 +1,11 @@
 package com.ammar.wallflow.data.network
 
 import com.ammar.wallflow.data.network.model.reddit.NetworkRedditSearchResponse
-import com.ammar.wallflow.model.search.RedditSearchQuery
+import com.ammar.wallflow.model.search.RedditSearch
 
 interface RedditNetworkDataSource {
     suspend fun search(
-        searchQuery: RedditSearchQuery,
+        search: RedditSearch,
         after: String? = null,
     ): NetworkRedditSearchResponse
 }

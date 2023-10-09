@@ -1,26 +1,23 @@
 package com.ammar.wallflow.data.network.retrofit.reddit
 
 import com.ammar.wallflow.data.network.RedditNetworkDataSource
-import com.ammar.wallflow.model.search.RedditSearchQuery
+import com.ammar.wallflow.extensions.trimAll
+import com.ammar.wallflow.model.search.RedditSearch
 
 class RetrofitRedditNetwork(
     private val redditNetworkApi: RedditNetworkApi,
 ) : RedditNetworkDataSource {
     override suspend fun search(
-        searchQuery: RedditSearchQuery,
+        search: RedditSearch,
         after: String?,
-    ) = with(searchQuery) {
-        if (subreddit.isBlank()) {
-            throw IllegalArgumentException("subreddit cannot be empty")
+    ) = with(search) {
+        if (subreddits.isEmpty()) {
+            throw IllegalArgumentException("subreddits cannot be empty")
         }
         redditNetworkApi.search(
-            query = "self%3Ano ${query ?: ""}",
-            subreddit = subreddit,
-            includeNsfw = if (includeNsfw) {
-                "on"
-            } else {
-                "off"
-            },
+            query = "self%3Ano $query".trimAll(),
+            subreddit = subreddits.joinToString("+"),
+            includeNsfw = if (includeNsfw) "on" else "off",
             sort = sort.value,
             timeRange = timeRange.value,
             after = after,

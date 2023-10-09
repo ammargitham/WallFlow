@@ -107,11 +107,11 @@ fun HomeScreen(
         bottomBarController.update { it.copy(visible = true) }
     }
 
-    LaunchedEffect(uiState.mainSearch) {
+    LaunchedEffect(uiState.wallhaven.mainSearch) {
         searchBarController.update {
             it.copy(
                 visible = true,
-                search = uiState.mainSearch ?: MainSearchBar.Defaults.search,
+                search = uiState.wallhaven.mainSearch ?: MainSearchBar.Defaults.search,
             )
         }
     }
@@ -178,11 +178,11 @@ fun HomeScreen(
                     sourceHeader = {
                         wallhavenHeader(
                             wallhavenTags = if (uiState.isHome) {
-                                uiState.wallhavenTags
+                                uiState.wallhaven.wallhavenTags
                             } else {
                                 persistentListOf()
                             },
-                            isTagsLoading = uiState.areTagsLoading,
+                            isTagsLoading = uiState.wallhaven.areTagsLoading,
                             onTagClick = onTagClick,
                         )
                     },
@@ -257,9 +257,9 @@ fun HomeScreen(
         val state = rememberModalBottomSheetState()
         val scope = rememberCoroutineScope()
         var localSearch by rememberSaveable(
-            uiState.homeSearch,
+            uiState.wallhaven.homeSearch,
             stateSaver = WallhavenSearchSaver,
-        ) { mutableStateOf(uiState.homeSearch) }
+        ) { mutableStateOf(uiState.wallhaven.homeSearch) }
 
         EditSearchModalBottomSheet(
             state = state,
@@ -271,7 +271,7 @@ fun HomeScreen(
                         end = 22.dp,
                         bottom = 16.dp,
                     ),
-                    saveEnabled = localSearch != uiState.homeSearch,
+                    saveEnabled = localSearch != uiState.wallhaven.homeSearch,
                     onSaveClick = {
                         viewModel.updateHomeSearch(localSearch)
                         scope.launch { state.hide() }.invokeOnCompletion {
@@ -293,7 +293,7 @@ fun HomeScreen(
     if (uiState.showSaveAsDialog) {
         SaveAsDialog(
             onSave = {
-                val search = uiState.saveSearchAsSearch ?: return@SaveAsDialog
+                val search = uiState.wallhaven.saveSearchAsSearch ?: return@SaveAsDialog
                 viewModel.saveSearchAs(it, search)
                 viewModel.showSaveSearchAsDialog(null)
             },
@@ -303,7 +303,7 @@ fun HomeScreen(
 
     if (uiState.showSavedSearchesDialog) {
         SavedSearchesDialog(
-            savedSearches = uiState.savedSearches,
+            savedSearches = uiState.wallhaven.savedSearches,
             onSelect = {
                 viewModel.updateHomeSearch(it.search)
                 viewModel.showSavedSearches(false)

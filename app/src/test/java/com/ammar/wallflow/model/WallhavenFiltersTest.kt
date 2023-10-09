@@ -4,7 +4,7 @@ import com.ammar.wallflow.model.search.WallhavenFilters
 import kotlin.test.assertEquals
 import org.junit.Test
 
-class WallhavenWallhavenFiltersTest {
+class WallhavenFiltersTest {
     @Test
     fun `convert tags, tagId, etc to qString`() {
         var searchQuery = WallhavenFilters(

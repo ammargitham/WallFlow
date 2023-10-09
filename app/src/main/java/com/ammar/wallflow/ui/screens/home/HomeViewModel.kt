@@ -29,6 +29,7 @@ import com.ammar.wallflow.model.search.toSearchQuery
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.ui.screens.navArgs
 import com.github.materiiapps.partial.Partialize
+import com.github.materiiapps.partial.getOrElse
 import com.github.materiiapps.partial.partial
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -63,7 +64,7 @@ class HomeViewModel @Inject constructor(
     private val localUiState = MutableStateFlow(HomeUiStatePartial())
 
     private val homeSearchFlow = appPreferencesRepository.appPreferencesFlow.mapLatest {
-        it.homeSearch
+        it.homeWallhavenSearch
     }.distinctUntilChanged()
 
     val wallpapers = if (mainSearch != null) {
@@ -89,24 +90,26 @@ class HomeViewModel @Inject constructor(
         ->
         local.merge(
             HomeUiState(
-                wallhavenTags = (
-                    if (tags is Resource.Loading) {
-                        tempWallhavenTags
-                    } else {
-                        tags.successOr(
-                            emptyList(),
-                        )
-                    }
-                    ).toImmutableList(),
-                areTagsLoading = tags is Resource.Loading,
-                mainSearch = mainSearch,
-                homeSearch = appPreferences.homeSearch,
+                wallhaven = WallhavenState(
+                    wallhavenTags = (
+                        if (tags is Resource.Loading) {
+                            tempWallhavenTags
+                        } else {
+                            tags.successOr(
+                                emptyList(),
+                            )
+                        }
+                        ).toImmutableList(),
+                    areTagsLoading = tags is Resource.Loading,
+                    mainSearch = mainSearch,
+                    homeSearch = appPreferences.homeWallhavenSearch,
+                    savedSearches = savedSearchEntities.map(
+                        WallhavenSavedSearchEntity::toWallhavenSavedSearch,
+                    ),
+                ),
                 blurSketchy = appPreferences.blurSketchy,
                 blurNsfw = appPreferences.blurNsfw,
                 showNSFW = appPreferences.wallhavenApiKey.isNotBlank(),
-                savedSearches = savedSearchEntities.map(
-                    WallhavenSavedSearchEntity::toWallhavenSavedSearch,
-                ),
                 layoutPreferences = appPreferences.lookAndFeelPreferences.layoutPreferences,
                 favorites = favorites.map(FavoriteEntity::toFavorite).toImmutableList(),
                 sources = persistentMapOf(
@@ -128,7 +131,7 @@ class HomeViewModel @Inject constructor(
 
     fun updateHomeSearch(search: WallhavenSearch) {
         viewModelScope.launch {
-            appPreferencesRepository.updateHomeSearch(search)
+            appPreferencesRepository.updateHomeWallhavenSearch(search)
         }
     }
 
@@ -141,7 +144,14 @@ class HomeViewModel @Inject constructor(
     }
 
     fun showSaveSearchAsDialog(search: WallhavenSearch? = null) = localUiState.update {
-        it.copy(saveSearchAsSearch = partial(search))
+        val wallhaven = it.wallhaven.getOrElse { WallhavenState() }
+        it.copy(
+            wallhaven = partial(
+                wallhaven.copy(
+                    saveSearchAsSearch = search,
+                ),
+            ),
+        )
     }
 
     fun saveSearchAs(name: String, search: WallhavenSearch) = viewModelScope.launch {
@@ -202,6 +212,33 @@ private val tempWallhavenTags = List(3) {
 @Stable
 @Partialize
 data class HomeUiState(
+    val selectedSource: OnlineSource = OnlineSource.WALLHAVEN,
+    val sources: ImmutableMap<OnlineSource, Boolean> = persistentMapOf(
+        OnlineSource.WALLHAVEN to true,
+    ),
+    val wallhaven: WallhavenState = WallhavenState(),
+    val showFilters: Boolean = false,
+    val blurSketchy: Boolean = false,
+    val blurNsfw: Boolean = false,
+    val showNSFW: Boolean = false,
+    val selectedWallpaper: Wallpaper? = null,
+    val showSavedSearchesDialog: Boolean = false,
+    val layoutPreferences: LayoutPreferences = LayoutPreferences(),
+    val favorites: ImmutableList<Favorite> = persistentListOf(),
+    val showManageSourcesDialog: Boolean = false,
+    val showRedditInitDialog: Boolean = false,
+) {
+    val isHome = when (selectedSource) {
+        OnlineSource.WALLHAVEN -> wallhaven.mainSearch == null
+        OnlineSource.REDDIT -> TODO()
+    }
+    val showSaveAsDialog = when (selectedSource) {
+        OnlineSource.WALLHAVEN -> wallhaven.saveSearchAsSearch != null
+        OnlineSource.REDDIT -> TODO()
+    }
+}
+
+data class WallhavenState(
     val wallhavenTags: ImmutableList<WallhavenTag> = persistentListOf(),
     val areTagsLoading: Boolean = true,
     val mainSearch: WallhavenSearch? = null,
@@ -211,20 +248,6 @@ data class HomeUiState(
             topRange = WallhavenTopRange.ONE_DAY,
         ),
     ),
-    val showFilters: Boolean = false,
-    val blurSketchy: Boolean = false,
-    val blurNsfw: Boolean = false,
-    val showNSFW: Boolean = false,
-    val selectedWallpaper: Wallpaper? = null,
     val saveSearchAsSearch: WallhavenSearch? = null,
-    val showSavedSearchesDialog: Boolean = false,
     val savedSearches: List<WallhavenSavedSearch> = emptyList(),
-    val layoutPreferences: LayoutPreferences = LayoutPreferences(),
-    val favorites: ImmutableList<Favorite> = persistentListOf(),
-    val sources: ImmutableMap<OnlineSource, Boolean> = persistentMapOf(),
-    val showManageSourcesDialog: Boolean = false,
-    val showRedditInitDialog: Boolean = false,
-) {
-    val isHome = mainSearch == null
-    val showSaveAsDialog = saveSearchAsSearch != null
-}
+)

@@ -4,7 +4,6 @@ import android.util.Log
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
-import androidx.paging.PagingData
 import androidx.paging.map
 import androidx.room.withTransaction
 import com.ammar.wallflow.IoDispatcher
@@ -228,7 +227,7 @@ class DefaultWallhavenRepository @Inject constructor(
         pageSize: Int,
         prefetchDistance: Int,
         initialLoadSize: Int,
-    ): Flow<PagingData<Wallpaper>> = Pager(
+    ) = Pager(
         config = PagingConfig(
             pageSize = pageSize,
             prefetchDistance = prefetchDistance,

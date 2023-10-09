@@ -23,6 +23,7 @@ import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.extensions.toConstraintTypeMap
 import com.ammar.wallflow.extensions.toConstraints
 import com.ammar.wallflow.model.WallpaperTarget
+import com.ammar.wallflow.model.search.RedditSearch
 import com.ammar.wallflow.model.search.WallhavenFilters
 import com.ammar.wallflow.model.search.WallhavenSearch
 import com.ammar.wallflow.model.search.WallhavenSorting
@@ -66,10 +67,16 @@ class AppPreferencesRepository @Inject constructor(
         dataStore.edit { it[PreferencesKeys.WALLHAVEN_API_KEY] = wallhavenApiKey }
     }
 
-    suspend fun updateHomeSearch(search: WallhavenSearch) = withContext(ioDispatcher) {
+    suspend fun updateHomeWallhavenSearch(search: WallhavenSearch) = withContext(ioDispatcher) {
         dataStore.edit {
-            it[PreferencesKeys.HOME_SEARCH_QUERY] = search.query
-            it[PreferencesKeys.HOME_FILTERS] = search.filters.toQueryString()
+            it[PreferencesKeys.HOME_WALLHAVEN_SEARCH_QUERY] = search.query
+            it[PreferencesKeys.HOME_WALLHAVEN_FILTERS] = search.filters.toQueryString()
+        }
+    }
+
+    suspend fun updateHomeRedditSearch(search: RedditSearch) = withContext(ioDispatcher) {
+        dataStore.edit {
+            it[PreferencesKeys.HOME_REDDIT_SEARCH] = search.toQueryString()
         }
     }
 
@@ -153,14 +160,17 @@ class AppPreferencesRepository @Inject constructor(
 
     private fun mapAppPreferences(preferences: Preferences) = AppPreferences(
         wallhavenApiKey = preferences[PreferencesKeys.WALLHAVEN_API_KEY] ?: "",
-        homeSearch = WallhavenSearch(
-            query = preferences[PreferencesKeys.HOME_SEARCH_QUERY] ?: "",
-            filters = preferences[PreferencesKeys.HOME_FILTERS]?.let {
+        homeWallhavenSearch = WallhavenSearch(
+            query = preferences[PreferencesKeys.HOME_WALLHAVEN_SEARCH_QUERY] ?: "",
+            filters = preferences[PreferencesKeys.HOME_WALLHAVEN_FILTERS]?.let {
                 WallhavenFilters.fromQueryString(it)
             } ?: WallhavenFilters(
                 sorting = WallhavenSorting.TOPLIST,
                 topRange = WallhavenTopRange.ONE_DAY,
             ),
+        ),
+        homeRedditSearch = RedditSearch.fromQueryString(
+            preferences[PreferencesKeys.HOME_REDDIT_SEARCH],
         ),
         blurSketchy = preferences[PreferencesKeys.BLUR_SKETCHY] ?: false,
         blurNsfw = preferences[PreferencesKeys.BLUR_NSFW] ?: false,
@@ -297,7 +307,7 @@ class AppPreferencesRepository @Inject constructor(
 
     suspend fun setPreferences(appPreferences: AppPreferences) {
         updateWallhavenApiKey(appPreferences.wallhavenApiKey)
-        updateHomeSearch(appPreferences.homeSearch)
+        updateHomeWallhavenSearch(appPreferences.homeWallhavenSearch)
         updateBlurSketchy(appPreferences.blurSketchy)
         updateBlurNsfw(appPreferences.blurNsfw)
         updateObjectDetectionPrefs(appPreferences.objectDetectionPreferences)
