@@ -11,11 +11,11 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ammar.wallflow.MockFactory
 import com.ammar.wallflow.data.db.AppDatabase
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
-import com.ammar.wallflow.data.network.model.NetworkWallhavenMeta
-import com.ammar.wallflow.data.network.model.StringNetworkWallhavenMetaQuery
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenMeta
+import com.ammar.wallflow.data.network.model.wallhaven.StringNetworkWallhavenMetaQuery
 import com.ammar.wallflow.data.network.retrofit.RetrofitWallhavenNetwork
 import com.ammar.wallflow.extensions.randomList
-import com.ammar.wallflow.model.search.WallhavenSearchQuery
+import com.ammar.wallflow.model.search.WallhavenFilters
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
@@ -41,7 +41,7 @@ class WallpapersRemoteMediatorTest {
         klass = AppDatabase::class.java,
     ).build()
     private val wallpapersDao = mockDb.wallhavenWallpapersDao()
-    private val searchQueryDao = mockDb.searchQueryDao()
+    private val searchQueryDao = mockDb.wallhavenSearchQueryDao()
     private val searchQueryWallpapersDao = mockDb.wallhavenSearchQueryWallpapersDao()
 
     @After
@@ -54,7 +54,7 @@ class WallpapersRemoteMediatorTest {
     @Test
     fun refreshLoadReturnsSuccessResultWhenMoreDataIsPresent() = runTest {
         val query = "test"
-        val searchQuery = WallhavenSearchQuery(includedTags = setOf(query))
+        val searchQuery = WallhavenFilters(includedTags = setOf(query))
         val mockNetworkWallpapers = MockFactory.generateNetworkWallpapers(20)
         mockNetworkApi.setWallpapersForQuery(
             query = searchQuery.getQString(),
@@ -100,7 +100,7 @@ class WallpapersRemoteMediatorTest {
     @Test
     fun refreshLoadSuccessAndEndOfPaginationWhenNoMoreData() = runTest {
         val remoteMediator = WallpapersRemoteMediator(
-            WallhavenSearchQuery(includedTags = setOf("test")),
+            WallhavenFilters(includedTags = setOf("test")),
             mockDb,
             wallHavenNetworkDataSource,
         )
@@ -119,7 +119,7 @@ class WallpapersRemoteMediatorTest {
     fun refreshLoadReturnsErrorResultWhenErrorOccurs() = runTest {
         mockNetworkApi.failureMsg = "Throw test failure"
         val remoteMediator = WallpapersRemoteMediator(
-            WallhavenSearchQuery(includedTags = setOf("test")),
+            WallhavenFilters(includedTags = setOf("test")),
             mockDb,
             wallHavenNetworkDataSource,
         )
@@ -135,7 +135,7 @@ class WallpapersRemoteMediatorTest {
 
     @Test
     fun refreshLoadUpdateRemoteKeyLastUpdated() = runTest {
-        val searchQuery = WallhavenSearchQuery(includedTags = setOf("test"))
+        val searchQuery = WallhavenFilters(includedTags = setOf("test"))
         val remoteMediator = WallpapersRemoteMediator(
             searchQuery,
             mockDb,
@@ -164,7 +164,7 @@ class WallpapersRemoteMediatorTest {
     @Test
     fun refreshLoadSameQueryUpdateWallpapers() = runTest {
         val queryStr = "test"
-        val searchQuery = WallhavenSearchQuery(includedTags = setOf(queryStr))
+        val searchQuery = WallhavenFilters(includedTags = setOf(queryStr))
 
         val queryWallpapers1 = MockFactory.generateNetworkWallpapers(20)
         val queryWallpaperWallhavenIds = queryWallpapers1.map { it.id }
@@ -221,9 +221,9 @@ class WallpapersRemoteMediatorTest {
     @Test
     fun refreshLoadMultipleQueries() = runTest {
         val queryStr1 = "test1"
-        val searchQuery1 = WallhavenSearchQuery(includedTags = setOf(queryStr1))
+        val searchQuery1 = WallhavenFilters(includedTags = setOf(queryStr1))
         val queryStr2 = "test2"
-        val searchQuery2 = WallhavenSearchQuery(includedTags = setOf(queryStr2))
+        val searchQuery2 = WallhavenFilters(includedTags = setOf(queryStr2))
 
         val query1Wallpapers = MockFactory.generateNetworkWallpapers(20)
         mockNetworkApi.setWallpapersForQuery(

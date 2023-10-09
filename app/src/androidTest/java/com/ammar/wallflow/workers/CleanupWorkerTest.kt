@@ -15,10 +15,10 @@ import com.ammar.wallflow.MockFactory
 import com.ammar.wallflow.data.db.AppDatabase
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
-import com.ammar.wallflow.data.network.model.NetworkWallhavenMeta
-import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpaper
-import com.ammar.wallflow.data.network.model.StringNetworkWallhavenMetaQuery
-import com.ammar.wallflow.data.network.model.toWallpaperEntity
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenMeta
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenWallpaper
+import com.ammar.wallflow.data.network.model.wallhaven.StringNetworkWallhavenMetaQuery
+import com.ammar.wallflow.data.network.model.wallhaven.toWallpaperEntity
 import com.ammar.wallflow.data.network.retrofit.RetrofitWallhavenNetwork
 import com.ammar.wallflow.data.repository.MockWallhavenNetworkApi
 import com.ammar.wallflow.data.repository.WallpapersRemoteMediator
@@ -26,7 +26,7 @@ import com.ammar.wallflow.extensions.getFileNameFromUrl
 import com.ammar.wallflow.extensions.getTempDir
 import com.ammar.wallflow.extensions.getTempFile
 import com.ammar.wallflow.model.Source
-import com.ammar.wallflow.model.search.WallhavenSearchQuery
+import com.ammar.wallflow.model.search.WallhavenFilters
 import io.mockk.every
 import io.mockk.mockkStatic
 import io.mockk.slot
@@ -96,7 +96,7 @@ class CleanupWorkerTest {
         val clock = TestClock(Clock.System.now())
         val query = "test"
         simulateSearch(clock, query)
-        val searchQueryDao = db.searchQueryDao()
+        val searchQueryDao = db.wallhavenSearchQueryDao()
         val wallpapersDao = db.wallhavenWallpapersDao()
         assertEquals(20, wallpapersDao.count())
         assertEquals(1, searchQueryDao.count())
@@ -132,7 +132,7 @@ class CleanupWorkerTest {
 
     @Test
     fun testCleanupWorker2QueriesUniqueWalls() = runTest(testDispatcher) {
-        val searchQueryDao = db.searchQueryDao()
+        val searchQueryDao = db.wallhavenSearchQueryDao()
         val wallpapersDao = db.wallhavenWallpapersDao()
 
         val clock = TestClock(Clock.System.now())
@@ -165,7 +165,7 @@ class CleanupWorkerTest {
 
     @Test
     fun testCleanupWorker2QueriesOnDifferentDatesUniqueWalls() = runTest(testDispatcher) {
-        val searchQueryDao = db.searchQueryDao()
+        val searchQueryDao = db.wallhavenSearchQueryDao()
         val wallpapersDao = db.wallhavenWallpapersDao()
 
         val clock = TestClock(Clock.System.now())
@@ -228,7 +228,7 @@ class CleanupWorkerTest {
 
     @Test
     fun testCleanupWorker2QueriesOnSamesDatesCommonWalls() = runTest(testDispatcher) {
-        val searchQueryDao = db.searchQueryDao()
+        val searchQueryDao = db.wallhavenSearchQueryDao()
         val wallpapersDao = db.wallhavenWallpapersDao()
 
         val clock = TestClock(Clock.System.now())
@@ -295,7 +295,7 @@ class CleanupWorkerTest {
 
     @Test
     fun testCleanupWorker2QueriesOnDifferentDatesCommonWalls() = runTest(testDispatcher) {
-        val searchQueryDao = db.searchQueryDao()
+        val searchQueryDao = db.wallhavenSearchQueryDao()
         val wallpapersDao = db.wallhavenWallpapersDao()
 
         val clock = TestClock(Clock.System.now())
@@ -424,7 +424,7 @@ class CleanupWorkerTest {
 
     @Test
     fun testCleanupWorker1QueriesWithFavoriteWalls() = runTest(testDispatcher) {
-        val searchQueryDao = db.searchQueryDao()
+        val searchQueryDao = db.wallhavenSearchQueryDao()
         val wallpapersDao = db.wallhavenWallpapersDao()
         val favoriteDao = db.favoriteDao()
 
@@ -486,7 +486,7 @@ class CleanupWorkerTest {
         mockNetworkWallhavenWallpapers: List<NetworkWallhavenWallpaper> =
             MockFactory.generateNetworkWallpapers(20),
     ) {
-        val searchQuery = WallhavenSearchQuery(includedTags = setOf(query))
+        val searchQuery = WallhavenFilters(includedTags = setOf(query))
         mockNetworkApi.setWallpapersForQuery(
             query = searchQuery.getQString(),
             networkWallhavenWallpapers = mockNetworkWallhavenWallpapers,

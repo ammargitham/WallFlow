@@ -1,13 +1,13 @@
 package com.ammar.wallflow
 
-import com.ammar.wallflow.data.network.model.NetworkWallhavenTag
-import com.ammar.wallflow.data.network.model.NetworkWallhavenThumbs
-import com.ammar.wallflow.data.network.model.NetworkWallhavenUploader
-import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpaper
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenTag
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenThumbs
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenUploader
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenWallpaper
 import com.ammar.wallflow.extensions.toHexString
+import com.ammar.wallflow.model.search.WallhavenFilters
 import com.ammar.wallflow.model.search.WallhavenSavedSearch
 import com.ammar.wallflow.model.search.WallhavenSearch
-import com.ammar.wallflow.model.search.WallhavenSearchQuery
 import kotlin.math.absoluteValue
 import kotlin.random.Random
 import kotlinx.datetime.Clock
@@ -96,7 +96,7 @@ object MockFactory {
             name = "saved_search_$id",
             search = WallhavenSearch(
                 query = "test_q_$id",
-                filters = WallhavenSearchQuery(),
+                filters = WallhavenFilters(),
             ),
         )
     }

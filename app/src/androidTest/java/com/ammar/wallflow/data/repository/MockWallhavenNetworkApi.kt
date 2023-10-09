@@ -1,8 +1,8 @@
 package com.ammar.wallflow.data.repository
 
-import com.ammar.wallflow.data.network.model.NetworkWallhavenMeta
-import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpaper
-import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpapersResponse
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenMeta
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenWallpaper
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenWallpapersResponse
 import com.ammar.wallflow.data.network.retrofit.api.WallhavenNetworkApi
 import java.io.IOException
 

@@ -17,14 +17,14 @@ import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperTagsEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallpaperWithUploaderAndTags
 import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
-import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpaperResponse
-import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpapersResponse
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenWallpaperResponse
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenWallpapersResponse
 import com.ammar.wallflow.data.repository.local.LocalWallpapersRepository
 import com.ammar.wallflow.data.repository.utils.Resource
 import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.local.LocalWallpaper
-import com.ammar.wallflow.model.search.WallhavenSearchQuery
+import com.ammar.wallflow.model.search.WallhavenFilters
 import com.ammar.wallflow.ui.screens.local.LocalSort
 import kotlinx.coroutines.flow.Flow
 import okhttp3.Call
@@ -127,7 +127,7 @@ internal open class FakeObjectDetectionModelDao : ObjectDetectionModelDao {
 
 internal open class FakeWallhavenNetworkDataSource : WallhavenNetworkDataSource {
     override suspend fun search(
-        searchQuery: WallhavenSearchQuery,
+        searchQuery: WallhavenFilters,
         page: Int?,
     ): NetworkWallhavenWallpapersResponse {
         throw RuntimeException()

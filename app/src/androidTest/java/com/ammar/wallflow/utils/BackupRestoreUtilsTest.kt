@@ -14,8 +14,8 @@ import com.ammar.wallflow.MockFactory
 import com.ammar.wallflow.data.db.AppDatabase
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperTagsEntity
-import com.ammar.wallflow.data.network.model.toEntity
-import com.ammar.wallflow.data.network.model.toWallpaperEntity
+import com.ammar.wallflow.data.network.model.wallhaven.toEntity
+import com.ammar.wallflow.data.network.model.wallhaven.toWallpaperEntity
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.FavoritesRepository
 import com.ammar.wallflow.data.repository.SavedSearchRepository
@@ -53,7 +53,7 @@ class BackupRestoreUtilsTest {
     private val tagsDao = mockDb.wallhavenTagsDao()
     private val uploadersDao = mockDb.wallhavenUploadersDao()
     private val favoriteDao = mockDb.favoriteDao()
-    private val savedSearchDao = mockDb.savedSearchDao()
+    private val savedSearchDao = mockDb.wallhavenSavedSearchDao()
     private val random = Random(1000)
     private val clock = TestClock(now = Instant.fromEpochMilliseconds(1694954538))
 

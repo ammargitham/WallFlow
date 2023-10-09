@@ -26,14 +26,14 @@ import com.ammar.wallflow.data.db.entity.AutoWallpaperHistoryEntity
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.toWallpaper
 import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
-import com.ammar.wallflow.data.network.model.NetworkWallhavenMeta
-import com.ammar.wallflow.data.network.model.NetworkWallhavenTag
-import com.ammar.wallflow.data.network.model.NetworkWallhavenThumbs
-import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpaper
-import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpapersResponse
-import com.ammar.wallflow.data.network.model.StringNetworkWallhavenMetaQuery
-import com.ammar.wallflow.data.network.model.toWallhavenWallpaper
-import com.ammar.wallflow.data.network.model.toWallpaperEntity
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenMeta
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenTag
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenThumbs
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenWallpaper
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenWallpapersResponse
+import com.ammar.wallflow.data.network.model.wallhaven.StringNetworkWallhavenMetaQuery
+import com.ammar.wallflow.data.network.model.wallhaven.toWallhavenWallpaper
+import com.ammar.wallflow.data.network.model.wallhaven.toWallpaperEntity
 import com.ammar.wallflow.data.preferences.AutoWallpaperPreferences
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.AutoWallpaperHistoryRepository
@@ -45,9 +45,9 @@ import com.ammar.wallflow.extensions.getTempFile
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.model.local.LocalWallpaper
+import com.ammar.wallflow.model.search.WallhavenFilters
 import com.ammar.wallflow.model.search.WallhavenSavedSearch
 import com.ammar.wallflow.model.search.WallhavenSearch
-import com.ammar.wallflow.model.search.WallhavenSearchQuery
 import com.ammar.wallflow.model.search.toEntity
 import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.FAILURE_REASON
 import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.FailureReason
@@ -187,7 +187,7 @@ class AutoWallpaperTest {
                 name = "Test",
                 search = WallhavenSearch(
                     query = "test",
-                    filters = WallhavenSearchQuery(),
+                    filters = WallhavenFilters(),
                 ),
             )
             val networkWallpapers = List(30) { testNetworkWallhavenWallpaper }
@@ -219,7 +219,7 @@ class AutoWallpaperTest {
                 autoWallpaperHistoryDao = autoWallpaperHistoryDao,
                 wallHavenNetwork = object : FakeWallhavenNetworkDataSource() {
                     override suspend fun search(
-                        searchQuery: WallhavenSearchQuery,
+                        searchQuery: WallhavenFilters,
                         page: Int?,
                     ) = NetworkWallhavenWallpapersResponse(
                         data = networkWallpapers,
@@ -277,7 +277,7 @@ class AutoWallpaperTest {
                 name = "Test",
                 search = WallhavenSearch(
                     query = "test",
-                    filters = WallhavenSearchQuery(),
+                    filters = WallhavenFilters(),
                 ),
             )
             val networkWallpapers = List(30) { testNetworkWallhavenWallpaper }
@@ -319,7 +319,7 @@ class AutoWallpaperTest {
                 autoWallpaperHistoryDao = autoWallpaperHistoryDao,
                 wallHavenNetwork = object : FakeWallhavenNetworkDataSource() {
                     override suspend fun search(
-                        searchQuery: WallhavenSearchQuery,
+                        searchQuery: WallhavenFilters,
                         page: Int?,
                     ) = NetworkWallhavenWallpapersResponse(
                         data = networkWallpapers,
@@ -377,7 +377,7 @@ class AutoWallpaperTest {
                 name = "Test",
                 search = WallhavenSearch(
                     query = "test",
-                    filters = WallhavenSearchQuery(),
+                    filters = WallhavenFilters(),
                 ),
             )
             val networkWallpapers = List(30) { testNetworkWallhavenWallpaper }
@@ -422,7 +422,7 @@ class AutoWallpaperTest {
                 autoWallpaperHistoryDao = autoWallpaperHistoryDao,
                 wallHavenNetwork = object : FakeWallhavenNetworkDataSource() {
                     override suspend fun search(
-                        searchQuery: WallhavenSearchQuery,
+                        searchQuery: WallhavenFilters,
                         page: Int?,
                     ) = NetworkWallhavenWallpapersResponse(
                         data = networkWallpapers,
