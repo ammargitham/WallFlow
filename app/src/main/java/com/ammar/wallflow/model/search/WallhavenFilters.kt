@@ -9,7 +9,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntSize
 import androidx.core.graphics.toColorInt
 import com.ammar.wallflow.data.db.converters.Converters.fromIntSizeStr
-import com.ammar.wallflow.extensions.quoteIfSpaced
 import com.ammar.wallflow.extensions.toHexString
 import com.ammar.wallflow.extensions.toQueryString
 import com.ammar.wallflow.extensions.urlDecoded
@@ -65,34 +64,6 @@ data class WallhavenFilters(
         "colors" to (colors?.toHexString() ?: ""),
         "seed" to (seed ?: ""),
     )
-
-    fun getQString(): String {
-        return ArrayList<String>().apply {
-            val i = includedTags
-                .filter { it.isNotBlank() }
-                .joinToString(" ") { "+${it.quoteIfSpaced()}" }
-            if (i.isNotBlank()) {
-                add(i)
-            }
-            val e = excludedTags
-                .filter { it.isNotBlank() }
-                .joinToString(" ") { "-${it.quoteIfSpaced()}" }
-            if (e.isNotBlank()) {
-                add(e)
-            }
-            username?.run {
-                if (this.isNotBlank()) {
-                    this@apply.add("@$this")
-                }
-            }
-            tagId?.run {
-                this@apply.add("id:$this")
-            }
-            wallpaperId?.run {
-                this@apply.add("like:$this")
-            }
-        }.joinToString(" ")
-    }
 
     fun toQueryString() = toStringMap().toQueryString()
 
