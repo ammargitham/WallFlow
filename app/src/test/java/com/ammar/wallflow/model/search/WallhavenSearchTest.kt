@@ -18,7 +18,7 @@ class WallhavenSearchTest {
         var searchStr = "query=test&filters=includedTags%3Dtest%26excludedTags%3D%26" +
             "username%3D%26tagId%3D%26wallpaperId%3D%26categories%3Danime%252Cgeneral%252C" +
             "people%26purity%3Dsfw%26sorting%3Ddate_added%26order%3Ddesc%26topRange%3D1M%26" +
-            "atleast%3D%26resolutions%3D%26ratios%3D%26colors%3D%26seed%3D&meta="
+            "atleast%3D%26resolutions%3D%26ratios%3D%26colors%3D%26seed%3D&meta=null"
         assertEquals(
             searchStr,
             search.toQueryString(),
@@ -43,11 +43,11 @@ class WallhavenSearchTest {
         searchStr = "query=test&filters=includedTags%3Dtest%26excludedTags%3D%26username%3D%26" +
             "tagId%3D%26wallpaperId%3D%26categories%3Danime%252Cgeneral%252Cpeople%26" +
             "purity%3Dsfw%26sorting%3Ddate_added%26order%3Ddesc%26topRange%3D1M%26atleast%3D%26" +
-            "resolutions%3D%26ratios%3D%26colors%3D%26seed%3D&meta=type%3DWALLHAVEN_TAG%26" +
-            "tag%3D%257B%2522id%2522%253A1%252C%2522name%2522%253A%2522test%2522%252C%2522" +
-            "alias%2522%253A%255B%255D%252C%2522categoryId%2522%253A1%252C%2522" +
-            "category%2522%253A%2522test_cat%2522%252C%2522purity%2522%253A%2522" +
-            "SFW%2522%252C%2522createdAt%2522%253A%25222023-10-09T14%253A02%253A59Z%2522%257D"
+            "resolutions%3D%26ratios%3D%26colors%3D%26seed%3D&meta=%7B%22type%22%3A%22" +
+            "com.ammar.wallflow.model.search.WallhavenTagSearchMeta%22%2C%22" +
+            "tag%22%3A%7B%22id%22%3A1%2C%22name%22%3A%22test%22%2C%22alias%22%3A%5B%5D%2C%22" +
+            "categoryId%22%3A1%2C%22category%22%3A%22test_cat%22%2C%22purity%22%3A%22SFW%22%2C%22" +
+            "createdAt%22%3A%222023-10-09T14%3A02%3A59Z%22%7D%7D"
         assertEquals(
             searchStr,
             search.toQueryString(),
@@ -74,11 +74,11 @@ class WallhavenSearchTest {
         searchStr = "query=test&filters=includedTags%3Dtest%26excludedTags%3D%26username%3D%26" +
             "tagId%3D%26wallpaperId%3D%26categories%3Danime%252Cgeneral%252Cpeople%26" +
             "purity%3Dsfw%26sorting%3Ddate_added%26order%3Ddesc%26topRange%3D1M%26atleast%3D%26" +
-            "resolutions%3D%26ratios%3D%26colors%3D%26seed%3D&meta=type%3DWALLHAVEN_TAG%26" +
-            "tag%3D%257B%2522id%2522%253A1%252C%2522name%2522%253A%2522test%2522%252C%2522" +
-            "alias%2522%253A%255B%255D%252C%2522categoryId%2522%253A1%252C%2522" +
-            "category%2522%253A%2522test_cat%2522%252C%2522purity%2522%253A%2522" +
-            "SFW%2522%252C%2522createdAt%2522%253A%25222023-10-09T14%253A02%253A59Z%2522%257D"
+            "resolutions%3D%26ratios%3D%26colors%3D%26seed%3D&meta=%7B%22" +
+            "type%22%3A%22com.ammar.wallflow.model.search.WallhavenTagSearchMeta%22%2C%22" +
+            "tag%22%3A%7B%22id%22%3A1%2C%22name%22%3A%22test%22%2C%22alias%22%3A%5B%5D%2C%22" +
+            "categoryId%22%3A1%2C%22category%22%3A%22test_cat%22%2C%22purity%22%3A%22SFW%22%2C%22" +
+            "createdAt%22%3A%222023-10-09T14%3A02%3A59Z%22%7D%7D"
         search = WallhavenSearch(
             query = "test",
             filters = WallhavenFilters(includedTags = setOf("test")),

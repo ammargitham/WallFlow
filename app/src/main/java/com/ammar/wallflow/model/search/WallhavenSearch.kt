@@ -12,6 +12,8 @@ import com.ammar.wallflow.extensions.toQueryString
 import com.ammar.wallflow.extensions.trimAll
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 @Serializable
 data class WallhavenSearch(
@@ -22,7 +24,7 @@ data class WallhavenSearch(
     private fun toStringMap() = mapOf(
         "query" to query,
         "filters" to filters.toQueryString(),
-        "meta" to (meta?.toQueryString() ?: ""),
+        "meta" to Json.encodeToString(meta),
     )
 
     fun toQueryString(
@@ -115,10 +117,10 @@ data class WallhavenSearch(
                 }
             }
             val metaStr = map["meta"]
-            val meta = if (metaStr == null) {
+            val meta: SearchMeta? = if (metaStr.isNullOrBlank()) {
                 null
             } else {
-                SearchMeta.fromQueryString(metaStr)
+                Json.decodeFromString(metaStr)
             }
             return WallhavenSearch(
                 query = query ?: "",
