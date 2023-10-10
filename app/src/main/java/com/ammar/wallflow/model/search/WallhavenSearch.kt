@@ -1,9 +1,13 @@
 package com.ammar.wallflow.model.search
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.saveable.Saver
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSearchHistoryEntity
+import com.ammar.wallflow.extensions.TAG
+import com.ammar.wallflow.extensions.fromQueryString
+import com.ammar.wallflow.extensions.toQueryString
 import com.ammar.wallflow.extensions.trimAll
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
@@ -13,7 +17,52 @@ data class WallhavenSearch(
     val query: String = "",
     val filters: WallhavenFilters = WallhavenFilters(),
     val meta: SearchMeta? = null,
-)
+) {
+    private fun toStringMap() = mapOf(
+        "query" to query,
+        "filters" to filters.toQueryString(),
+        "meta" to (meta?.toQueryString() ?: ""),
+    )
+
+    fun toQueryString() = toStringMap().toQueryString()
+
+    companion object {
+        fun fromQueryString(string: String): WallhavenSearch {
+            val map = string.fromQueryString()
+            val query = map["query"]
+            var filters: WallhavenFilters? = null
+            if (query == null) {
+                // for backwards compat, check if is a WallhavenFilters qs
+                try {
+                    filters = WallhavenFilters.fromQueryString(string)
+                } catch (e: Exception) {
+                    // if not even WallhavenFilters qs return default
+                    Log.e(TAG, "fromQueryString: ", e)
+                    return WallhavenSearch()
+                }
+            }
+            if (filters == null) {
+                val filtersStr = map["filters"]
+                filters = if (filtersStr == null) {
+                    WallhavenFilters()
+                } else {
+                    WallhavenFilters.fromQueryString(filtersStr)
+                }
+            }
+            val metaStr = map["meta"]
+            val meta = if (metaStr == null) {
+                null
+            } else {
+                SearchMeta.fromQueryString(metaStr)
+            }
+            return WallhavenSearch(
+                query = query ?: "",
+                filters = filters,
+                meta = meta,
+            )
+        }
+    }
+}
 
 fun WallhavenSearch.toSearchHistoryEntity(
     id: Long = 0,
