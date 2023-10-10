@@ -1,14 +1,10 @@
 package com.ammar.wallflow.model.search
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.runtime.saveable.Saver
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSearchHistoryEntity
-import com.ammar.wallflow.extensions.TAG
-import com.ammar.wallflow.extensions.fromQueryString
 import com.ammar.wallflow.extensions.quoteIfSpaced
-import com.ammar.wallflow.extensions.toQueryString
 import com.ammar.wallflow.extensions.trimAll
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
@@ -21,19 +17,13 @@ data class WallhavenSearch(
     val filters: WallhavenFilters = WallhavenFilters(),
     val meta: SearchMeta? = null,
 ) {
-    private fun toStringMap() = mapOf(
-        "query" to query,
-        "filters" to filters.toQueryString(),
-        "meta" to Json.encodeToString(meta),
-    )
-
     fun toQueryString(
         backwardsCompat: Boolean = false,
     ): String {
         if (backwardsCompat) {
             return getQueryCombinedFilters().toQueryString()
         }
-        return toStringMap().toQueryString()
+        return Json.encodeToString(this)
     }
 
     fun getApiQueryString() = with(getQueryCombinedFilters()) {
@@ -94,39 +84,18 @@ data class WallhavenSearch(
     }
 
     companion object {
-        fun fromQueryString(string: String): WallhavenSearch {
-            val map = string.fromQueryString()
-            val query = map["query"]
-            var filters: WallhavenFilters? = null
-            if (query == null) {
-                // for backwards compat, check if is a WallhavenFilters qs
-                try {
-                    filters = WallhavenFilters.fromQueryString(string)
-                } catch (e: Exception) {
-                    // if not even WallhavenFilters qs return default
-                    Log.e(TAG, "fromQueryString: ", e)
-                    return WallhavenSearch()
-                }
+        fun fromQueryString(string: String) = try {
+            Json.decodeFromString(string)
+        } catch (e: Exception) {
+            // for backwards compat, check if is a WallhavenFilters qs
+            try {
+                WallhavenSearch(
+                    filters = WallhavenFilters.fromQueryString(string),
+                )
+            } catch (e: Exception) {
+                // if not even WallhavenFilters qs return default
+                WallhavenSearch()
             }
-            if (filters == null) {
-                val filtersStr = map["filters"]
-                filters = if (filtersStr == null) {
-                    WallhavenFilters()
-                } else {
-                    WallhavenFilters.fromQueryString(filtersStr)
-                }
-            }
-            val metaStr = map["meta"]
-            val meta: SearchMeta? = if (metaStr.isNullOrBlank()) {
-                null
-            } else {
-                Json.decodeFromString(metaStr)
-            }
-            return WallhavenSearch(
-                query = query ?: "",
-                filters = filters,
-                meta = meta,
-            )
         }
     }
 }

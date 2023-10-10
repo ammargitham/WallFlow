@@ -15,10 +15,7 @@ class WallhavenSearchTest {
             filters = WallhavenFilters(includedTags = setOf("test")),
             meta = null,
         )
-        var searchStr = "query=test&filters=includedTags%3Dtest%26excludedTags%3D%26" +
-            "username%3D%26tagId%3D%26wallpaperId%3D%26categories%3Danime%252Cgeneral%252C" +
-            "people%26purity%3Dsfw%26sorting%3Ddate_added%26order%3Ddesc%26topRange%3D1M%26" +
-            "atleast%3D%26resolutions%3D%26ratios%3D%26colors%3D%26seed%3D&meta=null"
+        var searchStr = "{\"query\":\"test\",\"filters\":{\"includedTags\":[\"test\"]}}"
         assertEquals(
             searchStr,
             search.toQueryString(),
@@ -40,26 +37,35 @@ class WallhavenSearchTest {
                 ),
             ),
         )
-        searchStr = "query=test&filters=includedTags%3Dtest%26excludedTags%3D%26username%3D%26" +
-            "tagId%3D%26wallpaperId%3D%26categories%3Danime%252Cgeneral%252Cpeople%26" +
-            "purity%3Dsfw%26sorting%3Ddate_added%26order%3Ddesc%26topRange%3D1M%26atleast%3D%26" +
-            "resolutions%3D%26ratios%3D%26colors%3D%26seed%3D&meta=%7B%22type%22%3A%22" +
-            "com.ammar.wallflow.model.search.WallhavenTagSearchMeta%22%2C%22" +
-            "tag%22%3A%7B%22id%22%3A1%2C%22name%22%3A%22test%22%2C%22alias%22%3A%5B%5D%2C%22" +
-            "categoryId%22%3A1%2C%22category%22%3A%22test_cat%22%2C%22purity%22%3A%22SFW%22%2C%22" +
-            "createdAt%22%3A%222023-10-09T14%3A02%3A59Z%22%7D%7D"
+        searchStr = "{\"query\":\"test\",\"filters\":{\"includedTags\":[\"test\"]}," +
+            "\"meta\":{\"type\":\"WallhavenTagSearchMeta\"," +
+            "\"tag\":{\"id\":1,\"name\":\"test\",\"alias\":[],\"categoryId\":1," +
+            "\"category\":\"test_cat\",\"purity\":\"SFW\",\"createdAt\":\"2023-10-09T14:02:59Z\"}}}"
         assertEquals(
             searchStr,
             search.toQueryString(),
+        )
+
+        search = WallhavenSearch(
+            query = "",
+            filters = WallhavenFilters(includedTags = setOf("test")),
+            meta = null,
+        )
+        // backwards compat
+        searchStr = "includedTags=test&excludedTags=&username=&tagId=&wallpaperId=" +
+            "&categories=anime%2Cgeneral%2Cpeople&purity=sfw&sorting=date_added&order=desc" +
+            "&topRange=1M&atleast=&resolutions=&ratios=&colors=&seed="
+        assertEquals(
+            searchStr,
+            search.toQueryString(
+                backwardsCompat = true,
+            ),
         )
     }
 
     @Test
     fun `should convert qs to WallhavenSearch`() {
-        var searchStr = "query=test&filters=includedTags%3Dtest%26excludedTags%3D%26" +
-            "username%3D%26tagId%3D%26wallpaperId%3D%26categories%3Danime%252Cgeneral%252C" +
-            "people%26purity%3Dsfw%26sorting%3Ddate_added%26order%3Ddesc%26topRange%3D1M%26" +
-            "atleast%3D%26resolutions%3D%26ratios%3D%26colors%3D%26seed%3D&meta="
+        var searchStr = "{\"query\":\"test\",\"filters\":{\"includedTags\":[\"test\"]}}"
         var search = WallhavenSearch(
             query = "test",
             filters = WallhavenFilters(includedTags = setOf("test")),
@@ -71,14 +77,10 @@ class WallhavenSearchTest {
         )
 
         val createdAt = TestClock(now = Instant.fromEpochSeconds(1696860179))
-        searchStr = "query=test&filters=includedTags%3Dtest%26excludedTags%3D%26username%3D%26" +
-            "tagId%3D%26wallpaperId%3D%26categories%3Danime%252Cgeneral%252Cpeople%26" +
-            "purity%3Dsfw%26sorting%3Ddate_added%26order%3Ddesc%26topRange%3D1M%26atleast%3D%26" +
-            "resolutions%3D%26ratios%3D%26colors%3D%26seed%3D&meta=%7B%22" +
-            "type%22%3A%22com.ammar.wallflow.model.search.WallhavenTagSearchMeta%22%2C%22" +
-            "tag%22%3A%7B%22id%22%3A1%2C%22name%22%3A%22test%22%2C%22alias%22%3A%5B%5D%2C%22" +
-            "categoryId%22%3A1%2C%22category%22%3A%22test_cat%22%2C%22purity%22%3A%22SFW%22%2C%22" +
-            "createdAt%22%3A%222023-10-09T14%3A02%3A59Z%22%7D%7D"
+        searchStr = "{\"query\":\"test\",\"filters\":{\"includedTags\":[\"test\"]}," +
+            "\"meta\":{\"type\":\"WallhavenTagSearchMeta\"," +
+            "\"tag\":{\"id\":1,\"name\":\"test\",\"alias\":[],\"categoryId\":1," +
+            "\"category\":\"test_cat\",\"purity\":\"SFW\",\"createdAt\":\"2023-10-09T14:02:59Z\"}}}"
         search = WallhavenSearch(
             query = "test",
             filters = WallhavenFilters(includedTags = setOf("test")),
