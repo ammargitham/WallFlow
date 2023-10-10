@@ -2,6 +2,7 @@ package com.ammar.wallflow.data.repository
 
 import android.util.Log
 import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
@@ -64,81 +65,118 @@ class AppPreferencesRepository @Inject constructor(
         .flowOn(ioDispatcher)
 
     suspend fun updateWallhavenApiKey(wallhavenApiKey: String) = withContext(ioDispatcher) {
-        dataStore.edit { it[PreferencesKeys.WALLHAVEN_API_KEY] = wallhavenApiKey }
+        dataStore.edit { it.updateWallhavenApikey(wallhavenApiKey) }
     }
 
     suspend fun updateHomeWallhavenSearch(search: WallhavenSearch) = withContext(ioDispatcher) {
-        dataStore.edit {
-            it[PreferencesKeys.HOME_WALLHAVEN_SEARCH_QUERY] = search.query
-            it[PreferencesKeys.HOME_WALLHAVEN_FILTERS] = search.filters.toQueryString()
-        }
+        dataStore.edit { it.updateHomeWallhavenSearch(search) }
     }
 
     suspend fun updateHomeRedditSearch(search: RedditSearch) = withContext(ioDispatcher) {
-        dataStore.edit {
-            it[PreferencesKeys.HOME_REDDIT_SEARCH] = search.toQueryString()
-        }
+        dataStore.edit { it.updateHomeRedditSearch(search) }
     }
 
     suspend fun updateBlurSketchy(blurSketchy: Boolean) = withContext(ioDispatcher) {
-        dataStore.edit { it[PreferencesKeys.BLUR_SKETCHY] = blurSketchy }
+        dataStore.edit { it.updateBlurSketchy(blurSketchy) }
     }
 
     suspend fun updateBlurNsfw(blurNsfw: Boolean) = withContext(ioDispatcher) {
-        dataStore.edit { it[PreferencesKeys.BLUR_NSFW] = blurNsfw }
+        dataStore.edit { it.updateBlurNsfw(blurNsfw) }
     }
 
-    suspend fun updateObjectDetectionPrefs(objectDetectionPreferences: ObjectDetectionPreferences) =
-        withContext(ioDispatcher) {
-            dataStore.edit {
-                with(objectDetectionPreferences) {
-                    it[PreferencesKeys.ENABLE_OBJECT_DETECTION] = enabled
-                    it[PreferencesKeys.OBJECT_DETECTION_DELEGATE] = delegate.name
-                    it[PreferencesKeys.OBJECT_DETECTION_MODEL_ID] = modelId
-                }
-            }
+    suspend fun updateObjectDetectionPrefs(
+        objectDetectionPreferences: ObjectDetectionPreferences,
+    ) = withContext(ioDispatcher) {
+        dataStore.edit {
+            it.updateObjectDetectionPrefs(objectDetectionPreferences)
         }
+    }
 
-    suspend fun updateAutoWallpaperPrefs(autoWallpaperPreferences: AutoWallpaperPreferences) =
-        withContext(ioDispatcher) {
-            dataStore.edit {
-                with(autoWallpaperPreferences) {
-                    it[PreferencesKeys.ENABLE_AUTO_WALLPAPER] = enabled
-                    it[PreferencesKeys.AUTO_WALLPAPER_SAVED_SEARCH_ENABLED] = savedSearchEnabled
-                    it[PreferencesKeys.AUTO_WALLPAPER_FAVORITES_ENABLED] = favoritesEnabled
-                    it[PreferencesKeys.AUTO_WALLPAPER_LOCAL_ENABLED] = localEnabled
-                    it[PreferencesKeys.AUTO_WALLPAPER_SAVED_SEARCH_ID] = savedSearchId
-                    it[PreferencesKeys.AUTO_WALLPAPER_USE_OBJECT_DETECTION] = useObjectDetection
-                    it[PreferencesKeys.AUTO_WALLPAPER_FREQUENCY] = frequency.toString()
-                    it[PreferencesKeys.AUTO_WALLPAPER_CONSTRAINTS] = Json.encodeToString(
-                        constraintTypeMapSerializer,
-                        constraints.toConstraintTypeMap(),
-                    )
-                    it[PreferencesKeys.AUTO_WALLPAPER_SHOW_NOTIFICATION] = showNotification
-                    it[PreferencesKeys.AUTO_WALLPAPER_TARGETS] = targets.map {
-                        it.name
-                    }.toSet()
-                    it[PreferencesKeys.AUTO_WALLPAPER_MARK_FAVORITE] = markFavorite
-                    it[PreferencesKeys.AUTO_WALLPAPER_DOWNLOAD] = download
-                }
-            }
+    suspend fun updateAutoWallpaperPrefs(
+        autoWallpaperPreferences: AutoWallpaperPreferences,
+    ) = withContext(ioDispatcher) {
+        dataStore.edit {
+            it.updateAutoWallpaperPrefs(autoWallpaperPreferences)
         }
+    }
 
-    suspend fun updateLookAndFeelPreferences(lookAndFeelPreferences: LookAndFeelPreferences) =
-        withContext(ioDispatcher) {
-            dataStore.edit {
-                with(lookAndFeelPreferences) {
-                    it[PreferencesKeys.THEME] = theme.name
-                    it[PreferencesKeys.LAYOUT_GRID_TYPE] = layoutPreferences.gridType.name
-                    it[PreferencesKeys.LAYOUT_GRID_COL_TYPE] = layoutPreferences.gridColType.name
-                    it[PreferencesKeys.LAYOUT_GRID_COL_COUNT] = layoutPreferences.gridColCount
-                    it[PreferencesKeys.LAYOUT_GRID_COL_MIN_WIDTH_PCT] =
-                        layoutPreferences.gridColMinWidthPct
-                    it[PreferencesKeys.LAYOUT_ROUNDED_CORNERS] = layoutPreferences.roundedCorners
-                    it[PreferencesKeys.SHOW_LOCAL_TAB] = showLocalTab
-                }
-            }
+    suspend fun updateLookAndFeelPreferences(
+        lookAndFeelPreferences: LookAndFeelPreferences,
+    ) = withContext(ioDispatcher) {
+        dataStore.edit {
+            it.updateLookAndFeelPreferences(lookAndFeelPreferences)
         }
+    }
+
+    private fun MutablePreferences.updateWallhavenApikey(wallhavenApiKey: String) {
+        set(PreferencesKeys.WALLHAVEN_API_KEY, wallhavenApiKey)
+    }
+
+    private fun MutablePreferences.updateHomeWallhavenSearch(search: WallhavenSearch) {
+        set(PreferencesKeys.HOME_WALLHAVEN_SEARCH_QUERY, search.query)
+        set(PreferencesKeys.HOME_WALLHAVEN_FILTERS, search.filters.toQueryString())
+    }
+
+    private fun MutablePreferences.updateHomeRedditSearch(search: RedditSearch) {
+        set(PreferencesKeys.HOME_REDDIT_SEARCH, search.toQueryString())
+    }
+
+    private fun MutablePreferences.updateBlurSketchy(blurSketchy: Boolean) {
+        set(PreferencesKeys.BLUR_SKETCHY, blurSketchy)
+    }
+
+    private fun MutablePreferences.updateBlurNsfw(blurNsfw: Boolean) {
+        set(PreferencesKeys.BLUR_NSFW, blurNsfw)
+    }
+
+    private fun MutablePreferences.updateObjectDetectionPrefs(
+        objectDetectionPreferences: ObjectDetectionPreferences,
+    ) = with(objectDetectionPreferences) {
+        set(PreferencesKeys.ENABLE_OBJECT_DETECTION, enabled)
+        set(PreferencesKeys.OBJECT_DETECTION_DELEGATE, delegate.name)
+        set(PreferencesKeys.OBJECT_DETECTION_MODEL_ID, modelId)
+    }
+
+    private fun MutablePreferences.updateAutoWallpaperPrefs(
+        autoWallpaperPreferences: AutoWallpaperPreferences,
+    ) = with(autoWallpaperPreferences) {
+        set(PreferencesKeys.ENABLE_AUTO_WALLPAPER, enabled)
+        set(PreferencesKeys.AUTO_WALLPAPER_SAVED_SEARCH_ENABLED, savedSearchEnabled)
+        set(PreferencesKeys.AUTO_WALLPAPER_FAVORITES_ENABLED, favoritesEnabled)
+        set(PreferencesKeys.AUTO_WALLPAPER_LOCAL_ENABLED, localEnabled)
+        set(PreferencesKeys.AUTO_WALLPAPER_SAVED_SEARCH_ID, savedSearchId)
+        set(PreferencesKeys.AUTO_WALLPAPER_USE_OBJECT_DETECTION, useObjectDetection)
+        set(PreferencesKeys.AUTO_WALLPAPER_FREQUENCY, frequency.toString())
+        set(
+            PreferencesKeys.AUTO_WALLPAPER_CONSTRAINTS,
+            Json.encodeToString(
+                constraintTypeMapSerializer,
+                constraints.toConstraintTypeMap(),
+            ),
+        )
+        set(PreferencesKeys.AUTO_WALLPAPER_SHOW_NOTIFICATION, showNotification)
+        set(
+            PreferencesKeys.AUTO_WALLPAPER_TARGETS,
+            targets.map { it.name }.toSet(),
+        )
+        set(PreferencesKeys.AUTO_WALLPAPER_MARK_FAVORITE, markFavorite)
+        set(PreferencesKeys.AUTO_WALLPAPER_DOWNLOAD, download)
+    }
+
+    private fun MutablePreferences.updateLookAndFeelPreferences(
+        lookAndFeelPreferences: LookAndFeelPreferences,
+    ) = with(lookAndFeelPreferences) {
+        set(PreferencesKeys.THEME, theme.name)
+        set(PreferencesKeys.LAYOUT_GRID_TYPE, layoutPreferences.gridType.name)
+        set(PreferencesKeys.LAYOUT_GRID_COL_TYPE, layoutPreferences.gridColType.name)
+        set(PreferencesKeys.LAYOUT_GRID_COL_COUNT, layoutPreferences.gridColCount)
+        set(
+            PreferencesKeys.LAYOUT_GRID_COL_MIN_WIDTH_PCT,
+            layoutPreferences.gridColMinWidthPct,
+        )
+        set(PreferencesKeys.LAYOUT_ROUNDED_CORNERS, layoutPreferences.roundedCorners)
+        set(PreferencesKeys.SHOW_LOCAL_TAB, showLocalTab)
+    }
 
     suspend fun updateAutoWallpaperWorkRequestId(id: UUID?) = withContext(ioDispatcher) {
         dataStore.edit {
@@ -154,8 +192,12 @@ class AppPreferencesRepository @Inject constructor(
 
     suspend fun updateLocalWallpapersSort(sort: LocalSort) = withContext(ioDispatcher) {
         dataStore.edit {
-            it[PreferencesKeys.LOCAL_WALLPAPERS_SORT] = sort.name
+            it.updateLocalWallpapersSort(sort)
         }
+    }
+
+    private fun MutablePreferences.updateLocalWallpapersSort(sort: LocalSort) {
+        set(PreferencesKeys.LOCAL_WALLPAPERS_SORT, sort.name)
     }
 
     private fun mapAppPreferences(preferences: Preferences) = AppPreferences(
@@ -325,13 +367,20 @@ class AppPreferencesRepository @Inject constructor(
     ).workRequestId
 
     suspend fun setPreferences(appPreferences: AppPreferences) {
-        updateWallhavenApiKey(appPreferences.wallhavenApiKey)
-        updateHomeWallhavenSearch(appPreferences.homeWallhavenSearch)
-        updateBlurSketchy(appPreferences.blurSketchy)
-        updateBlurNsfw(appPreferences.blurNsfw)
-        updateObjectDetectionPrefs(appPreferences.objectDetectionPreferences)
-        updateAutoWallpaperPrefs(appPreferences.autoWallpaperPreferences)
-        updateLookAndFeelPreferences(appPreferences.lookAndFeelPreferences)
-        updateLocalWallpapersSort(appPreferences.localWallpapersPreferences.sort)
+        dataStore.edit {
+            it.apply {
+                updateWallhavenApikey(appPreferences.wallhavenApiKey)
+                updateHomeWallhavenSearch(appPreferences.homeWallhavenSearch)
+                appPreferences.homeRedditSearch?.run {
+                    updateHomeRedditSearch(this@run)
+                }
+                updateBlurSketchy(appPreferences.blurSketchy)
+                updateBlurNsfw(appPreferences.blurNsfw)
+                updateObjectDetectionPrefs(appPreferences.objectDetectionPreferences)
+                updateAutoWallpaperPrefs(appPreferences.autoWallpaperPreferences)
+                updateLookAndFeelPreferences(appPreferences.lookAndFeelPreferences)
+                updateLocalWallpapersSort(appPreferences.localWallpapersPreferences.sort)
+            }
+        }
     }
 }
