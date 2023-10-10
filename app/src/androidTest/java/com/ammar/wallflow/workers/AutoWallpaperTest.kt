@@ -219,7 +219,7 @@ class AutoWallpaperTest {
                 autoWallpaperHistoryDao = autoWallpaperHistoryDao,
                 wallHavenNetwork = object : FakeWallhavenNetworkDataSource() {
                     override suspend fun search(
-                        searchQuery: WallhavenFilters,
+                        search: WallhavenSearch,
                         page: Int?,
                     ) = NetworkWallhavenWallpapersResponse(
                         data = networkWallpapers,
@@ -319,7 +319,7 @@ class AutoWallpaperTest {
                 autoWallpaperHistoryDao = autoWallpaperHistoryDao,
                 wallHavenNetwork = object : FakeWallhavenNetworkDataSource() {
                     override suspend fun search(
-                        searchQuery: WallhavenFilters,
+                        search: WallhavenSearch,
                         page: Int?,
                     ) = NetworkWallhavenWallpapersResponse(
                         data = networkWallpapers,
@@ -422,7 +422,7 @@ class AutoWallpaperTest {
                 autoWallpaperHistoryDao = autoWallpaperHistoryDao,
                 wallHavenNetwork = object : FakeWallhavenNetworkDataSource() {
                     override suspend fun search(
-                        searchQuery: WallhavenFilters,
+                        search: WallhavenSearch,
                         page: Int?,
                     ) = NetworkWallhavenWallpapersResponse(
                         data = networkWallpapers,

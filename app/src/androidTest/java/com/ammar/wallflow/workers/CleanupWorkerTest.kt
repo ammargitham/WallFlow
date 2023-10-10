@@ -27,6 +27,7 @@ import com.ammar.wallflow.extensions.getTempDir
 import com.ammar.wallflow.extensions.getTempFile
 import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.model.search.WallhavenFilters
+import com.ammar.wallflow.model.search.WallhavenSearch
 import io.mockk.every
 import io.mockk.mockkStatic
 import io.mockk.slot
@@ -486,9 +487,11 @@ class CleanupWorkerTest {
         mockNetworkWallhavenWallpapers: List<NetworkWallhavenWallpaper> =
             MockFactory.generateNetworkWallpapers(20),
     ) {
-        val searchQuery = WallhavenFilters(includedTags = setOf(query))
+        val search = WallhavenSearch(
+            filters = WallhavenFilters(includedTags = setOf(query)),
+        )
         fakeWallhavenNetworkApi.setWallpapersForQuery(
-            query = searchQuery.getQString(),
+            query = search.getApiQueryString(),
             networkWallhavenWallpapers = mockNetworkWallhavenWallpapers,
             meta = NetworkWallhavenMeta(
                 query = StringNetworkWallhavenMetaQuery(""),
@@ -499,7 +502,7 @@ class CleanupWorkerTest {
             ),
         )
         val remoteMediator = WallpapersRemoteMediator(
-            searchQuery,
+            search,
             db,
             wallHavenNetworkDataSource,
             clock,

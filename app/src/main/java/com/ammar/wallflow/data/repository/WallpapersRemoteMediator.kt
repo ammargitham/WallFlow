@@ -12,14 +12,14 @@ import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSearchQueryWallpaper
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
 import com.ammar.wallflow.data.network.model.wallhaven.toWallpaperEntity
-import com.ammar.wallflow.model.search.WallhavenFilters
+import com.ammar.wallflow.model.search.WallhavenSearch
 import java.io.IOException
 import kotlinx.datetime.Clock
 import retrofit2.HttpException
 
 @OptIn(ExperimentalPagingApi::class)
 class WallpapersRemoteMediator(
-    private val searchQuery: WallhavenFilters,
+    private val search: WallhavenSearch,
     private val appDatabase: AppDatabase,
     private val wallHavenNetwork: WallhavenNetworkDataSource,
     private val clock: Clock = Clock.System,
@@ -30,9 +30,13 @@ class WallpapersRemoteMediator(
     private val searchQueryWallpapersDao = appDatabase.wallhavenSearchQueryWallpapersDao()
 
     override suspend fun initialize(): InitializeAction {
-        val searchQueryEntity = searchQueryDao.getBySearchQuery(searchQuery.toQueryString())
-        val lastUpdatedOn =
-            searchQueryEntity?.lastUpdatedOn ?: return InitializeAction.LAUNCH_INITIAL_REFRESH
+        val searchQueryEntity = searchQueryDao.getBySearchQuery(
+            search.toQueryString(
+                backwardsCompat = true,
+            ),
+        )
+        val lastUpdatedOn = searchQueryEntity?.lastUpdatedOn
+            ?: return InitializeAction.LAUNCH_INITIAL_REFRESH
         val cacheTimeout = 3 // hours
         val diffHours = (clock.now() - lastUpdatedOn).absoluteValue.inWholeMinutes / 60f
         return if (diffHours <= cacheTimeout) {
@@ -51,7 +55,11 @@ class WallpapersRemoteMediator(
         state: PagingState<Int, WallhavenWallpaperEntity>,
     ): MediatorResult {
         return try {
-            val searchQueryEntity = searchQueryDao.getBySearchQuery(searchQuery.toQueryString())
+            val searchQueryEntity = searchQueryDao.getBySearchQuery(
+                search.toQueryString(
+                    backwardsCompat = true,
+                ),
+            )
             val nextPage = when (loadType) {
                 LoadType.REFRESH -> null
                 LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
@@ -61,7 +69,7 @@ class WallpapersRemoteMediator(
                         ?: return MediatorResult.Success(endOfPaginationReached = true)
                 }
             }
-            val response = wallHavenNetwork.search(searchQuery, nextPage)
+            val response = wallHavenNetwork.search(search, nextPage)
             // if at last page, next page is null else current + 1
             val nextPageNumber = response.meta?.run {
                 if (current_page != last_page) current_page + 1 else null
@@ -71,7 +79,9 @@ class WallpapersRemoteMediator(
                 val searchQueryId = searchQueryEntity?.id ?: searchQueryDao.upsert(
                     WallhavenSearchQueryEntity(
                         id = 0,
-                        queryString = searchQuery.toQueryString(),
+                        queryString = search.toQueryString(
+                            backwardsCompat = true,
+                        ),
                         lastUpdatedOn = now,
                     ),
                 ).first()

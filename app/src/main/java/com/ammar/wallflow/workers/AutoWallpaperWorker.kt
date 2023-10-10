@@ -53,8 +53,7 @@ import com.ammar.wallflow.model.ObjectDetectionModel
 import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.local.LocalWallpaper
-import com.ammar.wallflow.model.search.WallhavenFilters
-import com.ammar.wallflow.model.search.toSearchQuery
+import com.ammar.wallflow.model.search.WallhavenSearch
 import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import com.ammar.wallflow.services.ChangeWallpaperTileService
 import com.ammar.wallflow.ui.common.permissions.checkNotificationPermission
@@ -209,7 +208,6 @@ class AutoWallpaperWorker @AssistedInject constructor(
                 val savedSearchQuery = savedSearch
                     ?.toWallhavenSavedSearch()
                     ?.search
-                    ?.toSearchQuery()
                     ?: return null to null
                 // get a fresh wallpaper, ignoring the history initially
                 getNextSavedSearchWallpaper(savedSearchQuery)
@@ -390,7 +388,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
     }
 
     private suspend fun getNextSavedSearchWallpaper(
-        searchQuery: WallhavenFilters,
+        search: WallhavenSearch,
         excludeHistory: Boolean = true,
     ): WallhavenWallpaper? {
         val historyIds = if (excludeHistory) {
@@ -403,7 +401,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
         while (hasMore) {
             val wallpapers = if (excludeHistory) {
                 val (wallpapers, nextPageNum) = loadWallpapers(
-                    searchQuery = searchQuery,
+                    search = search,
                     pageNum = prevPageNum,
                 )
                 prevPageNum = nextPageNum
@@ -442,10 +440,10 @@ class AutoWallpaperWorker @AssistedInject constructor(
     )
 
     private suspend fun loadWallpapers(
-        searchQuery: WallhavenFilters,
+        search: WallhavenSearch,
         pageNum: Int? = null,
     ): Pair<List<WallhavenWallpaper>, Int?> {
-        val response = wallHavenNetwork.search(searchQuery, pageNum)
+        val response = wallHavenNetwork.search(search, pageNum)
         val nextPageNumber = response.meta?.run {
             if (current_page != last_page) current_page + 1 else null
         }

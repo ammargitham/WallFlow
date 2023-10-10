@@ -112,4 +112,56 @@ class WallhavenSearchTest {
             WallhavenSearch.fromQueryString(searchStr),
         )
     }
+
+    /**
+     * For backwards compatibility
+     */
+    @Test
+    fun `getApiQueryString should match prev WallhavenFilters#getQString`() {
+        val search = WallhavenSearch(
+            query = "test",
+            filters = WallhavenFilters(
+                includedTags = setOf("test2"),
+                excludedTags = setOf("test3"),
+                username = "user",
+                tagId = 100,
+                wallpaperId = "new_wall",
+            ),
+        )
+        val expectedQuery = "+test2 +test -test3 @user id:100 like:new_wall"
+        assertEquals(
+            expectedQuery,
+            search.getApiQueryString(),
+        )
+    }
+
+    @Test
+    fun `convert tags, tagId, etc to ApiQueryString`() {
+        var search = WallhavenSearch(
+            filters = WallhavenFilters(
+                includedTags = setOf("i1", "i2"),
+                excludedTags = setOf("e1", "e2"),
+            ),
+        )
+        assertEquals("+i1 +i2 -e1 -e2", search.getApiQueryString())
+
+        search = WallhavenSearch(
+            filters = WallhavenFilters(
+                includedTags = setOf("i 1", "i 2"),
+                excludedTags = setOf("e 1", "e 2"),
+            ),
+        )
+        assertEquals("+\"i 1\" +\"i 2\" -\"e 1\" -\"e 2\"", search.getApiQueryString())
+
+        search = WallhavenSearch(
+            filters = WallhavenFilters(
+                includedTags = setOf("i1", "i2"),
+                excludedTags = setOf("e1", "e2"),
+                username = "test",
+                tagId = 12L,
+                wallpaperId = "xx1234xx",
+            ),
+        )
+        assertEquals("+i1 +i2 -e1 -e2 @test id:12 like:xx1234xx", search.getApiQueryString())
+    }
 }

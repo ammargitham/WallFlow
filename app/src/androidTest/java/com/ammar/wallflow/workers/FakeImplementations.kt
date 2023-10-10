@@ -24,7 +24,7 @@ import com.ammar.wallflow.data.repository.utils.Resource
 import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.local.LocalWallpaper
-import com.ammar.wallflow.model.search.WallhavenFilters
+import com.ammar.wallflow.model.search.WallhavenSearch
 import com.ammar.wallflow.ui.screens.local.LocalSort
 import kotlinx.coroutines.flow.Flow
 import okhttp3.Call
@@ -127,7 +127,7 @@ internal open class FakeObjectDetectionModelDao : ObjectDetectionModelDao {
 
 internal open class FakeWallhavenNetworkDataSource : WallhavenNetworkDataSource {
     override suspend fun search(
-        searchQuery: WallhavenFilters,
+        search: WallhavenSearch,
         page: Int?,
     ): NetworkWallhavenWallpapersResponse {
         throw RuntimeException()

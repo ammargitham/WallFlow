@@ -7,6 +7,7 @@ import com.ammar.wallflow.R
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSearchHistoryEntity
 import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.extensions.fromQueryString
+import com.ammar.wallflow.extensions.quoteIfSpaced
 import com.ammar.wallflow.extensions.toQueryString
 import com.ammar.wallflow.extensions.trimAll
 import kotlinx.datetime.Instant
@@ -24,7 +25,71 @@ data class WallhavenSearch(
         "meta" to (meta?.toQueryString() ?: ""),
     )
 
-    fun toQueryString() = toStringMap().toQueryString()
+    fun toQueryString(
+        backwardsCompat: Boolean = false,
+    ): String {
+        if (backwardsCompat) {
+            return toSearchQuery().toQueryString()
+        }
+        return toStringMap().toQueryString()
+    }
+
+    fun getApiQueryString() = with(toSearchQuery()) {
+        ArrayList<String>().apply {
+            val i = includedTags
+                .filter { it.isNotBlank() }
+                .joinToString(" ") { "+${it.quoteIfSpaced()}" }
+            if (i.isNotBlank()) {
+                add(i)
+            }
+            val e = excludedTags
+                .filter { it.isNotBlank() }
+                .joinToString(" ") { "-${it.quoteIfSpaced()}" }
+            if (e.isNotBlank()) {
+                add(e)
+            }
+            username?.run {
+                if (this.isNotBlank()) {
+                    this@apply.add("@$this")
+                }
+            }
+            tagId?.run {
+                this@apply.add("id:$this")
+            }
+            wallpaperId?.run {
+                this@apply.add("like:$this")
+            }
+        }.joinToString(" ")
+    }
+
+    private fun toSearchQuery(): WallhavenFilters {
+        if (query.isBlank()) return filters
+        val q = query.trimAll()
+        if (q.startsWith("id:")) {
+            val tagIdString = q.removePrefix("id:")
+            val tagId = tagIdString.toLongOrNull() ?: return filters
+            return filters.copy(
+                tagId = tagId,
+            )
+        }
+        if (q.startsWith("like:")) {
+            val wallpaperId = q.removePrefix("like:")
+            if (wallpaperId.isBlank()) return filters
+            return filters.copy(
+                wallpaperId = wallpaperId,
+            )
+        }
+        if (q.startsWith("@")) {
+            val username = q.removePrefix("@")
+            if (username.isBlank()) return filters
+            return filters.copy(
+                username = username,
+            )
+        }
+        return filters.copy(
+            includedTags = filters.includedTags + q,
+        )
+    }
 
     companion object {
         fun fromQueryString(string: String): WallhavenSearch {
@@ -73,35 +138,6 @@ fun WallhavenSearch.toSearchHistoryEntity(
     filters = filters.toQueryString(),
     lastUpdatedOn = lastUpdatedOn,
 )
-
-fun WallhavenSearch.toSearchQuery(): WallhavenFilters {
-    if (query.isBlank()) return filters
-    val q = query.trimAll()
-    if (q.startsWith("id:")) {
-        val tagIdString = q.removePrefix("id:")
-        val tagId = tagIdString.toLongOrNull() ?: return filters
-        return filters.copy(
-            tagId = tagId,
-        )
-    }
-    if (q.startsWith("like:")) {
-        val wallpaperId = q.removePrefix("like:")
-        if (wallpaperId.isBlank()) return filters
-        return filters.copy(
-            wallpaperId = wallpaperId,
-        )
-    }
-    if (q.startsWith("@")) {
-        val username = q.removePrefix("@")
-        if (username.isBlank()) return filters
-        return filters.copy(
-            username = username,
-        )
-    }
-    return filters.copy(
-        includedTags = filters.includedTags + q,
-    )
-}
 
 fun WallhavenSearch.getSupportingText(
     context: Context,

@@ -31,7 +31,7 @@ import com.ammar.wallflow.data.repository.utils.WallhavenTagsDocumentParser.pars
 import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.Wallpaper
-import com.ammar.wallflow.model.search.WallhavenFilters
+import com.ammar.wallflow.model.search.WallhavenSearch
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import javax.inject.Inject
@@ -223,7 +223,7 @@ class DefaultWallhavenRepository @Inject constructor(
     }
 
     override fun wallpapersPager(
-        searchQuery: WallhavenFilters,
+        search: WallhavenSearch,
         pageSize: Int,
         prefetchDistance: Int,
         initialLoadSize: Int,
@@ -234,12 +234,16 @@ class DefaultWallhavenRepository @Inject constructor(
             initialLoadSize = initialLoadSize,
         ),
         remoteMediator = WallpapersRemoteMediator(
-            searchQuery,
+            search,
             appDatabase,
             wallHavenNetwork,
         ),
         pagingSourceFactory = {
-            wallpapersDao.pagingSource(queryString = searchQuery.toQueryString())
+            wallpapersDao.pagingSource(
+                queryString = search.toQueryString(
+                    backwardsCompat = true,
+                ),
+            )
         },
     ).flow.map {
         it.map<WallhavenWallpaperEntity, Wallpaper> { entity ->

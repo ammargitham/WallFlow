@@ -25,7 +25,6 @@ import com.ammar.wallflow.model.search.WallhavenSavedSearch
 import com.ammar.wallflow.model.search.WallhavenSearch
 import com.ammar.wallflow.model.search.WallhavenSorting
 import com.ammar.wallflow.model.search.WallhavenTopRange
-import com.ammar.wallflow.model.search.toSearchQuery
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.ui.screens.navArgs
 import com.github.materiiapps.partial.Partialize
@@ -68,10 +67,10 @@ class HomeViewModel @Inject constructor(
     }.distinctUntilChanged()
 
     val wallpapers = if (mainSearch != null) {
-        wallHavenRepository.wallpapersPager(mainSearch.toSearchQuery())
+        wallHavenRepository.wallpapersPager(mainSearch)
     } else {
         homeSearchFlow.flatMapLatest {
-            wallHavenRepository.wallpapersPager(it.toSearchQuery())
+            wallHavenRepository.wallpapersPager(it)
         }
     }.cachedIn(viewModelScope)
 
