@@ -15,7 +15,7 @@ enum class SearchMetaType {
 
 @Serializable
 sealed class SearchMeta {
-    abstract val type: SearchMetaType
+    abstract val metaType: SearchMetaType
     abstract fun toQueryString(): String
 
     companion object {
@@ -45,7 +45,7 @@ sealed class SearchMeta {
 data class WallhavenTagSearchMeta(
     val tag: WallhavenTag,
 ) : SearchMeta() {
-    override val type = SearchMetaType.WALLHAVEN_TAG
+    override val metaType = SearchMetaType.WALLHAVEN_TAG
 
     override fun toQueryString() = mapOf(
         "type" to SearchMetaType.WALLHAVEN_TAG.name,
@@ -69,7 +69,7 @@ data class WallhavenTagSearchMeta(
 data class WallhavenUploaderSearchMeta(
     val uploader: WallhavenUploader,
 ) : SearchMeta() {
-    override val type = SearchMetaType.WALLHAVEN_UPLOADER
+    override val metaType = SearchMetaType.WALLHAVEN_UPLOADER
 
     override fun toQueryString() = mapOf(
         "type" to SearchMetaType.WALLHAVEN_UPLOADER.name,
