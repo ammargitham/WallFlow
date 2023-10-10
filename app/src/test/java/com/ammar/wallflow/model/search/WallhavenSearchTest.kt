@@ -100,11 +100,12 @@ class WallhavenSearchTest {
         )
 
         // backwards compat
-        val filters = WallhavenFilters(includedTags = setOf("test"))
-        searchStr = filters.toQueryString()
+        searchStr = "includedTags=test&excludedTags=&username=&tagId=&wallpaperId=" +
+            "&categories=anime%2Cgeneral%2Cpeople&purity=sfw&sorting=date_added&order=desc" +
+            "&topRange=1M&atleast=&resolutions=&ratios=&colors=&seed="
         search = WallhavenSearch(
             query = "",
-            filters = filters,
+            filters = WallhavenFilters(includedTags = setOf("test")),
             meta = null,
         )
         assertEquals(
