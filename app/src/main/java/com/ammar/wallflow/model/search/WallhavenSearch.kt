@@ -29,12 +29,12 @@ data class WallhavenSearch(
         backwardsCompat: Boolean = false,
     ): String {
         if (backwardsCompat) {
-            return toSearchQuery().toQueryString()
+            return getQueryCombinedFilters().toQueryString()
         }
         return toStringMap().toQueryString()
     }
 
-    fun getApiQueryString() = with(toSearchQuery()) {
+    fun getApiQueryString() = with(getQueryCombinedFilters()) {
         ArrayList<String>().apply {
             val i = includedTags
                 .filter { it.isNotBlank() }
@@ -62,7 +62,7 @@ data class WallhavenSearch(
         }.joinToString(" ")
     }
 
-    private fun toSearchQuery(): WallhavenFilters {
+    private fun getQueryCombinedFilters(): WallhavenFilters {
         if (query.isBlank()) return filters
         val q = query.trimAll()
         if (q.startsWith("id:")) {
