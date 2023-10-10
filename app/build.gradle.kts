@@ -85,14 +85,7 @@ android {
                 signingConfig = signingConfigs.getByName("release")
             }
         }
-
-        create("staging") {
-            initWith(buildTypes.getByName("debug"))
-            applicationIdSuffix = ".test"
-        }
     }
-
-    testBuildType = "staging"
 
     flavorDimensions += "feature"
     productFlavors {

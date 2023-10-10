@@ -10,7 +10,7 @@
       </option>
       <option name="taskNames">
         <list>
-          <option value=":app:testPlusStagingUnitTest" />
+          <option value=":app:testPlusDebugUnitTest" />
           <option value="--tests" />
           <option value="&quot;com.ammar.wallflow.*&quot;" />
         </list>
