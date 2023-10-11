@@ -31,6 +31,7 @@ import kotlinx.serialization.json.Json
 
 @Serializable
 data class AppPreferences(
+    val version: Int? = CURRENT_VERSION,
     val wallhavenApiKey: String = "",
     val homeWallhavenSearch: WallhavenSearch = WallhavenSearch(
         filters = WallhavenFilters(
@@ -46,7 +47,11 @@ data class AppPreferences(
     val lookAndFeelPreferences: LookAndFeelPreferences = LookAndFeelPreferences(),
     val changeWallpaperTileAdded: Boolean = false,
     val localWallpapersPreferences: LocalWallpapersPreferences = LocalWallpapersPreferences(),
-)
+) {
+    companion object {
+        const val CURRENT_VERSION = 2
+    }
+}
 
 enum class ObjectDetectionDelegate {
     NONE,

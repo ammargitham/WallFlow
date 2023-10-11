@@ -30,12 +30,15 @@ import com.ammar.wallflow.workers.TestClock
 import kotlin.random.Random
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
+import kotlin.test.assertTrue
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import kotlinx.datetime.Instant
 import kotlinx.serialization.json.Json
+import okio.buffer
+import okio.source
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -540,6 +543,26 @@ class BackupRestoreUtilsTest {
         } finally {
             dataStore.clear()
         }
+    }
+
+    @Test
+    fun shouldMigrateAppPrefsV1ToV2() = runTest(testDispatcher) {
+        // read v1 json file
+        val inputStream = this.javaClass.classLoader?.getResourceAsStream(
+            "wallflow_backup_v1.json",
+        ) ?: throw RuntimeException("Missing json file!")
+        val jsonString = inputStream.source().buffer().use { source ->
+            source.readUtf8()
+        }
+        // read json
+        val backup = readBackupJson(jsonString)
+        assertNotNull(backup)
+        assertTrue(backup is BackupV1)
+        assertNotNull(backup.preferences)
+        assertNotNull(backup.favorites)
+        assertNotNull(backup.wallhaven)
+        assertEquals(2, backup.preferences?.version)
+        assertEquals("nature", backup.preferences?.homeWallhavenSearch?.query)
     }
 
     companion object {

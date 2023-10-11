@@ -10,9 +10,17 @@ import androidx.datastore.preferences.preferencesDataStore
 
 private const val APP_PREFERENCES_NAME = "app_preferences"
 
-val Context.dataStore by preferencesDataStore(name = APP_PREFERENCES_NAME)
+val Context.dataStore by preferencesDataStore(
+    name = APP_PREFERENCES_NAME,
+    produceMigrations = { _ -> preferencesMigrations() },
+)
+
+fun preferencesMigrations() = listOf(
+    migrateAppPrefs1To2(),
+)
 
 object PreferencesKeys {
+    val VERSION = intPreferencesKey("version")
     val WALLHAVEN_API_KEY = stringPreferencesKey("wallhaven_api_key")
     val HOME_WALLHAVEN_SEARCH_QUERY = stringPreferencesKey("home_search_query")
     val HOME_WALLHAVEN_FILTERS = stringPreferencesKey("home_filters")

@@ -8,6 +8,7 @@ import androidx.test.platform.app.InstrumentationRegistry
 import com.ammar.wallflow.data.db.automigrations.AutoMigration4To5Spec
 import com.ammar.wallflow.data.db.manualmigrations.MIGRATION_1_2
 import com.ammar.wallflow.data.db.manualmigrations.MIGRATION_3_4
+import com.ammar.wallflow.data.db.manualmigrations.MIGRATION_6_7
 import java.io.IOException
 import kotlin.test.assertEquals
 import org.junit.Rule
@@ -20,6 +21,7 @@ class MigrationTest {
     private val allManualMigrations = arrayOf(
         MIGRATION_1_2,
         MIGRATION_3_4,
+        MIGRATION_6_7,
     )
 
     @get:Rule
@@ -232,6 +234,45 @@ class MigrationTest {
                 assertEquals("test", queryString)
                 val lastUpdatedOn = it.getLong(2)
                 assertEquals(12345, lastUpdatedOn)
+            }
+        }
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun migrate6To7() {
+        helper.createDatabase(testDbName, 6).apply {
+            execSQL(
+                // language=sql
+                """
+                    INSERT INTO wallhaven_search_query
+                        ("id", "query_string", "last_updated_on")
+                    VALUES
+                        (
+                            '1',
+                            'includedTags=&excludedTags=&username=&tagId=&wallpaperId=&categories=anime%2Cgeneral%2Cpeople&purity=sfw&sorting=toplist&order=desc&topRange=1d&atleast=&resolutions=&ratios=&colors=&seed=',
+                            '12345'
+                        );
+                """.trimIndent(),
+            )
+            close()
+        }
+        helper.runMigrationsAndValidate(
+            testDbName,
+            7,
+            true,
+            MIGRATION_6_7,
+        ).use { db ->
+            db.query(
+                // language=sql
+                "SELECT * from wallhaven_search_query",
+            ).use {
+                it.moveToFirst()
+                val queryString = it.getString(1)
+                assertEquals(
+                    "{\"filters\":{\"sorting\":\"TOPLIST\",\"topRange\":\"ONE_DAY\"}}",
+                    queryString,
+                )
             }
         }
     }

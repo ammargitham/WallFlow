@@ -167,3 +167,11 @@ val WallhavenSearchSaver = Saver<WallhavenSearch, List<String>>(
         )
     },
 )
+
+fun migrateWallhavenFiltersQSToWallhavenSearchJson(
+    filtersStr: String,
+) = Json.encodeToString(
+    WallhavenSearch(
+        filters = WallhavenFilters.fromQueryString(filtersStr),
+    ),
+)

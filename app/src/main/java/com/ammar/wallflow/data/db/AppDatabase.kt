@@ -54,7 +54,7 @@ import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperTagsEntity
         FavoriteEntity::class,
         RateLimitEntity::class,
     ],
-    version = 6,
+    version = 7,
     autoMigrations = [
         AutoMigration(from = 2, to = 3),
         AutoMigration(from = 4, to = 5, spec = AutoMigration4To5Spec::class),

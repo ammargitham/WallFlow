@@ -201,6 +201,7 @@ class AppPreferencesRepository @Inject constructor(
     }
 
     private fun mapAppPreferences(preferences: Preferences) = AppPreferences(
+        version = preferences[PreferencesKeys.VERSION] ?: AppPreferences.CURRENT_VERSION,
         wallhavenApiKey = getWallhavenApiKey(preferences),
         homeWallhavenSearch = getHomeWallhavenSearch(preferences),
         homeRedditSearch = getHomeRedditSearch(preferences),
@@ -369,6 +370,10 @@ class AppPreferencesRepository @Inject constructor(
     suspend fun setPreferences(appPreferences: AppPreferences) {
         dataStore.edit {
             it.apply {
+                set(
+                    PreferencesKeys.VERSION,
+                    appPreferences.version ?: AppPreferences.CURRENT_VERSION,
+                )
                 updateWallhavenApikey(appPreferences.wallhavenApiKey)
                 updateHomeWallhavenSearch(appPreferences.homeWallhavenSearch)
                 appPreferences.homeRedditSearch?.run {

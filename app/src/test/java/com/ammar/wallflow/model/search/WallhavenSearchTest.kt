@@ -116,9 +116,6 @@ class WallhavenSearchTest {
         )
     }
 
-    /**
-     * For backwards compatibility
-     */
     @Test
     fun `getApiQueryString should match prev WallhavenFilters#getQString`() {
         val search = WallhavenSearch(
@@ -166,5 +163,17 @@ class WallhavenSearchTest {
             ),
         )
         assertEquals("+i1 +i2 -e1 -e2 @test id:12 like:xx1234xx", search.getApiQueryString())
+    }
+
+    @Test
+    fun `migrate queryString created by WallhavenFilters to WallhavenSearch`() {
+        val filtersStr = "includedTags=test&excludedTags=&username=&tagId=&wallpaperId=" +
+            "&categories=anime%2Cgeneral%2Cpeople&purity=sfw&sorting=date_added&order=desc" +
+            "&topRange=1M&atleast=&resolutions=&ratios=&colors=&seed="
+        val expectedStr = "{\"filters\":{\"includedTags\":[\"test\"]}}"
+        assertEquals(
+            expectedStr,
+            migrateWallhavenFiltersQSToWallhavenSearchJson(filtersStr),
+        )
     }
 }

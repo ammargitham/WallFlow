@@ -1,6 +1,7 @@
 package com.ammar.wallflow.utils
 
 import android.content.Context
+import android.util.Log
 import androidx.core.net.toUri
 import com.ammar.wallflow.data.db.dao.FavoriteDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenSavedSearchDao
@@ -29,6 +30,7 @@ import kotlinx.datetime.Clock
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.intOrNull
 import kotlinx.serialization.json.jsonObject
@@ -126,7 +128,8 @@ private val safeJson = Json { coerceInputValues = true }
 fun readBackupV1Json(
     jsonObject: JsonObject,
 ) = try {
-    safeJson.decodeFromJsonElement<BackupV1>(jsonObject)
+    val updatedJsonObject = migrateBackupJson(jsonObject)
+    safeJson.decodeFromJsonElement<BackupV1>(updatedJsonObject)
 } catch (e: Exception) {
     throw InvalidJsonException(e)
 }
@@ -240,4 +243,51 @@ suspend fun restoreBackupV1(
         }
         favoritesRepository.insertEntities(favoritesToInsert)
     }
+}
+
+fun migrateBackupJson(currentJson: JsonObject) = try {
+    val prefs = currentJson["preferences"]?.let {
+        // migrate preferences
+        migratePrefs(it.jsonObject)
+    }
+    JsonObject(
+        currentJson.toMutableMap().apply {
+            if (prefs != null) {
+                put("preferences", prefs)
+            }
+        },
+    )
+} catch (e: Exception) {
+    Log.e("migrateBackupJson", "Error migrating: ", e)
+    currentJson
+}
+
+private fun migratePrefs(prefsJson: JsonObject): JsonObject {
+    val version = prefsJson["version"]?.jsonPrimitive?.intOrNull ?: 1
+    if (version == 2) {
+        // no migration needed
+        return prefsJson
+    }
+    return when (version) {
+        1 -> migratePrefs1To2(prefsJson)
+        else -> throw IllegalArgumentException("Invalid app prefs version: $version")
+    }
+}
+
+private fun migratePrefs1To2(prefsJson: JsonObject): JsonObject {
+    // we need to convert key `homeSearch` to `homeWallhavenSearch`
+    val homeSearchKey = "homeSearch"
+    val homeSearchJson = prefsJson[homeSearchKey]
+    return JsonObject(
+        prefsJson.toMutableMap().apply {
+            // insert new key
+            if (homeSearchJson != null) {
+                put("homeWallhavenSearch", homeSearchJson)
+            }
+            // set version to 2
+            put("version", JsonPrimitive(2))
+            // remove old key
+            remove(homeSearchKey)
+        },
+    )
 }
