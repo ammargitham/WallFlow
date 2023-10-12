@@ -113,8 +113,7 @@ class AppPreferencesRepository @Inject constructor(
     }
 
     private fun MutablePreferences.updateHomeWallhavenSearch(search: WallhavenSearch) {
-        set(PreferencesKeys.HOME_WALLHAVEN_SEARCH_QUERY, search.query)
-        set(PreferencesKeys.HOME_WALLHAVEN_FILTERS, search.filters.toQueryString())
+        set(PreferencesKeys.HOME_WALLHAVEN_SEARCH, search.toJson())
     }
 
     private fun MutablePreferences.updateHomeRedditSearch(search: RedditSearch) {
@@ -317,15 +316,17 @@ class AppPreferencesRepository @Inject constructor(
             preferences[PreferencesKeys.HOME_REDDIT_SEARCH],
         )
 
-    private fun getHomeWallhavenSearch(preferences: Preferences) = WallhavenSearch(
-        query = preferences[PreferencesKeys.HOME_WALLHAVEN_SEARCH_QUERY] ?: "",
-        filters = preferences[PreferencesKeys.HOME_WALLHAVEN_FILTERS]?.let {
-            WallhavenFilters.fromQueryString(it)
-        } ?: WallhavenFilters(
-            sorting = WallhavenSorting.TOPLIST,
-            topRange = WallhavenTopRange.ONE_DAY,
-        ),
-    )
+    private fun getHomeWallhavenSearch(preferences: Preferences) = try {
+        WallhavenSearch.fromJson(preferences[PreferencesKeys.HOME_WALLHAVEN_SEARCH] ?: "")
+    } catch (e: Exception) {
+        Log.e(TAG, "getHomeWallhavenSearch: ", e)
+        WallhavenSearch(
+            filters = WallhavenFilters(
+                sorting = WallhavenSorting.TOPLIST,
+                topRange = WallhavenTopRange.ONE_DAY,
+            ),
+        )
+    }
 
     private fun getWallhavenApiKey(preferences: Preferences) =
         preferences[PreferencesKeys.WALLHAVEN_API_KEY] ?: ""

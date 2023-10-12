@@ -22,8 +22,7 @@ fun preferencesMigrations() = listOf(
 object PreferencesKeys {
     val VERSION = intPreferencesKey("version")
     val WALLHAVEN_API_KEY = stringPreferencesKey("wallhaven_api_key")
-    val HOME_WALLHAVEN_SEARCH_QUERY = stringPreferencesKey("home_search_query")
-    val HOME_WALLHAVEN_FILTERS = stringPreferencesKey("home_filters")
+    val HOME_WALLHAVEN_SEARCH = stringPreferencesKey("home_wallhaven_search")
     val HOME_REDDIT_SEARCH = stringPreferencesKey("home_reddit_search")
     val BLUR_SKETCHY = booleanPreferencesKey("blur_sketchy")
     val BLUR_NSFW = booleanPreferencesKey("blur_nsfw")
