@@ -44,6 +44,7 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.DateTimePeriod
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 @Singleton
@@ -117,7 +118,7 @@ class AppPreferencesRepository @Inject constructor(
     }
 
     private fun MutablePreferences.updateHomeRedditSearch(search: RedditSearch) {
-        set(PreferencesKeys.HOME_REDDIT_SEARCH, search.toQueryString())
+        set(PreferencesKeys.HOME_REDDIT_SEARCH, Json.encodeToString(search))
     }
 
     private fun MutablePreferences.updateBlurSketchy(blurSketchy: Boolean) {
@@ -311,10 +312,11 @@ class AppPreferencesRepository @Inject constructor(
         )
     }
 
-    private fun getHomeRedditSearch(preferences: Preferences) =
-        RedditSearch.fromQueryString(
-            preferences[PreferencesKeys.HOME_REDDIT_SEARCH],
-        )
+    private fun getHomeRedditSearch(preferences: Preferences): RedditSearch? = try {
+        Json.decodeFromString(preferences[PreferencesKeys.HOME_REDDIT_SEARCH] ?: "")
+    } catch (e: Exception) {
+        null
+    }
 
     private fun getHomeWallhavenSearch(preferences: Preferences) = try {
         WallhavenSearch.fromJson(preferences[PreferencesKeys.HOME_WALLHAVEN_SEARCH] ?: "")

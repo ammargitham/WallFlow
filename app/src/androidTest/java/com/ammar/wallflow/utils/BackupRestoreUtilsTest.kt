@@ -23,6 +23,9 @@ import com.ammar.wallflow.data.repository.wallhaven.DefaultWallhavenRepository
 import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.model.backup.BackupOptions
 import com.ammar.wallflow.model.backup.BackupV1
+import com.ammar.wallflow.model.search.RedditSearch
+import com.ammar.wallflow.model.search.RedditSort
+import com.ammar.wallflow.model.search.RedditTimeRange
 import com.ammar.wallflow.model.search.toEntity
 import com.ammar.wallflow.workers.FakeLocalWallpapersRepository
 import com.ammar.wallflow.workers.FakeWallhavenNetworkDataSource
@@ -313,6 +316,15 @@ class BackupRestoreUtilsTest {
             appPreferencesRepository.updateBlurNsfw(true)
             appPreferencesRepository.updateBlurSketchy(true)
             appPreferencesRepository.updateWallhavenApiKey("test")
+            appPreferencesRepository.updateHomeRedditSearch(
+                RedditSearch(
+                    query = "test",
+                    subreddits = setOf("test", "test2"),
+                    includeNsfw = false,
+                    sort = RedditSort.RELEVANCE,
+                    timeRange = RedditTimeRange.ALL,
+                ),
+            )
             val oldPreferences = appPreferencesRepository.appPreferencesFlow.firstOrNull()
             val json = getBackupV1Json(
                 options = BackupOptions(
