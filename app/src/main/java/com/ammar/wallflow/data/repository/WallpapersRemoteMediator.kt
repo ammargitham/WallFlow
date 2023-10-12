@@ -30,11 +30,7 @@ class WallpapersRemoteMediator(
     private val searchQueryWallpapersDao = appDatabase.wallhavenSearchQueryWallpapersDao()
 
     override suspend fun initialize(): InitializeAction {
-        val searchQueryEntity = searchQueryDao.getBySearchQuery(
-            search.toQueryString(
-                backwardsCompat = true,
-            ),
-        )
+        val searchQueryEntity = searchQueryDao.getBySearchQuery(search.toJson())
         val lastUpdatedOn = searchQueryEntity?.lastUpdatedOn
             ?: return InitializeAction.LAUNCH_INITIAL_REFRESH
         val cacheTimeout = 3 // hours
@@ -55,11 +51,7 @@ class WallpapersRemoteMediator(
         state: PagingState<Int, WallhavenWallpaperEntity>,
     ): MediatorResult {
         return try {
-            val searchQueryEntity = searchQueryDao.getBySearchQuery(
-                search.toQueryString(
-                    backwardsCompat = true,
-                ),
-            )
+            val searchQueryEntity = searchQueryDao.getBySearchQuery(search.toJson())
             val nextPage = when (loadType) {
                 LoadType.REFRESH -> null
                 LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
@@ -79,9 +71,7 @@ class WallpapersRemoteMediator(
                 val searchQueryId = searchQueryEntity?.id ?: searchQueryDao.upsert(
                     WallhavenSearchQueryEntity(
                         id = 0,
-                        queryString = search.toQueryString(
-                            backwardsCompat = true,
-                        ),
+                        queryString = search.toJson(),
                         lastUpdatedOn = now,
                     ),
                 ).first()

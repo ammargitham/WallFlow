@@ -90,9 +90,7 @@ class WallpapersRemoteMediatorTest {
         assertEquals(1, searchQueryCount)
 
         val searchQueryEntity = wallhavenSearchQueryDao.getBySearchQuery(
-            search.toQueryString(
-                backwardsCompat = true,
-            ),
+            search.toJson(),
         )
         assertNotNull(searchQueryEntity)
 
@@ -166,9 +164,7 @@ class WallpapersRemoteMediatorTest {
         val result = remoteMediator.load(LoadType.REFRESH, pagingState)
         assertTrue { result is MediatorResult.Success }
         val searchQueryEntity = wallhavenSearchQueryDao.getBySearchQuery(
-            search.toQueryString(
-                backwardsCompat = true,
-            ),
+            search.toJson(),
         )
         assertNotNull(searchQueryEntity)
         val lastUpdated = searchQueryEntity.lastUpdatedOn
@@ -176,9 +172,7 @@ class WallpapersRemoteMediatorTest {
         val refreshResult = remoteMediator.load(LoadType.REFRESH, pagingState)
         assertTrue { refreshResult is MediatorResult.Success }
         val refreshSearchQueryEntity = wallhavenSearchQueryDao.getBySearchQuery(
-            search.toQueryString(
-                backwardsCompat = true,
-            ),
+            search.toJson(),
         )
         assertNotNull(refreshSearchQueryEntity)
         val refreshLastUpdated = refreshSearchQueryEntity.lastUpdatedOn
@@ -315,15 +309,11 @@ class WallpapersRemoteMediatorTest {
         assertEquals(2, searchQueryCount)
 
         val searchQueryEntity1 = wallhavenSearchQueryDao.getBySearchQuery(
-            search1.toQueryString(
-                backwardsCompat = true,
-            ),
+            search1.toJson(),
         )
         assertNotNull(searchQueryEntity1)
         val searchQueryEntity2 = wallhavenSearchQueryDao.getBySearchQuery(
-            search2.toQueryString(
-                backwardsCompat = true,
-            ),
+            search2.toJson(),
         )
         assertNotNull(searchQueryEntity2)
 

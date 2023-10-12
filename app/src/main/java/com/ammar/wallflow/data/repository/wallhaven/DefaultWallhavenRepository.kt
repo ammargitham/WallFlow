@@ -239,11 +239,7 @@ class DefaultWallhavenRepository @Inject constructor(
             wallHavenNetwork,
         ),
         pagingSourceFactory = {
-            wallpapersDao.pagingSource(
-                queryString = search.toQueryString(
-                    backwardsCompat = true,
-                ),
-            )
+            wallpapersDao.pagingSource(queryString = search.toJson())
         },
     ).flow.map {
         it.map<WallhavenWallpaperEntity, Wallpaper> { entity ->

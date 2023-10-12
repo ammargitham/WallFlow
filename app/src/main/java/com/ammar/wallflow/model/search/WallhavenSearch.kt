@@ -17,14 +17,7 @@ data class WallhavenSearch(
     val filters: WallhavenFilters = WallhavenFilters(),
     val meta: SearchMeta? = null,
 ) {
-    fun toQueryString(
-        backwardsCompat: Boolean = false,
-    ): String {
-        if (backwardsCompat) {
-            return getQueryCombinedFilters().toQueryString()
-        }
-        return Json.encodeToString(this)
-    }
+    fun toJson() = Json.encodeToString(this)
 
     fun getApiQueryString() = with(getQueryCombinedFilters()) {
         ArrayList<String>().apply {
@@ -84,19 +77,7 @@ data class WallhavenSearch(
     }
 
     companion object {
-        fun fromQueryString(string: String) = try {
-            Json.decodeFromString(string)
-        } catch (e: Exception) {
-            // for backwards compat, check if is a WallhavenFilters qs
-            try {
-                WallhavenSearch(
-                    filters = WallhavenFilters.fromQueryString(string),
-                )
-            } catch (e: Exception) {
-                // if not even WallhavenFilters qs return default
-                WallhavenSearch()
-            }
-        }
+        fun fromJson(string: String): WallhavenSearch = Json.decodeFromString(string)
     }
 }
 

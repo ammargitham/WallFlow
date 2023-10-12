@@ -18,7 +18,7 @@ class WallhavenSearchTest {
         var searchStr = "{\"query\":\"test\",\"filters\":{\"includedTags\":[\"test\"]}}"
         assertEquals(
             searchStr,
-            search.toQueryString(),
+            search.toJson(),
         )
 
         val createdAt = TestClock(now = Instant.fromEpochSeconds(1696860179))
@@ -43,23 +43,7 @@ class WallhavenSearchTest {
             "\"category\":\"test_cat\",\"purity\":\"SFW\",\"createdAt\":\"2023-10-09T14:02:59Z\"}}}"
         assertEquals(
             searchStr,
-            search.toQueryString(),
-        )
-
-        search = WallhavenSearch(
-            query = "",
-            filters = WallhavenFilters(includedTags = setOf("test")),
-            meta = null,
-        )
-        // backwards compat
-        searchStr = "includedTags=test&excludedTags=&username=&tagId=&wallpaperId=" +
-            "&categories=anime%2Cgeneral%2Cpeople&purity=sfw&sorting=date_added&order=desc" +
-            "&topRange=1M&atleast=&resolutions=&ratios=&colors=&seed="
-        assertEquals(
-            searchStr,
-            search.toQueryString(
-                backwardsCompat = true,
-            ),
+            search.toJson(),
         )
     }
 
@@ -73,7 +57,7 @@ class WallhavenSearchTest {
         )
         assertEquals(
             search,
-            WallhavenSearch.fromQueryString(searchStr),
+            WallhavenSearch.fromJson(searchStr),
         )
 
         val createdAt = TestClock(now = Instant.fromEpochSeconds(1696860179))
@@ -98,21 +82,7 @@ class WallhavenSearchTest {
         )
         assertEquals(
             search,
-            WallhavenSearch.fromQueryString(searchStr),
-        )
-
-        // backwards compat
-        searchStr = "includedTags=test&excludedTags=&username=&tagId=&wallpaperId=" +
-            "&categories=anime%2Cgeneral%2Cpeople&purity=sfw&sorting=date_added&order=desc" +
-            "&topRange=1M&atleast=&resolutions=&ratios=&colors=&seed="
-        search = WallhavenSearch(
-            query = "",
-            filters = WallhavenFilters(includedTags = setOf("test")),
-            meta = null,
-        )
-        assertEquals(
-            search,
-            WallhavenSearch.fromQueryString(searchStr),
+            WallhavenSearch.fromJson(searchStr),
         )
     }
 
