@@ -30,8 +30,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.R
 import com.ammar.wallflow.model.MenuItem
+import com.ammar.wallflow.model.search.Filters
+import com.ammar.wallflow.model.search.Search
 import com.ammar.wallflow.model.search.WallhavenFilters
 import com.ammar.wallflow.model.search.WallhavenSearch
+import com.ammar.wallflow.model.search.WallhavenSearchMeta
 import com.ammar.wallflow.model.search.WallhavenSorting
 import com.ammar.wallflow.model.search.WallhavenTagSearchMeta
 import com.ammar.wallflow.model.search.WallhavenUploaderSearchMeta
@@ -51,23 +54,23 @@ object MainSearchBar {
         useDocked: Boolean = false,
         visible: Boolean = true,
         active: Boolean = false,
-        search: WallhavenSearch = Defaults.search,
+        search: Search = Defaults.search,
         query: String = "",
-        suggestions: List<Suggestion<WallhavenSearch>> = emptyList(),
+        suggestions: List<Suggestion<Search>> = emptyList(),
         showFilters: Boolean = false,
-        deleteSuggestion: WallhavenSearch? = null,
+        deleteSuggestion: Search? = null,
         overflowIcon: @Composable (() -> Unit)? = null,
         showNSFW: Boolean = false,
         showQuery: Boolean = true,
         onQueryChange: (String) -> Unit = {},
         onBackClick: (() -> Unit)? = null,
         onSearch: (query: String) -> Unit = {},
-        onSuggestionClick: (suggestion: Suggestion<WallhavenSearch>) -> Unit = {},
-        onSuggestionInsert: (suggestion: Suggestion<WallhavenSearch>) -> Unit = {},
-        onSuggestionDeleteRequest: (suggestion: Suggestion<WallhavenSearch>) -> Unit = {},
+        onSuggestionClick: (suggestion: Suggestion<Search>) -> Unit = {},
+        onSuggestionInsert: (suggestion: Suggestion<Search>) -> Unit = {},
+        onSuggestionDeleteRequest: (suggestion: Suggestion<Search>) -> Unit = {},
         onActiveChange: (active: Boolean) -> Unit = {},
         onShowFiltersChange: (show: Boolean) -> Unit = {},
-        onFiltersChange: (searchQuery: WallhavenFilters) -> Unit = {},
+        onFiltersChange: (filters: Filters) -> Unit = {},
         onDeleteSuggestionConfirmClick: () -> Unit = {},
         onDeleteSuggestionDismissRequest: () -> Unit = {},
         onSaveAsClick: () -> Unit = {},
@@ -100,12 +103,9 @@ object MainSearchBar {
                 extraLeadingContent = when {
                     active -> null
                     else -> when (search.meta) {
-                        is WallhavenTagSearchMeta -> {
-                            { TagChip(wallhavenTag = search.meta.tag) }
-                        }
-                        is WallhavenUploaderSearchMeta -> {
-                            { UploaderChip(wallhavenUploader = search.meta.uploader) }
-                        }
+                        is WallhavenSearchMeta -> getWallhavenSearchMetaContent(
+                            search.meta as WallhavenSearchMeta,
+                        )
                         else -> null
                     }
                 },
@@ -189,6 +189,18 @@ object MainSearchBar {
                 sorting = WallhavenSorting.RELEVANCE,
             ),
         )
+    }
+}
+
+@Composable
+internal fun getWallhavenSearchMetaContent(
+    meta: WallhavenSearchMeta,
+): @Composable () -> Unit = when (meta) {
+    is WallhavenTagSearchMeta -> {
+        { TagChip(wallhavenTag = meta.tag) }
+    }
+    is WallhavenUploaderSearchMeta -> {
+        { UploaderChip(wallhavenUploader = meta.uploader) }
     }
 }
 

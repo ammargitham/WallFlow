@@ -13,10 +13,12 @@ import com.ammar.wallflow.model.search.WallhavenRatio.CategoryWallhavenRatio
 import com.ammar.wallflow.model.serializers.ColorSerializer
 import com.ammar.wallflow.model.serializers.IntSizeSerializer
 import java.util.regex.Pattern
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 
 @Serializable
+@SerialName("WallhavenFilters")
 data class WallhavenFilters(
     val includedTags: Set<String> = emptySet(),
     val excludedTags: Set<String> = emptySet(),
@@ -33,10 +35,13 @@ data class WallhavenFilters(
     val colors: Color? = null,
     val seed: String? = null,
     val ratios: Set<WallhavenRatio> = emptySet(),
-) {
+) : Filters() {
     companion object {
-        val defaultCategories =
-            setOf(WallhavenCategory.GENERAL, WallhavenCategory.ANIME, WallhavenCategory.PEOPLE)
+        val defaultCategories = setOf(
+            WallhavenCategory.GENERAL,
+            WallhavenCategory.ANIME,
+            WallhavenCategory.PEOPLE,
+        )
         val defaultPurities = setOf(Purity.SFW)
 
         @Deprecated(

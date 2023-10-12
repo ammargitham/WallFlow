@@ -41,6 +41,10 @@ import com.ammar.wallflow.extensions.search
 import com.ammar.wallflow.extensions.toPxF
 import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.model.Source
+import com.ammar.wallflow.model.search.RedditFilters
+import com.ammar.wallflow.model.search.RedditSearch
+import com.ammar.wallflow.model.search.Search
+import com.ammar.wallflow.model.search.WallhavenFilters
 import com.ammar.wallflow.model.search.WallhavenSearch
 import com.ammar.wallflow.model.search.WallhavenTagSearchMeta
 import com.ammar.wallflow.model.search.WallhavenUploaderSearchMeta
@@ -238,13 +242,20 @@ class MainActivity : ComponentActivity() {
                         val search = if (it.trimAll() == searchBarQuery) {
                             // keep current search data if query hasn't changed
                             // this allows to keep meta data if only filters were changed
-                            uiState.searchBarSearch.copy(
-                                filters = uiState.searchBarSearch.filters,
-                            )
+                            val searchBarSearch = uiState.searchBarSearch
+                            val filters = uiState.searchBarSearch.filters
+                            when (searchBarSearch) {
+                                is RedditSearch -> searchBarSearch.copy(
+                                    filters = filters as RedditFilters,
+                                )
+                                is WallhavenSearch -> searchBarSearch.copy(
+                                    filters = filters as WallhavenFilters,
+                                )
+                            }
                         } else {
                             WallhavenSearch(
                                 query = it,
-                                filters = uiState.searchBarSearch.filters,
+                                filters = uiState.searchBarSearch.filters as WallhavenFilters,
                             )
                         }
                         doSearch(
@@ -285,12 +296,22 @@ class MainActivity : ComponentActivity() {
                     },
                     onSearchBarShowFiltersChange = viewModel::setShowSearchBarFilters,
                     onSearchBarFiltersChange = {
-                        viewModel.setSearchBarSearch(
-                            uiState.searchBarSearch.copy(filters = it),
-                        )
+                        val searchBarSearch = uiState.searchBarSearch
+                        val filters = uiState.searchBarSearch.filters
+                        val updated = when (searchBarSearch) {
+                            is RedditSearch -> searchBarSearch.copy(
+                                filters = filters as RedditFilters,
+                            )
+                            is WallhavenSearch -> searchBarSearch.copy(
+                                filters = filters as WallhavenFilters,
+                            )
+                        }
+                        viewModel.setSearchBarSearch(updated)
                     },
                     onDeleteSearchBarSuggestionConfirmClick = {
-                        uiState.searchBarDeleteSuggestion?.run { viewModel.deleteSearch(this) }
+                        uiState.searchBarDeleteSuggestion?.run {
+                            viewModel.deleteSearch(this)
+                        }
                     },
                     onDeleteSearchBarSuggestionDismissRequest = {
                         viewModel.setShowSearchBarSuggestionDeleteRequest(null)
@@ -312,11 +333,17 @@ class MainActivity : ComponentActivity() {
                         }
                     },
                     onSearchBarSaveAsClick = {
-                        viewModel.showSaveSearchAsDialog(
-                            uiState.searchBarSearch.copy(
-                                query = searchBarQuery,
-                            ),
-                        )
+                        val searchBarSearch = uiState.searchBarSearch
+                        val query = uiState.searchBarSearch.query
+                        val updated = when (searchBarSearch) {
+                            is RedditSearch -> searchBarSearch.copy(
+                                query = query,
+                            )
+                            is WallhavenSearch -> searchBarSearch.copy(
+                                query = query,
+                            )
+                        }
+                        viewModel.showSaveSearchAsDialog(updated)
                     },
                     onSearchBarLoadClick = viewModel::showSavedSearches,
                 ) {
@@ -383,7 +410,7 @@ class MainActivity : ComponentActivity() {
         viewModel: MainActivityViewModel,
         navController: NavHostController,
         searchBarController: MainSearchBarController,
-        search: WallhavenSearch,
+        search: Search,
     ) {
         if (searchBarController.state.value.search == search) {
             return

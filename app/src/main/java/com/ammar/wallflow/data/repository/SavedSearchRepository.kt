@@ -3,6 +3,7 @@ package com.ammar.wallflow.data.repository
 import com.ammar.wallflow.IoDispatcher
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenSavedSearchDao
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSavedSearchEntity
+import com.ammar.wallflow.json
 import com.ammar.wallflow.model.search.WallhavenSavedSearch
 import com.ammar.wallflow.model.search.toEntity
 import javax.inject.Inject
@@ -11,7 +12,6 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 @Singleton
 class SavedSearchRepository @Inject constructor(
@@ -52,7 +52,7 @@ class SavedSearchRepository @Inject constructor(
     ) = existing?.copy(
         name = savedSearch.name,
         query = savedSearch.search.query,
-        filters = Json.encodeToString(savedSearch.search.filters),
+        filters = json.encodeToString(savedSearch.search.filters),
     ) ?: savedSearch.toEntity(0)
 
     suspend fun delete(savedSearch: WallhavenSavedSearch) = withContext(ioDispatcher) {

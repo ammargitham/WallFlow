@@ -32,6 +32,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.R
 import com.ammar.wallflow.extensions.toDp
+import com.ammar.wallflow.model.search.RedditSearch
+import com.ammar.wallflow.model.search.Search
 import com.ammar.wallflow.model.search.WallhavenFilters
 import com.ammar.wallflow.model.search.WallhavenSearch
 import com.ammar.wallflow.model.search.WallhavenSorting
@@ -45,10 +47,10 @@ fun EditSearchModalBottomSheet(
     modifier: Modifier = Modifier,
     contentModifier: Modifier = Modifier,
     state: SheetState = rememberModalBottomSheetState(),
-    search: WallhavenSearch = WallhavenSearch(),
+    search: Search = WallhavenSearch(),
     header: @Composable (ColumnScope.() -> Unit)? = null,
     showNSFW: Boolean = false,
-    onChange: (WallhavenSearch) -> Unit = {},
+    onChange: (Search) -> Unit = {},
     onDismissRequest: () -> Unit = {},
 ) {
     val imePadding = WindowInsets.ime.getBottom(LocalDensity.current).toDp()
@@ -89,7 +91,10 @@ fun EditSearchModalBottomSheet(
         )
     }
 
-    if (showMinResAddCustomResDialog) {
+    if (
+        search is WallhavenSearch &&
+        showMinResAddCustomResDialog
+    ) {
         CustomResolutionDialog(
             onSave = {
                 onChange(search.copy(filters = search.filters.copy(atleast = it)))
@@ -103,7 +108,10 @@ fun EditSearchModalBottomSheet(
         )
     }
 
-    if (showResolutionsAddCustomResDialog) {
+    if (
+        search is WallhavenSearch &&
+        showResolutionsAddCustomResDialog
+    ) {
         CustomResolutionDialog(
             onSave = {
                 onChange(
@@ -126,6 +134,30 @@ fun EditSearchModalBottomSheet(
 
 @Composable
 fun EditSearchContent(
+    modifier: Modifier = Modifier,
+    search: Search = WallhavenSearch(),
+    showQueryField: Boolean = true,
+    showNSFW: Boolean = false,
+    onChange: (Search) -> Unit = {},
+    onMinResAddCustomResClick: () -> Unit = {},
+    onResolutionsAddCustomResClick: () -> Unit = {},
+) {
+    when (search) {
+        is WallhavenSearch -> EditWallhavenSearchContent(
+            modifier = modifier,
+            showQueryField = showQueryField,
+            search = search,
+            showNSFW = showNSFW,
+            onChange = onChange,
+            onMinResAddCustomResClick = onMinResAddCustomResClick,
+            onResolutionsAddCustomResClick = onResolutionsAddCustomResClick,
+        )
+        is RedditSearch -> {}
+    }
+}
+
+@Composable
+private fun EditWallhavenSearchContent(
     modifier: Modifier = Modifier,
     search: WallhavenSearch = WallhavenSearch(),
     showQueryField: Boolean = true,

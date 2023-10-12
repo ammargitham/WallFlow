@@ -10,12 +10,12 @@ class RetrofitRedditNetwork(
     override suspend fun search(
         search: RedditSearch,
         after: String?,
-    ) = with(search) {
+    ) = with(search.filters) {
         if (subreddits.isEmpty()) {
             throw IllegalArgumentException("subreddits cannot be empty")
         }
         redditNetworkApi.search(
-            query = "self%3Ano $query".trimAll(),
+            query = "self%3Ano ${search.query}".trimAll(),
             subreddit = subreddits.joinToString("+"),
             includeNsfw = if (includeNsfw) "on" else "off",
             sort = sort.value,

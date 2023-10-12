@@ -3,10 +3,14 @@ package com.ammar.wallflow.data.db.entity.wallhaven
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.ammar.wallflow.json
+import com.ammar.wallflow.model.search.Filters
+import com.ammar.wallflow.model.search.RedditFilters
+import com.ammar.wallflow.model.search.RedditSearch
+import com.ammar.wallflow.model.search.WallhavenFilters
 import com.ammar.wallflow.model.search.WallhavenSavedSearch
 import com.ammar.wallflow.model.search.WallhavenSearch
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.json.Json
 
 @Entity(
     tableName = "wallhaven_saved_searches",
@@ -25,11 +29,20 @@ data class WallhavenSavedSearchEntity(
     val filters: String,
 )
 
-fun WallhavenSavedSearchEntity.toWallhavenSavedSearch() = WallhavenSavedSearch(
-    id = id,
-    name = name,
-    search = WallhavenSearch(
-        query = query,
-        filters = Json.decodeFromString(filters),
-    ),
-)
+fun WallhavenSavedSearchEntity.toWallhavenSavedSearch(): WallhavenSavedSearch {
+    val filters: Filters = json.decodeFromString(this.filters)
+    return WallhavenSavedSearch(
+        id = id,
+        name = name,
+        search = when (filters) {
+            is RedditFilters -> RedditSearch(
+                query = query,
+                filters = filters,
+            )
+            is WallhavenFilters -> WallhavenSearch(
+                query = query,
+                filters = filters,
+            )
+        },
+    )
+}

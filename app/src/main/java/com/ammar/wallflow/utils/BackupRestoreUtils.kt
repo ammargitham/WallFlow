@@ -18,12 +18,14 @@ import com.ammar.wallflow.data.repository.FavoritesRepository
 import com.ammar.wallflow.data.repository.SavedSearchRepository
 import com.ammar.wallflow.data.repository.wallhaven.WallhavenRepository
 import com.ammar.wallflow.extensions.format
+import com.ammar.wallflow.json
 import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.model.backup.Backup
 import com.ammar.wallflow.model.backup.BackupOptions
 import com.ammar.wallflow.model.backup.BackupV1
 import com.ammar.wallflow.model.backup.InvalidJsonException
 import com.ammar.wallflow.model.backup.WallhavenBackupV1
+import com.ammar.wallflow.safeJson
 import com.lazygeniouz.dfc.file.DocumentFileCompat
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.datetime.Clock
@@ -102,7 +104,7 @@ suspend fun getBackupV1Json(
         favorites = favorites,
         wallhaven = wallhavenBackupV1,
     )
-    return Json.encodeToString(backupV1)
+    return json.encodeToString(backupV1)
 }
 
 fun readBackupJson(
@@ -122,8 +124,6 @@ fun readBackupJson(
         else -> throw InvalidJsonException()
     }
 }
-
-private val safeJson = Json { coerceInputValues = true }
 
 fun readBackupV1Json(
     jsonObject: JsonObject,

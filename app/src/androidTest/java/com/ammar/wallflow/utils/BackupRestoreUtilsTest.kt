@@ -20,13 +20,20 @@ import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.FavoritesRepository
 import com.ammar.wallflow.data.repository.SavedSearchRepository
 import com.ammar.wallflow.data.repository.wallhaven.DefaultWallhavenRepository
+import com.ammar.wallflow.json
+import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.model.backup.BackupOptions
 import com.ammar.wallflow.model.backup.BackupV1
+import com.ammar.wallflow.model.search.RedditFilters
 import com.ammar.wallflow.model.search.RedditSearch
 import com.ammar.wallflow.model.search.RedditSort
 import com.ammar.wallflow.model.search.RedditTimeRange
+import com.ammar.wallflow.model.search.WallhavenFilters
+import com.ammar.wallflow.model.search.WallhavenSearch
+import com.ammar.wallflow.model.search.WallhavenTagSearchMeta
 import com.ammar.wallflow.model.search.toEntity
+import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.workers.FakeLocalWallpapersRepository
 import com.ammar.wallflow.workers.FakeWallhavenNetworkDataSource
 import com.ammar.wallflow.workers.TestClock
@@ -38,8 +45,8 @@ import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import kotlinx.serialization.json.Json
 import okio.buffer
 import okio.source
 import org.junit.After
@@ -150,7 +157,7 @@ class BackupRestoreUtilsTest {
         val appPreferencesRepository = dataStore.appPreferencesRepository
         try {
             initDb()
-            val json = getBackupV1Json(
+            val jsonStr = getBackupV1Json(
                 options = BackupOptions(
                     settings = true,
                     favorites = true,
@@ -162,11 +169,11 @@ class BackupRestoreUtilsTest {
                 wallpapersDao = wallpapersDao,
                 savedSearchDao = savedSearchDao,
             )
-            assertNotNull(json)
+            assertNotNull(jsonStr)
             val dbWallpapers = wallpapersDao.getAll()
             val dbFavorites = favoriteDao.getAll()
             val dbSavedSearches = savedSearchDao.getAll()
-            val decoded = Json.decodeFromString<BackupV1>(json)
+            val decoded = json.decodeFromString<BackupV1>(jsonStr)
             assertEquals(
                 appPreferencesRepository.appPreferencesFlow.firstOrNull(),
                 decoded.preferences,
@@ -316,13 +323,32 @@ class BackupRestoreUtilsTest {
             appPreferencesRepository.updateBlurNsfw(true)
             appPreferencesRepository.updateBlurSketchy(true)
             appPreferencesRepository.updateWallhavenApiKey("test")
+            appPreferencesRepository.updateHomeWallhavenSearch(
+                WallhavenSearch(
+                    query = "test",
+                    filters = WallhavenFilters(),
+                    meta = WallhavenTagSearchMeta(
+                        tag = WallhavenTag(
+                            id = 1,
+                            name = "test_tag",
+                            alias = emptyList(),
+                            categoryId = 1,
+                            category = "people",
+                            purity = Purity.SFW,
+                            createdAt = Clock.System.now(),
+                        ),
+                    ),
+                ),
+            )
             appPreferencesRepository.updateHomeRedditSearch(
                 RedditSearch(
                     query = "test",
-                    subreddits = setOf("test", "test2"),
-                    includeNsfw = false,
-                    sort = RedditSort.RELEVANCE,
-                    timeRange = RedditTimeRange.ALL,
+                    filters = RedditFilters(
+                        subreddits = setOf("test", "test2"),
+                        includeNsfw = false,
+                        sort = RedditSort.RELEVANCE,
+                        timeRange = RedditTimeRange.ALL,
+                    ),
                 ),
             )
             val oldPreferences = appPreferencesRepository.appPreferencesFlow.firstOrNull()

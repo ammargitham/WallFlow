@@ -1,23 +1,22 @@
 package com.ammar.wallflow.model.search
 
 import android.content.Context
-import androidx.compose.runtime.saveable.Saver
 import com.ammar.wallflow.R
-import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSearchHistoryEntity
 import com.ammar.wallflow.extensions.quoteIfSpaced
 import com.ammar.wallflow.extensions.trimAll
-import kotlinx.datetime.Instant
+import com.ammar.wallflow.json
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 @Serializable
+@SerialName("WallhavenSearch")
 data class WallhavenSearch(
-    val query: String = "",
-    val filters: WallhavenFilters = WallhavenFilters(),
-    val meta: SearchMeta? = null,
-) {
-    fun toJson() = Json.encodeToString(this)
+    override val query: String = "",
+    override val filters: WallhavenFilters = WallhavenFilters(),
+    override val meta: WallhavenSearchMeta? = null,
+) : Search() {
+    fun toJson() = json.encodeToString(this)
 
     fun getApiQueryString() = with(getQueryCombinedFilters()) {
         ArrayList<String>().apply {
@@ -77,19 +76,9 @@ data class WallhavenSearch(
     }
 
     companion object {
-        fun fromJson(string: String): WallhavenSearch = Json.decodeFromString(string)
+        fun fromJson(string: String): WallhavenSearch = json.decodeFromString(string)
     }
 }
-
-fun WallhavenSearch.toSearchHistoryEntity(
-    id: Long = 0,
-    lastUpdatedOn: Instant,
-) = WallhavenSearchHistoryEntity(
-    id = id,
-    query = query.trimAll().lowercase(),
-    filters = Json.encodeToString(filters),
-    lastUpdatedOn = lastUpdatedOn,
-)
 
 fun WallhavenSearch.getSupportingText(
     context: Context,
@@ -139,25 +128,10 @@ fun WallhavenSearch.getSupportingText(
     }
 }.joinToString(", ").ifBlank { null }
 
-val WallhavenSearchSaver = Saver<WallhavenSearch, List<String>>(
-    save = {
-        listOf(
-            it.query,
-            Json.encodeToString(it.filters),
-        )
-    },
-    restore = {
-        WallhavenSearch(
-            query = it[0],
-            filters = Json.decodeFromString(it[1]),
-        )
-    },
-)
-
 @Suppress("DEPRECATION")
 fun migrateWallhavenFiltersQSToWallhavenSearchJson(
     filtersStr: String,
-) = Json.encodeToString(
+) = json.encodeToString(
     WallhavenSearch(
         filters = WallhavenFilters.fromQueryString(filtersStr),
     ),
@@ -166,6 +140,6 @@ fun migrateWallhavenFiltersQSToWallhavenSearchJson(
 @Suppress("DEPRECATION")
 fun migrateWallhavenFiltersQSToWallhavenFiltersJson(
     filtersStr: String,
-) = Json.encodeToString(
+) = json.encodeToString(
     WallhavenFilters.fromQueryString(filtersStr),
 )

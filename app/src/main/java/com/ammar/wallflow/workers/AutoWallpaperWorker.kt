@@ -53,6 +53,8 @@ import com.ammar.wallflow.model.ObjectDetectionModel
 import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.local.LocalWallpaper
+import com.ammar.wallflow.model.search.RedditSearch
+import com.ammar.wallflow.model.search.Search
 import com.ammar.wallflow.model.search.WallhavenSearch
 import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import com.ammar.wallflow.services.ChangeWallpaperTileService
@@ -106,7 +108,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
         }
     }
     private var prevPageNum: Int? = null
-    private var cachedWallhavenWallpapers = mutableListOf<WallhavenWallpaper>()
+    private var cachedWallhavenWallpapers = mutableListOf<Wallpaper>()
     private val sourceChoices: Set<SourceChoice>
         get() {
             return mutableSetOf<SourceChoice>().apply {
@@ -388,9 +390,9 @@ class AutoWallpaperWorker @AssistedInject constructor(
     }
 
     private suspend fun getNextSavedSearchWallpaper(
-        search: WallhavenSearch,
+        search: Search,
         excludeHistory: Boolean = true,
-    ): WallhavenWallpaper? {
+    ): Wallpaper? {
         val historyIds = if (excludeHistory) {
             autoWallpaperHistoryRepository.getAllBySource(Source.WALLHAVEN).map { it.sourceId }
         } else {
@@ -440,14 +442,19 @@ class AutoWallpaperWorker @AssistedInject constructor(
     )
 
     private suspend fun loadWallpapers(
-        search: WallhavenSearch,
+        search: Search,
         pageNum: Int? = null,
-    ): Pair<List<WallhavenWallpaper>, Int?> {
-        val response = wallHavenNetwork.search(search, pageNum)
-        val nextPageNumber = response.meta?.run {
-            if (current_page != last_page) current_page + 1 else null
+    ): Pair<List<Wallpaper>, Int?> {
+        when (search) {
+            is WallhavenSearch -> {
+                val response = wallHavenNetwork.search(search, pageNum)
+                val nextPageNumber = response.meta?.run {
+                    if (current_page != last_page) current_page + 1 else null
+                }
+                return response.data.map { it.toWallhavenWallpaper() } to nextPageNumber
+            }
+            is RedditSearch -> TODO()
         }
-        return response.data.map { it.toWallhavenWallpaper() } to nextPageNumber
     }
 
     private fun showSuccessNotification(

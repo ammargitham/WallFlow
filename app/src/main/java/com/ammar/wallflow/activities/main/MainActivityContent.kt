@@ -33,7 +33,8 @@ import com.ammar.wallflow.extensions.toDp
 import com.ammar.wallflow.extensions.toPx
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.Wallpaper
-import com.ammar.wallflow.model.search.WallhavenFilters
+import com.ammar.wallflow.model.search.Filters
+import com.ammar.wallflow.model.search.Search
 import com.ammar.wallflow.model.search.WallhavenSearch
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.model.wallhaven.wallhavenWallpaper1
@@ -66,11 +67,11 @@ fun MainActivityContent(
     searchBarOffset: Density.() -> IntOffset = { IntOffset.Zero },
     searchBarVisible: Boolean = true,
     searchBarActive: Boolean = false,
-    searchBarSearch: WallhavenSearch = WallhavenSearch(),
+    searchBarSearch: Search = WallhavenSearch(),
     searchBarQuery: String = "",
-    searchBarSuggestions: List<Suggestion<WallhavenSearch>> = emptyList(),
+    searchBarSuggestions: List<Suggestion<Search>> = emptyList(),
     showSearchBarFilters: Boolean = false,
-    searchBarDeleteSuggestion: WallhavenSearch? = null,
+    searchBarDeleteSuggestion: Search? = null,
     searchBarOverflowIcon: @Composable (() -> Unit)? = null,
     searchBarShowNSFW: Boolean = false,
     searchBarShowQuery: Boolean = true,
@@ -83,11 +84,11 @@ fun MainActivityContent(
     onSearchBarActiveChange: (active: Boolean) -> Unit = {},
     onSearchBarQueryChange: (String) -> Unit = {},
     onSearchBarSearch: (query: String) -> Unit = {},
-    onSearchBarSuggestionClick: (suggestion: Suggestion<WallhavenSearch>) -> Unit = {},
-    onSearchBarSuggestionInsert: (suggestion: Suggestion<WallhavenSearch>) -> Unit = {},
-    onSearchBarSuggestionDeleteRequest: (suggestion: Suggestion<WallhavenSearch>) -> Unit = {},
+    onSearchBarSuggestionClick: (suggestion: Suggestion<Search>) -> Unit = {},
+    onSearchBarSuggestionInsert: (suggestion: Suggestion<Search>) -> Unit = {},
+    onSearchBarSuggestionDeleteRequest: (suggestion: Suggestion<Search>) -> Unit = {},
     onSearchBarShowFiltersChange: (show: Boolean) -> Unit = {},
-    onSearchBarFiltersChange: (searchQuery: WallhavenFilters) -> Unit = {},
+    onSearchBarFiltersChange: (searchQuery: Filters) -> Unit = {},
     onDeleteSearchBarSuggestionConfirmClick: () -> Unit = {},
     onDeleteSearchBarSuggestionDismissRequest: () -> Unit = {},
     onSearchBarSaveAsClick: () -> Unit = {},

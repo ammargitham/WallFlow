@@ -12,6 +12,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.work.Constraints
 import androidx.work.NetworkType
+import com.ammar.wallflow.json
 import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.model.search.RedditSearch
 import com.ammar.wallflow.model.search.WallhavenFilters
@@ -27,7 +28,6 @@ import kotlinx.datetime.DateTimePeriod
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 @Serializable
 data class AppPreferences(
@@ -95,10 +95,10 @@ data class AutoWallpaperPreferences(
 val MutableStateAutoWallpaperPreferencesSaver =
     Saver<MutableState<AutoWallpaperPreferences>, String>(
         save = {
-            Json.encodeToString<AutoWallpaperPreferences>(it.value)
+            json.encodeToString<AutoWallpaperPreferences>(it.value)
         },
         restore = {
-            mutableStateOf(Json.decodeFromString<AutoWallpaperPreferences>(it))
+            mutableStateOf(json.decodeFromString<AutoWallpaperPreferences>(it))
         },
     )
 

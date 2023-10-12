@@ -23,6 +23,7 @@ import com.ammar.wallflow.data.preferences.defaultAutoWallpaperFreq
 import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.extensions.toConstraintTypeMap
 import com.ammar.wallflow.extensions.toConstraints
+import com.ammar.wallflow.json
 import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.model.search.RedditSearch
 import com.ammar.wallflow.model.search.WallhavenFilters
@@ -45,7 +46,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.DateTimePeriod
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 @Singleton
 class AppPreferencesRepository @Inject constructor(
@@ -118,7 +118,7 @@ class AppPreferencesRepository @Inject constructor(
     }
 
     private fun MutablePreferences.updateHomeRedditSearch(search: RedditSearch) {
-        set(PreferencesKeys.HOME_REDDIT_SEARCH, Json.encodeToString(search))
+        set(PreferencesKeys.HOME_REDDIT_SEARCH, json.encodeToString(search))
     }
 
     private fun MutablePreferences.updateBlurSketchy(blurSketchy: Boolean) {
@@ -149,7 +149,7 @@ class AppPreferencesRepository @Inject constructor(
         set(PreferencesKeys.AUTO_WALLPAPER_FREQUENCY, frequency.toString())
         set(
             PreferencesKeys.AUTO_WALLPAPER_CONSTRAINTS,
-            Json.encodeToString(
+            json.encodeToString(
                 constraintTypeMapSerializer,
                 constraints.toConstraintTypeMap(),
             ),
@@ -313,7 +313,7 @@ class AppPreferencesRepository @Inject constructor(
     }
 
     private fun getHomeRedditSearch(preferences: Preferences): RedditSearch? = try {
-        Json.decodeFromString(preferences[PreferencesKeys.HOME_REDDIT_SEARCH] ?: "")
+        json.decodeFromString(preferences[PreferencesKeys.HOME_REDDIT_SEARCH] ?: "")
     } catch (e: Exception) {
         null
     }
@@ -346,7 +346,7 @@ class AppPreferencesRepository @Inject constructor(
 
     private fun parseConstraints(constraintsStr: String?) = try {
         if (constraintsStr != null) {
-            Json.decodeFromString(
+            json.decodeFromString(
                 constraintTypeMapSerializer,
                 constraintsStr,
             ).toConstraints()

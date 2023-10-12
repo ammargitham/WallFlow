@@ -6,13 +6,13 @@ import androidx.core.graphics.toColorInt
 import androidx.room.TypeConverter
 import com.ammar.wallflow.extensions.toHexString
 import com.ammar.wallflow.extensions.trimAll
+import com.ammar.wallflow.json
 import com.ammar.wallflow.model.Order
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.search.WallhavenCategory
 import com.ammar.wallflow.model.search.WallhavenSorting
 import com.ammar.wallflow.model.search.WallhavenTopRange
 import kotlinx.datetime.Instant
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonArray
@@ -26,8 +26,8 @@ object Converters {
     fun instantToTimestamp(instant: Instant) = instant.toEpochMilliseconds()
 
     @TypeConverter
-    fun fromJsonToStringList(value: String) =
-        Json.parseToJsonElement(value).jsonArray.map { it.jsonPrimitive.content }
+    fun fromJsonToStringList(value: String) = json.parseToJsonElement(value)
+        .jsonArray.map { it.jsonPrimitive.content }
 
     @TypeConverter
     fun stringListToJson(strings: List<String>) =

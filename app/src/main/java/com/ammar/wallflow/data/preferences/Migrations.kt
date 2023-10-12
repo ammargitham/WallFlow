@@ -3,12 +3,12 @@ package com.ammar.wallflow.data.preferences
 import androidx.datastore.core.DataMigration
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.ammar.wallflow.json
 import com.ammar.wallflow.model.search.WallhavenFilters
 import com.ammar.wallflow.model.search.WallhavenSearch
 import com.ammar.wallflow.model.search.WallhavenSorting
 import com.ammar.wallflow.model.search.WallhavenTopRange
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 /**
  * Use static strings for preference keys except PreferencesKeys.VERSION
@@ -51,8 +51,9 @@ fun migrateAppPrefs1To2() = object : DataMigration<Preferences> {
         }
 
         // insert new "home_wallhaven_search"
-        mutablePrefs[stringPreferencesKey("home_wallhaven_search")] =
-            Json.encodeToString(wallhavenSearch)
+        mutablePrefs[stringPreferencesKey("home_wallhaven_search")] = json.encodeToString(
+            wallhavenSearch,
+        )
         mutablePrefs[PreferencesKeys.VERSION] = 2
         return mutablePrefs.toPreferences()
     }
