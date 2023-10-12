@@ -10,6 +10,8 @@ import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 @Singleton
 class SavedSearchRepository @Inject constructor(
@@ -50,7 +52,7 @@ class SavedSearchRepository @Inject constructor(
     ) = existing?.copy(
         name = savedSearch.name,
         query = savedSearch.search.query,
-        filters = savedSearch.search.filters.toQueryString(),
+        filters = Json.encodeToString(savedSearch.search.filters),
     ) ?: savedSearch.toEntity(0)
 
     suspend fun delete(savedSearch: WallhavenSavedSearch) = withContext(ioDispatcher) {

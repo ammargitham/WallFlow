@@ -136,7 +136,7 @@ class WallhavenSearchTest {
     }
 
     @Test
-    fun `migrate queryString created by WallhavenFilters to WallhavenSearch`() {
+    fun `migrate WallhavenFilters queryString to WallhavenSearch json`() {
         val filtersStr = "includedTags=test&excludedTags=&username=&tagId=&wallpaperId=" +
             "&categories=anime%2Cgeneral%2Cpeople&purity=sfw&sorting=date_added&order=desc" +
             "&topRange=1M&atleast=&resolutions=&ratios=&colors=&seed="
@@ -144,6 +144,18 @@ class WallhavenSearchTest {
         assertEquals(
             expectedStr,
             migrateWallhavenFiltersQSToWallhavenSearchJson(filtersStr),
+        )
+    }
+
+    @Test
+    fun `migrate WallhavenFilters queryString to WallhavenFilters json`() {
+        val filtersStr = "includedTags=test&excludedTags=&username=&tagId=&wallpaperId=" +
+            "&categories=anime%2Cgeneral%2Cpeople&purity=sfw&sorting=date_added&order=desc" +
+            "&topRange=1M&atleast=&resolutions=&ratios=&colors=&seed="
+        val expectedStr = "{\"includedTags\":[\"test\"]}"
+        assertEquals(
+            expectedStr,
+            migrateWallhavenFiltersQSToWallhavenFiltersJson(filtersStr),
         )
     }
 }

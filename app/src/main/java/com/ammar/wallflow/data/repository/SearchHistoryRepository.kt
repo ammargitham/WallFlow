@@ -10,6 +10,8 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.Clock
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 @Singleton
 class SearchHistoryRepository @Inject constructor(
@@ -21,7 +23,7 @@ class SearchHistoryRepository @Inject constructor(
     suspend fun addSearch(search: WallhavenSearch) = withContext(ioDispatcher) {
         val lastUpdatedOn = Clock.System.now()
         val searchHistory = searchHistoryDao.getByQuery(search.query)?.copy(
-            filters = search.filters.toQueryString(),
+            filters = Json.encodeToString(search.filters),
             lastUpdatedOn = lastUpdatedOn,
         ) ?: search.toSearchHistoryEntity(lastUpdatedOn = lastUpdatedOn)
         searchHistoryDao.upsert(searchHistory)

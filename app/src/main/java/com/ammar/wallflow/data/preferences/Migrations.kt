@@ -34,6 +34,7 @@ fun migrateAppPrefs1To2() = object : DataMigration<Preferences> {
         val wallhavenSearch = WallhavenSearch(
             query = homeSearchQuery ?: "",
             filters = homeFilters?.let {
+                @Suppress("DEPRECATION")
                 WallhavenFilters.fromQueryString(it)
             } ?: WallhavenFilters(
                 sorting = WallhavenSorting.TOPLIST,

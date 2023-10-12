@@ -4,9 +4,9 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.ammar.wallflow.model.search.WallhavenFilters
 import com.ammar.wallflow.model.search.WallhavenSearch
 import kotlinx.datetime.Instant
+import kotlinx.serialization.json.Json
 
 @Entity(
     tableName = "wallhaven_search_history",
@@ -26,5 +26,5 @@ data class WallhavenSearchHistoryEntity(
 
 fun WallhavenSearchHistoryEntity.toWallhavenSearch() = WallhavenSearch(
     query = query,
-    filters = WallhavenFilters.fromQueryString(filters),
+    filters = Json.decodeFromString(filters),
 )

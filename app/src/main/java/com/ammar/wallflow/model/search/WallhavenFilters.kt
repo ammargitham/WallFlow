@@ -2,15 +2,10 @@
 
 package com.ammar.wallflow.model.search
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.Saver
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntSize
 import androidx.core.graphics.toColorInt
 import com.ammar.wallflow.data.db.converters.Converters.fromIntSizeStr
-import com.ammar.wallflow.extensions.toHexString
-import com.ammar.wallflow.extensions.toQueryString
 import com.ammar.wallflow.extensions.urlDecoded
 import com.ammar.wallflow.model.Order
 import com.ammar.wallflow.model.Purity
@@ -39,39 +34,15 @@ data class WallhavenFilters(
     val seed: String? = null,
     val ratios: Set<WallhavenRatio> = emptySet(),
 ) {
-    private fun toStringMap() = mapOf(
-        "includedTags" to includedTags
-            .sorted()
-            .joinToString(","),
-        "excludedTags" to excludedTags
-            .sorted()
-            .joinToString(","),
-        "username" to (username ?: ""),
-        "tagId" to (tagId?.toString() ?: ""),
-        "wallpaperId" to (wallpaperId ?: ""),
-        "categories" to categories
-            .sortedBy { it.value }
-            .joinToString(",") { it.value },
-        "purity" to purity
-            .sortedBy { it.purityName }
-            .joinToString(",") { it.purityName },
-        "sorting" to sorting.value,
-        "order" to order.value,
-        "topRange" to topRange.value,
-        "atleast" to (atleast?.toString() ?: ""),
-        "resolutions" to resolutions.sortedBy { it.width }.joinToString(","),
-        "ratios" to ratios.map { it.toRatioString() }.sorted().joinToString(","),
-        "colors" to (colors?.toHexString() ?: ""),
-        "seed" to (seed ?: ""),
-    )
-
-    fun toQueryString() = toStringMap().toQueryString()
-
     companion object {
         val defaultCategories =
             setOf(WallhavenCategory.GENERAL, WallhavenCategory.ANIME, WallhavenCategory.PEOPLE)
         val defaultPurities = setOf(Purity.SFW)
 
+        @Deprecated(
+            level = DeprecationLevel.WARNING,
+            message = "Used only for migrations. Replace with json serialization",
+        )
         fun fromQueryString(string: String): WallhavenFilters {
             val map = string
                 .split("&")
@@ -259,13 +230,3 @@ sealed class WallhavenRatio {
             CategoryWallhavenRatio(category)
     }
 }
-
-val WallhavenFiltersSaver = Saver<WallhavenFilters, String>(
-    save = { it.toQueryString() },
-    restore = { WallhavenFilters.fromQueryString(it) },
-)
-
-val MutableStateWallhavenFiltersSaver = Saver<MutableState<WallhavenFilters>, String>(
-    save = { it.value.toQueryString() },
-    restore = { mutableStateOf(WallhavenFilters.fromQueryString(it)) },
-)

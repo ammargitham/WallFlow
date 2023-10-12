@@ -87,7 +87,7 @@ fun WallhavenSearch.toSearchHistoryEntity(
 ) = WallhavenSearchHistoryEntity(
     id = id,
     query = query.trimAll().lowercase(),
-    filters = filters.toQueryString(),
+    filters = Json.encodeToString(filters),
     lastUpdatedOn = lastUpdatedOn,
 )
 
@@ -140,19 +140,32 @@ fun WallhavenSearch.getSupportingText(
 }.joinToString(", ").ifBlank { null }
 
 val WallhavenSearchSaver = Saver<WallhavenSearch, List<String>>(
-    save = { listOf(it.query, it.filters.toQueryString()) },
+    save = {
+        listOf(
+            it.query,
+            Json.encodeToString(it.filters),
+        )
+    },
     restore = {
         WallhavenSearch(
             query = it[0],
-            filters = WallhavenFilters.fromQueryString(it[1]),
+            filters = Json.decodeFromString(it[1]),
         )
     },
 )
 
+@Suppress("DEPRECATION")
 fun migrateWallhavenFiltersQSToWallhavenSearchJson(
     filtersStr: String,
 ) = Json.encodeToString(
     WallhavenSearch(
         filters = WallhavenFilters.fromQueryString(filtersStr),
     ),
+)
+
+@Suppress("DEPRECATION")
+fun migrateWallhavenFiltersQSToWallhavenFiltersJson(
+    filtersStr: String,
+) = Json.encodeToString(
+    WallhavenFilters.fromQueryString(filtersStr),
 )

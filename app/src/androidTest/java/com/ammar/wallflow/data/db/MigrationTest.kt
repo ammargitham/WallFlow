@@ -255,6 +255,34 @@ class MigrationTest {
                         );
                 """.trimIndent(),
             )
+            execSQL(
+                // language=sql
+                """
+                    INSERT INTO wallhaven_saved_searches
+                        ("id", "name", "query", "filters")
+                    VALUES
+                        (
+                            '1',
+                            'home',
+                            'test',
+                            'includedTags=&excludedTags=&username=&tagId=&wallpaperId=&categories=anime%2Cgeneral%2Cpeople&purity=sfw&sorting=toplist&order=desc&topRange=1d&atleast=&resolutions=&ratios=&colors=&seed='
+                        );
+                """.trimIndent(),
+            )
+            execSQL(
+                // language=sql
+                """
+                    INSERT INTO wallhaven_search_history
+                        ("id", "query", "filters", "last_updated_on")
+                    VALUES
+                        (
+                            '1',
+                            'test',
+                            'includedTags=&excludedTags=&username=&tagId=&wallpaperId=&categories=anime%2Cgeneral%2Cpeople&purity=sfw&sorting=toplist&order=desc&topRange=1d&atleast=&resolutions=&ratios=&colors=&seed=',
+                            '12345'
+                        );
+                """.trimIndent(),
+            )
             close()
         }
         helper.runMigrationsAndValidate(
@@ -268,10 +296,40 @@ class MigrationTest {
                 "SELECT * from wallhaven_search_query",
             ).use {
                 it.moveToFirst()
-                val queryString = it.getString(1)
+                val queryString = it.getString(
+                    it.getColumnIndexOrThrow("query_string"),
+                )
                 assertEquals(
                     "{\"filters\":{\"sorting\":\"TOPLIST\",\"topRange\":\"ONE_DAY\"}}",
                     queryString,
+                )
+            }
+
+            db.query(
+                // language=sql
+                "SELECT * from wallhaven_saved_searches",
+            ).use {
+                it.moveToFirst()
+                val filtersStr = it.getString(
+                    it.getColumnIndexOrThrow("filters"),
+                )
+                assertEquals(
+                    "{\"sorting\":\"TOPLIST\",\"topRange\":\"ONE_DAY\"}",
+                    filtersStr,
+                )
+            }
+
+            db.query(
+                // language=sql
+                "SELECT * from wallhaven_search_history",
+            ).use {
+                it.moveToFirst()
+                val filtersStr = it.getString(
+                    it.getColumnIndexOrThrow("filters"),
+                )
+                assertEquals(
+                    "{\"sorting\":\"TOPLIST\",\"topRange\":\"ONE_DAY\"}",
+                    filtersStr,
                 )
             }
         }
