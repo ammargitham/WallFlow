@@ -1,4 +1,4 @@
-package com.ammar.wallflow.data.db.entity.wallhaven
+package com.ammar.wallflow.data.db.entity.search
 
 import androidx.room.Entity
 import androidx.room.Index

@@ -1,8 +1,8 @@
 package com.ammar.wallflow.data.repository
 
 import com.ammar.wallflow.IoDispatcher
-import com.ammar.wallflow.data.db.dao.wallhaven.SavedSearchDao
-import com.ammar.wallflow.data.db.entity.wallhaven.SavedSearchEntity
+import com.ammar.wallflow.data.db.dao.search.SavedSearchDao
+import com.ammar.wallflow.data.db.entity.search.SavedSearchEntity
 import com.ammar.wallflow.json
 import com.ammar.wallflow.model.search.SavedSearch
 import com.ammar.wallflow.model.search.toEntity

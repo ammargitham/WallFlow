@@ -10,9 +10,9 @@ import com.ammar.wallflow.data.db.dao.FavoriteDao
 import com.ammar.wallflow.data.db.dao.LastUpdatedDao
 import com.ammar.wallflow.data.db.dao.ObjectDetectionModelDao
 import com.ammar.wallflow.data.db.dao.RateLimitDao
-import com.ammar.wallflow.data.db.dao.wallhaven.SavedSearchDao
-import com.ammar.wallflow.data.db.dao.wallhaven.SearchHistoryDao
-import com.ammar.wallflow.data.db.dao.wallhaven.SearchQueryDao
+import com.ammar.wallflow.data.db.dao.search.SavedSearchDao
+import com.ammar.wallflow.data.db.dao.search.SearchHistoryDao
+import com.ammar.wallflow.data.db.dao.search.SearchQueryDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenPopularTagsDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenSearchQueryRemoteKeysDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenSearchQueryWallpapersDao
@@ -24,9 +24,9 @@ import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.LastUpdatedEntity
 import com.ammar.wallflow.data.db.entity.ObjectDetectionModelEntity
 import com.ammar.wallflow.data.db.entity.RateLimitEntity
-import com.ammar.wallflow.data.db.entity.wallhaven.SavedSearchEntity
-import com.ammar.wallflow.data.db.entity.wallhaven.SearchHistoryEntity
-import com.ammar.wallflow.data.db.entity.wallhaven.SearchQueryEntity
+import com.ammar.wallflow.data.db.entity.search.SavedSearchEntity
+import com.ammar.wallflow.data.db.entity.search.SearchHistoryEntity
+import com.ammar.wallflow.data.db.entity.search.SearchQueryEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenPopularTagEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSearchQueryRemoteKeyEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSearchQueryWallpaperEntity

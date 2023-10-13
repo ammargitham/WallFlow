@@ -4,14 +4,14 @@ import android.content.Context
 import android.util.Log
 import androidx.core.net.toUri
 import com.ammar.wallflow.data.db.dao.FavoriteDao
-import com.ammar.wallflow.data.db.dao.wallhaven.SavedSearchDao
+import com.ammar.wallflow.data.db.dao.search.SavedSearchDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenUploadersDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenWallpapersDao
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
+import com.ammar.wallflow.data.db.entity.search.toSavedSearch
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenTagEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenUploaderEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
-import com.ammar.wallflow.data.db.entity.wallhaven.toSavedSearch
 import com.ammar.wallflow.data.preferences.AppPreferences
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.FavoritesRepository

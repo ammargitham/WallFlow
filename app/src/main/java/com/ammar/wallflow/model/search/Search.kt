@@ -1,7 +1,7 @@
 package com.ammar.wallflow.model.search
 
 import androidx.compose.runtime.saveable.Saver
-import com.ammar.wallflow.data.db.entity.wallhaven.SearchHistoryEntity
+import com.ammar.wallflow.data.db.entity.search.SearchHistoryEntity
 import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.json
 import kotlinx.datetime.Instant

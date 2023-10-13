@@ -3,8 +3,8 @@ package com.ammar.wallflow.activities.main
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.ammar.wallflow.data.db.entity.wallhaven.toSavedSearch
-import com.ammar.wallflow.data.db.entity.wallhaven.toSearch
+import com.ammar.wallflow.data.db.entity.search.toSavedSearch
+import com.ammar.wallflow.data.db.entity.search.toSearch
 import com.ammar.wallflow.data.preferences.Theme
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.GlobalErrorsRepository

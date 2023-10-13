@@ -6,9 +6,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
+import com.ammar.wallflow.data.db.entity.search.SavedSearchEntity
+import com.ammar.wallflow.data.db.entity.search.toSavedSearch
 import com.ammar.wallflow.data.db.entity.toFavorite
-import com.ammar.wallflow.data.db.entity.wallhaven.SavedSearchEntity
-import com.ammar.wallflow.data.db.entity.wallhaven.toSavedSearch
 import com.ammar.wallflow.data.preferences.LayoutPreferences
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.FavoritesRepository

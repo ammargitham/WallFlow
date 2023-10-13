@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.ammar.wallflow.data.db.entity.search.SearchQueryEntity
 
 @Entity(
     tableName = "search_query_remote_keys",

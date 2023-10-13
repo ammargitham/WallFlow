@@ -1,7 +1,7 @@
 package com.ammar.wallflow.data.repository
 
 import com.ammar.wallflow.IoDispatcher
-import com.ammar.wallflow.data.db.dao.wallhaven.SearchHistoryDao
+import com.ammar.wallflow.data.db.dao.search.SearchHistoryDao
 import com.ammar.wallflow.json
 import com.ammar.wallflow.model.search.Search
 import com.ammar.wallflow.model.search.toSearchHistoryEntity

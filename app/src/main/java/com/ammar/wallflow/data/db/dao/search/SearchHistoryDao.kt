@@ -1,9 +1,9 @@
-package com.ammar.wallflow.data.db.dao.wallhaven
+package com.ammar.wallflow.data.db.dao.search
 
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
-import com.ammar.wallflow.data.db.entity.wallhaven.SearchHistoryEntity
+import com.ammar.wallflow.data.db.entity.search.SearchHistoryEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
