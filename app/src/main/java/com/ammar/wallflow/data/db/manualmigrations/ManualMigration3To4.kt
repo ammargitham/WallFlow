@@ -149,7 +149,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
             UPDATE search_query
             SET query_string = '$queryString'
             WHERE id = $id
-        """.trimIndent(),
+                """.trimIndent(),
             )
         }
 
@@ -175,7 +175,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
             UPDATE saved_searches
             SET filters = '$queryString'
             WHERE id = $id
-        """.trimIndent(),
+                """.trimIndent(),
             )
         }
 
@@ -201,7 +201,7 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
             UPDATE search_history
             SET filters = '$queryString'
             WHERE id = $id
-        """.trimIndent(),
+                """.trimIndent(),
             )
         }
     }

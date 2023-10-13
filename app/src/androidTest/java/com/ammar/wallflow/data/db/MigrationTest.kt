@@ -191,7 +191,6 @@ class MigrationTest {
                 assertEquals(5, nextPageNumber)
             }
 
-
             db.query(
                 // language=sql
                 "SELECT * from search_query",
@@ -220,7 +219,6 @@ class MigrationTest {
                     filtersStr,
                 )
             }
-
 
             db.query(
                 // language=sql
