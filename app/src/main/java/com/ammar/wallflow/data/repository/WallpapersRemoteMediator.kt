@@ -6,7 +6,7 @@ import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import com.ammar.wallflow.data.db.AppDatabase
-import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSearchQueryEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.SearchQueryEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSearchQueryRemoteKeyEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSearchQueryWallpaperEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
@@ -25,7 +25,7 @@ class WallpapersRemoteMediator(
     private val clock: Clock = Clock.System,
 ) : RemoteMediator<Int, WallhavenWallpaperEntity>() {
     private val wallpapersDao = appDatabase.wallhavenWallpapersDao()
-    private val searchQueryDao = appDatabase.wallhavenSearchQueryDao()
+    private val searchQueryDao = appDatabase.searchQueryDao()
     private val remoteKeysDao = appDatabase.wallhavenSearchQueryRemoteKeysDao()
     private val searchQueryWallpapersDao = appDatabase.wallhavenSearchQueryWallpapersDao()
 
@@ -57,11 +57,11 @@ class WallpapersRemoteMediator(
                 LoadType.PREPEND -> return MediatorResult.Success(endOfPaginationReached = true)
                 LoadType.APPEND -> {
                     searchQueryEntity?.run { remoteKeysDao.getBySearchQueryId(id) }
-                        ?.nextPageNumber
+                        ?.nextPage
                         ?: return MediatorResult.Success(endOfPaginationReached = true)
                 }
             }
-            val response = wallHavenNetwork.search(search, nextPage)
+            val response = wallHavenNetwork.search(search, nextPage?.toIntOrNull())
             // if at last page, next page is null else current + 1
             val nextPageNumber = response.meta?.run {
                 if (current_page != last_page) current_page + 1 else null
@@ -69,7 +69,7 @@ class WallpapersRemoteMediator(
             appDatabase.withTransaction {
                 val now = clock.now()
                 val searchQueryId = searchQueryEntity?.id ?: searchQueryDao.upsert(
-                    WallhavenSearchQueryEntity(
+                    SearchQueryEntity(
                         id = 0,
                         queryString = search.toJson(),
                         lastUpdatedOn = now,
@@ -88,11 +88,11 @@ class WallpapersRemoteMediator(
 
                 // Update RemoteKey for this query.
                 val remoteKey = remoteKeysDao.getBySearchQueryId(searchQueryId)
-                val updatedRemoteKey = remoteKey?.copy(nextPageNumber = nextPageNumber)
+                val updatedRemoteKey = remoteKey?.copy(nextPage = nextPageNumber.toString())
                     ?: WallhavenSearchQueryRemoteKeyEntity(
                         id = 0,
                         searchQueryId = searchQueryId,
-                        nextPageNumber = nextPageNumber,
+                        nextPage = nextPageNumber.toString(),
                     )
                 remoteKeysDao.insertOrReplace(updatedRemoteKey)
 

@@ -13,7 +13,7 @@ import androidx.room.Index
     ],
     foreignKeys = [
         ForeignKey(
-            entity = WallhavenSearchQueryEntity::class,
+            entity = SearchQueryEntity::class,
             parentColumns = ["id"],
             childColumns = ["search_query_id"],
             onDelete = ForeignKey.CASCADE,

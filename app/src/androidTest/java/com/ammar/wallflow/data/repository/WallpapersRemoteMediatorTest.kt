@@ -42,7 +42,7 @@ class WallpapersRemoteMediatorTest {
         klass = AppDatabase::class.java,
     ).build()
     private val wallhavenWallpapersDao = mockDb.wallhavenWallpapersDao()
-    private val wallhavenSearchQueryDao = mockDb.wallhavenSearchQueryDao()
+    private val wallhavenSearchQueryDao = mockDb.searchQueryDao()
     private val wallhavenSearchQueryWallpapersDao = mockDb.wallhavenSearchQueryWallpapersDao()
 
     @After

@@ -4,14 +4,14 @@ import android.content.Context
 import android.util.Log
 import androidx.core.net.toUri
 import com.ammar.wallflow.data.db.dao.FavoriteDao
-import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenSavedSearchDao
+import com.ammar.wallflow.data.db.dao.wallhaven.SavedSearchDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenUploadersDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenWallpapersDao
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenTagEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenUploaderEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
-import com.ammar.wallflow.data.db.entity.wallhaven.toWallhavenSavedSearch
+import com.ammar.wallflow.data.db.entity.wallhaven.toSavedSearch
 import com.ammar.wallflow.data.preferences.AppPreferences
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.FavoritesRepository
@@ -46,7 +46,7 @@ suspend fun getBackupV1Json(
     appPreferencesRepository: AppPreferencesRepository,
     favoriteDao: FavoriteDao,
     wallpapersDao: WallhavenWallpapersDao,
-    savedSearchDao: WallhavenSavedSearchDao,
+    savedSearchDao: SavedSearchDao,
 ): String? {
     if (!options.atleastOneChosen) {
         return null
@@ -183,7 +183,7 @@ suspend fun restoreBackupV1(
         val savedSearches = backup.wallhaven?.savedSearches
         if (savedSearches != null) {
             savedSearchRepository.upsertAll(
-                savedSearches.map { it.toWallhavenSavedSearch() },
+                savedSearches.map { it.toSavedSearch() },
             )
         }
     }

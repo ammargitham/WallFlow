@@ -20,7 +20,7 @@ import com.ammar.wallflow.MIME_TYPE_JPEG
 import com.ammar.wallflow.data.db.dao.AutoWallpaperHistoryDao
 import com.ammar.wallflow.data.db.dao.FavoriteDao
 import com.ammar.wallflow.data.db.dao.ObjectDetectionModelDao
-import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenSavedSearchDao
+import com.ammar.wallflow.data.db.dao.wallhaven.SavedSearchDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenWallpapersDao
 import com.ammar.wallflow.data.db.entity.AutoWallpaperHistoryEntity
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
@@ -45,8 +45,8 @@ import com.ammar.wallflow.extensions.getTempFile
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.model.local.LocalWallpaper
+import com.ammar.wallflow.model.search.SavedSearch
 import com.ammar.wallflow.model.search.WallhavenFilters
-import com.ammar.wallflow.model.search.WallhavenSavedSearch
 import com.ammar.wallflow.model.search.WallhavenSearch
 import com.ammar.wallflow.model.search.toEntity
 import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.FAILURE_REASON
@@ -182,7 +182,7 @@ class AutoWallpaperTest {
                     useObjectDetection = false,
                 ),
             )
-            val savedSearch = WallhavenSavedSearch(
+            val savedSearch = SavedSearch(
                 id = 1,
                 name = "Test",
                 search = WallhavenSearch(
@@ -272,7 +272,7 @@ class AutoWallpaperTest {
                     savedSearchId = 1,
                 ),
             )
-            val savedSearch = WallhavenSavedSearch(
+            val savedSearch = SavedSearch(
                 id = 1,
                 name = "Test",
                 search = WallhavenSearch(
@@ -372,7 +372,7 @@ class AutoWallpaperTest {
                     savedSearchId = 1,
                 ),
             )
-            val savedSearch = WallhavenSavedSearch(
+            val savedSearch = SavedSearch(
                 id = 1,
                 name = "Test",
                 search = WallhavenSearch(
@@ -702,7 +702,7 @@ class AutoWallpaperTest {
     private fun getWorker(
         dataStore: DataStore<Preferences>,
         appPreferencesRepository: AppPreferencesRepository = dataStore.appPreferencesRepository,
-        savedSearchDao: WallhavenSavedSearchDao = FakeSavedSearchDao(),
+        savedSearchDao: SavedSearchDao = FakeSavedSearchDao(),
         autoWallpaperHistoryDao: AutoWallpaperHistoryDao = FakeAutoWallpaperHistoryDao(),
         objectDetectionModelDao: ObjectDetectionModelDao = FakeObjectDetectionModelDao(),
         wallHavenNetwork: WallhavenNetworkDataSource = FakeWallhavenNetworkDataSource(),

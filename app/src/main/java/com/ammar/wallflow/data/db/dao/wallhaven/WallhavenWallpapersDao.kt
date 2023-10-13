@@ -48,7 +48,7 @@ interface WallhavenWallpapersDao {
                 FROM wallhaven_search_query_wallpapers wsqw
                 WHERE wsqw.search_query_id = (
                     SELECT sq.id
-                    FROM wallhaven_search_query sq
+                    FROM search_query sq
                     WHERE query_string = :queryString
                 )
             )

@@ -7,7 +7,7 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 
 @Entity(
-    tableName = "wallhaven_search_query_remote_keys",
+    tableName = "search_query_remote_keys",
     indices = [
         Index(
             value = ["search_query_id"],
@@ -16,7 +16,7 @@ import androidx.room.PrimaryKey
     ],
     foreignKeys = [
         ForeignKey(
-            WallhavenSearchQueryEntity::class,
+            SearchQueryEntity::class,
             parentColumns = ["id"],
             childColumns = ["search_query_id"],
             onDelete = ForeignKey.CASCADE,
@@ -26,5 +26,5 @@ import androidx.room.PrimaryKey
 data class WallhavenSearchQueryRemoteKeyEntity(
     @PrimaryKey(autoGenerate = true) val id: Long,
     @ColumnInfo(name = "search_query_id") val searchQueryId: Long,
-    @ColumnInfo(name = "next_page_number") val nextPageNumber: Int?,
+    @ColumnInfo(name = "next_page") val nextPage: String?,
 )

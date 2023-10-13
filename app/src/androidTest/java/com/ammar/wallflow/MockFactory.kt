@@ -5,8 +5,8 @@ import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenThumbs
 import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenUploader
 import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenWallpaper
 import com.ammar.wallflow.extensions.toHexString
+import com.ammar.wallflow.model.search.SavedSearch
 import com.ammar.wallflow.model.search.WallhavenFilters
-import com.ammar.wallflow.model.search.WallhavenSavedSearch
 import com.ammar.wallflow.model.search.WallhavenSearch
 import kotlin.math.absoluteValue
 import kotlin.random.Random
@@ -89,9 +89,9 @@ object MockFactory {
     private fun generateWallhavenSavedSearch(
         random: Random = Random,
         idNumber: Int = random.nextInt().absoluteValue,
-    ): WallhavenSavedSearch {
+    ): SavedSearch {
         val id = idNumber + 1
-        return WallhavenSavedSearch(
+        return SavedSearch(
             id = id.toLong(),
             name = "saved_search_$id",
             search = WallhavenSearch(

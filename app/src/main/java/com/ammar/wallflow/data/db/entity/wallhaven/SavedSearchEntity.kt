@@ -7,13 +7,13 @@ import com.ammar.wallflow.json
 import com.ammar.wallflow.model.search.Filters
 import com.ammar.wallflow.model.search.RedditFilters
 import com.ammar.wallflow.model.search.RedditSearch
+import com.ammar.wallflow.model.search.SavedSearch
 import com.ammar.wallflow.model.search.WallhavenFilters
-import com.ammar.wallflow.model.search.WallhavenSavedSearch
 import com.ammar.wallflow.model.search.WallhavenSearch
 import kotlinx.serialization.Serializable
 
 @Entity(
-    tableName = "wallhaven_saved_searches",
+    tableName = "saved_searches",
     indices = [
         Index(
             value = ["name"],
@@ -22,27 +22,24 @@ import kotlinx.serialization.Serializable
     ],
 )
 @Serializable
-data class WallhavenSavedSearchEntity(
+data class SavedSearchEntity(
     @PrimaryKey(autoGenerate = true) val id: Long,
     val name: String,
     val query: String,
     val filters: String,
 )
 
-fun WallhavenSavedSearchEntity.toWallhavenSavedSearch(): WallhavenSavedSearch {
-    val filters: Filters = json.decodeFromString(this.filters)
-    return WallhavenSavedSearch(
-        id = id,
-        name = name,
-        search = when (filters) {
-            is RedditFilters -> RedditSearch(
-                query = query,
-                filters = filters,
-            )
-            is WallhavenFilters -> WallhavenSearch(
-                query = query,
-                filters = filters,
-            )
-        },
-    )
-}
+fun SavedSearchEntity.toSavedSearch() = SavedSearch(
+    id = id,
+    name = name,
+    search = when (val filters: Filters = json.decodeFromString(this.filters)) {
+        is RedditFilters -> RedditSearch(
+            query = query,
+            filters = filters,
+        )
+        is WallhavenFilters -> WallhavenSearch(
+            query = query,
+            filters = filters,
+        )
+    },
+)

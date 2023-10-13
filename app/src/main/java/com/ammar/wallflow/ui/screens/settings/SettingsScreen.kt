@@ -42,8 +42,8 @@ import com.ammar.wallflow.data.preferences.AppPreferences
 import com.ammar.wallflow.data.preferences.AutoWallpaperPreferences
 import com.ammar.wallflow.data.preferences.ObjectDetectionPreferences
 import com.ammar.wallflow.model.ObjectDetectionModel
-import com.ammar.wallflow.model.search.WallhavenSavedSearch
-import com.ammar.wallflow.model.search.WallhavenSavedSearchSaver
+import com.ammar.wallflow.model.search.SavedSearch
+import com.ammar.wallflow.model.search.SavedSearchSaver
 import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.TopBar
 import com.ammar.wallflow.ui.common.bottomWindowInsets
@@ -280,7 +280,7 @@ fun SettingsScreen(
         val scope = rememberCoroutineScope()
         var localSavedSearch by rememberSaveable(
             this,
-            stateSaver = WallhavenSavedSearchSaver,
+            stateSaver = SavedSearchSaver,
         ) { mutableStateOf(this) }
 
         EditSearchModalBottomSheet(
@@ -409,7 +409,7 @@ fun SettingsScreenContent(
     modifier: Modifier = Modifier,
     appPreferences: AppPreferences = AppPreferences(),
     model: ObjectDetectionModel = ObjectDetectionModel.DEFAULT,
-    autoWallpaperSavedSearch: WallhavenSavedSearch? = null,
+    autoWallpaperSavedSearch: SavedSearch? = null,
     hasSetWallpaperPermission: Boolean = true,
     autoWallpaperNextRun: NextRun = NextRun.NotScheduled,
     autoWallpaperStatus: AutoWallpaperWorker.Companion.Status? = null,
@@ -560,7 +560,7 @@ fun SettingsScreenContent(
 
 private fun getSourcesSummary(
     context: Context,
-    savedSearch: WallhavenSavedSearch?,
+    savedSearch: SavedSearch?,
     savedSearchEnabled: Boolean,
     favoritesEnabled: Boolean,
     localEnabled: Boolean,

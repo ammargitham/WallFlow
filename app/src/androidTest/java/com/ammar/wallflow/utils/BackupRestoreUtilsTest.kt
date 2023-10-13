@@ -66,7 +66,7 @@ class BackupRestoreUtilsTest {
     private val tagsDao = mockDb.wallhavenTagsDao()
     private val uploadersDao = mockDb.wallhavenUploadersDao()
     private val favoriteDao = mockDb.favoriteDao()
-    private val savedSearchDao = mockDb.wallhavenSavedSearchDao()
+    private val savedSearchDao = mockDb.savedSearchDao()
     private val random = Random(1000)
     private val clock = TestClock(now = Instant.fromEpochMilliseconds(1694954538))
 

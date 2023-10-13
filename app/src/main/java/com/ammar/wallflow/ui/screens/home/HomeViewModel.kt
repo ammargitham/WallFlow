@@ -7,8 +7,8 @@ import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.toFavorite
-import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSavedSearchEntity
-import com.ammar.wallflow.data.db.entity.wallhaven.toWallhavenSavedSearch
+import com.ammar.wallflow.data.db.entity.wallhaven.SavedSearchEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.toSavedSearch
 import com.ammar.wallflow.data.preferences.LayoutPreferences
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.FavoritesRepository
@@ -21,9 +21,9 @@ import com.ammar.wallflow.model.OnlineSource
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.search.RedditSearch
+import com.ammar.wallflow.model.search.SavedSearch
 import com.ammar.wallflow.model.search.Search
 import com.ammar.wallflow.model.search.WallhavenFilters
-import com.ammar.wallflow.model.search.WallhavenSavedSearch
 import com.ammar.wallflow.model.search.WallhavenSearch
 import com.ammar.wallflow.model.search.WallhavenSorting
 import com.ammar.wallflow.model.search.WallhavenTopRange
@@ -108,7 +108,7 @@ class HomeViewModel @Inject constructor(
                 mainSearch = mainSearch,
                 homeSearch = appPreferences.homeWallhavenSearch,
                 savedSearches = savedSearchEntities.map(
-                    WallhavenSavedSearchEntity::toWallhavenSavedSearch,
+                    SavedSearchEntity::toSavedSearch,
                 ),
                 blurSketchy = appPreferences.blurSketchy,
                 blurNsfw = appPreferences.blurNsfw,
@@ -157,7 +157,7 @@ class HomeViewModel @Inject constructor(
 
     fun saveSearchAs(name: String, search: Search) = viewModelScope.launch {
         savedSearchRepository.upsert(
-            WallhavenSavedSearch(
+            SavedSearch(
                 name = name,
                 search = search,
             ),
@@ -225,7 +225,7 @@ data class HomeUiState(
         ),
     ),
     val saveSearchAsSearch: Search? = null,
-    val savedSearches: List<WallhavenSavedSearch> = emptyList(),
+    val savedSearches: List<SavedSearch> = emptyList(),
     val wallhaven: WallhavenState = WallhavenState(),
     val showFilters: Boolean = false,
     val blurSketchy: Boolean = false,

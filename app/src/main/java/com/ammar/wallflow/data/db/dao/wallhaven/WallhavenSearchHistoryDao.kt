@@ -3,20 +3,20 @@ package com.ammar.wallflow.data.db.dao.wallhaven
 import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Upsert
-import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSearchHistoryEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.SearchHistoryEntity
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface WallhavenSearchHistoryDao {
-    @Query("SELECT * FROM wallhaven_search_history ORDER BY last_updated_on DESC")
-    fun getAll(): Flow<List<WallhavenSearchHistoryEntity>>
+interface SearchHistoryDao {
+    @Query("SELECT * FROM search_history ORDER BY last_updated_on DESC")
+    fun getAll(): Flow<List<SearchHistoryEntity>>
 
-    @Query("SELECT * FROM wallhaven_search_history WHERE `query` = :query")
-    suspend fun getByQuery(query: String): WallhavenSearchHistoryEntity?
+    @Query("SELECT * FROM search_history WHERE `query` = :query")
+    suspend fun getByQuery(query: String): SearchHistoryEntity?
 
     @Upsert
-    suspend fun upsert(searchHistory: WallhavenSearchHistoryEntity)
+    suspend fun upsert(searchHistory: SearchHistoryEntity)
 
-    @Query("DELETE FROM wallhaven_search_history WHERE `query` = :query")
+    @Query("DELETE FROM search_history WHERE `query` = :query")
     suspend fun deleteByQuery(query: String)
 }

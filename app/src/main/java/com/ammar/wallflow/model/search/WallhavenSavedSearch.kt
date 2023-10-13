@@ -1,24 +1,24 @@
 package com.ammar.wallflow.model.search
 
 import androidx.compose.runtime.saveable.Saver
-import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSavedSearchEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.SavedSearchEntity
 import com.ammar.wallflow.json
 import kotlinx.serialization.encodeToString
 
-data class WallhavenSavedSearch(
+data class SavedSearch(
     val id: Long = 0,
     val name: String = "",
     val search: Search = WallhavenSearch(),
 )
 
-fun WallhavenSavedSearch.toEntity(id: Long? = null) = WallhavenSavedSearchEntity(
+fun SavedSearch.toEntity(id: Long? = null) = SavedSearchEntity(
     id = id ?: this.id,
     name = name,
     query = search.query,
     filters = json.encodeToString(search.filters),
 )
 
-val WallhavenSavedSearchSaver = Saver<WallhavenSavedSearch, List<Any>>(
+val SavedSearchSaver = Saver<SavedSearch, List<Any>>(
     save = {
         listOf(
             it.id,
@@ -28,13 +28,21 @@ val WallhavenSavedSearchSaver = Saver<WallhavenSavedSearch, List<Any>>(
         )
     },
     restore = {
-        WallhavenSavedSearch(
+        SavedSearch(
             id = it[0] as Long,
             name = it[1] as String,
-            search = WallhavenSearch(
-                query = it[2] as String,
-                filters = json.decodeFromString(it[3] as String),
-            ),
+            search = when (
+                val filters = json.decodeFromString<Filters>(it[3] as String)
+            ) {
+                is WallhavenFilters -> WallhavenSearch(
+                    query = it[2] as String,
+                    filters = filters,
+                )
+                is RedditFilters -> RedditSearch(
+                    query = it[2] as String,
+                    filters = filters,
+                )
+            },
         )
     },
 )

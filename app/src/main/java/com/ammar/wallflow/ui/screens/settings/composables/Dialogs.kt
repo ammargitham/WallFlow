@@ -1,5 +1,6 @@
 package com.ammar.wallflow.ui.screens.settings.composables
 
+import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider as CPPP
 import android.content.res.Configuration
 import android.os.Build
 import androidx.compose.animation.AnimatedVisibility
@@ -55,7 +56,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
-import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider as CPPP
 import androidx.compose.ui.unit.dp
 import androidx.work.Constraints
 import com.ammar.wallflow.DISABLED_ALPHA
@@ -75,7 +75,7 @@ import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.model.ConstraintType
 import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.model.local.LocalDirectory
-import com.ammar.wallflow.model.search.WallhavenSavedSearch
+import com.ammar.wallflow.model.search.SavedSearch
 import com.ammar.wallflow.model.search.WallhavenSearch
 import com.ammar.wallflow.ui.common.Dropdown
 import com.ammar.wallflow.ui.common.DropdownOption
@@ -605,7 +605,7 @@ private fun PreviewOObjectDetectionModelDeleteConfirmDialog() {
 @Composable
 fun DeleteSavedSearchConfirmDialog(
     modifier: Modifier = Modifier,
-    savedSearch: WallhavenSavedSearch,
+    savedSearch: SavedSearch,
     onConfirmClick: () -> Unit = {},
     onDismissRequest: () -> Unit = {},
 ) {
@@ -640,7 +640,7 @@ private fun PreviewDeleteSavedSearchConfirmDialog() {
     WallFlowTheme {
         Surface {
             DeleteSavedSearchConfirmDialog(
-                savedSearch = WallhavenSavedSearch(
+                savedSearch = SavedSearch(
                     name = "test",
                 ),
             )
@@ -653,7 +653,7 @@ private fun PreviewDeleteSavedSearchConfirmDialog() {
 fun AutoWallpaperSourceOptionsDialog(
     modifier: Modifier = Modifier,
     autoWallpaperPreferences: AutoWallpaperPreferences = AutoWallpaperPreferences(),
-    savedSearches: List<WallhavenSavedSearch> = emptyList(),
+    savedSearches: List<SavedSearch> = emptyList(),
     localDirectories: List<LocalDirectory> = emptyList(),
     onSaveClick: (AutoWallpaperPreferences) -> Unit = {},
     onDismissRequest: () -> Unit = {},
@@ -737,7 +737,7 @@ private fun AutoWallpaperSourceOptionsDialogContent(
     modifier: Modifier = Modifier,
     savedSearchEnabled: Boolean = false,
     favoritesEnabled: Boolean = false,
-    savedSearches: List<WallhavenSavedSearch> = emptyList(),
+    savedSearches: List<SavedSearch> = emptyList(),
     selectedSavedSearchId: Long? = null,
     localEnabled: Boolean = false,
     localDirectories: List<LocalDirectory> = emptyList(),
@@ -853,7 +853,7 @@ private fun AutoWallpaperSourceOptionsDialogContent(
 }
 
 private data class AutoWallSrcOptsDialogParameters(
-    val savedSearches: List<WallhavenSavedSearch> = emptyList(),
+    val savedSearches: List<SavedSearch> = emptyList(),
     val prefs: AutoWallpaperPreferences = AutoWallpaperPreferences(),
 )
 
@@ -866,7 +866,7 @@ private class AutoWallSrcOptsDialogPP : CPPP<AutoWallSrcOptsDialogParameters>(
                 savedSearchEnabled = true,
             ),
             savedSearches = List(3) {
-                WallhavenSavedSearch(
+                SavedSearch(
                     id = it.toLong(),
                     name = "Saved search $it",
                     search = WallhavenSearch(),

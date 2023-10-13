@@ -10,7 +10,7 @@ import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSearchQueryRemoteKey
 @Dao
 interface WallhavenSearchQueryRemoteKeysDao {
     @Query(
-        "SELECT * FROM wallhaven_search_query_remote_keys WHERE search_query_id = :searchQueryId",
+        "SELECT * FROM search_query_remote_keys WHERE search_query_id = :searchQueryId",
     )
     suspend fun getBySearchQueryId(searchQueryId: Long): WallhavenSearchQueryRemoteKeyEntity?
 
@@ -20,6 +20,6 @@ interface WallhavenSearchQueryRemoteKeysDao {
     @Upsert
     suspend fun upsert(searchQueryRemoteKeyEntity: WallhavenSearchQueryRemoteKeyEntity)
 
-    @Query("DELETE FROM wallhaven_search_query_remote_keys WHERE search_query_id = :searchQueryId")
+    @Query("DELETE FROM search_query_remote_keys WHERE search_query_id = :searchQueryId")
     suspend fun deleteBySearchQueryId(searchQueryId: Long)
 }

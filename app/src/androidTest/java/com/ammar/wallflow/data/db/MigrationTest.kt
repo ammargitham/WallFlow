@@ -5,10 +5,8 @@ import androidx.room.testing.MigrationTestHelper
 import androidx.sqlite.db.framework.FrameworkSQLiteOpenHelperFactory
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
-import com.ammar.wallflow.data.db.automigrations.AutoMigration4To5Spec
 import com.ammar.wallflow.data.db.manualmigrations.MIGRATION_1_2
 import com.ammar.wallflow.data.db.manualmigrations.MIGRATION_3_4
-import com.ammar.wallflow.data.db.manualmigrations.MIGRATION_6_7
 import java.io.IOException
 import kotlin.test.assertEquals
 import org.junit.Rule
@@ -21,16 +19,13 @@ class MigrationTest {
     private val allManualMigrations = arrayOf(
         MIGRATION_1_2,
         MIGRATION_3_4,
-        MIGRATION_6_7,
     )
 
     @get:Rule
     val helper: MigrationTestHelper = MigrationTestHelper(
         instrumentation = InstrumentationRegistry.getInstrumentation(),
         databaseClass = AppDatabase::class.java,
-        specs = listOf(
-            AutoMigration4To5Spec(),
-        ),
+        specs = emptyList(),
         openFactory = FrameworkSQLiteOpenHelperFactory(),
     )
 
@@ -89,6 +84,73 @@ class MigrationTest {
                         ('210', '10');
                 """.trimIndent(),
             )
+            execSQL(
+                // language=sql
+                """
+                    INSERT INTO search_query
+                        ("id", "query_string", "last_updated_on")
+                    VALUES
+                        (
+                            '1',
+                            'includedTags=test&excludedTags=&username=&tagId=&wallpaperId=&categories=anime%2Cgeneral%2Cpeople&purity=sfw&sorting=toplist&order=desc&topRange=1d&atleast=&resolutions=&ratios=&colors=&seed=',
+                            '12345'
+                        ),
+                        (
+                            '2',
+                            'includedTags=test1&excludedTags=&username=&tagId=&wallpaperId=&categories=anime%2Cgeneral%2Cpeople&purity=sfw&sorting=toplist&order=desc&topRange=1d&atleast=&resolutions=&ratios=&colors=&seed=',
+                            '12345'
+                        ),
+                        (
+                            '3',
+                            'includedTags=test2&excludedTags=&username=&tagId=&wallpaperId=&categories=anime%2Cgeneral%2Cpeople&purity=sfw&sorting=toplist&order=desc&topRange=1d&atleast=&resolutions=&ratios=&colors=&seed=',
+                            '12345'
+                        ),
+                        (
+                            '4',
+                            'includedTags=&excludedTags=&username=&tagId=&wallpaperId=&categories=anime%2Cgeneral%2Cpeople&purity=sfw&sorting=toplist&order=desc&topRange=1d&atleast=&resolutions=&ratios=&colors=&seed=',
+                            '12345'
+                        );
+                """.trimIndent(),
+            )
+            execSQL(
+                // language=sql
+                """
+                    INSERT INTO search_query_remote_keys
+                        ("id", "search_query_id", "next_page_number")
+                    VALUES
+                        ('11', '2', '5'),
+                        ('12', '1', NULL),
+                        ('13', '3', '5');
+                """.trimIndent(),
+            )
+            execSQL(
+                // language=sql
+                """
+                    INSERT INTO saved_searches
+                        ("id", "name", "query", "filters")
+                    VALUES
+                        (
+                            '1',
+                            'home',
+                            'test',
+                            'includedTags=&excludedTags=&username=&tagId=&wallpaperId=&categories=anime%2Cgeneral%2Cpeople&purity=sfw&sorting=toplist&order=desc&topRange=1d&atleast=&resolutions=&ratios=&colors=&seed='
+                        );
+                """.trimIndent(),
+            )
+            execSQL(
+                // language=sql
+                """
+                    INSERT INTO search_history
+                        ("id", "query", "filters", "last_updated_on")
+                    VALUES
+                        (
+                            '1',
+                            'test',
+                            'includedTags=&excludedTags=&username=&tagId=&wallpaperId=&categories=anime%2Cgeneral%2Cpeople&purity=sfw&sorting=toplist&order=desc&topRange=1d&atleast=&resolutions=&ratios=&colors=&seed=',
+                            '12345'
+                        );
+                """.trimIndent(),
+            )
             close()
         }
         helper.runMigrationsAndValidate(
@@ -103,110 +165,23 @@ class MigrationTest {
                 val count = it.getInt(0)
                 assertEquals(10, count)
             }
+
             // language=sql
             db.query("SELECT COUNT(*) from wallhaven_tags").use {
                 it.moveToFirst()
                 val count = it.getInt(0)
                 assertEquals(10, count)
             }
-        }
-    }
 
-    @Test
-    @Throws(IOException::class)
-    fun migrate4To5() {
-        helper.createDatabase(testDbName, 4).apply {
-            execSQL(
-                // language=sql
-                """
-                    INSERT INTO saved_searches
-                        ("id", "name", "query", "filters")
-                    VALUES
-                        (
-                            '1',
-                            'Home',
-                            '',
-                            'includedTags=&excludedTags=&username=&tagId=&wallpaperId=&categories=anime%2Cgeneral%2Cpeople&purity=sfw&sorting=toplist&order=desc&topRange=1d&atleast=&resolutions=&ratios=&colors=&seed='
-                        );
-                """.trimIndent(),
-            )
-            execSQL(
-                // language=sql
-                """
-                    INSERT INTO search_history
-                        ("id", "query", "filters", "last_updated_on")
-                    VALUES
-                        (
-                            '1',
-                            'nature',
-                            'includedTags=&excludedTags=&username=&tagId=&wallpaperId=&categories=anime%2Cgeneral%2Cpeople&purity=sfw&sorting=relevance&order=desc&topRange=1M&atleast=&resolutions=&ratios=&colors=&seed=',
-                            '1696591975735'
-                        );
-                """.trimIndent(),
-            )
-            execSQL(
-                // language=sql
-                """
-                    INSERT INTO search_query
-                        ("id", "query_string", "last_updated_on")
-                    VALUES
-                        ('1', 'test', '12345'),
-                        ('2', 'test1', '12345'),
-                        ('3', 'test2', '12345');
-                """.trimIndent(),
-            )
-            execSQL(
-                // language=sql
-                """
-                    INSERT INTO search_query_remote_keys
-                        ("id", "search_query_id", "next_page_number")
-                    VALUES
-                        ('11', '2', '5'),
-                        ('12', '1', NULL),
-                        ('13', '3', '5');
-                """.trimIndent(),
-            )
-            close()
-        }
-        helper.runMigrationsAndValidate(
-            testDbName,
-            5,
-            true,
-        ).use { db ->
-            db.query(
-                // language=sql
-                "SELECT * from wallhaven_saved_searches",
-            ).use {
-                it.moveToFirst()
-                val id = it.getInt(0)
-                assertEquals(1, id)
-                val name = it.getString(1)
-                assertEquals("Home", name)
-            }
-            db.query(
-                // language=sql
-                "SELECT * from wallhaven_search_history",
-            ).use {
-                it.moveToFirst()
-                val id = it.getInt(0)
-                assertEquals(1, id)
-                val name = it.getString(1)
-                assertEquals("nature", name)
-                val lastUpdatedOn = it.getLong(3)
-                assertEquals(1696591975735, lastUpdatedOn)
-            }
-            db.query(
-                // language=sql
-                "SELECT COUNT(*) from wallhaven_search_query_remote_keys",
-            ).use {
+            // language=sql
+            db.query("SELECT COUNT(*) from search_query_remote_keys").use {
                 it.moveToFirst()
                 val count = it.getInt(0)
                 assertEquals(3, count)
             }
-            db.query(
-                // language=sql
-                "SELECT * from wallhaven_search_query_remote_keys",
-            ).use {
+
+            // language=sql
+            db.query("SELECT * from search_query_remote_keys").use {
                 it.moveToFirst()
                 val id = it.getInt(0)
                 assertEquals(11, id)
@@ -215,99 +190,26 @@ class MigrationTest {
                 val nextPageNumber = it.getInt(2)
                 assertEquals(5, nextPageNumber)
             }
-            db.query(
-                // language=sql
-                "SELECT COUNT(*) from wallhaven_search_query",
-            ).use {
-                it.moveToFirst()
-                val count = it.getInt(0)
-                assertEquals(3, count)
-            }
-            db.query(
-                // language=sql
-                "SELECT * from wallhaven_search_query",
-            ).use {
-                it.moveToFirst()
-                val id = it.getInt(0)
-                assertEquals(1, id)
-                val queryString = it.getString(1)
-                assertEquals("test", queryString)
-                val lastUpdatedOn = it.getLong(2)
-                assertEquals(12345, lastUpdatedOn)
-            }
-        }
-    }
 
-    @Test
-    @Throws(IOException::class)
-    fun migrate6To7() {
-        helper.createDatabase(testDbName, 6).apply {
-            execSQL(
-                // language=sql
-                """
-                    INSERT INTO wallhaven_search_query
-                        ("id", "query_string", "last_updated_on")
-                    VALUES
-                        (
-                            '1',
-                            'includedTags=&excludedTags=&username=&tagId=&wallpaperId=&categories=anime%2Cgeneral%2Cpeople&purity=sfw&sorting=toplist&order=desc&topRange=1d&atleast=&resolutions=&ratios=&colors=&seed=',
-                            '12345'
-                        );
-                """.trimIndent(),
-            )
-            execSQL(
-                // language=sql
-                """
-                    INSERT INTO wallhaven_saved_searches
-                        ("id", "name", "query", "filters")
-                    VALUES
-                        (
-                            '1',
-                            'home',
-                            'test',
-                            'includedTags=&excludedTags=&username=&tagId=&wallpaperId=&categories=anime%2Cgeneral%2Cpeople&purity=sfw&sorting=toplist&order=desc&topRange=1d&atleast=&resolutions=&ratios=&colors=&seed='
-                        );
-                """.trimIndent(),
-            )
-            execSQL(
-                // language=sql
-                """
-                    INSERT INTO wallhaven_search_history
-                        ("id", "query", "filters", "last_updated_on")
-                    VALUES
-                        (
-                            '1',
-                            'test',
-                            'includedTags=&excludedTags=&username=&tagId=&wallpaperId=&categories=anime%2Cgeneral%2Cpeople&purity=sfw&sorting=toplist&order=desc&topRange=1d&atleast=&resolutions=&ratios=&colors=&seed=',
-                            '12345'
-                        );
-                """.trimIndent(),
-            )
-            close()
-        }
-        helper.runMigrationsAndValidate(
-            testDbName,
-            7,
-            true,
-            MIGRATION_6_7,
-        ).use { db ->
+
             db.query(
                 // language=sql
-                "SELECT * from wallhaven_search_query",
+                "SELECT * from search_query",
             ).use {
                 it.moveToFirst()
                 val queryString = it.getString(
                     it.getColumnIndexOrThrow("query_string"),
                 )
                 assertEquals(
-                    "{\"filters\":{\"sorting\":\"TOPLIST\",\"topRange\":\"ONE_DAY\"}}",
+                    "{\"filters\":{\"includedTags\":[\"test\"]," +
+                        "\"sorting\":\"TOPLIST\",\"topRange\":\"ONE_DAY\"}}",
                     queryString,
                 )
             }
 
             db.query(
                 // language=sql
-                "SELECT * from wallhaven_saved_searches",
+                "SELECT * from saved_searches",
             ).use {
                 it.moveToFirst()
                 val filtersStr = it.getString(
@@ -319,9 +221,10 @@ class MigrationTest {
                 )
             }
 
+
             db.query(
                 // language=sql
-                "SELECT * from wallhaven_search_history",
+                "SELECT * from search_history",
             ).use {
                 it.moveToFirst()
                 val filtersStr = it.getString(

@@ -97,7 +97,7 @@ class CleanupWorkerTest {
         val clock = TestClock(Clock.System.now())
         val query = "test"
         simulateSearch(clock, query)
-        val searchQueryDao = db.wallhavenSearchQueryDao()
+        val searchQueryDao = db.searchQueryDao()
         val wallpapersDao = db.wallhavenWallpapersDao()
         assertEquals(20, wallpapersDao.count())
         assertEquals(1, searchQueryDao.count())
@@ -133,7 +133,7 @@ class CleanupWorkerTest {
 
     @Test
     fun testCleanupWorker2QueriesUniqueWalls() = runTest(testDispatcher) {
-        val searchQueryDao = db.wallhavenSearchQueryDao()
+        val searchQueryDao = db.searchQueryDao()
         val wallpapersDao = db.wallhavenWallpapersDao()
 
         val clock = TestClock(Clock.System.now())
@@ -166,7 +166,7 @@ class CleanupWorkerTest {
 
     @Test
     fun testCleanupWorker2QueriesOnDifferentDatesUniqueWalls() = runTest(testDispatcher) {
-        val searchQueryDao = db.wallhavenSearchQueryDao()
+        val searchQueryDao = db.searchQueryDao()
         val wallpapersDao = db.wallhavenWallpapersDao()
 
         val clock = TestClock(Clock.System.now())
@@ -229,7 +229,7 @@ class CleanupWorkerTest {
 
     @Test
     fun testCleanupWorker2QueriesOnSamesDatesCommonWalls() = runTest(testDispatcher) {
-        val searchQueryDao = db.wallhavenSearchQueryDao()
+        val searchQueryDao = db.searchQueryDao()
         val wallpapersDao = db.wallhavenWallpapersDao()
 
         val clock = TestClock(Clock.System.now())
@@ -296,7 +296,7 @@ class CleanupWorkerTest {
 
     @Test
     fun testCleanupWorker2QueriesOnDifferentDatesCommonWalls() = runTest(testDispatcher) {
-        val searchQueryDao = db.wallhavenSearchQueryDao()
+        val searchQueryDao = db.searchQueryDao()
         val wallpapersDao = db.wallhavenWallpapersDao()
 
         val clock = TestClock(Clock.System.now())
@@ -425,7 +425,7 @@ class CleanupWorkerTest {
 
     @Test
     fun testCleanupWorker1QueriesWithFavoriteWalls() = runTest(testDispatcher) {
-        val searchQueryDao = db.wallhavenSearchQueryDao()
+        val searchQueryDao = db.searchQueryDao()
         val wallpapersDao = db.wallhavenWallpapersDao()
         val favoriteDao = db.favoriteDao()
 

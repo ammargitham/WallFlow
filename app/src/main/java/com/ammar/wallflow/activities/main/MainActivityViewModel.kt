@@ -3,8 +3,8 @@ package com.ammar.wallflow.activities.main
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.ammar.wallflow.data.db.entity.wallhaven.toWallhavenSavedSearch
-import com.ammar.wallflow.data.db.entity.wallhaven.toWallhavenSearch
+import com.ammar.wallflow.data.db.entity.wallhaven.toSavedSearch
+import com.ammar.wallflow.data.db.entity.wallhaven.toSearch
 import com.ammar.wallflow.data.preferences.Theme
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.GlobalErrorsRepository
@@ -13,8 +13,8 @@ import com.ammar.wallflow.data.repository.SavedSearchRepository
 import com.ammar.wallflow.data.repository.SearchHistoryRepository
 import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.model.search.RedditSearch
+import com.ammar.wallflow.model.search.SavedSearch
 import com.ammar.wallflow.model.search.Search
-import com.ammar.wallflow.model.search.WallhavenSavedSearch
 import com.ammar.wallflow.model.search.WallhavenSearch
 import com.ammar.wallflow.model.search.getSupportingText
 import com.ammar.wallflow.ui.common.Suggestion
@@ -59,16 +59,18 @@ class MainActivityViewModel @Inject constructor(
                             it.query.trimAll().lowercase().contains(localQuery)
                     }
                     .map { s ->
-                        val search = s.toWallhavenSearch()
-                        Suggestion(
-                            value = search,
-                            headline = s.query,
-                            supportingText = search.getSupportingText(application),
-                        )
+                        when (val search = s.toSearch()) {
+                            is WallhavenSearch -> Suggestion(
+                                value = search,
+                                headline = s.query,
+                                supportingText = search.getSupportingText(application),
+                            )
+                            is RedditSearch -> TODO()
+                        }
                     },
                 globalErrors = errors,
                 savedSearches = savedSearchEntities.map { entity ->
-                    entity.toWallhavenSavedSearch()
+                    entity.toSavedSearch()
                 },
                 theme = appPreferences.lookAndFeelPreferences.theme,
                 searchBarShowNSFW = appPreferences.wallhavenApiKey.isNotBlank(),
@@ -132,7 +134,7 @@ class MainActivityViewModel @Inject constructor(
 
     fun saveSearchAs(name: String, search: Search) = viewModelScope.launch {
         savedSearchRepository.upsert(
-            WallhavenSavedSearch(
+            SavedSearch(
                 name = name,
                 search = search,
             ),
@@ -154,7 +156,7 @@ data class MainUiState(
     val searchBarDeleteSuggestion: Search? = null,
     val saveSearchAsSearch: Search? = null,
     val showSavedSearchesDialog: Boolean = false,
-    val savedSearches: List<WallhavenSavedSearch> = emptyList(),
+    val savedSearches: List<SavedSearch> = emptyList(),
     val theme: Theme = Theme.SYSTEM,
     val searchBarShowNSFW: Boolean = false,
     val showLocalTab: Boolean = true,

@@ -80,10 +80,10 @@ import com.ammar.wallflow.R
 import com.ammar.wallflow.extensions.getScreenResolution
 import com.ammar.wallflow.model.Order
 import com.ammar.wallflow.model.Purity
+import com.ammar.wallflow.model.search.SavedSearch
 import com.ammar.wallflow.model.search.WallhavenCategory
 import com.ammar.wallflow.model.search.WallhavenRatio
 import com.ammar.wallflow.model.search.WallhavenRatio.CategoryWallhavenRatio
-import com.ammar.wallflow.model.search.WallhavenSavedSearch
 import com.ammar.wallflow.model.search.WallhavenSearch
 import com.ammar.wallflow.model.search.WallhavenSorting
 import com.ammar.wallflow.model.search.WallhavenTopRange
@@ -886,14 +886,14 @@ private fun PreviewSaveAsDialog() {
 @Composable
 fun SavedSearchesDialog(
     modifier: Modifier = Modifier,
-    savedSearches: List<WallhavenSavedSearch> = emptyList(),
+    savedSearches: List<SavedSearch> = emptyList(),
     title: String = stringResource(R.string.load_search),
     selectable: Boolean = true,
     showActions: Boolean = false,
-    onSelect: (WallhavenSavedSearch) -> Unit = {},
+    onSelect: (SavedSearch) -> Unit = {},
     onDismissRequest: () -> Unit = {},
-    onEditClick: (WallhavenSavedSearch) -> Unit = {},
-    onDeleteClick: (WallhavenSavedSearch) -> Unit = {},
+    onEditClick: (SavedSearch) -> Unit = {},
+    onDeleteClick: (SavedSearch) -> Unit = {},
 ) {
     AlertDialog(
         modifier = modifier,
@@ -932,10 +932,10 @@ fun SavedSearchesDialog(
 @Composable
 private fun SavedSearchItem(
     modifier: Modifier = Modifier,
-    savedSearch: WallhavenSavedSearch,
+    savedSearch: SavedSearch,
     showActions: Boolean,
-    onEditClick: (WallhavenSavedSearch) -> Unit,
-    onDeleteClick: (WallhavenSavedSearch) -> Unit,
+    onEditClick: (SavedSearch) -> Unit,
+    onDeleteClick: (SavedSearch) -> Unit,
 ) {
     Row(
         modifier = modifier
@@ -970,14 +970,14 @@ private fun SavedSearchItem(
 }
 
 private val tempSavedSearches = List(3) {
-    WallhavenSavedSearch(
+    SavedSearch(
         name = "Saved search $it",
         search = WallhavenSearch(),
     )
 }
 
 private class SavedSearchesDialogPreviewParameterProvider :
-    CollectionPreviewParameterProvider<Pair<List<WallhavenSavedSearch>, Boolean>>(
+    CollectionPreviewParameterProvider<Pair<List<SavedSearch>, Boolean>>(
         listOf(
             Pair(emptyList(), false),
             Pair(tempSavedSearches, true),
@@ -990,7 +990,7 @@ private class SavedSearchesDialogPreviewParameterProvider :
 @Composable
 private fun PreviewSavedSearchesDialog(
     @PreviewParameter(SavedSearchesDialogPreviewParameterProvider::class) parameters:
-    Pair<List<WallhavenSavedSearch>, Boolean>,
+    Pair<List<SavedSearch>, Boolean>,
 ) {
     WallFlowTheme {
         SavedSearchesDialog(

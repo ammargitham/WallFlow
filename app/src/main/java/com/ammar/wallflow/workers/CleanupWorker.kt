@@ -47,7 +47,7 @@ class CleanupWorker @AssistedInject constructor(
     private val remoteKeysDao by lazy { appDatabase.wallhavenSearchQueryRemoteKeysDao() }
     private val wallpapersDao by lazy { appDatabase.wallhavenWallpapersDao() }
     private val searchQueryWallpapersDao by lazy { appDatabase.wallhavenSearchQueryWallpapersDao() }
-    private val searchQueryDao by lazy { appDatabase.wallhavenSearchQueryDao() }
+    private val searchQueryDao by lazy { appDatabase.searchQueryDao() }
     private val notificationBuilder by lazy {
         NotificationCompat.Builder(context, NotificationChannels.CLEANUP_CHANNEL_ID).apply {
             setContentTitle(context.getString(R.string.cache_clean_up))

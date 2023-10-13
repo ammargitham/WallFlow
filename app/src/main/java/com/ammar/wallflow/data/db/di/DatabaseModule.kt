@@ -9,7 +9,6 @@ import com.ammar.wallflow.IoDispatcher
 import com.ammar.wallflow.data.db.AppDatabase
 import com.ammar.wallflow.data.db.manualmigrations.MIGRATION_1_2
 import com.ammar.wallflow.data.db.manualmigrations.MIGRATION_3_4
-import com.ammar.wallflow.data.db.manualmigrations.MIGRATION_6_7
 import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.model.ObjectDetectionModel
 import com.ammar.wallflow.model.toEntity
@@ -35,8 +34,7 @@ class DatabaseModule {
         appDatabase.wallhavenPopularTagsDao()
 
     @Provides
-    fun providesWallhavenSearchQueryDao(appDatabase: AppDatabase) =
-        appDatabase.wallhavenSearchQueryDao()
+    fun searchQueryDao(appDatabase: AppDatabase) = appDatabase.searchQueryDao()
 
     @Provides
     fun providesWallhavenSearchQueryRemoteKeysDao(appDatabase: AppDatabase) =
@@ -54,16 +52,14 @@ class DatabaseModule {
     fun providesWallhavenTagsDao(appDatabase: AppDatabase) = appDatabase.wallhavenTagsDao()
 
     @Provides
-    fun providesWallhavenSearchHistoryDao(appDatabase: AppDatabase) =
-        appDatabase.wallhavenSearchHistoryDao()
+    fun providesSearchHistoryDao(appDatabase: AppDatabase) = appDatabase.searchHistoryDao()
 
     @Provides
     fun providesObjectDetectionModelDao(appDatabase: AppDatabase) =
         appDatabase.objectDetectionModelDao()
 
     @Provides
-    fun providesWallhavenSavedSearchDao(appDatabase: AppDatabase) =
-        appDatabase.wallhavenSavedSearchDao()
+    fun providesSavedSearchDao(appDatabase: AppDatabase) = appDatabase.savedSearchDao()
 
     @Provides
     fun providesAutoWallpaperHistoryDao(appDatabase: AppDatabase) =
@@ -95,7 +91,6 @@ class DatabaseModule {
             addMigrations(
                 MIGRATION_1_2,
                 MIGRATION_3_4,
-                MIGRATION_6_7,
             )
             addCallback(
                 object : RoomDatabase.Callback() {

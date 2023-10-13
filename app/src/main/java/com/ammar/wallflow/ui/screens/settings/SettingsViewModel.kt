@@ -10,7 +10,7 @@ import com.ammar.wallflow.EFFICIENT_DET_LITE_0_MODEL_NAME
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.db.entity.ObjectDetectionModelEntity
 import com.ammar.wallflow.data.db.entity.toModel
-import com.ammar.wallflow.data.db.entity.wallhaven.toWallhavenSavedSearch
+import com.ammar.wallflow.data.db.entity.wallhaven.toSavedSearch
 import com.ammar.wallflow.data.preferences.AppPreferences
 import com.ammar.wallflow.data.preferences.AutoWallpaperPreferences
 import com.ammar.wallflow.data.preferences.LookAndFeelPreferences
@@ -24,7 +24,7 @@ import com.ammar.wallflow.extensions.getMLModelsFileIfExists
 import com.ammar.wallflow.extensions.workManager
 import com.ammar.wallflow.model.ObjectDetectionModel
 import com.ammar.wallflow.model.local.LocalDirectory
-import com.ammar.wallflow.model.search.WallhavenSavedSearch
+import com.ammar.wallflow.model.search.SavedSearch
 import com.ammar.wallflow.services.ChangeWallpaperTileService
 import com.ammar.wallflow.utils.DownloadManager
 import com.ammar.wallflow.utils.DownloadStatus
@@ -97,7 +97,7 @@ class SettingsViewModel @Inject constructor(
                 ?.toModel()
                 ?: ObjectDetectionModel.DEFAULT
         }
-        val allSavedSearches = savedSearches.map { entity -> entity.toWallhavenSavedSearch() }
+        val allSavedSearches = savedSearches.map { entity -> entity.toSavedSearch() }
         localUiState.merge(
             SettingsUiState(
                 appPreferences = appPreferences,
@@ -282,21 +282,21 @@ class SettingsViewModel @Inject constructor(
         it.copy(showSavedSearches = partial(show))
     }
 
-    fun editSavedSearch(savedSearch: WallhavenSavedSearch?) = localUiStateFlow.update {
+    fun editSavedSearch(savedSearch: SavedSearch?) = localUiStateFlow.update {
         it.copy(
             editSavedSearch = partial(savedSearch),
             showSavedSearches = partial(false),
         )
     }
 
-    fun updateSavedSearch(savedSearch: WallhavenSavedSearch) {
+    fun updateSavedSearch(savedSearch: SavedSearch) {
         viewModelScope.launch {
             savedSearchRepository.upsert(savedSearch)
         }
     }
 
     fun deleteSavedSearch(
-        savedSearch: WallhavenSavedSearch?,
+        savedSearch: SavedSearch?,
         confirmed: Boolean = false,
     ) {
         if (savedSearch == null) {
@@ -465,10 +465,10 @@ data class SettingsUiState(
     val modelDownloadStatus: DownloadStatus? = null,
     val deleteModel: ObjectDetectionModelEntity? = null,
     val showSavedSearches: Boolean = false,
-    val savedSearches: List<WallhavenSavedSearch> = emptyList(),
-    val editSavedSearch: WallhavenSavedSearch? = null,
-    val deleteSavedSearch: WallhavenSavedSearch? = null,
-    val autoWallpaperSavedSearch: WallhavenSavedSearch? = null,
+    val savedSearches: List<SavedSearch> = emptyList(),
+    val editSavedSearch: SavedSearch? = null,
+    val deleteSavedSearch: SavedSearch? = null,
+    val autoWallpaperSavedSearch: SavedSearch? = null,
     val showAutoWallpaperSourcesDialog: Boolean = false,
     val showAutoWallpaperFrequencyDialog: Boolean = false,
     val showAutoWallpaperConstraintsDialog: Boolean = false,

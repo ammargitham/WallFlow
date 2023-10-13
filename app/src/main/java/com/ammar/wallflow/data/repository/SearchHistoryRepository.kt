@@ -1,7 +1,7 @@
 package com.ammar.wallflow.data.repository
 
 import com.ammar.wallflow.IoDispatcher
-import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenSearchHistoryDao
+import com.ammar.wallflow.data.db.dao.wallhaven.SearchHistoryDao
 import com.ammar.wallflow.json
 import com.ammar.wallflow.model.search.Search
 import com.ammar.wallflow.model.search.toSearchHistoryEntity
@@ -15,7 +15,7 @@ import kotlinx.serialization.encodeToString
 
 @Singleton
 class SearchHistoryRepository @Inject constructor(
-    private val searchHistoryDao: WallhavenSearchHistoryDao,
+    private val searchHistoryDao: SearchHistoryDao,
     @IoDispatcher val ioDispatcher: CoroutineDispatcher,
 ) {
     fun getAll() = searchHistoryDao.getAll().flowOn(ioDispatcher)
