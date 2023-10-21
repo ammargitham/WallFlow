@@ -15,7 +15,7 @@ abstract class MainSearchBarController {
 
 data class MainSearchBarState(
     val visible: Boolean = true,
-    val search: Search = MainSearchBar.Defaults.search,
+    val search: Search = MainSearchBar.Defaults.wallhavenSearch,
     val showQuery: Boolean = true,
     val overflowIcon: @Composable (() -> Unit)? = null,
     val onActiveChange: (active: Boolean) -> Unit = {},

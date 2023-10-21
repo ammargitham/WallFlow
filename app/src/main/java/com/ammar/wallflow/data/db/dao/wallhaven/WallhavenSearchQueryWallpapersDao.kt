@@ -4,10 +4,11 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.ammar.wallflow.data.db.dao.SearchQueryWallpapersDao
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSearchQueryWallpaperEntity
 
 @Dao
-interface WallhavenSearchQueryWallpapersDao {
+interface WallhavenSearchQueryWallpapersDao : SearchQueryWallpapersDao {
     @Query("SELECT * FROM wallhaven_search_query_wallpapers WHERE search_query_id = :searchQueryId")
     suspend fun getBySearchQueryId(searchQueryId: Long): List<WallhavenSearchQueryWallpaperEntity>
 

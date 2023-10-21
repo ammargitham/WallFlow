@@ -10,11 +10,13 @@ import com.ammar.wallflow.data.db.dao.FavoriteDao
 import com.ammar.wallflow.data.db.dao.LastUpdatedDao
 import com.ammar.wallflow.data.db.dao.ObjectDetectionModelDao
 import com.ammar.wallflow.data.db.dao.RateLimitDao
+import com.ammar.wallflow.data.db.dao.reddit.RedditSearchQueryWallpapersDao
+import com.ammar.wallflow.data.db.dao.reddit.RedditWallpapersDao
 import com.ammar.wallflow.data.db.dao.search.SavedSearchDao
 import com.ammar.wallflow.data.db.dao.search.SearchHistoryDao
 import com.ammar.wallflow.data.db.dao.search.SearchQueryDao
+import com.ammar.wallflow.data.db.dao.search.SearchQueryRemoteKeysDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenPopularTagsDao
-import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenSearchQueryRemoteKeysDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenSearchQueryWallpapersDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenTagsDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenUploadersDao
@@ -24,11 +26,13 @@ import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.LastUpdatedEntity
 import com.ammar.wallflow.data.db.entity.ObjectDetectionModelEntity
 import com.ammar.wallflow.data.db.entity.RateLimitEntity
+import com.ammar.wallflow.data.db.entity.reddit.RedditSearchQueryWallpaperEntity
+import com.ammar.wallflow.data.db.entity.reddit.RedditWallpaperEntity
 import com.ammar.wallflow.data.db.entity.search.SavedSearchEntity
 import com.ammar.wallflow.data.db.entity.search.SearchHistoryEntity
 import com.ammar.wallflow.data.db.entity.search.SearchQueryEntity
+import com.ammar.wallflow.data.db.entity.search.SearchQueryRemoteKeyEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenPopularTagEntity
-import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSearchQueryRemoteKeyEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSearchQueryWallpaperEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenTagEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenUploaderEntity
@@ -40,7 +44,7 @@ import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperTagsEntity
         LastUpdatedEntity::class,
         WallhavenPopularTagEntity::class,
         SearchQueryEntity::class,
-        WallhavenSearchQueryRemoteKeyEntity::class,
+        SearchQueryRemoteKeyEntity::class,
         WallhavenSearchQueryWallpaperEntity::class,
         WallhavenWallpaperEntity::class,
         WallhavenUploaderEntity::class,
@@ -52,11 +56,12 @@ import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperTagsEntity
         AutoWallpaperHistoryEntity::class,
         FavoriteEntity::class,
         RateLimitEntity::class,
+        RedditWallpaperEntity::class,
+        RedditSearchQueryWallpaperEntity::class,
     ],
     version = 4,
     autoMigrations = [
         AutoMigration(from = 2, to = 3),
-        // AutoMigration(from = 4, to = 5, spec = AutoMigration4To5Spec::class),
     ],
 )
 @TypeConverters(Converters::class)
@@ -64,7 +69,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun lastUpdatedDao(): LastUpdatedDao
     abstract fun wallhavenPopularTagsDao(): WallhavenPopularTagsDao
     abstract fun searchQueryDao(): SearchQueryDao
-    abstract fun wallhavenSearchQueryRemoteKeysDao(): WallhavenSearchQueryRemoteKeysDao
+    abstract fun searchQueryRemoteKeysDao(): SearchQueryRemoteKeysDao
     abstract fun wallhavenSearchQueryWallpapersDao(): WallhavenSearchQueryWallpapersDao
     abstract fun wallhavenWallpapersDao(): WallhavenWallpapersDao
     abstract fun wallhavenTagsDao(): WallhavenTagsDao
@@ -75,4 +80,6 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun autoWallpaperHistoryDao(): AutoWallpaperHistoryDao
     abstract fun favoriteDao(): FavoriteDao
     abstract fun rateLimitDao(): RateLimitDao
+    abstract fun redditWallpapersDao(): RedditWallpapersDao
+    abstract fun redditSearchQueryWallpapersDao(): RedditSearchQueryWallpapersDao
 }

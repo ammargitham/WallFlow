@@ -578,7 +578,7 @@ private fun PreviewColorsRow() {
 }
 
 @Composable
-fun UploaderRow(
+fun WallhavenUploaderRow(
     modifier: Modifier = Modifier,
     wallhavenUploader: WallhavenUploader,
     onClick: () -> Unit = {},
@@ -609,7 +609,7 @@ fun UploaderRow(
 private fun PreviewUploaderRow() {
     WallFlowTheme {
         Surface {
-            UploaderRow(
+            WallhavenUploaderRow(
                 wallhavenUploader = WallhavenUploader(
                     username = "test",
                     group = "",

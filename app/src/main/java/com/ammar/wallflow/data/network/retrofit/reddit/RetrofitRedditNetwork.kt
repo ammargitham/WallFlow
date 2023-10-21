@@ -15,7 +15,7 @@ class RetrofitRedditNetwork(
             throw IllegalArgumentException("subreddits cannot be empty")
         }
         redditNetworkApi.search(
-            query = "self%3Ano ${search.query}".trimAll(),
+            query = "self:no ${search.query}".trimAll(),
             subreddit = subreddits.joinToString("+"),
             includeNsfw = if (includeNsfw) "on" else "off",
             sort = sort.value,

@@ -5,10 +5,10 @@ import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenWallpaper
 import com.ammar.wallflow.model.search.WallhavenSearch
 import org.jsoup.nodes.Document
 
-interface WallhavenNetworkDataSource {
+interface WallhavenNetworkDataSource : OnlineSourceNetworkDataSource {
     suspend fun search(
         search: WallhavenSearch,
-        page: Int? = null,
+        page: Int?,
     ): NetworkWallhavenWallpapersResponse
 
     suspend fun wallpaper(wallpaperWallhavenId: String): NetworkWallhavenWallpaperResponse

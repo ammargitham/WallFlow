@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
+import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
@@ -37,7 +38,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -46,11 +46,13 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3x.FilterChip
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -78,8 +80,12 @@ import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.COMMON_RESOLUTIONS
 import com.ammar.wallflow.R
 import com.ammar.wallflow.extensions.getScreenResolution
+import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.model.Order
 import com.ammar.wallflow.model.Purity
+import com.ammar.wallflow.model.search.RedditSearch
+import com.ammar.wallflow.model.search.RedditSort
+import com.ammar.wallflow.model.search.RedditTimeRange
 import com.ammar.wallflow.model.search.SavedSearch
 import com.ammar.wallflow.model.search.WallhavenCategory
 import com.ammar.wallflow.model.search.WallhavenRatio
@@ -89,12 +95,11 @@ import com.ammar.wallflow.model.search.WallhavenSorting
 import com.ammar.wallflow.model.search.WallhavenTopRange
 import com.ammar.wallflow.ui.common.ClearableChip
 import com.ammar.wallflow.ui.common.IntState
-import com.ammar.wallflow.ui.common.NameState
 import com.ammar.wallflow.ui.common.drawVerticalScrollbar
 import com.ammar.wallflow.ui.common.intStateSaver
-import com.ammar.wallflow.ui.common.nameStateSaver
 import com.ammar.wallflow.ui.common.taginput.TagInputField
 import com.ammar.wallflow.ui.theme.WallFlowTheme
+import kotlinx.coroutines.launch
 
 @Composable
 internal fun IncludedTagsFilter(
@@ -178,6 +183,8 @@ internal fun CategoriesFilter(
 internal fun PurityFilter(
     purities: Set<Purity> = setOf(Purity.SFW),
     showNSFW: Boolean = false,
+    showSketchy: Boolean = true,
+    canToggleSFW: Boolean = true,
     onChange: (purities: Set<Purity>) -> Unit = {},
 ) {
     Column {
@@ -190,7 +197,11 @@ internal fun PurityFilter(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Purity.entries.filter {
-                if (it == Purity.NSFW) showNSFW else true
+                when (it) {
+                    Purity.SFW -> true
+                    Purity.SKETCHY -> showSketchy
+                    Purity.NSFW -> showNSFW
+                }
             }.map {
                 val selected = it in purities
 
@@ -206,6 +217,11 @@ internal fun PurityFilter(
                         }
                     },
                     selected = selected,
+                    enabled = if (it == Purity.SFW) {
+                        canToggleSFW
+                    } else {
+                        true
+                    },
                     onClick = {
                         onChange(
                             if (selected && purities.size > 1) purities - it else purities + it,
@@ -231,9 +247,12 @@ private fun PreviewPurityFilter() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalLayoutApi::class,
+)
 @Composable
-internal fun SortingFilter(
+internal fun WallhavenSortingFilter(
     sorting: WallhavenSorting = WallhavenSorting.DATE_ADDED,
     onChange: (sorting: WallhavenSorting) -> Unit = {},
 ) {
@@ -250,7 +269,47 @@ internal fun SortingFilter(
                 val selected = it == sorting
 
                 FilterChip(
-                    label = { Text(text = getSortingString(it)) },
+                    label = { Text(text = getWallhavenSortingString(it)) },
+                    leadingIcon = {
+                        AnimatedVisibility(selected) {
+                            Icon(
+                                modifier = Modifier.size(16.dp),
+                                imageVector = Icons.Default.Check,
+                                contentDescription = null,
+                            )
+                        }
+                    },
+                    selected = selected,
+                    onClick = { onChange(it) },
+                )
+            }
+        }
+    }
+}
+
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalLayoutApi::class,
+)
+@Composable
+internal fun RedditSortFilter(
+    sort: RedditSort = RedditSort.RELEVANCE,
+    onChange: (RedditSort) -> Unit = {},
+) {
+    Column {
+        Text(
+            text = stringResource(R.string.sort),
+            style = MaterialTheme.typography.labelLarge,
+        )
+        Spacer(modifier = Modifier.requiredHeight(8.dp))
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            RedditSort.entries.map {
+                val selected = it == sort
+
+                FilterChip(
+                    label = { Text(text = getRedditSortString(it)) },
                     leadingIcon = {
                         AnimatedVisibility(selected) {
                             Icon(
@@ -291,6 +350,46 @@ internal fun TopRangeFilter(
 
                 FilterChip(
                     label = { Text(text = getTopRangeString(it)) },
+                    leadingIcon = {
+                        AnimatedVisibility(selected) {
+                            Icon(
+                                modifier = Modifier.size(16.dp),
+                                imageVector = Icons.Default.Check,
+                                contentDescription = null,
+                            )
+                        }
+                    },
+                    selected = selected,
+                    onClick = { onChange(it) },
+                )
+            }
+        }
+    }
+}
+
+@OptIn(
+    ExperimentalLayoutApi::class,
+    ExperimentalMaterial3Api::class,
+)
+@Composable
+internal fun RedditTimeRangeFilter(
+    timeRange: RedditTimeRange = RedditTimeRange.ALL,
+    onChange: (RedditTimeRange) -> Unit,
+) {
+    Column {
+        Text(
+            text = stringResource(R.string.posts_from),
+            style = MaterialTheme.typography.labelLarge,
+        )
+        Spacer(modifier = Modifier.requiredHeight(8.dp))
+        FlowRow(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            RedditTimeRange.entries.map {
+                val selected = it == timeRange
+
+                FilterChip(
+                    label = { Text(text = getRedditTimeRangeString(it)) },
                     leadingIcon = {
                         AnimatedVisibility(selected) {
                             Icon(
@@ -549,7 +648,6 @@ internal fun RatioFilter(
             label = { Text(text = stringResource(R.string.ratio)) },
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             colors = ExposedDropdownMenuDefaults.textFieldColors(),
-            tagFromInputString = { WallhavenRatio.fromSize(IntSize(1, 1)) }, // dummy method
             getTagString = { it.toRatioString().capitalize(Locale.current) },
         )
         ExposedDropdownMenu(
@@ -788,7 +886,7 @@ private fun getPurityString(purity: Purity) = stringResource(
 )
 
 @Composable
-private fun getSortingString(sorting: WallhavenSorting) = stringResource(
+private fun getWallhavenSortingString(sorting: WallhavenSorting) = stringResource(
     when (sorting) {
         WallhavenSorting.DATE_ADDED -> R.string.date_added
         WallhavenSorting.RELEVANCE -> R.string.relevance
@@ -796,6 +894,28 @@ private fun getSortingString(sorting: WallhavenSorting) = stringResource(
         WallhavenSorting.VIEWS -> R.string.views
         WallhavenSorting.FAVORITES -> R.string.favorites
         WallhavenSorting.TOPLIST -> R.string.top
+    },
+)
+
+@Composable
+private fun getRedditSortString(sort: RedditSort) = stringResource(
+    when (sort) {
+        RedditSort.TOP -> R.string.top
+        RedditSort.RELEVANCE -> R.string.relevance
+        RedditSort.NEW -> R.string.sort_new
+        RedditSort.COMMENTS -> R.string.comments
+    },
+)
+
+@Composable
+private fun getRedditTimeRangeString(timeRange: RedditTimeRange) = stringResource(
+    when (timeRange) {
+        RedditTimeRange.ALL -> R.string.all
+        RedditTimeRange.HOUR -> R.string.one_hour
+        RedditTimeRange.DAY -> R.string.one_day
+        RedditTimeRange.MONTH -> R.string.one_month
+        RedditTimeRange.WEEK -> R.string.one_week
+        RedditTimeRange.YEAR -> R.string.one_year
     },
 )
 
@@ -823,13 +943,13 @@ private fun getOrderString(order: Order) = stringResource(
 @Composable
 fun SaveAsDialog(
     modifier: Modifier = Modifier,
+    checkNameExists: suspend (name: String) -> Boolean = { false },
     onSave: (String) -> Unit = {},
     onDismissRequest: () -> Unit = {},
 ) {
-    val context = LocalContext.current
-    val nameState by rememberSaveable(stateSaver = nameStateSaver(context)) {
-        mutableStateOf(NameState(context, ""))
-    }
+    val coroutineScope = rememberCoroutineScope()
+    var name by rememberSaveable { mutableStateOf("") }
+    var isError by rememberSaveable { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
 
     LaunchedEffect(Unit) {
@@ -841,26 +961,41 @@ fun SaveAsDialog(
         title = { Text(text = stringResource(R.string.save_as)) },
         text = {
             OutlinedTextField(
-                modifier = Modifier
-                    .focusRequester(focusRequester)
-                    .onFocusChanged { focusState ->
-                        nameState.onFocusChange(focusState.isFocused)
-                        if (!focusState.isFocused) {
-                            nameState.enableShowErrors()
-                        }
-                    },
+                modifier = Modifier.focusRequester(focusRequester),
                 label = { Text(text = stringResource(R.string.name)) },
-                value = nameState.text,
+                value = name,
+                isError = isError,
+                supportingText = if (isError) {
+                    {
+                        Text(
+                            text = stringResource(
+                                if (name.isBlank()) {
+                                    R.string.name_cannot_be_empty
+                                } else {
+                                    R.string.name_already_used
+                                },
+                            ),
+                        )
+                    }
+                } else {
+                    null
+                },
                 onValueChange = {
-                    nameState.text = it
-                    nameState.enableShowErrors()
+                    name = it
+                    if (it.isBlank()) {
+                        isError = true
+                        return@OutlinedTextField
+                    }
+                    coroutineScope.launch {
+                        isError = checkNameExists(name.trimAll())
+                    }
                 },
             )
         },
         confirmButton = {
             TextButton(
-                enabled = nameState.isValid,
-                onClick = { onSave(nameState.text) },
+                enabled = !isError,
+                onClick = { onSave(name.trimAll()) },
             ) {
                 Text(text = stringResource(R.string.save))
             }
@@ -874,8 +1009,8 @@ fun SaveAsDialog(
     )
 }
 
-@Preview(showSystemUi = true)
-@Preview(showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun PreviewSaveAsDialog() {
     WallFlowTheme {
@@ -943,6 +1078,17 @@ private fun SavedSearchItem(
             .heightIn(min = 56.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
+        Icon(
+            modifier = Modifier.size(24.dp),
+            painter = painterResource(
+                when (savedSearch.search) {
+                    is WallhavenSearch -> R.drawable.wallhaven_logo_short
+                    is RedditSearch -> R.drawable.reddit
+                },
+            ),
+            contentDescription = null,
+        )
+        Spacer(modifier = Modifier.requiredWidth(16.dp))
         Text(
             modifier = Modifier.weight(1f),
             text = savedSearch.name,
@@ -985,8 +1131,8 @@ private class SavedSearchesDialogPreviewParameterProvider :
         ),
     )
 
-@Preview(showSystemUi = true)
-@Preview(showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun PreviewSavedSearchesDialog(
     @PreviewParameter(SavedSearchesDialogPreviewParameterProvider::class) parameters:
@@ -1127,8 +1273,8 @@ fun CustomResolutionDialog(
     )
 }
 
-@Preview(showSystemUi = true)
-@Preview(showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun PreviewCustomResolutionDialog() {
     WallFlowTheme {

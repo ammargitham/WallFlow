@@ -1,11 +1,10 @@
-package com.ammar.wallflow.data.db.entity.wallhaven
+package com.ammar.wallflow.data.db.entity.search
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.ammar.wallflow.data.db.entity.search.SearchQueryEntity
 
 @Entity(
     tableName = "search_query_remote_keys",
@@ -24,7 +23,7 @@ import com.ammar.wallflow.data.db.entity.search.SearchQueryEntity
         ),
     ],
 )
-data class WallhavenSearchQueryRemoteKeyEntity(
+data class SearchQueryRemoteKeyEntity(
     @PrimaryKey(autoGenerate = true) val id: Long,
     @ColumnInfo(name = "search_query_id") val searchQueryId: Long,
     @ColumnInfo(name = "next_page") val nextPage: String?,

@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.ammar.wallflow.data.repository.local.LocalWallpapersRepository
+import com.ammar.wallflow.data.repository.reddit.RedditRepository
 import com.ammar.wallflow.data.repository.utils.Resource
 import com.ammar.wallflow.data.repository.utils.successOr
 import com.ammar.wallflow.data.repository.wallhaven.WallhavenRepository
@@ -32,7 +33,8 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class WallpaperViewerViewModel @Inject constructor(
     private val application: Application,
-    private val wallHavenRepository: WallhavenRepository,
+    private val wallhavenRepository: WallhavenRepository,
+    private val redditRepository: RedditRepository,
     private val localWallpapersRepository: LocalWallpapersRepository,
     private val downloadManager: DownloadManager,
 ) : AndroidViewModel(
@@ -47,7 +49,8 @@ class WallpaperViewerViewModel @Inject constructor(
             flowOf(Resource.Success(null))
         } else {
             when (it.source) {
-                Source.WALLHAVEN -> wallHavenRepository.wallpaper(it.wallpaperId)
+                Source.WALLHAVEN -> wallhavenRepository.wallpaper(it.wallpaperId)
+                Source.REDDIT -> redditRepository.wallpaper(it.wallpaperId)
                 Source.LOCAL -> localWallpapersRepository.wallpaper(application, it.wallpaperId)
             }
         }

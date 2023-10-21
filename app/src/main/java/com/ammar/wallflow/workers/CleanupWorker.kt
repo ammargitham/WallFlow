@@ -15,6 +15,8 @@ import androidx.work.WorkerParameters
 import com.ammar.wallflow.IoDispatcher
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.db.AppDatabase
+import com.ammar.wallflow.data.db.entity.OnlineSourceWallpaperEntity
+import com.ammar.wallflow.data.db.entity.reddit.RedditWallpaperEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
 import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.extensions.getFileNameFromUrl
@@ -44,9 +46,15 @@ class CleanupWorker @AssistedInject constructor(
     context,
     params,
 ) {
-    private val remoteKeysDao by lazy { appDatabase.wallhavenSearchQueryRemoteKeysDao() }
-    private val wallpapersDao by lazy { appDatabase.wallhavenWallpapersDao() }
-    private val searchQueryWallpapersDao by lazy { appDatabase.wallhavenSearchQueryWallpapersDao() }
+    private val remoteKeysDao by lazy { appDatabase.searchQueryRemoteKeysDao() }
+    private val wallhavenWallpapersDao by lazy { appDatabase.wallhavenWallpapersDao() }
+    private val wallhavenSearchQueryWallpapersDao by lazy {
+        appDatabase.wallhavenSearchQueryWallpapersDao()
+    }
+    private val redditWallpapersDao by lazy { appDatabase.redditWallpapersDao() }
+    private val redditSearchQueryWallpapersDao by lazy {
+        appDatabase.redditSearchQueryWallpapersDao()
+    }
     private val searchQueryDao by lazy { appDatabase.searchQueryDao() }
     private val notificationBuilder by lazy {
         NotificationCompat.Builder(context, NotificationChannels.CLEANUP_CHANNEL_ID).apply {
@@ -82,20 +90,34 @@ class CleanupWorker @AssistedInject constructor(
 
     private suspend fun cleanupOldSearchQueries(cutOff: Instant) {
         val ids = searchQueryDao.getAllIdsOlderThan(cutOff)
-        val deletedWallpapers = mutableSetOf<WallhavenWallpaperEntity>()
-        ids.forEach { deletedWallpapers.addAll(cleanupSearchQueryId(it)) }
-        val deleteFileNamesFromTemp = deletedWallpapers.map { it.path.getFileNameFromUrl() }
+        val deletedWallpapers = ids.flatMap { cleanupSearchQueryId(it) }
+        val deleteFileNamesFromTemp = deletedWallpapers.map {
+            when (it) {
+                is WallhavenWallpaperEntity -> it.path.getFileNameFromUrl()
+                is RedditWallpaperEntity -> it.url.getFileNameFromUrl()
+                else -> throw RuntimeException()
+            }
+        }
         val tempDir = context.getTempDir()
         deleteFileNamesFromTemp.forEach { File(tempDir, it).delete() }
     }
 
-    private suspend fun cleanupSearchQueryId(searchQueryId: Long): List<WallhavenWallpaperEntity> {
+    private suspend fun cleanupSearchQueryId(
+        searchQueryId: Long,
+    ): List<OnlineSourceWallpaperEntity> {
         remoteKeysDao.deleteBySearchQueryId(searchQueryId)
-        val wallpapersToDelete = wallpapersDao.getAllUniqueToSearchQueryId(searchQueryId)
-        wallpapersDao.deleteAllUniqueToSearchQueryId(searchQueryId)
-        searchQueryWallpapersDao.deleteBySearchQueryId(searchQueryId)
+        val wallhavenWallpapersToDelete = wallhavenWallpapersDao.getAllUniqueToSearchQueryId(
+            searchQueryId,
+        )
+        wallhavenWallpapersDao.deleteAllUniqueToSearchQueryId(searchQueryId)
+        wallhavenSearchQueryWallpapersDao.deleteBySearchQueryId(searchQueryId)
+        val redditWallpapersToDelete = redditWallpapersDao.getAllUniqueToSearchQueryId(
+            searchQueryId,
+        )
+        redditWallpapersDao.deleteAllUniqueToSearchQueryId(searchQueryId)
+        redditSearchQueryWallpapersDao.deleteBySearchQueryId(searchQueryId)
         searchQueryDao.deleteById(searchQueryId)
-        return wallpapersToDelete
+        return wallhavenWallpapersToDelete + redditWallpapersToDelete
     }
 
     private fun deleteOldTempFiles(cutOff: Instant) {

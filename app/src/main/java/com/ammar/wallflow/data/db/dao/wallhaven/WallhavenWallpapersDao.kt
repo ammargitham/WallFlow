@@ -8,12 +8,13 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import androidx.room.Upsert
+import com.ammar.wallflow.data.db.dao.WallpapersDao
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperTagsEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallpaperWithUploaderAndTags
 
 @Dao
-interface WallhavenWallpapersDao {
+interface WallhavenWallpapersDao : WallpapersDao {
     @Query("SELECT * FROM wallhaven_wallpapers")
     suspend fun getAll(): List<WallhavenWallpaperEntity>
 

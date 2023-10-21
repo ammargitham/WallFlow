@@ -74,8 +74,8 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
         db.execSQL(
             // language=sql
             """
-                    INSERT INTO wallhaven_search_query_wallpapers
-                    SELECT * FROM search_query_wallpapers
+                INSERT INTO wallhaven_search_query_wallpapers
+                SELECT * FROM search_query_wallpapers
             """.trimMargin(),
         )
         db.execSQL(
@@ -87,23 +87,38 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
         db.execSQL(
             // language=sql
             """
-                ALTER TABLE search_query_remote_keys
-                ADD COLUMN next_page TEXT
+                CREATE TABLE IF NOT EXISTS `search_query_remote_keys_copy` (
+                    `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    `search_query_id` INTEGER NOT NULL,
+                    `next_page` TEXT,
+                    FOREIGN KEY(`search_query_id`)
+                        REFERENCES `search_query`(`id`)
+                        ON UPDATE NO ACTION
+                        ON DELETE CASCADE
+                )
             """.trimIndent(),
         )
         db.execSQL(
             // language=sql
             """
-                UPDATE search_query_remote_keys
-                SET next_page = CAST(next_page_number AS TEXT)
-            """.trimIndent(),
+                INSERT INTO search_query_remote_keys_copy
+                SELECT * FROM search_query_remote_keys
+            """.trimMargin(),
+        )
+        db.execSQL(
+            // language=sql
+            "DROP TABLE search_query_remote_keys",
+        )
+        db.execSQL(
+            // language=sql
+            "ALTER TABLE search_query_remote_keys_copy RENAME TO search_query_remote_keys",
         )
         db.execSQL(
             // language=sql
             """
-                ALTER TABLE search_query_remote_keys
-                DROP COLUMN next_page_number
-            """.trimIndent(),
+                CREATE UNIQUE INDEX IF NOT EXISTS `index_search_query_remote_keys_search_query_id`
+                ON `search_query_remote_keys` (`search_query_id`)
+            """.trimMargin(),
         )
 
         // create table rate_limits
@@ -204,5 +219,62 @@ val MIGRATION_3_4 = object : Migration(3, 4) {
                 """.trimIndent(),
             )
         }
+
+        // create reddit_wallpapers
+        db.execSQL(
+            // language=sql
+            """
+                CREATE TABLE IF NOT EXISTS `reddit_wallpapers` (
+                    `id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                    `reddit_id` TEXT NOT NULL,
+                    `subreddit` TEXT NOT NULL,
+                    `post_id` TEXT NOT NULL,
+                    `post_title` TEXT NOT NULL,
+                    `post_url` TEXT NOT NULL,
+                    `purity` TEXT NOT NULL,
+                    `url` TEXT NOT NULL,
+                    `thumbnail_url` TEXT NOT NULL,
+                    `width` INTEGER NOT NULL,
+                    `height` INTEGER NOT NULL,
+                    `author` TEXT NOT NULL,
+                    `mime_type` TEXT,
+                    `gallery_pos` INTEGER
+                )
+            """.trimIndent(),
+        )
+        db.execSQL(
+            // language=sql
+            """
+                CREATE UNIQUE INDEX IF NOT EXISTS `index_reddit_wallpapers_reddit_id`
+                ON `reddit_wallpapers` (`reddit_id`)
+            """.trimIndent(),
+        )
+
+        // create reddit_search_query_wallpapers
+        db.execSQL(
+            // language=sql
+            """
+                CREATE TABLE IF NOT EXISTS `reddit_search_query_wallpapers` (
+                    `search_query_id` INTEGER NOT NULL,
+                    `wallpaper_id` INTEGER NOT NULL,
+                    PRIMARY KEY(`search_query_id`, `wallpaper_id`),
+                    FOREIGN KEY(`search_query_id`)
+                        REFERENCES `search_query`(`id`)
+                        ON UPDATE NO ACTION
+                        ON DELETE CASCADE,
+                    FOREIGN KEY(`wallpaper_id`)
+                        REFERENCES `reddit_wallpapers`(`id`)
+                        ON UPDATE NO ACTION
+                        ON DELETE CASCADE
+                )
+            """.trimIndent(),
+        )
+        db.execSQL(
+            // language=sql
+            """
+                CREATE INDEX IF NOT EXISTS `index_reddit_search_query_wallpapers_wallpaper_id`
+                ON `reddit_search_query_wallpapers` (`wallpaper_id`)
+            """.trimIndent(),
+        )
     }
 }

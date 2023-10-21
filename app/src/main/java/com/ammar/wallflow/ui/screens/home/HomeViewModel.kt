@@ -13,6 +13,7 @@ import com.ammar.wallflow.data.preferences.LayoutPreferences
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.FavoritesRepository
 import com.ammar.wallflow.data.repository.SavedSearchRepository
+import com.ammar.wallflow.data.repository.reddit.RedditRepository
 import com.ammar.wallflow.data.repository.utils.Resource
 import com.ammar.wallflow.data.repository.utils.successOr
 import com.ammar.wallflow.data.repository.wallhaven.WallhavenRepository
@@ -20,7 +21,10 @@ import com.ammar.wallflow.model.Favorite
 import com.ammar.wallflow.model.OnlineSource
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.Wallpaper
+import com.ammar.wallflow.model.search.RedditFilters
 import com.ammar.wallflow.model.search.RedditSearch
+import com.ammar.wallflow.model.search.RedditSort
+import com.ammar.wallflow.model.search.RedditTimeRange
 import com.ammar.wallflow.model.search.SavedSearch
 import com.ammar.wallflow.model.search.Search
 import com.ammar.wallflow.model.search.WallhavenFilters
@@ -30,21 +34,28 @@ import com.ammar.wallflow.model.search.WallhavenTopRange
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.ui.screens.navArgs
 import com.github.materiiapps.partial.Partialize
+import com.github.materiiapps.partial.getOrElse
 import com.github.materiiapps.partial.partial
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.ImmutableSet
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.collections.immutable.persistentSetOf
 import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableMap
+import kotlinx.collections.immutable.toImmutableSet
+import kotlinx.collections.immutable.toPersistentMap
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -53,39 +64,89 @@ import kotlinx.datetime.Clock
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val wallHavenRepository: WallhavenRepository,
+    private val wallhavenRepository: WallhavenRepository,
+    private val redditRepository: RedditRepository,
     private val appPreferencesRepository: AppPreferencesRepository,
     private val savedSearchRepository: SavedSearchRepository,
     private val favoritesRepository: FavoritesRepository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val mainSearch = savedStateHandle.navArgs<HomeScreenNavArgs>().search
-    private val popularTags = wallHavenRepository.popularTags()
+    private val popularTags = wallhavenRepository.popularTags()
     private val localUiState = MutableStateFlow(HomeUiStatePartial())
+    private val homeSearchFlow = combine(
+        localUiState,
+        appPreferencesRepository.appPreferencesFlow,
+    ) { local, appPreferences ->
+        val source = getCorrectSelectedSource(
+            local = local,
+            homeSource = appPreferences.homeSources,
+            homeRedditSearch = appPreferences.homeRedditSearch,
+        )
+        when (source) {
+            OnlineSource.WALLHAVEN -> appPreferences.homeWallhavenSearch
+            OnlineSource.REDDIT -> appPreferences.homeRedditSearch
+        }
+    }.filterNotNull().distinctUntilChanged()
 
-    private val homeSearchFlow = appPreferencesRepository.appPreferencesFlow.mapLatest {
-        it.homeWallhavenSearch
-    }.distinctUntilChanged()
+    private fun getCorrectSelectedSource(
+        local: HomeUiStatePartial,
+        homeSource: Map<OnlineSource, Boolean>,
+        homeRedditSearch: RedditSearch?,
+    ): OnlineSource {
+        var source = local.selectedSource.getOrElse { OnlineSource.WALLHAVEN }
+        val sourceEnabled = homeSource[source] ?: false
+        if (!sourceEnabled) {
+            source = OnlineSource.entries.first { it != source }
+        }
+        if (source == OnlineSource.REDDIT && homeRedditSearch == null) {
+            // fallback to wallhaven
+            source = OnlineSource.WALLHAVEN
+        }
+        return source
+    }
 
     val wallpapers = if (mainSearch != null) {
         when (mainSearch) {
-            is WallhavenSearch -> wallHavenRepository.wallpapersPager(mainSearch)
-            is RedditSearch -> TODO()
+            is WallhavenSearch -> wallhavenRepository.wallpapersPager(mainSearch)
+            is RedditSearch -> redditRepository.wallpapersPager(mainSearch)
         }
     } else {
         homeSearchFlow.flatMapLatest {
-            wallHavenRepository.wallpapersPager(it)
+            when (it) {
+                is WallhavenSearch -> wallhavenRepository.wallpapersPager(it)
+                is RedditSearch -> redditRepository.wallpapersPager(it)
+            }
         }
     }.cachedIn(viewModelScope)
 
-    val uiState = combine(
+    init {
+        viewModelScope.launch {
+            localUiState.update {
+                val appPreferences = appPreferencesRepository.appPreferencesFlow.first()
+                it.copy(
+                    selectedSource = partial(
+                        getCorrectSelectedSource(
+                            local = it,
+                            homeSource = appPreferences.homeSources,
+                            homeRedditSearch = appPreferences.homeRedditSearch,
+                        ),
+                    ),
+                )
+            }
+        }
+    }
+
+    val uiState = com.ammar.wallflow.utils.combine(
         popularTags,
+        homeSearchFlow,
         appPreferencesRepository.appPreferencesFlow,
         localUiState,
         savedSearchRepository.observeAll(),
         favoritesRepository.observeAll(),
     ) {
             tags,
+            homeSearch,
             appPreferences,
             local,
             savedSearchEntities,
@@ -98,15 +159,18 @@ class HomeViewModel @Inject constructor(
                         if (tags is Resource.Loading) {
                             tempWallhavenTags
                         } else {
-                            tags.successOr(
-                                emptyList(),
-                            )
+                            tags.successOr(emptyList())
                         }
                         ).toImmutableList(),
                     areTagsLoading = tags is Resource.Loading,
                 ),
+                reddit = RedditState(
+                    subreddits = appPreferences.homeRedditSearch?.filters?.subreddits
+                        ?.toImmutableSet()
+                        ?: persistentSetOf(),
+                ),
                 mainSearch = mainSearch,
-                homeSearch = appPreferences.homeWallhavenSearch,
+                homeSearch = homeSearch,
                 savedSearches = savedSearchEntities.map(
                     SavedSearchEntity::toSavedSearch,
                 ),
@@ -115,9 +179,7 @@ class HomeViewModel @Inject constructor(
                 showNSFW = appPreferences.wallhavenApiKey.isNotBlank(),
                 layoutPreferences = appPreferences.lookAndFeelPreferences.layoutPreferences,
                 favorites = favorites.map(FavoriteEntity::toFavorite).toImmutableList(),
-                sources = persistentMapOf(
-                    OnlineSource.WALLHAVEN to true,
-                ),
+                sources = appPreferences.homeSources.toImmutableMap(),
             ),
         )
     }.stateIn(
@@ -128,7 +190,7 @@ class HomeViewModel @Inject constructor(
 
     fun refresh() {
         viewModelScope.launch {
-            wallHavenRepository.refreshPopularTags()
+            wallhavenRepository.refreshPopularTags()
         }
     }
 
@@ -176,26 +238,103 @@ class HomeViewModel @Inject constructor(
     }
 
     fun showManageSourcesDialog(show: Boolean) = localUiState.update {
-        it.copy(showManageSourcesDialog = partial(show))
+        it.copy(
+            manageSourcesState = partial(
+                ManageSourcesState(
+                    showDialog = show,
+                    currentSources = if (show) {
+                        uiState.value.sources
+                    } else {
+                        uiState.value.manageSourcesState.currentSources
+                    },
+                ),
+            ),
+        )
     }
 
-    fun addSource(source: OnlineSource) = localUiState.update {
-        when (source) {
-            OnlineSource.WALLHAVEN -> it // will never be called
-            OnlineSource.REDDIT -> it.copy(
-                showManageSourcesDialog = partial(false),
-                showRedditInitDialog = partial(true),
-            )
+    fun addSource(source: OnlineSource) {
+        localUiState.update {
+            when (source) {
+                OnlineSource.WALLHAVEN -> it // will never be called
+                OnlineSource.REDDIT -> it.copy(
+                    showRedditInitDialog = partial(true),
+                )
+            }
         }
+        showManageSourcesDialog(false)
     }
 
     fun showRedditInitDialog(show: Boolean) = localUiState.update {
         it.copy(showRedditInitDialog = partial(show))
     }
 
-    fun updateRedditConfigAndCloseDialog(subreddits: Set<String>) = localUiState.update {
-        it.copy(showRedditInitDialog = partial(false))
+    fun updateRedditConfigAndCloseDialog(subreddits: Set<String>) = viewModelScope.launch {
+        appPreferencesRepository.updateHomeRedditSearch(
+            RedditSearch(
+                query = "",
+                filters = RedditFilters(
+                    subreddits = subreddits,
+                    includeNsfw = false,
+                    sort = RedditSort.TOP,
+                    timeRange = RedditTimeRange.WEEK,
+                ),
+            ),
+        )
+        localUiState.update {
+            it.copy(showRedditInitDialog = partial(false))
+        }
     }
+
+    fun changeSource(source: OnlineSource) {
+        if (uiState.value.selectedSource == source) {
+            return
+        }
+        localUiState.update {
+            it.copy(selectedSource = partial(source))
+        }
+    }
+
+    fun updateManageSourcesDialogSources(
+        sources: Map<OnlineSource, Boolean>,
+    ) = localUiState.update {
+        val existingSources = uiState.value.sources
+        val updatedSources = sources.toPersistentMap()
+        val saveEnabled = existingSources != updatedSources
+        it.copy(
+            manageSourcesState = partial(
+                uiState.value.manageSourcesState.copy(
+                    currentSources = updatedSources,
+                    saveEnabled = saveEnabled,
+                ),
+            ),
+        )
+    }
+
+    fun saveManageSources() = viewModelScope.launch {
+        val manageSourcesState = uiState.value.manageSourcesState
+        val currentSources = manageSourcesState.currentSources
+        val allDisabled = currentSources.all { !it.value }
+        if (allDisabled) {
+            return@launch
+        }
+        appPreferencesRepository.updateHomeSources(currentSources)
+        localUiState.update {
+            it.copy(
+                selectedSource = partial(
+                    getCorrectSelectedSource(
+                        local = it,
+                        homeSource = currentSources,
+                        homeRedditSearch = appPreferencesRepository.appPreferencesFlow
+                            .first()
+                            .homeRedditSearch,
+                    ),
+                ),
+            )
+        }
+        showManageSourcesDialog(false)
+    }
+
+    suspend fun checkSavedSearchNameExists(name: String) = savedSearchRepository.exists(name)
 }
 
 private val tempWallhavenTags = List(3) {
@@ -213,11 +352,11 @@ private val tempWallhavenTags = List(3) {
 @Stable
 @Partialize
 data class HomeUiState(
-    val selectedSource: OnlineSource = OnlineSource.WALLHAVEN,
     val sources: ImmutableMap<OnlineSource, Boolean> = persistentMapOf(
         OnlineSource.WALLHAVEN to true,
     ),
     val mainSearch: Search? = null,
+    val selectedSource: OnlineSource = OnlineSource.WALLHAVEN,
     val homeSearch: Search = WallhavenSearch(
         filters = WallhavenFilters(
             sorting = WallhavenSorting.TOPLIST,
@@ -227,6 +366,7 @@ data class HomeUiState(
     val saveSearchAsSearch: Search? = null,
     val savedSearches: List<SavedSearch> = emptyList(),
     val wallhaven: WallhavenState = WallhavenState(),
+    val reddit: RedditState = RedditState(),
     val showFilters: Boolean = false,
     val blurSketchy: Boolean = false,
     val blurNsfw: Boolean = false,
@@ -235,20 +375,24 @@ data class HomeUiState(
     val showSavedSearchesDialog: Boolean = false,
     val layoutPreferences: LayoutPreferences = LayoutPreferences(),
     val favorites: ImmutableList<Favorite> = persistentListOf(),
-    val showManageSourcesDialog: Boolean = false,
     val showRedditInitDialog: Boolean = false,
+    val manageSourcesState: ManageSourcesState = ManageSourcesState(),
 ) {
-    val isHome = when (selectedSource) {
-        OnlineSource.WALLHAVEN -> mainSearch == null
-        OnlineSource.REDDIT -> TODO()
-    }
-    val showSaveAsDialog = when (selectedSource) {
-        OnlineSource.WALLHAVEN -> saveSearchAsSearch != null
-        OnlineSource.REDDIT -> TODO()
-    }
+    val isHome = mainSearch == null
+    val showSaveAsDialog = saveSearchAsSearch != null
 }
 
 data class WallhavenState(
     val wallhavenTags: ImmutableList<WallhavenTag> = persistentListOf(),
     val areTagsLoading: Boolean = true,
+)
+
+data class RedditState(
+    val subreddits: ImmutableSet<String> = persistentSetOf(),
+)
+
+data class ManageSourcesState(
+    val showDialog: Boolean = false,
+    val currentSources: ImmutableMap<OnlineSource, Boolean> = persistentMapOf(),
+    val saveEnabled: Boolean = false,
 )

@@ -27,7 +27,8 @@ fun GlobalErrorsColumn(
                 is RateLimitError -> stringResource(
                     R.string.rate_limited_please_try_again_after_some_time,
                     when (it.source) {
-                        Source.WALLHAVEN -> "wallhaven.cc"
+                        Source.WALLHAVEN -> stringResource(R.string.wallhaven_cc)
+                        Source.REDDIT -> stringResource(R.string.reddit)
                         Source.LOCAL -> "" // will never be local
                     },
                 )

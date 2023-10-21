@@ -3,6 +3,7 @@ package com.ammar.wallflow
 import androidx.compose.ui.unit.IntSize
 
 const val WALLHAVEN_BASE_URL = "https://wallhaven.cc/api/v1/"
+const val REDDIT_BASE_URL = "https://reddit.com/"
 
 val COMMON_RESOLUTIONS = mapOf(
     "VGA" to IntSize(640, 480),

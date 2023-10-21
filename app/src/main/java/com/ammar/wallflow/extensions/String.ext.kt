@@ -3,6 +3,7 @@ package com.ammar.wallflow.extensions
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.util.regex.Pattern
+import org.jsoup.parser.Parser
 
 val Any.TAG: String
     get() {
@@ -50,3 +51,5 @@ fun String.fromQueryString() = this
             if (it.size > 1) it[1].urlDecoded() else null,
         )
     }
+
+fun String.htmlUnescaped(): String = Parser.unescapeEntities(this, false)

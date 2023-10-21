@@ -1,24 +1,24 @@
-package com.ammar.wallflow.data.db.dao.wallhaven
+package com.ammar.wallflow.data.db.dao.search
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Upsert
-import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSearchQueryRemoteKeyEntity
+import com.ammar.wallflow.data.db.entity.search.SearchQueryRemoteKeyEntity
 
 @Dao
-interface WallhavenSearchQueryRemoteKeysDao {
+interface SearchQueryRemoteKeysDao {
     @Query(
         "SELECT * FROM search_query_remote_keys WHERE search_query_id = :searchQueryId",
     )
-    suspend fun getBySearchQueryId(searchQueryId: Long): WallhavenSearchQueryRemoteKeyEntity?
+    suspend fun getBySearchQueryId(searchQueryId: Long): SearchQueryRemoteKeyEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertOrReplace(remoteKey: WallhavenSearchQueryRemoteKeyEntity)
+    suspend fun insertOrReplace(remoteKey: SearchQueryRemoteKeyEntity)
 
     @Upsert
-    suspend fun upsert(searchQueryRemoteKeyEntity: WallhavenSearchQueryRemoteKeyEntity)
+    suspend fun upsert(searchQueryRemoteKeyEntity: SearchQueryRemoteKeyEntity)
 
     @Query("DELETE FROM search_query_remote_keys WHERE search_query_id = :searchQueryId")
     suspend fun deleteBySearchQueryId(searchQueryId: Long)

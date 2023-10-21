@@ -3,6 +3,7 @@ package com.ammar.wallflow.ui.common
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.ColumnScope
@@ -25,9 +26,12 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar as MaterialSearchBar
+import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.minimumInteractiveComponentSize
+import androidx.compose.material3x.FilterChipDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -46,10 +50,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.zIndex
 import com.ammar.wallflow.R
 import com.ammar.wallflow.extensions.toDp
+import com.ammar.wallflow.model.OnlineSource
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
 
 object SearchBar {
-    @OptIn(ExperimentalFoundationApi::class)
     @Composable
     operator fun <T> invoke(
         modifier: Modifier = Modifier,
@@ -73,55 +77,6 @@ object SearchBar {
         var localActive by rememberSaveable { mutableStateOf(active) }
         val density = LocalDensity.current
         val imePadding = WindowInsets.ime.getBottom(density).toDp()
-        val content: @Composable ColumnScope.() -> Unit = {
-            Box {
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(
-                        top = 16.dp,
-                        bottom = imePadding,
-                    ),
-                    // verticalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    items(suggestions) {
-                        ListItem(
-                            modifier = Modifier.combinedClickable(
-                                onClick = {
-                                    localActive = false
-                                    onActiveChange(false)
-                                    onSuggestionClick(it)
-                                },
-                                onLongClick = { onSuggestionDeleteRequest(it) },
-                            ),
-                            headlineContent = { Text(it.headline) },
-                            supportingContent = it.supportingText?.let { t ->
-                                {
-                                    Text(
-                                        text = t,
-                                        maxLines = 2,
-                                        overflow = TextOverflow.Ellipsis,
-                                    )
-                                }
-                            },
-                            leadingContent = it.icon,
-                            trailingContent = {
-                                IconButton(
-                                    onClick = { onSuggestionInsert(it) },
-                                ) {
-                                    Icon(
-                                        painter = painterResource(
-                                            R.drawable.baseline_north_west_24,
-                                        ),
-                                        contentDescription = null,
-                                    )
-                                }
-                            },
-                        )
-                    }
-                }
-                extraContent?.invoke()
-            }
-        }
 
         LaunchedEffect(active) {
             localActive = active
@@ -194,9 +149,90 @@ object SearchBar {
                 },
                 trailingIcon = trailingIcon,
                 enabled = enabled,
-                content = content,
-            )
+            ) {
+                Box {
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(
+                            top = 16.dp,
+                            bottom = imePadding,
+                        ),
+                    ) {
+                        items(suggestions) {
+                            SuggestionItem(
+                                suggestion = it,
+                                onClick = {
+                                    localActive = false
+                                    onActiveChange(false)
+                                    onSuggestionClick(it)
+                                },
+                                onDeleteRequest = { onSuggestionDeleteRequest(it) },
+                                onInsertClick = { onSuggestionInsert(it) },
+                            )
+                        }
+                    }
+                    extraContent?.invoke()
+                }
+            }
         }
+    }
+
+    @Composable
+    @OptIn(
+        ExperimentalFoundationApi::class,
+        ExperimentalMaterial3Api::class,
+    )
+    private fun <T> SuggestionItem(
+        suggestion: Suggestion<T>,
+        modifier: Modifier = Modifier,
+        onClick: () -> Unit = {},
+        onDeleteRequest: () -> Unit = {},
+        onInsertClick: () -> Unit = {},
+    ) {
+        ListItem(
+            modifier = modifier.combinedClickable(
+                onClick = onClick,
+                onLongClick = onDeleteRequest,
+            ),
+            headlineContent = {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    Icon(
+                        modifier = Modifier.size(FilterChipDefaults.IconSize),
+                        painter = painterResource(
+                            when (suggestion.source) {
+                                OnlineSource.WALLHAVEN -> R.drawable.wallhaven_logo_short
+                                OnlineSource.REDDIT -> R.drawable.reddit
+                            },
+                        ),
+                        contentDescription = null,
+                    )
+                    Text(suggestion.headline)
+                }
+            },
+            supportingContent = suggestion.supportingText?.let { t ->
+                {
+                    Text(
+                        text = t,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+                }
+            },
+            leadingContent = suggestion.icon,
+            trailingContent = {
+                IconButton(onClick = onInsertClick) {
+                    Icon(
+                        painter = painterResource(
+                            R.drawable.baseline_north_west_24,
+                        ),
+                        contentDescription = null,
+                    )
+                }
+            },
+        )
     }
 
     @Composable
@@ -244,6 +280,12 @@ object SearchBar {
                 trailingIcon = trailingIcon,
                 enabled = enabled,
                 content = content,
+                colors = SearchBarDefaults.colors(
+                    inputFieldColors = SearchBarDefaults.inputFieldColors(
+                        disabledLeadingIconColor = MaterialTheme.colorScheme.onSurface,
+                        disabledTrailingIconColor = MaterialTheme.colorScheme.onSurface,
+                    ),
+                ),
             )
         }
     }
@@ -255,6 +297,7 @@ object SearchBar {
 
 data class Suggestion<T>(
     val value: T,
+    val source: OnlineSource,
     val headline: String,
     val supportingText: String? = null,
     val icon: (@Composable () -> Unit)? = {

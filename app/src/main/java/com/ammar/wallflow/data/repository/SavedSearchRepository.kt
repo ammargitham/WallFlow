@@ -58,4 +58,13 @@ class SavedSearchRepository @Inject constructor(
     suspend fun delete(savedSearch: SavedSearch) = withContext(ioDispatcher) {
         savedSearchDao.deleteByName(savedSearch.name)
     }
+
+    suspend fun exists(id: Long) = savedSearchDao.exists(id)
+
+    suspend fun exists(name: String) = savedSearchDao.exists(name)
+
+    suspend fun existsExcludingId(
+        id: Long,
+        name: String,
+    ) = savedSearchDao.existsExcludingId(id, name)
 }

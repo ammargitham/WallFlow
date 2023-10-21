@@ -296,14 +296,12 @@ class MainActivity : ComponentActivity() {
                     },
                     onSearchBarShowFiltersChange = viewModel::setShowSearchBarFilters,
                     onSearchBarFiltersChange = {
-                        val searchBarSearch = uiState.searchBarSearch
-                        val filters = uiState.searchBarSearch.filters
-                        val updated = when (searchBarSearch) {
+                        val updated = when (val searchBarSearch = uiState.searchBarSearch) {
                             is RedditSearch -> searchBarSearch.copy(
-                                filters = filters as RedditFilters,
+                                filters = it as RedditFilters,
                             )
                             is WallhavenSearch -> searchBarSearch.copy(
-                                filters = filters as WallhavenFilters,
+                                filters = it as WallhavenFilters,
                             )
                         }
                         viewModel.setSearchBarSearch(updated)
@@ -357,6 +355,7 @@ class MainActivity : ComponentActivity() {
 
                 uiState.saveSearchAsSearch?.run {
                     SaveAsDialog(
+                        checkNameExists = viewModel::checkSavedSearchNameExists,
                         onSave = {
                             viewModel.saveSearchAs(it, this)
                             viewModel.showSaveSearchAsDialog(null)

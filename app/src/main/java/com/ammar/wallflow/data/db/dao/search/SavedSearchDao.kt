@@ -20,8 +20,27 @@ interface SavedSearchDao {
     @Query("SELECT * FROM saved_searches WHERE name = :name")
     suspend fun getByName(name: String): SavedSearchEntity?
 
-    @Query("SELECT * FROM saved_searches WHERE name in (:names)")
+    @Query("SELECT * FROM saved_searches WHERE name IN (:names)")
     suspend fun getAllByNames(names: Collection<String>): List<SavedSearchEntity>
+
+    @Query("SELECT EXISTS(SELECT 1 FROM saved_searches WHERE id = :id)")
+    suspend fun exists(id: Long): Boolean
+
+    @Query("SELECT EXISTS(SELECT 1 FROM saved_searches WHERE name = :name)")
+    suspend fun exists(name: String): Boolean
+
+    @Query(
+        """
+        SELECT EXISTS(
+            SELECT 1
+            FROM saved_searches
+            WHERE
+                id != :id
+                AND name = :name
+        )
+    """,
+    )
+    suspend fun existsExcludingId(id: Long, name: String): Boolean
 
     @Upsert
     suspend fun upsert(savedSearch: SavedSearchEntity)

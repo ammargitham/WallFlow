@@ -1,6 +1,8 @@
 package com.ammar.wallflow.ui.screens.home
 
 import android.content.res.Configuration
+import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,32 +10,36 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridScope
 import androidx.compose.foundation.lazy.staggeredgrid.LazyVerticalStaggeredGrid
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridCells
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalIconButton
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3x.FilterChip
+import androidx.compose.material3x.FilterChipDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -54,12 +60,18 @@ import kotlinx.collections.immutable.toPersistentList
 import kotlinx.datetime.Clock
 
 internal fun LazyStaggeredGridScope.header(
+    sources: ImmutableList<OnlineSource> = persistentListOf(OnlineSource.WALLHAVEN),
+    selectedSource: OnlineSource = OnlineSource.WALLHAVEN,
     sourceHeader: (LazyStaggeredGridScope.() -> Unit)? = null,
-    onSourceAddClick: () -> Unit = {},
+    onSourceClick: (OnlineSource) -> Unit = {},
+    onManageSourcesClick: () -> Unit = {},
 ) {
     item(span = StaggeredGridItemSpan.FullLine) {
         SourcesRow(
-            onAddClick = onSourceAddClick,
+            sources = sources,
+            selected = selectedSource,
+            onSourceClick = onSourceClick,
+            onManageClick = onManageSourcesClick,
         )
     }
     sourceHeader?.invoke(this)
@@ -119,60 +131,73 @@ internal fun LazyStaggeredGridScope.wallhavenHeader(
 @Composable
 internal fun SourcesRow(
     modifier: Modifier = Modifier,
+    sources: ImmutableList<OnlineSource> = persistentListOf(OnlineSource.WALLHAVEN),
+    selected: OnlineSource = OnlineSource.WALLHAVEN,
     onSourceClick: (OnlineSource) -> Unit = {},
-    onAddClick: () -> Unit = {},
+    onManageClick: () -> Unit = {},
 ) {
-    LazyRow(
-        modifier = modifier,
+    Row(
+        modifier = modifier.scrollable(
+            state = rememberScrollState(),
+            orientation = Orientation.Horizontal,
+        ),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        item(
-            key = "wallhaven",
-            contentType = "tab",
-        ) {
+        sources.forEach {
             FilterChip(
-                modifier = Modifier.height(40.dp),
-                shape = MaterialTheme.shapes.large,
+                shape = MaterialTheme.shapes.medium,
+                colors = FilterChipDefaults.filterChipColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                    iconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                    selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                    selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+                ),
+                border = FilterChipDefaults.filterChipBorder(
+                    borderWidth = 0.dp,
+                    borderColor = Color.Transparent,
+                ),
                 leadingIcon = {
-                    // Box(
-                    //     modifier = Modifier
-                    //         .size(24.dp)
-                    //         .background(
-                    //             // color = Color("#0b5277".toColorInt()),
-                    //             // color = MaterialTheme.colorScheme.primaryContainer,
-                    //             color = MaterialTheme.colorScheme.onSecondaryContainer,
-                    //             shape = MaterialTheme.shapes.large,
-                    //         ),
-                    // ) {
                     Icon(
-                        // modifier = Modifier
-                        //     .align(Alignment.Center)
-                        //     .padding(4.dp),
-                        // tint = contentColorFor(MaterialTheme.colorScheme.primaryContainer),
-                        // tint =
-                        // MaterialTheme.colorScheme.secondaryContainer,
-                        painter = painterResource(R.drawable.wallhaven_logo_short),
+                        modifier = Modifier.size(FilterChipDefaults.IconSize),
+                        painter = painterResource(
+                            when (it) {
+                                OnlineSource.WALLHAVEN -> R.drawable.wallhaven_logo_short
+                                OnlineSource.REDDIT -> R.drawable.reddit
+                            },
+                        ),
                         contentDescription = null,
                     )
-                    // }
                 },
-                label = { Text(text = stringResource(R.string.wallhaven_cc)) },
-                selected = true,
-                onClick = {
-                    onSourceClick(OnlineSource.WALLHAVEN)
+                label = {
+                    Text(
+                        text = stringResource(
+                            when (it) {
+                                OnlineSource.WALLHAVEN -> R.string.wallhaven_cc
+                                OnlineSource.REDDIT -> R.string.reddit
+                            },
+                        ),
+                    )
                 },
+                selected = it == selected,
+                onClick = { onSourceClick(it) },
             )
         }
-        item(contentType = "button") {
-            FilledTonalIconButton(
-                onClick = onAddClick,
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(R.string.add),
-                )
-            }
+        FilledTonalIconButton(
+            modifier = Modifier.size(32.dp),
+            onClick = onManageClick,
+        ) {
+            Icon(
+                modifier = Modifier.size(FilterChipDefaults.IconSize),
+                imageVector = if (sources.size == OnlineSource.entries.size) {
+                    Icons.Default.Edit
+                } else {
+                    Icons.Default.Add
+                },
+                contentDescription = stringResource(R.string.add),
+            )
         }
     }
 }
@@ -184,7 +209,12 @@ fun PreviewSourcesRow() {
     WallFlowTheme {
         Surface {
             Box(modifier = Modifier.padding(8.dp)) {
-                SourcesRow()
+                SourcesRow(
+                    sources = persistentListOf(
+                        OnlineSource.WALLHAVEN,
+                        OnlineSource.REDDIT,
+                    ),
+                )
             }
         }
     }
@@ -258,29 +288,30 @@ fun SearchBarFiltersToggle(
     }
 }
 
-@Composable
-fun SearchBarOverflowMenu(
-    modifier: Modifier = Modifier,
-    items: List<MenuItem> = emptyList(),
-    onItemClick: (MenuItem) -> Unit = {},
-) {
-    OverflowMenu(
-        modifier = modifier,
-    ) { closeMenu ->
-        items.forEach {
-            DropdownMenuItem(
-                text = { Text(it.text) },
-                onClick = {
-                    onItemClick(it)
-                    closeMenu()
-                },
-            )
-        }
-    }
-}
+// @Composable
+// fun SearchBarOverflowMenu(
+//     modifier: Modifier = Modifier,
+//     items: List<MenuItem> = emptyList(),
+//     onItemClick: (MenuItem) -> Unit = {},
+// ) {
+//     OverflowMenu(
+//         modifier = modifier,
+//     ) { closeMenu ->
+//         items.forEach {
+//             DropdownMenuItem(
+//                 text = { Text(it.text) },
+//                 onClick = {
+//                     onItemClick(it)
+//                     closeMenu()
+//                 },
+//             )
+//         }
+//     }
+// }
 
 @Composable
 fun HomeFiltersBottomSheetHeader(
+    source: OnlineSource,
     modifier: Modifier = Modifier,
     saveEnabled: Boolean = true,
     onSaveClick: () -> Unit = {},
@@ -307,13 +338,27 @@ fun HomeFiltersBottomSheetHeader(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
+        Column(
             modifier = Modifier.weight(1f),
-            text = stringResource(R.string.home_filters),
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis,
-            style = MaterialTheme.typography.headlineMedium,
-        )
+        ) {
+            Text(
+                text = stringResource(R.string.home_filters),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.headlineMedium,
+            )
+            Text(
+                text = stringResource(
+                    when (source) {
+                        OnlineSource.WALLHAVEN -> R.string.wallhaven_cc
+                        OnlineSource.REDDIT -> R.string.reddit
+                    },
+                ),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.labelLarge,
+            )
+        }
         Spacer(modifier = Modifier.requiredWidth(8.dp))
         Button(
             enabled = saveEnabled,
@@ -343,7 +388,9 @@ private fun PreviewEditSearchBottomSheetHeader() {
     WallFlowTheme {
         Surface {
             Column {
-                HomeFiltersBottomSheetHeader()
+                HomeFiltersBottomSheetHeader(
+                    source = OnlineSource.WALLHAVEN,
+                )
             }
         }
     }

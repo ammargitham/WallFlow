@@ -37,8 +37,8 @@ class DatabaseModule {
     fun searchQueryDao(appDatabase: AppDatabase) = appDatabase.searchQueryDao()
 
     @Provides
-    fun providesWallhavenSearchQueryRemoteKeysDao(appDatabase: AppDatabase) =
-        appDatabase.wallhavenSearchQueryRemoteKeysDao()
+    fun providesSearchQueryRemoteKeysDao(appDatabase: AppDatabase) =
+        appDatabase.searchQueryRemoteKeysDao()
 
     @Provides
     fun providesWallhavenSearchQueryWallpapersDao(appDatabase: AppDatabase) =
@@ -74,6 +74,9 @@ class DatabaseModule {
 
     @Provides
     fun providesRateLimitDao(appDatabase: AppDatabase) = appDatabase.rateLimitDao()
+
+    @Provides
+    fun providesRedditWallpaperDao(appDatabase: AppDatabase) = appDatabase.redditWallpapersDao()
 
     lateinit var appDatabase: AppDatabase
 

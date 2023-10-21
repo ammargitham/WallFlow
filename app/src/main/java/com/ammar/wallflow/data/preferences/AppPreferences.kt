@@ -13,6 +13,7 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.work.Constraints
 import androidx.work.NetworkType
 import com.ammar.wallflow.json
+import com.ammar.wallflow.model.OnlineSource
 import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.model.search.RedditSearch
 import com.ammar.wallflow.model.search.WallhavenFilters
@@ -40,6 +41,7 @@ data class AppPreferences(
         ),
     ),
     val homeRedditSearch: RedditSearch? = null,
+    val homeSources: Map<OnlineSource, Boolean> = mapOf(OnlineSource.WALLHAVEN to true),
     val blurSketchy: Boolean = false,
     val blurNsfw: Boolean = false,
     val objectDetectionPreferences: ObjectDetectionPreferences = ObjectDetectionPreferences(),
@@ -77,7 +79,7 @@ data class AutoWallpaperPreferences(
     val savedSearchEnabled: Boolean = false,
     val favoritesEnabled: Boolean = false,
     val localEnabled: Boolean = false,
-    val savedSearchId: Long = 0,
+    val savedSearchIds: Set<Long> = emptySet(),
     val useObjectDetection: Boolean = true,
     val frequency: DateTimePeriod = defaultAutoWallpaperFreq,
     val constraints: Constraints = defaultAutoWallpaperConstraints,
@@ -87,7 +89,11 @@ data class AutoWallpaperPreferences(
     val markFavorite: Boolean = false,
     val download: Boolean = false,
 ) {
-    val anySourceEnabled = (savedSearchEnabled && savedSearchId > 0) ||
+    val anySourceEnabled = (
+        savedSearchEnabled &&
+            savedSearchIds.isNotEmpty() &&
+            savedSearchIds.all { it > 0 }
+        ) ||
         favoritesEnabled ||
         localEnabled
 }

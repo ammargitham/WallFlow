@@ -17,9 +17,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.ammar.wallflow.R
+import com.ammar.wallflow.ui.common.taginput.TagInputField
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -96,6 +98,7 @@ fun <T> Dropdown(
 data class DropdownOption<T>(
     val value: T,
     val text: String,
+    val icon: @Composable (() -> Unit)? = null,
 )
 
 @Preview
@@ -110,6 +113,117 @@ private fun PreviewDropdownTextInput() {
                     DropdownOption(
                         value = "option1",
                         text = "Option 1",
+                    ),
+                ),
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun <T> DropdownMultiple(
+    modifier: Modifier = Modifier,
+    label: @Composable (() -> Unit)? = null,
+    options: Set<DropdownOption<T>> = emptySet(),
+    initialSelectedOptions: Set<T>? = null,
+    emptyOptionsMessage: String? = null,
+    placeholder: @Composable (() -> Unit)? = null,
+    onChange: (value: Set<T>) -> Unit = {},
+) {
+    var expanded by remember { mutableStateOf(false) }
+    var selectedOptions by remember {
+        val selected = options.filter {
+            initialSelectedOptions?.contains(it.value) == true
+        }.ifEmpty {
+            val first = options.firstOrNull()
+            if (first == null) {
+                emptySet()
+            } else {
+                setOf(first)
+            }
+        }.toSet()
+        mutableStateOf(selected)
+    }
+
+    ExposedDropdownMenuBox(
+        modifier = modifier,
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded },
+    ) {
+        TagInputField(
+            modifier = Modifier.menuAnchor(),
+            readOnly = true,
+            tags = selectedOptions,
+            label = label,
+            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            colors = ExposedDropdownMenuDefaults.textFieldColors(),
+            placeholder = placeholder,
+            getTagString = { it.text },
+            onRemoveTag = { selectedOptions -= it },
+            getLeadingIcon = { it.icon },
+        )
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+        ) {
+            options.forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(option.text) },
+                    onClick = {
+                        selectedOptions = if (option in selectedOptions) {
+                            selectedOptions - option
+                        } else {
+                            selectedOptions + option
+                        }
+                        onChange(selectedOptions.map { it.value }.toSet())
+                    },
+                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                    leadingIcon = option.icon,
+                    trailingIcon = if (option in selectedOptions) {
+                        {
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = "Selected",
+                            )
+                        }
+                    } else {
+                        null
+                    },
+                )
+            }
+            if (options.isEmpty()) {
+                DropdownMenuItem(
+                    text = {
+                        Text(text = emptyOptionsMessage ?: stringResource(R.string.no_options))
+                    },
+                    enabled = false,
+                    onClick = {},
+                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
+                )
+            }
+        }
+    }
+}
+
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun PreviewDropdownMultiple() {
+    WallFlowTheme {
+        Surface {
+            DropdownMultiple(
+                label = { Text(text = "Dropdown") },
+                options = setOf(
+                    DropdownOption(
+                        value = "option1",
+                        text = "Option 1",
+                        icon = {
+                            Icon(
+                                painter = painterResource(R.drawable.baseline_folder_24),
+                                contentDescription = null,
+                            )
+                        },
                     ),
                 ),
             )

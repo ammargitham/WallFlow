@@ -21,7 +21,7 @@
     <string name="favorites">Favorites</string>
     <string name="top">Top</string>
     <string name="one_day">1 day</string>
-    <string name="three_days">Three days</string>
+    <string name="three_days">3 days</string>
     <string name="one_week">1 week</string>
     <string name="one_month">1 month</string>
     <string name="three_months">3 months</string>
@@ -95,6 +95,7 @@
     <string name="auto_wallpaper">Auto wallpaper</string>
     <string name="enable_auto_wallpaper">Enable auto wallpaper</string>
     <string name="search">Search</string>
+    <string name="search_source">Search %1s</string>
     <string name="use_object_detection">Use object detection</string>
     <string name="use_object_detection_desc">Crop wallpaper using object detection</string>
     <string name="search_to_use">Search to use</string>
@@ -269,6 +270,15 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="subreddit_input_support_text">Hit space, comma or enter to confirm</string>
     <string name="subreddit_input_error_support_text">One of the subreddits contains an invalid name</string>
     <string name="configure_reddit">Configure reddit</string>
+    <string name="sort_new">New</string>
+    <string name="comments">Comments</string>
+    <string name="posts_from">Posts from</string>
+    <string name="all">All</string>
+    <string name="one_hour">1 hour</string>
+    <string name="user">User</string>
+    <string name="title">Title</string>
+    <string name="required_one_subreddit">Atleast 1 subreddit is required</string>
+    <string name="source_home_visibility_toggle">Source home visibility toggle</string>
     <plurals name="every_x_hrs">
         <item quantity="one">Every %d hour</item>
         <item quantity="other">Every %d hours</item>

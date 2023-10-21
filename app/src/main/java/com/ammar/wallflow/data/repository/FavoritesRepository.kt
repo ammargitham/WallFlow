@@ -9,8 +9,10 @@ import androidx.paging.filter
 import androidx.paging.map
 import com.ammar.wallflow.IoDispatcher
 import com.ammar.wallflow.data.db.dao.FavoriteDao
+import com.ammar.wallflow.data.db.dao.reddit.RedditWallpapersDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenWallpapersDao
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
+import com.ammar.wallflow.data.db.entity.reddit.toWallpaper
 import com.ammar.wallflow.data.db.entity.wallhaven.toWallpaper
 import com.ammar.wallflow.data.repository.local.LocalWallpapersRepository
 import com.ammar.wallflow.data.repository.utils.successOr
@@ -30,7 +32,8 @@ import kotlinx.datetime.Clock
 @Singleton
 class FavoritesRepository @Inject constructor(
     private val favoriteDao: FavoriteDao,
-    private val wallpapersDao: WallhavenWallpapersDao,
+    private val wallhavenWallpapersDao: WallhavenWallpapersDao,
+    private val redditWallpapersDao: RedditWallpapersDao,
     private val localWallpapersRepository: LocalWallpapersRepository,
     @IoDispatcher val ioDispatcher: CoroutineDispatcher,
 ) {
@@ -54,7 +57,11 @@ class FavoritesRepository @Inject constructor(
         it.map { entity ->
             when (entity.source) {
                 Source.WALLHAVEN -> {
-                    val wallpaperEntity = wallpapersDao.getByWallhavenId(entity.sourceId)
+                    val wallpaperEntity = wallhavenWallpapersDao.getByWallhavenId(entity.sourceId)
+                    wallpaperEntity?.toWallpaper() ?: wallhavenWallpaper1
+                }
+                Source.REDDIT -> {
+                    val wallpaperEntity = redditWallpapersDao.getByRedditId(entity.sourceId)
                     wallpaperEntity?.toWallpaper() ?: wallhavenWallpaper1
                 }
                 Source.LOCAL -> localWallpapersRepository.wallpaper(
@@ -118,7 +125,11 @@ class FavoritesRepository @Inject constructor(
         val entity = favoriteDao.getRandom() ?: return@withContext null
         when (entity.source) {
             Source.WALLHAVEN -> {
-                val wallpaperEntity = wallpapersDao.getByWallhavenId(entity.sourceId)
+                val wallpaperEntity = wallhavenWallpapersDao.getByWallhavenId(entity.sourceId)
+                wallpaperEntity?.toWallpaper()
+            }
+            Source.REDDIT -> {
+                val wallpaperEntity = redditWallpapersDao.getByRedditId(entity.sourceId)
                 wallpaperEntity?.toWallpaper()
             }
             Source.LOCAL -> localWallpapersRepository.wallpaper(

@@ -52,6 +52,8 @@ import com.ammar.wallflow.extensions.toast
 import com.ammar.wallflow.extensions.wallpaperManager
 import com.ammar.wallflow.model.DownloadableWallpaper
 import com.ammar.wallflow.model.Wallpaper
+import com.ammar.wallflow.model.reddit.RedditWallpaper
+import com.ammar.wallflow.model.reddit.withRedditDomainPrefix
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.model.wallhaven.WallhavenUploader
 import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
@@ -282,8 +284,13 @@ fun WallpaperViewer(
                     }
                 },
                 onSourceClick = {
-                    if (this is WallhavenWallpaper) {
-                        context.openUrl(wallhavenSource)
+                    val url = when (this) {
+                        is WallhavenWallpaper -> wallhavenSource
+                        is RedditWallpaper -> postUrl.withRedditDomainPrefix()
+                        else -> null
+                    }
+                    if (url != null) {
+                        context.openUrl(url)
                     }
                 },
             )

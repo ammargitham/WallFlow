@@ -33,7 +33,9 @@ import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.ammar.wallflow.extensions.rememberLazyStaggeredGridState
 import com.ammar.wallflow.extensions.search
+import com.ammar.wallflow.model.OnlineSource
 import com.ammar.wallflow.model.Wallpaper
+import com.ammar.wallflow.model.search.RedditSearch
 import com.ammar.wallflow.model.search.SearchSaver
 import com.ammar.wallflow.model.search.WallhavenSearch
 import com.ammar.wallflow.model.search.WallhavenTagSearchMeta
@@ -59,7 +61,7 @@ import com.ammar.wallflow.utils.shareWallpaper
 import com.ammar.wallflow.utils.shareWallpaperUrl
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.navigate
-import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 
 @OptIn(
@@ -107,11 +109,17 @@ fun HomeScreen(
         bottomBarController.update { it.copy(visible = true) }
     }
 
-    LaunchedEffect(uiState.mainSearch) {
+    LaunchedEffect(uiState.mainSearch, uiState.selectedSource) {
         searchBarController.update {
             it.copy(
                 visible = true,
-                search = uiState.mainSearch ?: MainSearchBar.Defaults.search,
+                search = uiState.mainSearch
+                    ?: when (uiState.selectedSource) {
+                        OnlineSource.WALLHAVEN -> MainSearchBar.Defaults.wallhavenSearch
+                        OnlineSource.REDDIT -> MainSearchBar.Defaults.redditSearch(
+                            subreddits = uiState.reddit.subreddits,
+                        )
+                    },
             )
         }
     }
@@ -173,23 +181,34 @@ fun HomeScreen(
                 bottom = bottomPadding + 8.dp,
             ),
             wallpapers = wallpapers,
-            header = {
-                header(
-                    sourceHeader = {
-                        wallhavenHeader(
-                            wallhavenTags = if (uiState.isHome) {
-                                uiState.wallhaven.wallhavenTags
-                            } else {
-                                persistentListOf()
-                            },
-                            isTagsLoading = uiState.wallhaven.areTagsLoading,
-                            onTagClick = onTagClick,
-                        )
-                    },
-                    onSourceAddClick = {
-                        viewModel.showManageSourcesDialog(true)
-                    },
-                )
+            header = if (uiState.isHome) {
+                {
+                    header(
+                        sources = uiState.sources
+                            .filter { it.value }
+                            .keys
+                            .toImmutableList(),
+                        selectedSource = uiState.selectedSource,
+                        sourceHeader = when (uiState.selectedSource) {
+                            OnlineSource.WALLHAVEN -> {
+                                {
+                                    wallhavenHeader(
+                                        wallhavenTags = uiState.wallhaven.wallhavenTags,
+                                        isTagsLoading = uiState.wallhaven.areTagsLoading,
+                                        onTagClick = onTagClick,
+                                    )
+                                }
+                            }
+                            OnlineSource.REDDIT -> null
+                        },
+                        onSourceClick = viewModel::changeSource,
+                        onManageSourcesClick = {
+                            viewModel.showManageSourcesDialog(true)
+                        },
+                    )
+                }
+            } else {
+                null
             },
             favorites = uiState.favorites,
             blurSketchy = uiState.blurSketchy,
@@ -254,12 +273,17 @@ fun HomeScreen(
     }
 
     if (uiState.showFilters) {
-        val state = rememberModalBottomSheetState()
+        val state = rememberModalBottomSheetState(
+            skipPartiallyExpanded = uiState.selectedSource == OnlineSource.REDDIT,
+        )
         val scope = rememberCoroutineScope()
         var localSearch by rememberSaveable(
             uiState.homeSearch,
             stateSaver = SearchSaver,
         ) { mutableStateOf(uiState.homeSearch) }
+        var hasError by rememberSaveable {
+            mutableStateOf(false)
+        }
 
         EditSearchModalBottomSheet(
             state = state,
@@ -271,7 +295,11 @@ fun HomeScreen(
                         end = 22.dp,
                         bottom = 16.dp,
                     ),
-                    saveEnabled = localSearch != uiState.homeSearch,
+                    source = when (localSearch) {
+                        is WallhavenSearch -> OnlineSource.WALLHAVEN
+                        is RedditSearch -> OnlineSource.REDDIT
+                    },
+                    saveEnabled = !hasError && localSearch != uiState.homeSearch,
                     onSaveClick = {
                         viewModel.updateHomeSearch(localSearch)
                         scope.launch { state.hide() }.invokeOnCompletion {
@@ -286,12 +314,14 @@ fun HomeScreen(
             },
             showNSFW = uiState.showNSFW,
             onChange = { localSearch = it },
+            onErrorStateChange = { hasError = it },
             onDismissRequest = { viewModel.showFilters(false) },
         )
     }
 
     if (uiState.showSaveAsDialog) {
         SaveAsDialog(
+            checkNameExists = viewModel::checkSavedSearchNameExists,
             onSave = {
                 val search = uiState.saveSearchAsSearch ?: return@SaveAsDialog
                 viewModel.saveSearchAs(it, search)
@@ -303,7 +333,12 @@ fun HomeScreen(
 
     if (uiState.showSavedSearchesDialog) {
         SavedSearchesDialog(
-            savedSearches = uiState.savedSearches,
+            savedSearches = uiState.savedSearches.filter {
+                when (uiState.selectedSource) {
+                    OnlineSource.WALLHAVEN -> it.search is WallhavenSearch
+                    OnlineSource.REDDIT -> it.search is RedditSearch
+                }
+            },
             onSelect = {
                 viewModel.updateHomeSearch(it.search)
                 viewModel.showSavedSearches(false)
@@ -312,13 +347,18 @@ fun HomeScreen(
         )
     }
 
-    if (uiState.showManageSourcesDialog) {
+    if (uiState.manageSourcesState.showDialog) {
         ManageSourcesDialog(
-            currentSources = uiState.sources,
+            currentSources = uiState.manageSourcesState.currentSources,
+            saveEnabled = uiState.manageSourcesState.saveEnabled,
             onAddSourceClick = viewModel::addSource,
-            onDismissRequest = {
-                viewModel.showManageSourcesDialog(false)
+            onVisibilityChange = { source, visible ->
+                val updated = uiState.manageSourcesState.currentSources.toMutableMap()
+                updated[source] = visible
+                viewModel.updateManageSourcesDialogSources(updated)
             },
+            onSaveClick = viewModel::saveManageSources,
+            onDismissRequest = { viewModel.showManageSourcesDialog(false) },
         )
     }
 

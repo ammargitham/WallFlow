@@ -12,6 +12,7 @@ import com.ammar.wallflow.data.repository.GlobalErrorsRepository.GlobalError
 import com.ammar.wallflow.data.repository.SavedSearchRepository
 import com.ammar.wallflow.data.repository.SearchHistoryRepository
 import com.ammar.wallflow.extensions.trimAll
+import com.ammar.wallflow.model.OnlineSource
 import com.ammar.wallflow.model.search.RedditSearch
 import com.ammar.wallflow.model.search.SavedSearch
 import com.ammar.wallflow.model.search.Search
@@ -62,10 +63,16 @@ class MainActivityViewModel @Inject constructor(
                         when (val search = s.toSearch()) {
                             is WallhavenSearch -> Suggestion(
                                 value = search,
+                                source = OnlineSource.WALLHAVEN,
                                 headline = s.query,
                                 supportingText = search.getSupportingText(application),
                             )
-                            is RedditSearch -> TODO()
+                            is RedditSearch -> Suggestion(
+                                value = search,
+                                source = OnlineSource.REDDIT,
+                                headline = s.query,
+                                supportingText = null,
+                            )
                         }
                     },
                 globalErrors = errors,
@@ -111,7 +118,8 @@ class MainActivityViewModel @Inject constructor(
 
     fun onSearchBarQueryChange(query: String) = localUiState.update {
         val updated = when (
-            val currentSearch = it.searchBarSearch.getOrElse { MainSearchBar.Defaults.search }
+            val currentSearch =
+                it.searchBarSearch.getOrElse { MainSearchBar.Defaults.wallhavenSearch }
         ) {
             is RedditSearch -> currentSearch.copy(
                 query = query,
@@ -144,13 +152,15 @@ class MainActivityViewModel @Inject constructor(
     fun showSavedSearches(show: Boolean = true) = localUiState.update {
         it.copy(showSavedSearchesDialog = partial(show))
     }
+
+    suspend fun checkSavedSearchNameExists(name: String) = savedSearchRepository.exists(name)
 }
 
 @Partialize
 data class MainUiState(
     val globalErrors: List<GlobalError> = emptyList(),
     val searchBarActive: Boolean = false,
-    val searchBarSearch: Search = MainSearchBar.Defaults.search,
+    val searchBarSearch: Search = MainSearchBar.Defaults.wallhavenSearch,
     val searchBarSuggestions: List<Suggestion<Search>> = emptyList(),
     val showSearchBarFilters: Boolean = false,
     val searchBarDeleteSuggestion: Search? = null,

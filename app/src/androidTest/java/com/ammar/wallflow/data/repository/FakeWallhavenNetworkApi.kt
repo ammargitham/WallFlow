@@ -45,7 +45,7 @@ class FakeWallhavenNetworkApi : WallhavenNetworkApi {
         metaMap[query] = meta
     }
 
-    fun clearMockData() {
+    fun clearFakeData() {
         wallpaperMap.clear()
         metaMap.clear()
     }

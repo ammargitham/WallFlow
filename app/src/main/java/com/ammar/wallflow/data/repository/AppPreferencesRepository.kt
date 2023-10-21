@@ -24,6 +24,7 @@ import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.extensions.toConstraintTypeMap
 import com.ammar.wallflow.extensions.toConstraints
 import com.ammar.wallflow.json
+import com.ammar.wallflow.model.OnlineSource
 import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.model.search.RedditSearch
 import com.ammar.wallflow.model.search.WallhavenFilters
@@ -52,7 +53,6 @@ class AppPreferencesRepository @Inject constructor(
     private val dataStore: DataStore<Preferences>,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
-
     val appPreferencesFlow: Flow<AppPreferences> = dataStore.data
         .catch { exception ->
             if (exception is IOException) {
@@ -144,7 +144,10 @@ class AppPreferencesRepository @Inject constructor(
         set(PreferencesKeys.AUTO_WALLPAPER_SAVED_SEARCH_ENABLED, savedSearchEnabled)
         set(PreferencesKeys.AUTO_WALLPAPER_FAVORITES_ENABLED, favoritesEnabled)
         set(PreferencesKeys.AUTO_WALLPAPER_LOCAL_ENABLED, localEnabled)
-        set(PreferencesKeys.AUTO_WALLPAPER_SAVED_SEARCH_ID, savedSearchId)
+        set(
+            PreferencesKeys.AUTO_WALLPAPER_SAVED_SEARCH_ID,
+            savedSearchIds.mapTo(HashSet()) { it.toString() },
+        )
         set(PreferencesKeys.AUTO_WALLPAPER_USE_OBJECT_DETECTION, useObjectDetection)
         set(PreferencesKeys.AUTO_WALLPAPER_FREQUENCY, frequency.toString())
         set(
@@ -200,29 +203,67 @@ class AppPreferencesRepository @Inject constructor(
         set(PreferencesKeys.LOCAL_WALLPAPERS_SORT, sort.name)
     }
 
-    private fun mapAppPreferences(preferences: Preferences) = AppPreferences(
-        version = preferences[PreferencesKeys.VERSION] ?: AppPreferences.CURRENT_VERSION,
-        wallhavenApiKey = getWallhavenApiKey(preferences),
-        homeWallhavenSearch = getHomeWallhavenSearch(preferences),
-        homeRedditSearch = getHomeRedditSearch(preferences),
-        blurSketchy = preferences[PreferencesKeys.BLUR_SKETCHY] ?: false,
-        blurNsfw = preferences[PreferencesKeys.BLUR_NSFW] ?: false,
-        objectDetectionPreferences = getObjectDetectionPreferences(preferences),
-        autoWallpaperPreferences = getAutoWallpaperPreferences(preferences),
-        lookAndFeelPreferences = getLookAndFeelPreferences(preferences),
-        changeWallpaperTileAdded = preferences[PreferencesKeys.CHANGE_WALLPAPER_TILE_ADDED]
-            ?: false,
-        localWallpapersPreferences = getLocalWallpapersPreferences(preferences),
-    )
+    suspend fun updateHomeSources(
+        sources: Map<OnlineSource, Boolean>,
+    ) = withContext(ioDispatcher) {
+        dataStore.edit { it.updateHomeSources(sources) }
+    }
 
-    private fun getLocalWallpapersPreferences(preferences: Preferences) =
-        LocalWallpapersPreferences(
-            sort = try {
-                LocalSort.valueOf(preferences[PreferencesKeys.LOCAL_WALLPAPERS_SORT] ?: "")
-            } catch (e: Exception) {
-                LocalSort.NO_SORT
-            },
+    private fun MutablePreferences.updateHomeSources(sources: Map<OnlineSource, Boolean>) {
+        set(PreferencesKeys.HOME_SOURCES, json.encodeToString(sources))
+    }
+
+    private fun mapAppPreferences(preferences: Preferences): AppPreferences {
+        val homeRedditSearch = getHomeRedditSearch(preferences)
+        return AppPreferences(
+            version = preferences[PreferencesKeys.VERSION] ?: AppPreferences.CURRENT_VERSION,
+            wallhavenApiKey = getWallhavenApiKey(preferences),
+            homeWallhavenSearch = getHomeWallhavenSearch(preferences),
+            homeRedditSearch = homeRedditSearch,
+            homeSources = getHomeSources(preferences, homeRedditSearch),
+            blurSketchy = preferences[PreferencesKeys.BLUR_SKETCHY] ?: false,
+            blurNsfw = preferences[PreferencesKeys.BLUR_NSFW] ?: false,
+            objectDetectionPreferences = getObjectDetectionPreferences(preferences),
+            autoWallpaperPreferences = getAutoWallpaperPreferences(preferences),
+            lookAndFeelPreferences = getLookAndFeelPreferences(preferences),
+            changeWallpaperTileAdded = preferences[PreferencesKeys.CHANGE_WALLPAPER_TILE_ADDED]
+                ?: false,
+            localWallpapersPreferences = getLocalWallpapersPreferences(preferences),
         )
+    }
+
+    private fun getHomeSources(
+        preferences: Preferences,
+        homeRedditSearch: RedditSearch?,
+    ) = try {
+        val sourcesStr = preferences[PreferencesKeys.HOME_SOURCES] ?: ""
+        val sources = json.decodeFromString<Map<OnlineSource, Boolean>>(sourcesStr)
+        sources.mapValues {
+            if (it.key == OnlineSource.REDDIT) {
+                it.value && homeRedditSearch != null
+            } else {
+                it.value
+            }
+        }
+    } catch (e: Exception) {
+        val mutableMap = mutableMapOf(
+            OnlineSource.WALLHAVEN to true,
+        )
+        if (homeRedditSearch != null) {
+            mutableMap[OnlineSource.REDDIT] = true
+        }
+        mutableMap
+    }
+
+    private fun getLocalWallpapersPreferences(
+        preferences: Preferences,
+    ) = LocalWallpapersPreferences(
+        sort = try {
+            LocalSort.valueOf(preferences[PreferencesKeys.LOCAL_WALLPAPERS_SORT] ?: "")
+        } catch (e: Exception) {
+            LocalSort.NO_SORT
+        },
+    )
 
     private fun getLookAndFeelPreferences(preferences: Preferences) = LookAndFeelPreferences(
         theme = try {
@@ -254,10 +295,14 @@ class AppPreferencesRepository @Inject constructor(
     )
 
     private fun getAutoWallpaperPreferences(preferences: Preferences) = with(preferences) {
-        val savedSearchId = get(PreferencesKeys.AUTO_WALLPAPER_SAVED_SEARCH_ID) ?: 0
+        val savedSearchIdStrings = get(PreferencesKeys.AUTO_WALLPAPER_SAVED_SEARCH_ID)
+            ?: emptySet()
+        val savedSearchIds = savedSearchIdStrings
+            .mapNotNull { it.toLongOrNull() }
+            .filterTo(HashSet()) { it > 0 }
         val savedSearchEnabled =
             (get(PreferencesKeys.AUTO_WALLPAPER_SAVED_SEARCH_ENABLED) ?: false) &&
-                savedSearchId > 0
+                savedSearchIds.isNotEmpty()
         val favoritesEnabled = get(PreferencesKeys.AUTO_WALLPAPER_FAVORITES_ENABLED) ?: false
         val localEnabled = get(PreferencesKeys.AUTO_WALLPAPER_LOCAL_ENABLED) ?: false
         AutoWallpaperPreferences(
@@ -268,7 +313,7 @@ class AppPreferencesRepository @Inject constructor(
             savedSearchEnabled = savedSearchEnabled,
             favoritesEnabled = favoritesEnabled,
             localEnabled = localEnabled,
-            savedSearchId = savedSearchId,
+            savedSearchIds = savedSearchIds,
             useObjectDetection = get(PreferencesKeys.AUTO_WALLPAPER_USE_OBJECT_DETECTION)
                 ?: true,
             frequency = parseFrequency(get(PreferencesKeys.AUTO_WALLPAPER_FREQUENCY)),
@@ -321,7 +366,6 @@ class AppPreferencesRepository @Inject constructor(
     private fun getHomeWallhavenSearch(preferences: Preferences) = try {
         WallhavenSearch.fromJson(preferences[PreferencesKeys.HOME_WALLHAVEN_SEARCH] ?: "")
     } catch (e: Exception) {
-        Log.e(TAG, "getHomeWallhavenSearch: ", e)
         WallhavenSearch(
             filters = WallhavenFilters(
                 sorting = WallhavenSorting.TOPLIST,
@@ -382,6 +426,7 @@ class AppPreferencesRepository @Inject constructor(
                 appPreferences.homeRedditSearch?.run {
                     updateHomeRedditSearch(this@run)
                 }
+                updateHomeSources(appPreferences.homeSources)
                 updateBlurSketchy(appPreferences.blurSketchy)
                 updateBlurNsfw(appPreferences.blurNsfw)
                 updateObjectDetectionPrefs(appPreferences.objectDetectionPreferences)

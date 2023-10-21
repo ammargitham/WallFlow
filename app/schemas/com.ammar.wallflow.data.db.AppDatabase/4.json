@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 4,
-    "identityHash": "280627d93751a69f311afa9cf4189df2",
+    "identityHash": "1977dca558041c1c4255b2649dc6446c",
     "entities": [
       {
         "tableName": "last_updated",
@@ -869,12 +869,180 @@
           }
         ],
         "foreignKeys": []
+      },
+      {
+        "tableName": "reddit_wallpapers",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `reddit_id` TEXT NOT NULL, `subreddit` TEXT NOT NULL, `post_id` TEXT NOT NULL, `post_title` TEXT NOT NULL, `post_url` TEXT NOT NULL, `purity` TEXT NOT NULL, `url` TEXT NOT NULL, `thumbnail_url` TEXT NOT NULL, `width` INTEGER NOT NULL, `height` INTEGER NOT NULL, `author` TEXT NOT NULL, `mime_type` TEXT, `gallery_pos` INTEGER)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "redditId",
+            "columnName": "reddit_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "subreddit",
+            "columnName": "subreddit",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "postId",
+            "columnName": "post_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "postTitle",
+            "columnName": "post_title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "postUrl",
+            "columnName": "post_url",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "purity",
+            "columnName": "purity",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "url",
+            "columnName": "url",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "thumbnailUrl",
+            "columnName": "thumbnail_url",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "width",
+            "columnName": "width",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "height",
+            "columnName": "height",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "author",
+            "columnName": "author",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mimeType",
+            "columnName": "mime_type",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "galleryPosition",
+            "columnName": "gallery_pos",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_reddit_wallpapers_reddit_id",
+            "unique": true,
+            "columnNames": [
+              "reddit_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_reddit_wallpapers_reddit_id` ON `${TABLE_NAME}` (`reddit_id`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "reddit_search_query_wallpapers",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`search_query_id` INTEGER NOT NULL, `wallpaper_id` INTEGER NOT NULL, PRIMARY KEY(`search_query_id`, `wallpaper_id`), FOREIGN KEY(`search_query_id`) REFERENCES `search_query`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`wallpaper_id`) REFERENCES `reddit_wallpapers`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "searchQueryId",
+            "columnName": "search_query_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaperId",
+            "columnName": "wallpaper_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "search_query_id",
+            "wallpaper_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_reddit_search_query_wallpapers_wallpaper_id",
+            "unique": false,
+            "columnNames": [
+              "wallpaper_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_reddit_search_query_wallpapers_wallpaper_id` ON `${TABLE_NAME}` (`wallpaper_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "search_query",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "search_query_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "reddit_wallpapers",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "wallpaper_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '280627d93751a69f311afa9cf4189df2')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1977dca558041c1c4255b2649dc6446c')"
     ]
   }
 }

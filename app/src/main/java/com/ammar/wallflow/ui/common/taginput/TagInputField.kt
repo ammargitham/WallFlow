@@ -53,8 +53,8 @@ import com.ammar.wallflow.ui.theme.WallFlowTheme
 )
 @Composable
 fun <T> TagInputField(
-    tagFromInputString: (String) -> T,
     modifier: Modifier = Modifier,
+    tagFromInputString: ((String) -> T)? = null,
     label: @Composable (() -> Unit)? = null,
     placeholder: @Composable (() -> Unit)? = null,
     tags: Set<T> = emptySet(),
@@ -63,11 +63,13 @@ fun <T> TagInputField(
     readOnly: Boolean = false,
     trailingIcon: @Composable (() -> Unit)? = null,
     showTagClearAction: Boolean = true,
+    isError: Boolean = false,
     separatorRegex: Regex = TAG_INPUT_DEFAULT_SEP_REGEX,
     getTagString: (tag: T) -> String = { "#$it" },
     onAddTag: (tag: T) -> Unit = {},
     onRemoveTag: (tag: T) -> Unit = {},
     validateTag: (tag: T) -> Boolean = { true },
+    getLeadingIcon: (tag: T) -> @Composable (() -> Unit)? = { null },
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val localStyle = LocalTextStyle.current
@@ -80,7 +82,9 @@ fun <T> TagInputField(
         tags.joinToString(",")
     }
     var selectLastTag by remember { mutableStateOf(false) }
-    val isError = remember(tags) { !tags.all(validateTag) }
+    val localIsError = remember(isError, tags) {
+        isError || !tags.all(validateTag)
+    }
 
     Box(
         modifier = modifier,
@@ -116,7 +120,9 @@ fun <T> TagInputField(
                 val parts = it.split(separatorRegex)
                 val tagString = parts[0].trimAll()
                 if (tagString.isBlank()) return@BasicTextField
-                onAddTag(tagFromInputString(tagString))
+                if (tagFromInputString != null) {
+                    onAddTag(tagFromInputString(tagString))
+                }
                 fieldValue = ""
             },
             readOnly = readOnly,
@@ -141,7 +147,7 @@ fun <T> TagInputField(
                                 ClearableChip(
                                     isError = !isValid,
                                     leadingIcon = if (isValid) {
-                                        null
+                                        getLeadingIcon(tag)
                                     } else {
                                         {
                                             Icon(
@@ -163,16 +169,18 @@ fun <T> TagInputField(
                                     },
                                 )
                             }
-                            Box(
-                                modifier = Modifier
-                                    .padding(
-                                        top = if (tags.isEmpty()) 0.dp else 12.dp,
-                                        bottom = if (tags.isEmpty()) 0.dp else 12.dp,
-                                    )
-                                    .width(IntrinsicSize.Min)
-                                    .widthIn(min = 5.dp),
-                            ) {
-                                innerTextField()
+                            if (!readOnly) {
+                                Box(
+                                    modifier = Modifier
+                                        .padding(
+                                            top = if (tags.isEmpty()) 0.dp else 12.dp,
+                                            bottom = if (tags.isEmpty()) 0.dp else 12.dp,
+                                        )
+                                        .width(IntrinsicSize.Min)
+                                        .widthIn(min = 5.dp),
+                                ) {
+                                    innerTextField()
+                                }
                             }
                         }
                     },
@@ -183,7 +191,7 @@ fun <T> TagInputField(
                     label = label,
                     placeholder = placeholder,
                     trailingIcon = trailingIcon,
-                    isError = isError,
+                    isError = localIsError,
                     contentPadding = OutlinedTextFieldDefaults.contentPadding(
                         top = if (tags.isNotEmpty()) 0.dp else 16.dp,
                         bottom = if (tags.isNotEmpty()) 0.dp else 16.dp,
@@ -191,7 +199,7 @@ fun <T> TagInputField(
                     container = {
                         OutlinedTextFieldDefaults.ContainerBox(
                             enabled = enabled,
-                            isError = isError,
+                            isError = localIsError,
                             interactionSource = interactionSource,
                             colors = colors,
                         )

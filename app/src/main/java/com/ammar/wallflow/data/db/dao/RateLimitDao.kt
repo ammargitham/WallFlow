@@ -12,5 +12,5 @@ interface RateLimitDao {
     suspend fun getBySource(source: OnlineSource): RateLimitEntity?
 
     @Upsert
-    fun upsert(entity: RateLimitEntity)
+    suspend fun upsert(entity: RateLimitEntity)
 }

@@ -41,6 +41,7 @@ import com.ammar.wallflow.R
 import com.ammar.wallflow.data.preferences.AppPreferences
 import com.ammar.wallflow.data.preferences.AutoWallpaperPreferences
 import com.ammar.wallflow.data.preferences.ObjectDetectionPreferences
+import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.model.ObjectDetectionModel
 import com.ammar.wallflow.model.search.SavedSearch
 import com.ammar.wallflow.model.search.SavedSearchSaver
@@ -83,6 +84,8 @@ import com.ammar.wallflow.workers.AutoWallpaperWorker
 import com.google.modernstorage.permissions.StoragePermissions
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.navigate
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -165,7 +168,7 @@ fun SettingsScreen(
             model = uiState.selectedModel,
             hasSetWallpaperPermission = context.checkSetWallpaperPermission(),
             autoWallpaperNextRun = uiState.autoWallpaperNextRun,
-            autoWallpaperSavedSearch = uiState.autoWallpaperSavedSearch,
+            autoWallpaperSavedSearches = uiState.autoWallpaperSavedSearches,
             autoWallpaperStatus = uiState.autoWallpaperStatus,
             showLocalTab = uiState.appPreferences.lookAndFeelPreferences.showLocalTab,
             onBlurSketchyCheckChange = viewModel::setBlurSketchy,
@@ -282,6 +285,7 @@ fun SettingsScreen(
             this,
             stateSaver = SavedSearchSaver,
         ) { mutableStateOf(this) }
+        var nameHasError by rememberSaveable { mutableStateOf(false) }
 
         EditSearchModalBottomSheet(
             state = state,
@@ -289,8 +293,21 @@ fun SettingsScreen(
             header = {
                 EditSavedSearchBottomSheetHeader(
                     name = localSavedSearch.name,
-                    saveEnabled = localSavedSearch != this@run,
-                    onNameChange = { localSavedSearch = localSavedSearch.copy(name = it) },
+                    saveEnabled = !nameHasError && localSavedSearch != this@run,
+                    nameHasError = nameHasError,
+                    onNameChange = {
+                        localSavedSearch = localSavedSearch.copy(name = it)
+                        if (it.isBlank()) {
+                            nameHasError = true
+                            return@EditSavedSearchBottomSheetHeader
+                        }
+                        scope.launch {
+                            nameHasError = viewModel.checkSavedSearchNameExists(
+                                name = localSavedSearch.name.trimAll(),
+                                id = localSavedSearch.id,
+                            )
+                        }
+                    },
                     onSaveClick = {
                         viewModel.updateSavedSearch(localSavedSearch)
                         scope.launch { state.hide() }.invokeOnCompletion {
@@ -409,7 +426,7 @@ fun SettingsScreenContent(
     modifier: Modifier = Modifier,
     appPreferences: AppPreferences = AppPreferences(),
     model: ObjectDetectionModel = ObjectDetectionModel.DEFAULT,
-    autoWallpaperSavedSearch: SavedSearch? = null,
+    autoWallpaperSavedSearches: ImmutableList<SavedSearch> = persistentListOf(),
     hasSetWallpaperPermission: Boolean = true,
     autoWallpaperNextRun: NextRun = NextRun.NotScheduled,
     autoWallpaperStatus: AutoWallpaperWorker.Companion.Status? = null,
@@ -475,7 +492,7 @@ fun SettingsScreenContent(
                     enabled = appPreferences.autoWallpaperPreferences.enabled,
                     sourcesSummary = getSourcesSummary(
                         context = context,
-                        savedSearch = autoWallpaperSavedSearch,
+                        savedSearches = autoWallpaperSavedSearches,
                         savedSearchEnabled = appPreferences
                             .autoWallpaperPreferences
                             .savedSearchEnabled,
@@ -560,13 +577,17 @@ fun SettingsScreenContent(
 
 private fun getSourcesSummary(
     context: Context,
-    savedSearch: SavedSearch?,
+    savedSearches: ImmutableList<SavedSearch>,
     savedSearchEnabled: Boolean,
     favoritesEnabled: Boolean,
     localEnabled: Boolean,
 ) = mutableListOf<String>().apply {
     if (savedSearchEnabled) {
-        add("${context.getString(R.string.saved_search)} (${savedSearch?.name ?: ""})")
+        add(
+            "${context.getString(R.string.saved_search)} (${
+                savedSearches.joinToString(",") { it.name }
+            })",
+        )
     }
     if (favoritesEnabled) {
         add(context.getString(R.string.favorites))

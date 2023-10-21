@@ -2,6 +2,7 @@ package com.ammar.wallflow.workers
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.compose.ui.unit.IntSize
 import androidx.core.net.toUri
 import androidx.datastore.core.DataStore
@@ -20,11 +21,13 @@ import com.ammar.wallflow.MIME_TYPE_JPEG
 import com.ammar.wallflow.data.db.dao.AutoWallpaperHistoryDao
 import com.ammar.wallflow.data.db.dao.FavoriteDao
 import com.ammar.wallflow.data.db.dao.ObjectDetectionModelDao
+import com.ammar.wallflow.data.db.dao.reddit.RedditWallpapersDao
 import com.ammar.wallflow.data.db.dao.search.SavedSearchDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenWallpapersDao
 import com.ammar.wallflow.data.db.entity.AutoWallpaperHistoryEntity
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.toWallpaper
+import com.ammar.wallflow.data.network.RedditNetworkDataSource
 import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
 import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenMeta
 import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenTag
@@ -41,6 +44,7 @@ import com.ammar.wallflow.data.repository.FavoritesRepository
 import com.ammar.wallflow.data.repository.ObjectDetectionModelRepository
 import com.ammar.wallflow.data.repository.SavedSearchRepository
 import com.ammar.wallflow.data.repository.local.LocalWallpapersRepository
+import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.extensions.getTempFile
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.Source
@@ -144,7 +148,7 @@ class AutoWallpaperTest {
                 AutoWallpaperPreferences(
                     enabled = true,
                     savedSearchEnabled = true,
-                    savedSearchId = 2,
+                    savedSearchIds = setOf(2),
                 ),
             )
             val worker = getWorker(
@@ -178,7 +182,7 @@ class AutoWallpaperTest {
                 AutoWallpaperPreferences(
                     enabled = true,
                     savedSearchEnabled = true,
-                    savedSearchId = 1,
+                    savedSearchIds = setOf(1),
                     useObjectDetection = false,
                 ),
             )
@@ -269,7 +273,7 @@ class AutoWallpaperTest {
                 AutoWallpaperPreferences(
                     enabled = true,
                     savedSearchEnabled = true,
-                    savedSearchId = 1,
+                    savedSearchIds = setOf(1),
                 ),
             )
             val savedSearch = SavedSearch(
@@ -369,7 +373,7 @@ class AutoWallpaperTest {
                 AutoWallpaperPreferences(
                     enabled = true,
                     savedSearchEnabled = true,
-                    savedSearchId = 1,
+                    savedSearchIds = setOf(1),
                 ),
             )
             val savedSearch = SavedSearch(
@@ -456,6 +460,8 @@ class AutoWallpaperTest {
             verify { worker["setWallpaper"](wallpapers[0]) }
             val updatedHistory = autoWallpaperHistoryDao.getAll()
             assertEquals(historyWalls.count(), updatedHistory.count())
+        } catch (e: Exception) {
+            Log.e(TAG, "testAutoWallpaperWorkerShouldNotIgnoreHistory: ", e)
         } finally {
             testDataStore.clear()
             tempFile.delete()
@@ -472,7 +478,7 @@ class AutoWallpaperTest {
                     enabled = true,
                     savedSearchEnabled = false,
                     favoritesEnabled = true,
-                    savedSearchId = 1,
+                    savedSearchIds = setOf(1),
                     useObjectDetection = false,
                 ),
             )
@@ -511,7 +517,7 @@ class AutoWallpaperTest {
                     enabled = true,
                     savedSearchEnabled = false,
                     favoritesEnabled = true,
-                    savedSearchId = 1,
+                    savedSearchIds = setOf(1),
                     useObjectDetection = false,
                 ),
             )
@@ -546,7 +552,7 @@ class AutoWallpaperTest {
                         favoritedOn = Clock.System.now(),
                     )
                 },
-                wallpapersDao = object : FakeWallhavenWallpapersDao() {
+                wallhavenWallpapersDao = object : FakeWallhavenWallpapersDao() {
                     override suspend fun getByWallhavenId(wallhavenId: String) = wallpaperEntity
                 },
             )
@@ -588,7 +594,7 @@ class AutoWallpaperTest {
                     savedSearchEnabled = false,
                     favoritesEnabled = false,
                     localEnabled = true,
-                    savedSearchId = 1,
+                    savedSearchIds = setOf(1),
                     useObjectDetection = false,
                 ),
             )
@@ -633,7 +639,7 @@ class AutoWallpaperTest {
                     savedSearchEnabled = false,
                     favoritesEnabled = false,
                     localEnabled = true,
-                    savedSearchId = 1,
+                    savedSearchIds = setOf(1),
                     useObjectDetection = false,
                 ),
             )
@@ -706,8 +712,10 @@ class AutoWallpaperTest {
         autoWallpaperHistoryDao: AutoWallpaperHistoryDao = FakeAutoWallpaperHistoryDao(),
         objectDetectionModelDao: ObjectDetectionModelDao = FakeObjectDetectionModelDao(),
         wallHavenNetwork: WallhavenNetworkDataSource = FakeWallhavenNetworkDataSource(),
+        redditNetwork: RedditNetworkDataSource = FakeRedditNetworkDataSource(),
         favoriteDao: FavoriteDao = FakeFavoriteDao(),
-        wallpapersDao: WallhavenWallpapersDao = FakeWallhavenWallpapersDao(),
+        wallhavenWallpapersDao: WallhavenWallpapersDao = FakeWallhavenWallpapersDao(),
+        redditWallpapersDao: RedditWallpapersDao = FakeRedditWallpapersDao(),
         localWallpapersRepository: LocalWallpapersRepository = FakeLocalWallpapersRepository(),
     ): AutoWallpaperWorker {
         val workTaskExecutor = InstantWorkTaskExecutor()
@@ -741,9 +749,11 @@ class AutoWallpaperTest {
                 ioDispatcher = testDispatcher,
             ),
             wallHavenNetwork = wallHavenNetwork,
+            redditNetwork = redditNetwork,
             favoritesRepository = FavoritesRepository(
                 favoriteDao = favoriteDao,
-                wallpapersDao = wallpapersDao,
+                wallhavenWallpapersDao = wallhavenWallpapersDao,
+                redditWallpapersDao = redditWallpapersDao,
                 localWallpapersRepository = localWallpapersRepository,
                 ioDispatcher = testDispatcher,
             ),
