@@ -352,9 +352,7 @@ private val tempWallhavenTags = List(3) {
 @Stable
 @Partialize
 data class HomeUiState(
-    val sources: ImmutableMap<OnlineSource, Boolean> = persistentMapOf(
-        OnlineSource.WALLHAVEN to true,
-    ),
+    val sources: ImmutableMap<OnlineSource, Boolean> = persistentMapOf(),
     val mainSearch: Search? = null,
     val selectedSource: OnlineSource = OnlineSource.WALLHAVEN,
     val homeSearch: Search = WallhavenSearch(

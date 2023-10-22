@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredWidth
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridScope
@@ -52,6 +53,7 @@ import com.ammar.wallflow.model.OnlineSource
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.ui.common.OverflowMenu
+import com.ammar.wallflow.ui.common.PlaceholderChip
 import com.ammar.wallflow.ui.common.TagChip
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import kotlinx.collections.immutable.ImmutableList
@@ -60,7 +62,7 @@ import kotlinx.collections.immutable.toPersistentList
 import kotlinx.datetime.Clock
 
 internal fun LazyStaggeredGridScope.header(
-    sources: ImmutableList<OnlineSource> = persistentListOf(OnlineSource.WALLHAVEN),
+    sources: ImmutableList<OnlineSource> = persistentListOf(),
     selectedSource: OnlineSource = OnlineSource.WALLHAVEN,
     sourceHeader: (LazyStaggeredGridScope.() -> Unit)? = null,
     onSourceClick: (OnlineSource) -> Unit = {},
@@ -88,6 +90,7 @@ fun PreviewGridHeader() {
                 contentPadding = PaddingValues(8.dp),
             ) {
                 header(
+                    sources = persistentListOf(OnlineSource.WALLHAVEN),
                     sourceHeader = {
                         wallhavenHeader(
                             wallhavenTags = List(5) {
@@ -131,7 +134,7 @@ internal fun LazyStaggeredGridScope.wallhavenHeader(
 @Composable
 internal fun SourcesRow(
     modifier: Modifier = Modifier,
-    sources: ImmutableList<OnlineSource> = persistentListOf(OnlineSource.WALLHAVEN),
+    sources: ImmutableList<OnlineSource> = persistentListOf(),
     selected: OnlineSource = OnlineSource.WALLHAVEN,
     onSourceClick: (OnlineSource) -> Unit = {},
     onManageClick: () -> Unit = {},
@@ -144,60 +147,36 @@ internal fun SourcesRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        sources.forEach {
-            FilterChip(
-                shape = MaterialTheme.shapes.medium,
-                colors = FilterChipDefaults.filterChipColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                    iconColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                    selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                ),
-                border = FilterChipDefaults.filterChipBorder(
-                    borderWidth = 0.dp,
-                    borderColor = Color.Transparent,
-                ),
-                leadingIcon = {
-                    Icon(
-                        modifier = Modifier.size(FilterChipDefaults.IconSize),
-                        painter = painterResource(
-                            when (it) {
-                                OnlineSource.WALLHAVEN -> R.drawable.wallhaven_logo_short
-                                OnlineSource.REDDIT -> R.drawable.reddit
-                            },
-                        ),
-                        contentDescription = null,
-                    )
-                },
-                label = {
-                    Text(
-                        text = stringResource(
-                            when (it) {
-                                OnlineSource.WALLHAVEN -> R.string.wallhaven_cc
-                                OnlineSource.REDDIT -> R.string.reddit
-                            },
-                        ),
-                    )
-                },
-                selected = it == selected,
-                onClick = { onSourceClick(it) },
-            )
+        if (sources.isEmpty()) {
+            repeat(2) {
+                PlaceholderChip(
+                    modifier = Modifier.width(120.dp),
+                )
+            }
+        } else {
+            sources.forEach {
+                SourceChip(
+                    source = it,
+                    selected = selected == it,
+                    onClick = { onSourceClick(it) },
+                )
+            }
         }
-        FilledTonalIconButton(
-            modifier = Modifier.size(32.dp),
-            onClick = onManageClick,
-        ) {
-            Icon(
-                modifier = Modifier.size(FilterChipDefaults.IconSize),
-                imageVector = if (sources.size == OnlineSource.entries.size) {
-                    Icons.Default.Edit
-                } else {
-                    Icons.Default.Add
-                },
-                contentDescription = stringResource(R.string.add),
-            )
+        if (sources.isNotEmpty()) {
+            FilledTonalIconButton(
+                modifier = Modifier.size(32.dp),
+                onClick = onManageClick,
+            ) {
+                Icon(
+                    modifier = Modifier.size(FilterChipDefaults.IconSize),
+                    imageVector = if (sources.size == OnlineSource.entries.size) {
+                        Icons.Default.Edit
+                    } else {
+                        Icons.Default.Add
+                    },
+                    contentDescription = stringResource(R.string.add),
+                )
+            }
         }
     }
 }
@@ -209,15 +188,70 @@ fun PreviewSourcesRow() {
     WallFlowTheme {
         Surface {
             Box(modifier = Modifier.padding(8.dp)) {
-                SourcesRow(
-                    sources = persistentListOf(
-                        OnlineSource.WALLHAVEN,
-                        OnlineSource.REDDIT,
-                    ),
-                )
+                Column {
+                    SourcesRow(
+                        sources = persistentListOf(),
+                    )
+                    SourcesRow(
+                        sources = persistentListOf(
+                            OnlineSource.WALLHAVEN,
+                            OnlineSource.REDDIT,
+                        ),
+                    )
+                }
             }
         }
     }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun SourceChip(
+    source: OnlineSource,
+    modifier: Modifier = Modifier,
+    selected: Boolean = false,
+    onClick: () -> Unit = {},
+) {
+    FilterChip(
+        modifier = modifier,
+        shape = MaterialTheme.shapes.medium,
+        colors = FilterChipDefaults.filterChipColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            iconColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            labelColor = MaterialTheme.colorScheme.onSurfaceVariant,
+            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+            selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer,
+            selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
+        ),
+        border = FilterChipDefaults.filterChipBorder(
+            borderWidth = 0.dp,
+            borderColor = Color.Transparent,
+        ),
+        leadingIcon = {
+            Icon(
+                modifier = Modifier.size(FilterChipDefaults.IconSize),
+                painter = painterResource(
+                    when (source) {
+                        OnlineSource.WALLHAVEN -> R.drawable.wallhaven_logo_short
+                        OnlineSource.REDDIT -> R.drawable.reddit
+                    },
+                ),
+                contentDescription = null,
+            )
+        },
+        label = {
+            Text(
+                text = stringResource(
+                    when (source) {
+                        OnlineSource.WALLHAVEN -> R.string.wallhaven_cc
+                        OnlineSource.REDDIT -> R.string.reddit
+                    },
+                ),
+            )
+        },
+        selected = selected,
+        onClick = onClick,
+    )
 }
 
 @Composable

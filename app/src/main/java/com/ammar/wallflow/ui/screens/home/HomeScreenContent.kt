@@ -35,6 +35,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.preferences.LayoutPreferences
 import com.ammar.wallflow.model.Favorite
+import com.ammar.wallflow.model.OnlineSource
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
@@ -258,6 +259,7 @@ private fun DefaultPreview() {
                 gridState = gridState,
                 header = {
                     header(
+                        sources = persistentListOf(OnlineSource.WALLHAVEN),
                         sourceHeader = {
                             wallhavenHeader(
                                 wallhavenTags = List(5) {

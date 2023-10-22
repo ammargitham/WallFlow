@@ -31,6 +31,7 @@ import com.ammar.wallflow.data.repository.GlobalErrorsRepository
 import com.ammar.wallflow.data.repository.GlobalErrorsRepository.GlobalError
 import com.ammar.wallflow.extensions.toDp
 import com.ammar.wallflow.extensions.toPx
+import com.ammar.wallflow.model.OnlineSource
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.search.Filters
@@ -50,6 +51,7 @@ import com.ammar.wallflow.ui.screens.home.HomeScreenContent
 import com.ammar.wallflow.ui.screens.home.composables.header
 import com.ammar.wallflow.ui.screens.home.composables.wallhavenHeader
 import com.ammar.wallflow.ui.theme.WallFlowTheme
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.datetime.Clock
@@ -303,6 +305,7 @@ private fun PreviewContent(
                     gridState = gridState,
                     header = {
                         header(
+                            sources = persistentListOf(OnlineSource.WALLHAVEN),
                             sourceHeader = {
                                 wallhavenHeader(
                                     wallhavenTags = previewWallhavenTags,

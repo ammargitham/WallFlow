@@ -5,16 +5,11 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.material3x.AssistChip
-import androidx.compose.material3x.AssistChipDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,9 +18,6 @@ import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.ui.theme.WallFlowTheme
-import com.google.accompanist.placeholder.PlaceholderHighlight
-import com.google.accompanist.placeholder.material3.fade
-import com.google.accompanist.placeholder.material3.placeholder
 import kotlinx.datetime.Clock
 
 @Composable
@@ -43,17 +35,8 @@ fun TagChip(
             label = { Text(text = "#${wallhavenTag.name}") },
         )
         if (loading) {
-            Box(
-                modifier = Modifier
-                    .height(AssistChipDefaults.Height)
-                    .fillMaxWidth()
-                    .align(Alignment.Center)
-                    .placeholder(
-                        color = MaterialTheme.colorScheme.surfaceColorAtElevation(2.dp),
-                        visible = true,
-                        highlight = PlaceholderHighlight.fade(),
-                        shape = AssistChipDefaults.shape,
-                    ),
+            PlaceholderChip(
+                modifier = Modifier.align(Alignment.Center),
             )
         }
     }
