@@ -2,7 +2,9 @@ package com.ammar.wallflow.data.preferences
 
 import androidx.datastore.core.DataMigration
 import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import com.ammar.wallflow.json
 import com.ammar.wallflow.model.search.WallhavenFilters
 import com.ammar.wallflow.model.search.WallhavenSearch
@@ -54,6 +56,15 @@ fun migrateAppPrefs1To2() = object : DataMigration<Preferences> {
         mutablePrefs[stringPreferencesKey("home_wallhaven_search")] = json.encodeToString(
             wallhavenSearch,
         )
+
+        // convert auto_wallpaper_saved_search_id to set
+        val savedSearchId = mutablePrefs[
+            longPreferencesKey("auto_wallpaper_saved_search_id"),
+        ]
+        mutablePrefs[
+            stringSetPreferencesKey("auto_wallpaper_saved_search_id"),
+        ] = setOf(savedSearchId.toString())
+
         mutablePrefs[PreferencesKeys.VERSION] = 2
         return mutablePrefs.toPreferences()
     }

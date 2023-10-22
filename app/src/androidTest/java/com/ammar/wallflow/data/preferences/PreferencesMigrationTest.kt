@@ -5,7 +5,9 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStoreFile
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -42,12 +44,16 @@ class PreferencesMigrationTest {
         try {
             val homeSearchQueryPrefKey = stringPreferencesKey("home_search_query")
             val homeFiltersPrefKey = stringPreferencesKey("home_filters")
+            val prevAutoWallpaperSavedSearchIdKey = longPreferencesKey(
+                "auto_wallpaper_saved_search_id",
+            )
             val preferences = dataStore.edit {
                 it[homeSearchQueryPrefKey] = "test"
                 it[homeFiltersPrefKey] =
                     "includedTags=&excludedTags=&username=&tagId=&wallpaperId=" +
-                    "&categories=anime%2Cgeneral%2Cpeople&purity=sfw&sorting=toplist&order=desc" +
-                    "&topRange=1d&atleast=&resolutions=&ratios=&colors=&seed="
+                        "&categories=anime%2Cgeneral%2Cpeople&purity=sfw&sorting=toplist&order=desc" +
+                        "&topRange=1d&atleast=&resolutions=&ratios=&colors=&seed="
+                it[prevAutoWallpaperSavedSearchIdKey] = 1
             }
             val migrateAppPrefs1To2 = migrateAppPrefs1To2()
             assertTrue(migrateAppPrefs1To2.shouldMigrate(preferences))
@@ -63,6 +69,10 @@ class PreferencesMigrationTest {
                     "\"filters\":{\"sorting\":\"TOPLIST\",\"topRange\":\"ONE_DAY\"}}",
                 updatedPrefs[homeWallhavenSearchPrefKey],
             )
+            val autoWallpaperSavedSearchIdKey = stringSetPreferencesKey(
+                "auto_wallpaper_saved_search_id",
+            )
+            assertEquals(setOf("1"), updatedPrefs[autoWallpaperSavedSearchIdKey])
         } finally {
             dataStore.clear()
         }
