@@ -1,4 +1,4 @@
-package com.ammar.wallflow.data.db.entity.wallhaven
+package com.ammar.wallflow.data.db.entity.wallpaper
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntSize
@@ -10,7 +10,11 @@ import androidx.room.Index
 import androidx.room.Junction
 import androidx.room.PrimaryKey
 import androidx.room.Relation
-import com.ammar.wallflow.data.db.entity.OnlineSourceWallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenTagEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenUploaderEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperTagsEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.asTag
+import com.ammar.wallflow.data.db.entity.wallhaven.asUploader
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import kotlinx.datetime.Instant

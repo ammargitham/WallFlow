@@ -1,6 +1,6 @@
 package com.ammar.wallflow.data.network.model.reddit
 
-import com.ammar.wallflow.data.db.entity.reddit.RedditWallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallpaper.RedditWallpaperEntity
 import com.ammar.wallflow.data.network.model.serializers.NetworkRedditPostCreatedUtcSerializer
 import com.ammar.wallflow.extensions.htmlUnescaped
 import com.ammar.wallflow.model.Purity

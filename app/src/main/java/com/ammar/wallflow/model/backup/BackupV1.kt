@@ -2,11 +2,11 @@ package com.ammar.wallflow.model.backup
 
 import android.net.Uri
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
-import com.ammar.wallflow.data.db.entity.reddit.RedditWallpaperEntity
 import com.ammar.wallflow.data.db.entity.search.SavedSearchEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenTagEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenUploaderEntity
-import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallpaper.RedditWallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallpaper.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.preferences.AppPreferences
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.ExperimentalSerializationApi

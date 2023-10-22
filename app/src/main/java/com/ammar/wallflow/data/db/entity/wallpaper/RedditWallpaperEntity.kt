@@ -1,11 +1,10 @@
-package com.ammar.wallflow.data.db.entity.reddit
+package com.ammar.wallflow.data.db.entity.wallpaper
 
 import androidx.compose.ui.unit.IntSize
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.ammar.wallflow.data.db.entity.OnlineSourceWallpaperEntity
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.reddit.RedditWallpaper
 import kotlinx.serialization.Serializable

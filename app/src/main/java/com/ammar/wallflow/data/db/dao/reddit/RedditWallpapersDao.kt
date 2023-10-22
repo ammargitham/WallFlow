@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.ammar.wallflow.data.db.dao.WallpapersDao
-import com.ammar.wallflow.data.db.entity.reddit.RedditWallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallpaper.RedditWallpaperEntity
 
 @Dao
 interface RedditWallpapersDao : WallpapersDao {

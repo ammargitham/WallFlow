@@ -27,7 +27,6 @@ import com.ammar.wallflow.data.db.entity.LastUpdatedEntity
 import com.ammar.wallflow.data.db.entity.ObjectDetectionModelEntity
 import com.ammar.wallflow.data.db.entity.RateLimitEntity
 import com.ammar.wallflow.data.db.entity.reddit.RedditSearchQueryWallpaperEntity
-import com.ammar.wallflow.data.db.entity.reddit.RedditWallpaperEntity
 import com.ammar.wallflow.data.db.entity.search.SavedSearchEntity
 import com.ammar.wallflow.data.db.entity.search.SearchHistoryEntity
 import com.ammar.wallflow.data.db.entity.search.SearchQueryEntity
@@ -36,8 +35,9 @@ import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenPopularTagEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSearchQueryWallpaperEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenTagEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenUploaderEntity
-import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperTagsEntity
+import com.ammar.wallflow.data.db.entity.wallpaper.RedditWallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallpaper.WallhavenWallpaperEntity
 
 @Database(
     entities = [

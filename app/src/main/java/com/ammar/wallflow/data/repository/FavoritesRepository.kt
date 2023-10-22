@@ -12,8 +12,7 @@ import com.ammar.wallflow.data.db.dao.FavoriteDao
 import com.ammar.wallflow.data.db.dao.reddit.RedditWallpapersDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenWallpapersDao
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
-import com.ammar.wallflow.data.db.entity.reddit.toWallpaper
-import com.ammar.wallflow.data.db.entity.wallhaven.toWallpaper
+import com.ammar.wallflow.data.db.entity.wallpaper.toWallpaper
 import com.ammar.wallflow.data.repository.local.LocalWallpapersRepository
 import com.ammar.wallflow.data.repository.utils.successOr
 import com.ammar.wallflow.model.Source

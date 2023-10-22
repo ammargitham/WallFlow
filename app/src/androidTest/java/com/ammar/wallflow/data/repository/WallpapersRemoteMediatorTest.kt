@@ -15,8 +15,8 @@ import com.ammar.wallflow.data.db.dao.reddit.RedditWallpapersDao
 import com.ammar.wallflow.data.db.dao.search.SearchQueryDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenSearchQueryWallpapersDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenWallpapersDao
-import com.ammar.wallflow.data.db.entity.reddit.RedditWallpaperEntity
-import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallpaper.RedditWallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallpaper.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenMeta
 import com.ammar.wallflow.data.network.model.wallhaven.StringNetworkWallhavenMetaQuery
 import com.ammar.wallflow.data.network.retrofit.RetrofitWallhavenNetwork

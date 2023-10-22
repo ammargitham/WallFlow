@@ -6,8 +6,8 @@ import androidx.paging.PagingConfig
 import androidx.paging.map
 import com.ammar.wallflow.IoDispatcher
 import com.ammar.wallflow.data.db.AppDatabase
-import com.ammar.wallflow.data.db.entity.reddit.RedditWallpaperEntity
-import com.ammar.wallflow.data.db.entity.reddit.toWallpaper
+import com.ammar.wallflow.data.db.entity.wallpaper.RedditWallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallpaper.toWallpaper
 import com.ammar.wallflow.data.network.RedditNetworkDataSource
 import com.ammar.wallflow.data.repository.WallpapersRemoteMediator
 import com.ammar.wallflow.data.repository.utils.Resource

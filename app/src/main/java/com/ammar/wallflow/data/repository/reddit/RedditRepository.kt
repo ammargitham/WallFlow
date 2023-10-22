@@ -1,7 +1,7 @@
 package com.ammar.wallflow.data.repository.reddit
 
 import androidx.paging.PagingData
-import com.ammar.wallflow.data.db.entity.reddit.RedditWallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallpaper.RedditWallpaperEntity
 import com.ammar.wallflow.data.repository.utils.Resource
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.reddit.RedditWallpaper

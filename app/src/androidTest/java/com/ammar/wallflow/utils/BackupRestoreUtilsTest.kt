@@ -19,9 +19,9 @@ import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenTagsDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenUploadersDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenWallpapersDao
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
-import com.ammar.wallflow.data.db.entity.reddit.RedditWallpaperEntity
-import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperTagsEntity
+import com.ammar.wallflow.data.db.entity.wallpaper.RedditWallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallpaper.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.network.model.reddit.toWallpaperEntities
 import com.ammar.wallflow.data.network.model.wallhaven.toEntity
 import com.ammar.wallflow.data.network.model.wallhaven.toWallpaperEntity

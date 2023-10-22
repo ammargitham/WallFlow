@@ -1,7 +1,7 @@
 package com.ammar.wallflow.data.network.model
 
-import com.ammar.wallflow.data.db.entity.wallhaven.ThumbsEntity
-import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallpaper.ThumbsEntity
+import com.ammar.wallflow.data.db.entity.wallpaper.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenThumbs
 import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenWallpaper
 import com.ammar.wallflow.data.network.model.wallhaven.toWallpaperEntity

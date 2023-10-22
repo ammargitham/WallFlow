@@ -22,9 +22,9 @@ import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.ammar.wallflow.R
-import com.ammar.wallflow.data.db.entity.reddit.toWallpaper
 import com.ammar.wallflow.data.db.entity.search.toSavedSearch
 import com.ammar.wallflow.data.db.entity.toModel
+import com.ammar.wallflow.data.db.entity.wallpaper.toWallpaper
 import com.ammar.wallflow.data.network.RedditNetworkDataSource
 import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
 import com.ammar.wallflow.data.network.model.reddit.toWallpaperEntities

@@ -12,7 +12,7 @@ import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.search.toSavedSearch
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenTagEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenUploaderEntity
-import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallpaper.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.preferences.AppPreferences
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.FavoritesRepository

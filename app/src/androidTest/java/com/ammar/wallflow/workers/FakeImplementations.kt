@@ -13,11 +13,11 @@ import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenWallpapersDao
 import com.ammar.wallflow.data.db.entity.AutoWallpaperHistoryEntity
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.ObjectDetectionModelEntity
-import com.ammar.wallflow.data.db.entity.reddit.RedditWallpaperEntity
 import com.ammar.wallflow.data.db.entity.search.SavedSearchEntity
-import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperTagsEntity
-import com.ammar.wallflow.data.db.entity.wallhaven.WallpaperWithUploaderAndTags
+import com.ammar.wallflow.data.db.entity.wallpaper.RedditWallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallpaper.WallhavenWallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallpaper.WallpaperWithUploaderAndTags
 import com.ammar.wallflow.data.network.RedditNetworkDataSource
 import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
 import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenWallpaperResponse

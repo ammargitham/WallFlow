@@ -13,11 +13,11 @@ import com.ammar.wallflow.data.db.entity.LastUpdatedEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenPopularTagEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenTagEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenUploaderEntity
-import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperTagsEntity
-import com.ammar.wallflow.data.db.entity.wallhaven.WallpaperWithUploaderAndTags
 import com.ammar.wallflow.data.db.entity.wallhaven.asTag
-import com.ammar.wallflow.data.db.entity.wallhaven.toWallpaper
+import com.ammar.wallflow.data.db.entity.wallpaper.WallhavenWallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallpaper.WallpaperWithUploaderAndTags
+import com.ammar.wallflow.data.db.entity.wallpaper.toWallpaper
 import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
 import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenTag
 import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenUploader

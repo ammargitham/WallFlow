@@ -14,9 +14,9 @@ import androidx.work.WorkerParameters
 import com.ammar.wallflow.MockFactory
 import com.ammar.wallflow.data.db.AppDatabase
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
-import com.ammar.wallflow.data.db.entity.OnlineSourceWallpaperEntity
-import com.ammar.wallflow.data.db.entity.reddit.RedditWallpaperEntity
-import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallpaper.OnlineSourceWallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallpaper.RedditWallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallpaper.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.network.model.reddit.NetworkRedditPost
 import com.ammar.wallflow.data.network.model.reddit.toWallpaperEntities
 import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenMeta
@@ -866,7 +866,6 @@ class CleanupWorkerTest {
             when (it) {
                 is WallhavenWallpaperEntity -> it.path.getFileNameFromUrl()
                 is RedditWallpaperEntity -> it.url.getFileNameFromUrl()
-                else -> throw RuntimeException()
             }
         }
         fileNames.forEach {

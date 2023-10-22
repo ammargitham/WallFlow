@@ -3,7 +3,7 @@ package com.ammar.wallflow.data.repository.wallhaven
 import androidx.paging.PagingData
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenTagEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenUploaderEntity
-import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallpaper.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.repository.utils.Resource
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.search.WallhavenSearch

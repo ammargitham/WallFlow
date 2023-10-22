@@ -3,7 +3,7 @@ package com.ammar.wallflow.data.network.model.wallhaven
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntSize
 import androidx.core.graphics.toColorInt
-import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallpaper.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.network.model.serializers.InstantSerializer
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper

@@ -26,7 +26,7 @@ import com.ammar.wallflow.data.db.dao.search.SavedSearchDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenWallpapersDao
 import com.ammar.wallflow.data.db.entity.AutoWallpaperHistoryEntity
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
-import com.ammar.wallflow.data.db.entity.wallhaven.toWallpaper
+import com.ammar.wallflow.data.db.entity.wallpaper.toWallpaper
 import com.ammar.wallflow.data.network.RedditNetworkDataSource
 import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
 import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenMeta
