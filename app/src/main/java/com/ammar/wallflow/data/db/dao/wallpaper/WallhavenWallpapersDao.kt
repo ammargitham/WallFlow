@@ -1,4 +1,4 @@
-package com.ammar.wallflow.data.db.dao.wallhaven
+package com.ammar.wallflow.data.db.dao.wallpaper
 
 import androidx.paging.PagingSource
 import androidx.room.Dao
@@ -8,7 +8,6 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
 import androidx.room.Upsert
-import com.ammar.wallflow.data.db.dao.WallpapersDao
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperTagsEntity
 import com.ammar.wallflow.data.db.entity.wallpaper.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.db.entity.wallpaper.WallpaperWithUploaderAndTags

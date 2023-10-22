@@ -13,11 +13,11 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.ammar.wallflow.MockFactory
 import com.ammar.wallflow.data.db.AppDatabase
 import com.ammar.wallflow.data.db.dao.FavoriteDao
-import com.ammar.wallflow.data.db.dao.reddit.RedditWallpapersDao
 import com.ammar.wallflow.data.db.dao.search.SavedSearchDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenTagsDao
 import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenUploadersDao
-import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenWallpapersDao
+import com.ammar.wallflow.data.db.dao.wallpaper.RedditWallpapersDao
+import com.ammar.wallflow.data.db.dao.wallpaper.WallhavenWallpapersDao
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperTagsEntity
 import com.ammar.wallflow.data.db.entity.wallpaper.RedditWallpaperEntity

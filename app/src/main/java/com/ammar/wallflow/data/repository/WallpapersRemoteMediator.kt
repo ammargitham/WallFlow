@@ -6,10 +6,10 @@ import androidx.paging.PagingState
 import androidx.paging.RemoteMediator
 import androidx.room.withTransaction
 import com.ammar.wallflow.data.db.AppDatabase
-import com.ammar.wallflow.data.db.dao.reddit.RedditSearchQueryWallpapersDao
-import com.ammar.wallflow.data.db.dao.reddit.RedditWallpapersDao
-import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenSearchQueryWallpapersDao
-import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenWallpapersDao
+import com.ammar.wallflow.data.db.dao.wallpaper.RedditSearchQueryWallpapersDao
+import com.ammar.wallflow.data.db.dao.wallpaper.RedditWallpapersDao
+import com.ammar.wallflow.data.db.dao.wallpaper.WallhavenSearchQueryWallpapersDao
+import com.ammar.wallflow.data.db.dao.wallpaper.WallhavenWallpapersDao
 import com.ammar.wallflow.data.db.entity.reddit.RedditSearchQueryWallpaperEntity
 import com.ammar.wallflow.data.db.entity.search.SearchQueryEntity
 import com.ammar.wallflow.data.db.entity.search.SearchQueryRemoteKeyEntity
@@ -136,7 +136,6 @@ class WallpapersRemoteMediator<T : Search, U : OnlineSourceWallpaperEntity>(
                         is RedditWallpapersDao -> {
                             wallpapersDao.deleteAllUniqueToSearchQueryId(searchQueryId)
                         }
-                        else -> throw RuntimeException()
                     }
                     when (searchQueryWallpapersDao) {
                         is WallhavenSearchQueryWallpapersDao -> {
@@ -145,7 +144,6 @@ class WallpapersRemoteMediator<T : Search, U : OnlineSourceWallpaperEntity>(
                         is RedditSearchQueryWallpapersDao -> {
                             searchQueryWallpapersDao.deleteBySearchQueryId(searchQueryId)
                         }
-                        else -> throw RuntimeException()
                     }
                     (searchQueryEntity ?: searchQueryDao.getById(searchQueryId))?.run {
                         // insert or update search query in db
@@ -189,7 +187,6 @@ class WallpapersRemoteMediator<T : Search, U : OnlineSourceWallpaperEntity>(
                             },
                         )
                     }
-                    else -> throw RuntimeException()
                 }
             }
 

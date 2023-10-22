@@ -1,10 +1,9 @@
-package com.ammar.wallflow.data.db.dao.reddit
+package com.ammar.wallflow.data.db.dao.wallpaper
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.ammar.wallflow.data.db.dao.SearchQueryWallpapersDao
 import com.ammar.wallflow.data.db.entity.reddit.RedditSearchQueryWallpaperEntity
 
 @Dao
