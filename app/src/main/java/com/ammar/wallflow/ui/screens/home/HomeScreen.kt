@@ -52,8 +52,11 @@ import com.ammar.wallflow.ui.common.searchedit.SaveAsDialog
 import com.ammar.wallflow.ui.common.searchedit.SavedSearchesDialog
 import com.ammar.wallflow.ui.common.topWindowInsets
 import com.ammar.wallflow.ui.screens.destinations.WallpaperScreenDestination
+import com.ammar.wallflow.ui.screens.home.composables.HomeFiltersBottomSheetHeader
 import com.ammar.wallflow.ui.screens.home.composables.ManageSourcesDialog
 import com.ammar.wallflow.ui.screens.home.composables.RedditInitDialog
+import com.ammar.wallflow.ui.screens.home.composables.header
+import com.ammar.wallflow.ui.screens.home.composables.wallhavenHeader
 import com.ammar.wallflow.ui.wallpaperviewer.WallpaperViewerViewModel
 import com.ammar.wallflow.utils.applyWallpaper
 import com.ammar.wallflow.utils.getStartBottomPadding

@@ -52,7 +52,7 @@ import com.ammar.wallflow.ui.common.Suggestion
 import com.ammar.wallflow.ui.common.TagChip
 import com.ammar.wallflow.ui.common.UploaderChip
 import com.ammar.wallflow.ui.common.searchedit.EditSearchContent
-import com.ammar.wallflow.ui.screens.home.SearchBarFiltersToggle
+import com.ammar.wallflow.ui.screens.home.composables.SearchBarFiltersToggle
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 
 object MainSearchBar {

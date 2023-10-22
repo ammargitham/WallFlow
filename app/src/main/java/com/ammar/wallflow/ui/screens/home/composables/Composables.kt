@@ -1,4 +1,4 @@
-package com.ammar.wallflow.ui.screens.home
+package com.ammar.wallflow.ui.screens.home.composables
 
 import android.content.res.Configuration
 import androidx.compose.foundation.gestures.Orientation

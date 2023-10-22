@@ -47,8 +47,8 @@ import com.ammar.wallflow.ui.common.mainsearch.MainSearchBar
 import com.ammar.wallflow.ui.common.topWindowInsets
 import com.ammar.wallflow.ui.screens.NavGraph
 import com.ammar.wallflow.ui.screens.home.HomeScreenContent
-import com.ammar.wallflow.ui.screens.home.header
-import com.ammar.wallflow.ui.screens.home.wallhavenHeader
+import com.ammar.wallflow.ui.screens.home.composables.header
+import com.ammar.wallflow.ui.screens.home.composables.wallhavenHeader
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.flowOf
