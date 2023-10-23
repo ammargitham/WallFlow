@@ -133,7 +133,7 @@ fun BackupRestoreScreen(
                 restoreProgress = uiState.restoreProgress,
                 exception = uiState.restoreException,
                 onOptionsChange = viewModel::updateRestoreOptions,
-                onFileInputClicked = { openDocumentLauncher.launch(arrayOf(MIME_TYPE_JSON)) },
+                onFileInputClicked = { openDocumentLauncher.launch(arrayOf("*/*")) },
                 onRestoreClick = viewModel::performRestore,
                 onDismissRequest = {
                     if (uiState.restoreProgress != null) {
