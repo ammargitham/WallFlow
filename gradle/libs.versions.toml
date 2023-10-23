@@ -4,7 +4,7 @@ accompanist = "0.33.2-alpha"
 androidGradlePlugin = "8.2.0-rc01"
 androidToolsDesugar = "2.0.3"
 androidxActivity = "1.8.0"
-androidxBenchmark = "1.2.0-beta05"
+androidxBenchmark = "1.2.0"
 # @keep
 androidxComposeCompiler = "1.5.3"
 androidxComposeMaterial = "1.5.4"

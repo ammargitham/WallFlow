@@ -1,6 +1,7 @@
 package com.ammar.wallflow.ui.common
 
 import android.util.Log
+import androidx.activity.compose.ReportDrawnWhen
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.updateTransition
@@ -22,7 +23,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -108,6 +111,7 @@ fun WallpaperCard(
             null,
         )?.toBitmap()?.asImageBitmap()
     }
+    var loaded by remember { mutableStateOf(false) }
 
     Box(
         modifier = modifier
@@ -181,6 +185,7 @@ fun WallpaperCard(
                     it.result.throwable,
                 )
             },
+            onSuccess = { loaded = true },
         )
         FilledIconButton(
             modifier = Modifier
@@ -208,6 +213,7 @@ fun WallpaperCard(
             )
         }
     }
+    ReportDrawnWhen { loaded }
 }
 
 @Composable
