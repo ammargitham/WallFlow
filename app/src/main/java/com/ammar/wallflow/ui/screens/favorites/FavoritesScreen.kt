@@ -21,10 +21,10 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.ammar.wallflow.data.preferences.LayoutPreferences
 import com.ammar.wallflow.extensions.search
 import com.ammar.wallflow.model.Favorite
-import com.ammar.wallflow.model.Search
-import com.ammar.wallflow.model.TagSearchMeta
-import com.ammar.wallflow.model.UploaderSearchMeta
 import com.ammar.wallflow.model.Wallpaper
+import com.ammar.wallflow.model.search.WallhavenSearch
+import com.ammar.wallflow.model.search.WallhavenTagSearchMeta
+import com.ammar.wallflow.model.search.WallhavenUploaderSearchMeta
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.model.wallhaven.WallhavenUploader
 import com.ammar.wallflow.ui.common.BottomBarAwareHorizontalTwoPane
@@ -141,9 +141,9 @@ fun FavoritesScreen(
                 }
             },
             onFullWallpaperTagClick = {
-                val search = Search(
+                val search = WallhavenSearch(
                     query = "id:${it.id}",
-                    meta = TagSearchMeta(it),
+                    meta = WallhavenTagSearchMeta(it),
                 )
                 if (searchBarController.state.value.search == search) {
                     return@FavoritesScreenContent
@@ -151,9 +151,9 @@ fun FavoritesScreen(
                 navController.search(search)
             },
             onFullWallpaperUploaderClick = {
-                val search = Search(
+                val search = WallhavenSearch(
                     query = "@${it.username}",
-                    meta = UploaderSearchMeta(wallhavenUploader = it),
+                    meta = WallhavenUploaderSearchMeta(uploader = it),
                 )
                 if (searchBarController.state.value.search == search) {
                     return@FavoritesScreenContent

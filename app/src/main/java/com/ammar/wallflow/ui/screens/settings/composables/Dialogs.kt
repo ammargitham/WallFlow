@@ -25,6 +25,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -73,11 +74,12 @@ import com.ammar.wallflow.extensions.toConstraintTypeMap
 import com.ammar.wallflow.extensions.toConstraints
 import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.model.ConstraintType
-import com.ammar.wallflow.model.SavedSearch
-import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.model.local.LocalDirectory
-import com.ammar.wallflow.ui.common.Dropdown
+import com.ammar.wallflow.model.search.RedditSearch
+import com.ammar.wallflow.model.search.SavedSearch
+import com.ammar.wallflow.model.search.WallhavenSearch
+import com.ammar.wallflow.ui.common.DropdownMultiple
 import com.ammar.wallflow.ui.common.DropdownOption
 import com.ammar.wallflow.ui.common.NameState
 import com.ammar.wallflow.ui.common.ProgressIndicator
@@ -89,6 +91,12 @@ import com.ammar.wallflow.ui.common.urlStateSaver
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import com.ammar.wallflow.utils.DownloadStatus
 import kotlin.math.roundToInt
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableSet
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.persistentSetOf
+import kotlinx.collections.immutable.toPersistentList
+import kotlinx.collections.immutable.toPersistentSet
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DateTimePeriod
@@ -653,8 +661,8 @@ private fun PreviewDeleteSavedSearchConfirmDialog() {
 fun AutoWallpaperSourceOptionsDialog(
     modifier: Modifier = Modifier,
     autoWallpaperPreferences: AutoWallpaperPreferences = AutoWallpaperPreferences(),
-    savedSearches: List<SavedSearch> = emptyList(),
-    localDirectories: List<LocalDirectory> = emptyList(),
+    savedSearches: ImmutableList<SavedSearch> = persistentListOf(),
+    localDirectories: ImmutableList<LocalDirectory> = persistentListOf(),
     onSaveClick: (AutoWallpaperPreferences) -> Unit = {},
     onDismissRequest: () -> Unit = {},
 ) {
@@ -674,7 +682,7 @@ fun AutoWallpaperSourceOptionsDialog(
                 return@derivedStateOf false
             }
             // if saved search is enabled and saved search id is not set
-            !(localPrefs.savedSearchEnabled && localPrefs.savedSearchId <= 0)
+            !(localPrefs.savedSearchEnabled && localPrefs.savedSearchIds.isEmpty())
         }
     }
 
@@ -689,16 +697,19 @@ fun AutoWallpaperSourceOptionsDialog(
                     savedSearchEnabled = localPrefs.savedSearchEnabled,
                     favoritesEnabled = localPrefs.favoritesEnabled,
                     savedSearches = savedSearches,
-                    selectedSavedSearchId = localPrefs.savedSearchId,
+                    selectedSavedSearchIds = localPrefs.savedSearchIds.toPersistentSet(),
                     localEnabled = localPrefs.localEnabled,
                     localDirectories = localDirectories,
                     onChangeSavedSearchEnabled = {
                         localPrefs = localPrefs.copy(
                             savedSearchEnabled = it,
-                            savedSearchId = if (localPrefs.savedSearchId <= 0) {
-                                savedSearches.firstOrNull()?.id ?: -1
-                            } else {
-                                localPrefs.savedSearchId
+                            savedSearchIds = localPrefs.savedSearchIds.ifEmpty {
+                                val savedSearchId = savedSearches.firstOrNull()?.id
+                                if (savedSearchId != null) {
+                                    setOf(savedSearchId)
+                                } else {
+                                    emptySet()
+                                }
                             },
                         )
                     },
@@ -708,8 +719,8 @@ fun AutoWallpaperSourceOptionsDialog(
                     onChangeLocalEnabled = {
                         localPrefs = localPrefs.copy(localEnabled = it)
                     },
-                    onSavedSearchIdChange = {
-                        localPrefs = localPrefs.copy(savedSearchId = it)
+                    onSavedSearchIdsChange = {
+                        localPrefs = localPrefs.copy(savedSearchIds = it)
                     },
                 )
             },
@@ -732,19 +743,20 @@ fun AutoWallpaperSourceOptionsDialog(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AutoWallpaperSourceOptionsDialogContent(
     modifier: Modifier = Modifier,
     savedSearchEnabled: Boolean = false,
     favoritesEnabled: Boolean = false,
-    savedSearches: List<SavedSearch> = emptyList(),
-    selectedSavedSearchId: Long? = null,
+    savedSearches: ImmutableList<SavedSearch> = persistentListOf(),
+    selectedSavedSearchIds: ImmutableSet<Long> = persistentSetOf(),
     localEnabled: Boolean = false,
-    localDirectories: List<LocalDirectory> = emptyList(),
+    localDirectories: ImmutableList<LocalDirectory> = persistentListOf(),
     onChangeSavedSearchEnabled: (Boolean) -> Unit = {},
     onChangeFavoritesEnabled: (Boolean) -> Unit = {},
     onChangeLocalEnabled: (Boolean) -> Unit = {},
-    onSavedSearchIdChange: (Long) -> Unit = {},
+    onSavedSearchIdsChange: (Set<Long>) -> Unit = {},
 ) {
     val localSavedSearchEnabled = savedSearchEnabled && savedSearches.isNotEmpty()
     val localLocalEnabled = localEnabled && localDirectories.isNotEmpty()
@@ -786,7 +798,7 @@ private fun AutoWallpaperSourceOptionsDialogContent(
             },
         )
         AnimatedVisibility(visible = localSavedSearchEnabled) {
-            Dropdown(
+            DropdownMultiple(
                 modifier = Modifier
                     .padding(
                         start = 64.dp,
@@ -799,10 +811,22 @@ private fun AutoWallpaperSourceOptionsDialogContent(
                     DropdownOption(
                         value = it.id,
                         text = it.name,
+                        icon = {
+                            Icon(
+                                modifier = Modifier.size(FilterChipDefaults.IconSize),
+                                painter = painterResource(
+                                    when (it.search) {
+                                        is WallhavenSearch -> R.drawable.wallhaven_logo_short
+                                        is RedditSearch -> R.drawable.reddit
+                                    },
+                                ),
+                                contentDescription = null,
+                            )
+                        },
                     )
                 },
-                initialSelectedOption = selectedSavedSearchId,
-                onChange = onSavedSearchIdChange,
+                initialSelectedOptions = selectedSavedSearchIds,
+                onChange = { onSavedSearchIdsChange(it) },
             )
         }
         ListItem(
@@ -862,14 +886,14 @@ private class AutoWallSrcOptsDialogPP : CPPP<AutoWallSrcOptsDialogParameters>(
         AutoWallSrcOptsDialogParameters(),
         AutoWallSrcOptsDialogParameters(
             prefs = AutoWallpaperPreferences(
-                savedSearchId = 1,
+                savedSearchIds = setOf(1),
                 savedSearchEnabled = true,
             ),
             savedSearches = List(3) {
                 SavedSearch(
                     id = it.toLong(),
                     name = "Saved search $it",
-                    search = Search(),
+                    search = WallhavenSearch(),
                 )
             },
         ),
@@ -886,7 +910,7 @@ private fun PreviewAutoWallpaperSourceOptionsDialog(
         Surface {
             AutoWallpaperSourceOptionsDialog(
                 autoWallpaperPreferences = parameters.prefs,
-                savedSearches = parameters.savedSearches,
+                savedSearches = parameters.savedSearches.toPersistentList(),
             )
         }
     }

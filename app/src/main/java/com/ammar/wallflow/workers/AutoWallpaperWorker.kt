@@ -22,10 +22,13 @@ import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.ammar.wallflow.R
+import com.ammar.wallflow.data.db.entity.search.toSavedSearch
 import com.ammar.wallflow.data.db.entity.toModel
-import com.ammar.wallflow.data.db.entity.toSavedSearch
+import com.ammar.wallflow.data.db.entity.wallpaper.toWallpaper
+import com.ammar.wallflow.data.network.RedditNetworkDataSource
 import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
-import com.ammar.wallflow.data.network.model.toWallhavenWallpaper
+import com.ammar.wallflow.data.network.model.reddit.toWallpaperEntities
+import com.ammar.wallflow.data.network.model.wallhaven.toWallhavenWallpaper
 import com.ammar.wallflow.data.preferences.AppPreferences
 import com.ammar.wallflow.data.preferences.AutoWallpaperPreferences
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
@@ -50,11 +53,12 @@ import com.ammar.wallflow.extensions.workManager
 import com.ammar.wallflow.model.AutoWallpaperHistory
 import com.ammar.wallflow.model.DownloadableWallpaper
 import com.ammar.wallflow.model.ObjectDetectionModel
-import com.ammar.wallflow.model.SearchQuery
 import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.local.LocalWallpaper
-import com.ammar.wallflow.model.toSearchQuery
+import com.ammar.wallflow.model.search.RedditSearch
+import com.ammar.wallflow.model.search.Search
+import com.ammar.wallflow.model.search.WallhavenSearch
 import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import com.ammar.wallflow.services.ChangeWallpaperTileService
 import com.ammar.wallflow.ui.common.permissions.checkNotificationPermission
@@ -88,6 +92,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
     private val autoWallpaperHistoryRepository: AutoWallpaperHistoryRepository,
     private val objectDetectionModelRepository: ObjectDetectionModelRepository,
     private val wallHavenNetwork: WallhavenNetworkDataSource,
+    private val redditNetwork: RedditNetworkDataSource,
     private val favoritesRepository: FavoritesRepository,
     private val localWallpapersRepository: LocalWallpapersRepository,
 ) : CoroutineWorker(
@@ -106,8 +111,8 @@ class AutoWallpaperWorker @AssistedInject constructor(
             priority = NotificationCompat.PRIORITY_LOW
         }
     }
-    private var prevPageNum: Int? = null
-    private var cachedWallhavenWallpapers = mutableListOf<WallhavenWallpaper>()
+    private var prevPageNum: String? = null
+    private var cachedWallhavenWallpapers = mutableListOf<Wallpaper>()
     private val sourceChoices: Set<SourceChoice>
         get() {
             return mutableSetOf<SourceChoice>().apply {
@@ -169,48 +174,61 @@ class AutoWallpaperWorker @AssistedInject constructor(
         }
         // check if saved search id is valid
         if (autoWallpaperPreferences.savedSearchEnabled) {
-            val savedSearchId = autoWallpaperPreferences.savedSearchId
-            savedSearchRepository.getById(savedSearchId) ?: return Result.failure(
+            if (autoWallpaperPreferences.savedSearchIds.isEmpty()) {
+                return Result.failure(
+                    workDataOf(
+                        FAILURE_REASON to FailureReason.SAVED_SEARCH_NOT_SET.name,
+                    ),
+                )
+            }
+        }
+        try {
+            val (nextWallpaper, uri) = setNextWallpaper()
+            if (nextWallpaper == null || uri == null) {
+                return Result.failure(
+                    workDataOf(
+                        FAILURE_REASON to FailureReason.NO_WALLPAPER_FOUND.name,
+                    ),
+                )
+            }
+            if (autoWallpaperPreferences.markFavorite) {
+                markFavorite(nextWallpaper)
+            }
+            if (autoWallpaperPreferences.download) {
+                saveWallpaperToDownloads(nextWallpaper, uri)
+            }
+            if (autoWallpaperPreferences.showNotification) {
+                showSuccessNotification(nextWallpaper, uri)
+            }
+            return Result.success(
+                workDataOf(
+                    SUCCESS_NEXT_WALLPAPER_ID to nextWallpaper.id,
+                ),
+            )
+        } catch (e: SavedSearchNotFoundError) {
+            return Result.failure(
                 workDataOf(
                     FAILURE_REASON to FailureReason.SAVED_SEARCH_NOT_SET.name,
                 ),
             )
         }
-        val (nextWallpaper, uri) = setNextWallpaper()
-        if (nextWallpaper == null || uri == null) {
-            return Result.failure(
-                workDataOf(
-                    FAILURE_REASON to FailureReason.NO_WALLPAPER_FOUND.name,
-                ),
-            )
-        }
-        if (autoWallpaperPreferences.markFavorite) {
-            markFavorite(nextWallpaper)
-        }
-        if (autoWallpaperPreferences.download) {
-            saveWallpaperToDownloads(nextWallpaper, uri)
-        }
-        if (autoWallpaperPreferences.showNotification) {
-            showSuccessNotification(nextWallpaper, uri)
-        }
-        return Result.success(
-            workDataOf(
-                SUCCESS_NEXT_WALLPAPER_ID to nextWallpaper.id,
-            ),
-        )
     }
+
+    private class SavedSearchNotFoundError : Error()
 
     private suspend fun setNextWallpaper(): Pair<Wallpaper?, Uri?> {
         val sourceChoice = getNextSourceChoice()
         val nextWallpaper: Wallpaper = when (sourceChoice) {
             SourceChoice.SAVED_SEARCH -> {
-                val savedSearchId = autoWallpaperPreferences.savedSearchId
+                val savedSearchId = autoWallpaperPreferences.savedSearchIds.random()
                 val savedSearch = savedSearchRepository.getById(savedSearchId)
-                val savedSearchQuery = savedSearch?.toSavedSearch()?.search?.toSearchQuery()
-                    ?: return null to null
+                val search = savedSearch
+                    ?.toSavedSearch()
+                    ?.search
+                    ?: throw SavedSearchNotFoundError()
                 // get a fresh wallpaper, ignoring the history initially
-                getNextSavedSearchWallpaper(savedSearchQuery)
-                    ?: getNextSavedSearchWallpaper(savedSearchQuery, false)
+                getNextSavedSearchWallpaper(search)
+                    ?: getNextSavedSearchWallpaper(search, false)
                     ?: return null to null
             }
             SourceChoice.FAVORITES -> getNextFavoriteWallpaper()
@@ -387,11 +405,11 @@ class AutoWallpaperWorker @AssistedInject constructor(
     }
 
     private suspend fun getNextSavedSearchWallpaper(
-        searchQuery: SearchQuery,
+        search: Search,
         excludeHistory: Boolean = true,
-    ): WallhavenWallpaper? {
+    ): Wallpaper? {
         val historyIds = if (excludeHistory) {
-            autoWallpaperHistoryRepository.getAllBySource(Source.WALLHAVEN).map { it.sourceId }
+            autoWallpaperHistoryRepository.getAll().map { it.sourceId }
         } else {
             emptyList()
         }
@@ -399,14 +417,14 @@ class AutoWallpaperWorker @AssistedInject constructor(
         var hasMore = true
         while (hasMore) {
             val wallpapers = if (excludeHistory) {
-                val (wallpapers, nextPageNum) = loadWallpapers(
-                    searchQuery = searchQuery,
-                    pageNum = prevPageNum,
+                val (tempWallpapers, nextPageNum) = loadWallpapers(
+                    search = search,
+                    page = prevPageNum,
                 )
                 prevPageNum = nextPageNum
-                cachedWallhavenWallpapers += wallpapers
+                cachedWallhavenWallpapers += tempWallpapers
                 hasMore = nextPageNum != null
-                wallpapers
+                tempWallpapers
             } else {
                 // not excluding history, means we already loaded all wallpapers previously
                 // in such case, use cachedWallpapers
@@ -439,14 +457,29 @@ class AutoWallpaperWorker @AssistedInject constructor(
     )
 
     private suspend fun loadWallpapers(
-        searchQuery: SearchQuery,
-        pageNum: Int? = null,
-    ): Pair<List<WallhavenWallpaper>, Int?> {
-        val response = wallHavenNetwork.search(searchQuery, pageNum)
-        val nextPageNumber = response.meta?.run {
-            if (current_page != last_page) current_page + 1 else null
+        search: Search,
+        page: String? = null,
+    ): Pair<List<Wallpaper>, String?> {
+        when (search) {
+            is WallhavenSearch -> {
+                val response = wallHavenNetwork.search(search, page?.toIntOrNull())
+                val nextPageNumber = response.meta?.run {
+                    if (current_page != last_page) current_page + 1 else null
+                }
+                return response.data.map {
+                    it.toWallhavenWallpaper()
+                } to nextPageNumber?.toString()
+            }
+            is RedditSearch -> {
+                val response = redditNetwork.search(search, page)
+                val after = response.data.after
+                return response.data.children.flatMap {
+                    it.data.toWallpaperEntities()
+                }.map {
+                    it.toWallpaper()
+                } to after
+            }
         }
-        return response.data.map { it.toWallhavenWallpaper() } to nextPageNumber
     }
 
     private fun showSuccessNotification(

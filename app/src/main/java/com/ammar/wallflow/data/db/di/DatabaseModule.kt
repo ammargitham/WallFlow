@@ -6,8 +6,9 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.ammar.wallflow.IoDispatcher
-import com.ammar.wallflow.data.db.database.AppDatabase
-import com.ammar.wallflow.data.db.di.ManualMigrations.MIGRATION_1_2
+import com.ammar.wallflow.data.db.AppDatabase
+import com.ammar.wallflow.data.db.manualmigrations.MIGRATION_1_2
+import com.ammar.wallflow.data.db.manualmigrations.MIGRATION_3_4
 import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.model.ObjectDetectionModel
 import com.ammar.wallflow.model.toEntity
@@ -29,24 +30,26 @@ class DatabaseModule {
     fun provideLastUpdatedDao(appDatabase: AppDatabase) = appDatabase.lastUpdatedDao()
 
     @Provides
-    fun providePopularTagsDao(appDatabase: AppDatabase) = appDatabase.popularTagsDao()
+    fun providesWallhavenPopularTagsDao(appDatabase: AppDatabase) =
+        appDatabase.wallhavenPopularTagsDao()
 
     @Provides
-    fun provideSearchQueryDao(appDatabase: AppDatabase) = appDatabase.searchQueryDao()
+    fun searchQueryDao(appDatabase: AppDatabase) = appDatabase.searchQueryDao()
 
     @Provides
-    fun provideSearchQueryRemoteKeysDao(appDatabase: AppDatabase) =
+    fun providesSearchQueryRemoteKeysDao(appDatabase: AppDatabase) =
         appDatabase.searchQueryRemoteKeysDao()
 
     @Provides
-    fun provideSearchQueryWallpapersDao(appDatabase: AppDatabase) =
-        appDatabase.searchQueryWallpapersDao()
+    fun providesWallhavenSearchQueryWallpapersDao(appDatabase: AppDatabase) =
+        appDatabase.wallhavenSearchQueryWallpapersDao()
 
     @Provides
-    fun provideWallpapersDao(appDatabase: AppDatabase) = appDatabase.wallpapersDao()
+    fun providesWallhavenWallpapersDao(appDatabase: AppDatabase) =
+        appDatabase.wallhavenWallpapersDao()
 
     @Provides
-    fun provideTagsDao(appDatabase: AppDatabase) = appDatabase.tagsDao()
+    fun providesWallhavenTagsDao(appDatabase: AppDatabase) = appDatabase.wallhavenTagsDao()
 
     @Provides
     fun providesSearchHistoryDao(appDatabase: AppDatabase) = appDatabase.searchHistoryDao()
@@ -66,7 +69,14 @@ class DatabaseModule {
     fun providesFavoritesDao(appDatabase: AppDatabase) = appDatabase.favoriteDao()
 
     @Provides
-    fun providesUploadersDao(appDatabase: AppDatabase) = appDatabase.uploadersDao()
+    fun providesWallhavenUploadersDao(appDatabase: AppDatabase) =
+        appDatabase.wallhavenUploadersDao()
+
+    @Provides
+    fun providesRateLimitDao(appDatabase: AppDatabase) = appDatabase.rateLimitDao()
+
+    @Provides
+    fun providesRedditWallpaperDao(appDatabase: AppDatabase) = appDatabase.redditWallpapersDao()
 
     lateinit var appDatabase: AppDatabase
 
@@ -83,6 +93,7 @@ class DatabaseModule {
         ).apply {
             addMigrations(
                 MIGRATION_1_2,
+                MIGRATION_3_4,
             )
             addCallback(
                 object : RoomDatabase.Callback() {

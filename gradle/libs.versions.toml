@@ -1,40 +1,44 @@
 [versions]
 aboutLibraries = "10.9.1"
 accompanist = "0.33.2-alpha"
-androidGradlePlugin = "8.2.0-beta06"
+androidGradlePlugin = "8.2.0-rc01"
 androidToolsDesugar = "2.0.3"
-androidxActivity = "1.7.2"
+androidxActivity = "1.8.0"
+androidxBenchmark = "1.2.0"
 # @keep
 androidxComposeCompiler = "1.5.3"
-androidxComposeMaterial = "1.5.2"
-androidxComposeMaterial3 = "1.2.0-alpha08"
+androidxComposeMaterial = "1.5.4"
+androidxComposeMaterial3 = "1.2.0-alpha10"
 androidxComposeRuntimeTracing = "1.0.0-alpha04"
-androidxComposeUi = "1.5.2"
+androidxComposeUi = "1.5.4"
 androidxCore = "1.12.0"
 androidxDatastore = "1.0.0"
 androidXExifInterface = "1.3.6"
-androidxHilt = "1.1.0-alpha01"
+androidxHilt = "1.1.0-rc01"
 androidxLifecycle = "2.6.2"
 androidxPaging = "3.2.1"
-androidxRoom = "2.6.0-rc01"
+androidxProfileinstaller = "1.3.1"
+androidxRoom = "2.6.0"
 androidxTest = "1.5.0"
+androidxTestEspresso = "3.5.1"
 androidxTestExt = "1.1.5"
 androidxTestRunner = "1.5.2"
 androidxTestServices = "1.4.2"
+androidxTestUiautomator = "2.3.0-alpha04"
 #androidXWindow = "1.2.0-beta01"
-androidxWork = "2.9.0-beta01"
+androidxWork = "2.9.0-rc01"
 cloudy = "0.1.2"
 coil = "2.4.0"
 coroutines = "1.7.3"
-composeDestinations = "1.9.53"
-daggerHilt = "2.48"
-documentFileCompat = "1.0.7"
+composeDestinations = "1.9.54"
+daggerHilt = "2.48.1"
+documentFileCompat = "1.0.8"
 #easycrop = "0.1.1"
 easycrop-fork = "0.1.2"
 jsoup = "1.16.1"
 junit = "4.13.2"
 kotlin = "1.9.10"
-kotlinxCollectionsImmutable = "0.3.5"
+kotlinxCollectionsImmutable = "0.3.6"
 kotlinxDatetime = "0.4.1"
 kotlinxSerializationJson = "1.6.0"
 ksp = "1.9.10-1.0.13"
@@ -44,20 +48,20 @@ leakcanary = "2.12"
 mockk = "1.13.8"
 modernstorage = "1.0.0-alpha06"
 partial = "1.1.0"
-okhttp = "4.11.0"
+okhttp = "4.12.0"
 retrofit = "2.9.0"
 retrofitKotlinxSerializationJson = "1.0.0"
 spotless = "6.22.0"
 telephoto = "0.6.2"
 tflite = "0.4.4"
-tflite-gpu = "2.13.0"
+tflite-gpu = "2.14.0"
 
 [libraries]
 about-libraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutLibraries" }
 accompanist-adaptive = { module = "com.google.accompanist:accompanist-adaptive", version.ref = "accompanist" }
 #accompanist-permission = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
-accompanist-placeholder-material = { module = "com.google.accompanist:accompanist-placeholder-material", version.ref = "accompanist" }
 android-tools-desugar = { module = "com.android.tools:desugar_jdk_libs", version.ref = "androidToolsDesugar" }
+androidx-benchmark-macro-junit4 = { module = "androidx.benchmark:benchmark-macro-junit4", version.ref = "androidxBenchmark" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "androidxCore" }
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "androidxActivity" }
 #androidx-compose-compiler = { module = "androidx.compose.compiler:compiler", version.ref = "androidxComposeCompiler" }
@@ -83,14 +87,18 @@ androidx-lifecycle-service = { module = "androidx.lifecycle:lifecycle-service", 
 androidx-lifecycle-viewmodel-compose = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "androidxLifecycle" }
 androidx-paging-compose = { module = "androidx.paging:paging-compose", version.ref = "androidxPaging" }
 androidx-paging-runtime = { module = "androidx.paging:paging-runtime", version.ref = "androidxPaging" }
+androidx-profileinstaller = { module = "androidx.profileinstaller:profileinstaller", version.ref = "androidxProfileinstaller" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidxRoom" }
 androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidxRoom" }
 androidx-room-paging = { module = "androidx.room:room-paging", version.ref = "androidxRoom" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidxRoom" }
+androidx-room-testing = { module = "androidx.room:room-testing", version.ref = "androidxRoom" }
 androidx-test-core = { module = "androidx.test:core", version.ref = "androidxTest" }
+androidx-test-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "androidxTestEspresso" }
 androidx-test-ext-junit = { module = "androidx.test.ext:junit", version.ref = "androidxTestExt" }
 androidx-test-runner = { module = "androidx.test:runner", version.ref = "androidxTestRunner" }
 androidx-test-services = { module = "androidx.test.services:test-services", version.ref = "androidxTestServices" }
+androidx-test-uiautomator = { module = "androidx.test.uiautomator:uiautomator", version.ref = "androidxTestUiautomator" }
 #androidx-window = { module = "androidx.window:window", version.ref = "androidXWindow" }
 androidx-work-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "androidxWork" }
 androidx-work-testing = { module = "androidx.work:work-testing", version.ref = "androidxWork" }
@@ -130,6 +138,8 @@ tflite-task-vision = { module = "org.tensorflow:tensorflow-lite-task-vision", ve
 [plugins]
 about-libraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutLibraries" }
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
+android-test = { id = "com.android.test", version.ref = "androidGradlePlugin" }
+baselineprofile = { id = "androidx.baselineprofile", version.ref = "androidxBenchmark"}
 #android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 hilt-gradle = { id = "com.google.dagger.hilt.android", version.ref = "daggerHilt" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

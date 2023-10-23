@@ -3,10 +3,11 @@ package com.ammar.wallflow.ui.wallpaperviewer
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.ammar.wallflow.data.repository.WallhavenRepository
 import com.ammar.wallflow.data.repository.local.LocalWallpapersRepository
+import com.ammar.wallflow.data.repository.reddit.RedditRepository
 import com.ammar.wallflow.data.repository.utils.Resource
 import com.ammar.wallflow.data.repository.utils.successOr
+import com.ammar.wallflow.data.repository.wallhaven.WallhavenRepository
 import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
@@ -19,6 +20,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.File
 import javax.inject.Inject
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.collectLatest
@@ -32,7 +34,8 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class WallpaperViewerViewModel @Inject constructor(
     private val application: Application,
-    private val wallHavenRepository: WallhavenRepository,
+    private val wallhavenRepository: WallhavenRepository,
+    private val redditRepository: RedditRepository,
     private val localWallpapersRepository: LocalWallpapersRepository,
     private val downloadManager: DownloadManager,
 ) : AndroidViewModel(
@@ -47,7 +50,8 @@ class WallpaperViewerViewModel @Inject constructor(
             flowOf(Resource.Success(null))
         } else {
             when (it.source) {
-                Source.WALLHAVEN -> wallHavenRepository.wallpaper(it.wallpaperId)
+                Source.WALLHAVEN -> wallhavenRepository.wallpaper(it.wallpaperId)
+                Source.REDDIT -> redditRepository.wallpaper(it.wallpaperId)
                 Source.LOCAL -> localWallpapersRepository.wallpaper(application, it.wallpaperId)
             }
         }
@@ -99,14 +103,26 @@ class WallpaperViewerViewModel @Inject constructor(
         it.copy(showInfo = partial(show))
     }
 
-    fun download() = viewModelScope.launch {
-        uiState.value.wallpaper?.run {
-            if (this !is WallhavenWallpaper) {
-                return@run
-            }
-            val workName = downloadManager.requestDownload(application, this)
-            downloadManager.getProgress(application, workName).collectLatest { state ->
-                localUiState.update { it.copy(downloadStatus = partial(state)) }
+    fun download() {
+        var job: Job? = null
+        job = viewModelScope.launch {
+            uiState.value.wallpaper?.run {
+                if (this !is WallhavenWallpaper) {
+                    return@run
+                }
+                val workName = downloadManager.requestDownload(
+                    context = application,
+                    wallpaper = this,
+                )
+                downloadManager.getProgress(
+                    context = application,
+                    workName = workName,
+                ).collectLatest { state ->
+                    localUiState.update { it.copy(downloadStatus = partial(state)) }
+                    if (state.isSuccessOrFail()) {
+                        job?.cancel()
+                    }
+                }
             }
         }
     }
@@ -116,14 +132,18 @@ class WallpaperViewerViewModel @Inject constructor(
             if (this !is WallhavenWallpaper) {
                 return@run
             }
-            viewModelScope.launch {
+            var job: Job? = null
+            job = viewModelScope.launch {
                 downloadManager.downloadWallpaperAsync(
                     context = application,
                     wallpaper = this@run,
                     onLoadingChange = { loading ->
                         localUiState.update { it.copy(loading = partial(loading)) }
                     },
-                    onResult = onResult,
+                    onResult = {
+                        onResult(it)
+                        job?.cancel()
+                    },
                 )
             }
         }

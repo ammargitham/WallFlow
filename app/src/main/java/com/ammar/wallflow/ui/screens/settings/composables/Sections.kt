@@ -70,6 +70,7 @@ import kotlinx.datetime.DateTimePeriod
 fun EditSavedSearchBottomSheetHeader(
     name: String = "",
     saveEnabled: Boolean = true,
+    nameHasError: Boolean = false,
     onSaveClick: () -> Unit = {},
     onNameChange: (String) -> Unit = {},
 ) {
@@ -108,8 +109,24 @@ fun EditSavedSearchBottomSheetHeader(
                 end = 22.dp,
             ),
         label = { Text(text = stringResource(R.string.name)) },
+        supportingText = if (nameHasError) {
+            {
+                Text(
+                    text = stringResource(
+                        if (name.isBlank()) {
+                            R.string.name_cannot_be_empty
+                        } else {
+                            R.string.name_already_used
+                        },
+                    ),
+                )
+            }
+        } else {
+            null
+        },
         value = name,
         singleLine = true,
+        isError = nameHasError,
         onValueChange = onNameChange,
     )
 }

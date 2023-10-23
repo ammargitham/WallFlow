@@ -6,7 +6,8 @@ import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.staticCompositionLocalOf
-import com.ammar.wallflow.model.Search
+import com.ammar.wallflow.model.OnlineSource
+import com.ammar.wallflow.model.search.Search
 
 abstract class MainSearchBarController {
     abstract val state: State<MainSearchBarState>
@@ -15,8 +16,9 @@ abstract class MainSearchBarController {
 
 data class MainSearchBarState(
     val visible: Boolean = true,
-    val search: Search = MainSearchBar.Defaults.search,
+    val search: Search = MainSearchBar.Defaults.wallhavenSearch,
     val showQuery: Boolean = true,
+    val source: OnlineSource = OnlineSource.WALLHAVEN,
     val overflowIcon: @Composable (() -> Unit)? = null,
     val onActiveChange: (active: Boolean) -> Unit = {},
 )

@@ -1,15 +1,17 @@
 package com.ammar.wallflow.data.repository
 
 import com.ammar.wallflow.IoDispatcher
-import com.ammar.wallflow.data.db.dao.SavedSearchDao
-import com.ammar.wallflow.data.db.entity.SavedSearchEntity
-import com.ammar.wallflow.model.SavedSearch
-import com.ammar.wallflow.model.toEntity
+import com.ammar.wallflow.data.db.dao.search.SavedSearchDao
+import com.ammar.wallflow.data.db.entity.search.SavedSearchEntity
+import com.ammar.wallflow.json
+import com.ammar.wallflow.model.search.SavedSearch
+import com.ammar.wallflow.model.search.toEntity
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
+import kotlinx.serialization.encodeToString
 
 @Singleton
 class SavedSearchRepository @Inject constructor(
@@ -50,10 +52,19 @@ class SavedSearchRepository @Inject constructor(
     ) = existing?.copy(
         name = savedSearch.name,
         query = savedSearch.search.query,
-        filters = savedSearch.search.filters.toQueryString(),
+        filters = json.encodeToString(savedSearch.search.filters),
     ) ?: savedSearch.toEntity(0)
 
     suspend fun delete(savedSearch: SavedSearch) = withContext(ioDispatcher) {
         savedSearchDao.deleteByName(savedSearch.name)
     }
+
+    suspend fun exists(id: Long) = savedSearchDao.exists(id)
+
+    suspend fun exists(name: String) = savedSearchDao.exists(name)
+
+    suspend fun existsExcludingId(
+        id: Long,
+        name: String,
+    ) = savedSearchDao.existsExcludingId(id, name)
 }

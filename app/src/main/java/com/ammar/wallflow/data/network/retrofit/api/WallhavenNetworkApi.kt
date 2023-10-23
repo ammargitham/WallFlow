@@ -1,7 +1,7 @@
 package com.ammar.wallflow.data.network.retrofit.api
 
-import com.ammar.wallflow.data.network.model.NetworkResponse
-import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpaper
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenWallpaperResponse
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenWallpapersResponse
 import org.jsoup.nodes.Document
 import retrofit2.http.GET
 import retrofit2.http.Path
@@ -22,12 +22,12 @@ interface WallhavenNetworkApi {
         @Query("ratios") ratios: String? = null,
         @Query("page") page: Int? = null,
         @Query("seed") seed: String? = null,
-    ): NetworkResponse<List<NetworkWallhavenWallpaper>>
+    ): NetworkWallhavenWallpapersResponse
 
     @GET("w/{id}")
     suspend fun wallpaper(
         @Path("id") id: String,
-    ): NetworkResponse<NetworkWallhavenWallpaper>
+    ): NetworkWallhavenWallpaperResponse
 
     @GET("https://wallhaven.cc/tags/popular")
     suspend fun popularTags(): Document?

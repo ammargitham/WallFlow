@@ -1,6 +1,7 @@
 package com.ammar.wallflow.ui.common
 
 import android.util.Log
+import androidx.activity.compose.ReportDrawnWhen
 import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.updateTransition
@@ -22,7 +23,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -35,6 +38,7 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -54,8 +58,8 @@ import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import com.ammar.wallflow.model.wallhaven.wallhavenWallpaper1
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import com.google.accompanist.placeholder.PlaceholderHighlight
-import com.google.accompanist.placeholder.material.fade
-import com.google.accompanist.placeholder.material.placeholder
+import com.google.accompanist.placeholder.material3.fade
+import com.google.accompanist.placeholder.material3.placeholder
 import kotlin.math.roundToInt
 
 private val cardHeight = 300.dp
@@ -107,6 +111,7 @@ fun WallpaperCard(
             null,
         )?.toBitmap()?.asImageBitmap()
     }
+    var loaded by remember { mutableStateOf(false) }
 
     Box(
         modifier = modifier
@@ -120,7 +125,8 @@ fun WallpaperCard(
                 }
             }
             .clip(if (roundedCorners) CardDefaults.shape else RectangleShape)
-            .clickable(onClick = onClick),
+            .clickable(onClick = onClick)
+            .testTag("wallpaper"),
     ) {
         AsyncImage(
             modifier = Modifier
@@ -179,6 +185,7 @@ fun WallpaperCard(
                     it.result.throwable,
                 )
             },
+            onSuccess = { loaded = true },
         )
         FilledIconButton(
             modifier = Modifier
@@ -206,6 +213,7 @@ fun WallpaperCard(
             )
         }
     }
+    ReportDrawnWhen { loaded }
 }
 
 @Composable

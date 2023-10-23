@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -19,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -29,10 +31,12 @@ import com.ammar.wallflow.data.repository.GlobalErrorsRepository
 import com.ammar.wallflow.data.repository.GlobalErrorsRepository.GlobalError
 import com.ammar.wallflow.extensions.toDp
 import com.ammar.wallflow.extensions.toPx
+import com.ammar.wallflow.model.OnlineSource
 import com.ammar.wallflow.model.Purity
-import com.ammar.wallflow.model.Search
-import com.ammar.wallflow.model.SearchQuery
 import com.ammar.wallflow.model.Wallpaper
+import com.ammar.wallflow.model.search.Filters
+import com.ammar.wallflow.model.search.Search
+import com.ammar.wallflow.model.search.WallhavenSearch
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.model.wallhaven.wallhavenWallpaper1
 import com.ammar.wallflow.model.wallhaven.wallhavenWallpaper2
@@ -44,8 +48,10 @@ import com.ammar.wallflow.ui.common.mainsearch.MainSearchBar
 import com.ammar.wallflow.ui.common.topWindowInsets
 import com.ammar.wallflow.ui.screens.NavGraph
 import com.ammar.wallflow.ui.screens.home.HomeScreenContent
+import com.ammar.wallflow.ui.screens.home.composables.header
+import com.ammar.wallflow.ui.screens.home.composables.wallhavenHeader
 import com.ammar.wallflow.ui.theme.WallFlowTheme
-import kotlin.math.roundToInt
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.datetime.Clock
@@ -60,10 +66,10 @@ fun MainActivityContent(
     globalErrors: List<GlobalError> = emptyList(),
     bottomBarVisible: Boolean = true,
     bottomBarSize: IntSize = IntSize.Zero,
-    searchBarOffsetHeightPx: Float = 0f,
+    searchBarOffset: Density.() -> IntOffset = { IntOffset.Zero },
     searchBarVisible: Boolean = true,
     searchBarActive: Boolean = false,
-    searchBarSearch: Search = Search(),
+    searchBarSearch: Search = WallhavenSearch(),
     searchBarQuery: String = "",
     searchBarSuggestions: List<Suggestion<Search>> = emptyList(),
     showSearchBarFilters: Boolean = false,
@@ -84,7 +90,7 @@ fun MainActivityContent(
     onSearchBarSuggestionInsert: (suggestion: Suggestion<Search>) -> Unit = {},
     onSearchBarSuggestionDeleteRequest: (suggestion: Suggestion<Search>) -> Unit = {},
     onSearchBarShowFiltersChange: (show: Boolean) -> Unit = {},
-    onSearchBarFiltersChange: (searchQuery: SearchQuery) -> Unit = {},
+    onSearchBarFiltersChange: (searchQuery: Filters) -> Unit = {},
     onDeleteSearchBarSuggestionConfirmClick: () -> Unit = {},
     onDeleteSearchBarSuggestionDismissRequest: () -> Unit = {},
     onSearchBarSaveAsClick: () -> Unit = {},
@@ -111,9 +117,7 @@ fun MainActivityContent(
                 content(it)
             }
             MainSearchBar(
-                modifier = Modifier
-                    .windowInsetsPadding(topWindowInsets)
-                    .offset { IntOffset(x = 0, y = searchBarOffsetHeightPx.roundToInt()) },
+                modifier = Modifier.offset(searchBarOffset),
                 useDocked = useDockedSearchBar,
                 visible = searchBarVisible,
                 active = searchBarActive,
@@ -295,11 +299,22 @@ private fun PreviewContent(
                 val nestedScrollConnection = remember {
                     object : NestedScrollConnection {}
                 }
+                val gridState = rememberLazyStaggeredGridState()
                 HomeScreenContent(
                     modifier = Modifier.windowInsetsPadding(topWindowInsets),
-                    wallhavenTags = previewWallhavenTags,
+                    gridState = gridState,
+                    header = {
+                        header(
+                            sources = persistentListOf(OnlineSource.WALLHAVEN),
+                            sourceHeader = {
+                                wallhavenHeader(
+                                    wallhavenTags = previewWallhavenTags,
+                                )
+                            },
+                        )
+                    },
                     wallpapers = pagingItems,
-                    nestedScrollConnection = nestedScrollConnection,
+                    nestedScrollConnectionGetter = { nestedScrollConnection },
                     contentPadding = PaddingValues(
                         start = 8.dp,
                         end = 8.dp,

@@ -10,12 +10,21 @@ import androidx.datastore.preferences.preferencesDataStore
 
 private const val APP_PREFERENCES_NAME = "app_preferences"
 
-val Context.dataStore by preferencesDataStore(name = APP_PREFERENCES_NAME)
+val Context.dataStore by preferencesDataStore(
+    name = APP_PREFERENCES_NAME,
+    produceMigrations = { _ -> preferencesMigrations() },
+)
+
+fun preferencesMigrations() = listOf(
+    migrateAppPrefs1To2(),
+)
 
 object PreferencesKeys {
+    val VERSION = intPreferencesKey("version")
     val WALLHAVEN_API_KEY = stringPreferencesKey("wallhaven_api_key")
-    val HOME_SEARCH_QUERY = stringPreferencesKey("home_search_query")
-    val HOME_FILTERS = stringPreferencesKey("home_filters")
+    val HOME_WALLHAVEN_SEARCH = stringPreferencesKey("home_wallhaven_search")
+    val HOME_REDDIT_SEARCH = stringPreferencesKey("home_reddit_search")
+    val HOME_SOURCES = stringPreferencesKey("home_sources")
     val BLUR_SKETCHY = booleanPreferencesKey("blur_sketchy")
     val BLUR_NSFW = booleanPreferencesKey("blur_nsfw")
     val ENABLE_OBJECT_DETECTION = booleanPreferencesKey("enable_object_detection")
@@ -31,7 +40,9 @@ object PreferencesKeys {
     val AUTO_WALLPAPER_LOCAL_ENABLED = booleanPreferencesKey(
         "auto_wallpaper_local_enabled",
     )
-    val AUTO_WALLPAPER_SAVED_SEARCH_ID = longPreferencesKey("auto_wallpaper_saved_search_id")
+    val AUTO_WALLPAPER_SAVED_SEARCH_ID = stringSetPreferencesKey(
+        "auto_wallpaper_saved_search_id",
+    )
     val AUTO_WALLPAPER_USE_OBJECT_DETECTION = booleanPreferencesKey(
         "auto_wallpaper_use_object_detection",
     )

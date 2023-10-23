@@ -6,13 +6,13 @@ import androidx.core.graphics.toColorInt
 import androidx.room.TypeConverter
 import com.ammar.wallflow.extensions.toHexString
 import com.ammar.wallflow.extensions.trimAll
-import com.ammar.wallflow.model.Category
+import com.ammar.wallflow.json
 import com.ammar.wallflow.model.Order
 import com.ammar.wallflow.model.Purity
-import com.ammar.wallflow.model.Sorting
-import com.ammar.wallflow.model.TopRange
+import com.ammar.wallflow.model.search.WallhavenCategory
+import com.ammar.wallflow.model.search.WallhavenSorting
+import com.ammar.wallflow.model.search.WallhavenTopRange
 import kotlinx.datetime.Instant
-import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonArray
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.jsonArray
@@ -26,8 +26,8 @@ object Converters {
     fun instantToTimestamp(instant: Instant) = instant.toEpochMilliseconds()
 
     @TypeConverter
-    fun fromJsonToStringList(value: String) =
-        Json.parseToJsonElement(value).jsonArray.map { it.jsonPrimitive.content }
+    fun fromJsonToStringList(value: String) = json.parseToJsonElement(value)
+        .jsonArray.map { it.jsonPrimitive.content }
 
     @TypeConverter
     fun stringListToJson(strings: List<String>) =
@@ -40,14 +40,14 @@ object Converters {
     fun purityToString(purity: Purity) = purity.purityName
 
     @TypeConverter
-    fun fromCategoriesStr(value: String): Set<Category> = value
+    fun fromCategoriesStr(value: String): Set<WallhavenCategory> = value
         .split(",")
         .filter { it.isNotBlank() }
         .sorted()
-        .mapTo(HashSet()) { Category.fromValue(it) }
+        .mapTo(HashSet()) { WallhavenCategory.fromValue(it) }
 
     @TypeConverter
-    fun categoriesToString(categories: Set<Category>) = categories
+    fun categoriesToString(categories: Set<WallhavenCategory>) = categories
         .map { it.value }
         .sorted()
         .joinToString(",")
@@ -66,10 +66,10 @@ object Converters {
         .joinToString(",")
 
     @TypeConverter
-    fun fromSortingStr(value: String) = Sorting.fromValue(value)
+    fun fromSortingStr(value: String) = WallhavenSorting.fromValue(value)
 
     @TypeConverter
-    fun sortingToString(sorting: Sorting) = sorting.value
+    fun sortingToString(sorting: WallhavenSorting) = sorting.value
 
     @TypeConverter
     fun fromOrderStr(value: String) = Order.fromValue(value)
@@ -78,10 +78,10 @@ object Converters {
     fun orderToString(order: Order) = order.value
 
     @TypeConverter
-    fun fromTopRangeStr(value: String) = TopRange.fromValue(value)
+    fun fromTopRangeStr(value: String) = WallhavenTopRange.fromValue(value)
 
     @TypeConverter
-    fun topRangeToString(topRange: TopRange) = topRange.value
+    fun topRangeToString(topRange: WallhavenTopRange) = topRange.value
 
     @TypeConverter
     fun fromIntSizeStr(value: String): IntSize {

@@ -1,17 +1,17 @@
 package com.ammar.wallflow.data.network
 
-import com.ammar.wallflow.data.network.model.NetworkResponse
-import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpaper
-import com.ammar.wallflow.model.SearchQuery
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenWallpaperResponse
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenWallpapersResponse
+import com.ammar.wallflow.model.search.WallhavenSearch
 import org.jsoup.nodes.Document
 
-interface WallhavenNetworkDataSource {
+interface WallhavenNetworkDataSource : OnlineSourceNetworkDataSource {
     suspend fun search(
-        searchQuery: SearchQuery,
-        page: Int? = null,
-    ): NetworkResponse<List<NetworkWallhavenWallpaper>>
+        search: WallhavenSearch,
+        page: Int?,
+    ): NetworkWallhavenWallpapersResponse
 
-    suspend fun wallpaper(wallpaperWallhavenId: String): NetworkResponse<NetworkWallhavenWallpaper>
+    suspend fun wallpaper(wallpaperWallhavenId: String): NetworkWallhavenWallpaperResponse
 
     suspend fun popularTags(): Document?
 }

@@ -12,11 +12,14 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.Saver
 import androidx.work.Constraints
 import androidx.work.NetworkType
-import com.ammar.wallflow.model.Search
-import com.ammar.wallflow.model.SearchQuery
-import com.ammar.wallflow.model.Sorting
-import com.ammar.wallflow.model.TopRange
+import com.ammar.wallflow.json
+import com.ammar.wallflow.model.OnlineSource
 import com.ammar.wallflow.model.WallpaperTarget
+import com.ammar.wallflow.model.search.RedditSearch
+import com.ammar.wallflow.model.search.WallhavenFilters
+import com.ammar.wallflow.model.search.WallhavenSearch
+import com.ammar.wallflow.model.search.WallhavenSorting
+import com.ammar.wallflow.model.search.WallhavenTopRange
 import com.ammar.wallflow.model.serializers.ConstraintsSerializer
 import com.ammar.wallflow.model.serializers.DateTimePeriodSerializer
 import com.ammar.wallflow.model.serializers.UUIDSerializer
@@ -26,17 +29,19 @@ import kotlinx.datetime.DateTimePeriod
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
 import kotlinx.serialization.encodeToString
-import kotlinx.serialization.json.Json
 
 @Serializable
 data class AppPreferences(
+    val version: Int? = CURRENT_VERSION,
     val wallhavenApiKey: String = "",
-    val homeSearch: Search = Search(
-        filters = SearchQuery(
-            sorting = Sorting.TOPLIST,
-            topRange = TopRange.ONE_DAY,
+    val homeWallhavenSearch: WallhavenSearch = WallhavenSearch(
+        filters = WallhavenFilters(
+            sorting = WallhavenSorting.TOPLIST,
+            topRange = WallhavenTopRange.ONE_DAY,
         ),
     ),
+    val homeRedditSearch: RedditSearch? = null,
+    val homeSources: Map<OnlineSource, Boolean> = mapOf(OnlineSource.WALLHAVEN to true),
     val blurSketchy: Boolean = false,
     val blurNsfw: Boolean = false,
     val objectDetectionPreferences: ObjectDetectionPreferences = ObjectDetectionPreferences(),
@@ -44,7 +49,11 @@ data class AppPreferences(
     val lookAndFeelPreferences: LookAndFeelPreferences = LookAndFeelPreferences(),
     val changeWallpaperTileAdded: Boolean = false,
     val localWallpapersPreferences: LocalWallpapersPreferences = LocalWallpapersPreferences(),
-)
+) {
+    companion object {
+        const val CURRENT_VERSION = 2
+    }
+}
 
 enum class ObjectDetectionDelegate {
     NONE,
@@ -70,7 +79,7 @@ data class AutoWallpaperPreferences(
     val savedSearchEnabled: Boolean = false,
     val favoritesEnabled: Boolean = false,
     val localEnabled: Boolean = false,
-    val savedSearchId: Long = 0,
+    val savedSearchIds: Set<Long> = emptySet(),
     val useObjectDetection: Boolean = true,
     val frequency: DateTimePeriod = defaultAutoWallpaperFreq,
     val constraints: Constraints = defaultAutoWallpaperConstraints,
@@ -80,7 +89,11 @@ data class AutoWallpaperPreferences(
     val markFavorite: Boolean = false,
     val download: Boolean = false,
 ) {
-    val anySourceEnabled = (savedSearchEnabled && savedSearchId > 0) ||
+    val anySourceEnabled = (
+        savedSearchEnabled &&
+            savedSearchIds.isNotEmpty() &&
+            savedSearchIds.all { it > 0 }
+        ) ||
         favoritesEnabled ||
         localEnabled
 }
@@ -88,10 +101,10 @@ data class AutoWallpaperPreferences(
 val MutableStateAutoWallpaperPreferencesSaver =
     Saver<MutableState<AutoWallpaperPreferences>, String>(
         save = {
-            Json.encodeToString<AutoWallpaperPreferences>(it.value)
+            json.encodeToString<AutoWallpaperPreferences>(it.value)
         },
         restore = {
-            mutableStateOf(Json.decodeFromString<AutoWallpaperPreferences>(it))
+            mutableStateOf(json.decodeFromString<AutoWallpaperPreferences>(it))
         },
     )
 

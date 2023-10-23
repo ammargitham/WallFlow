@@ -7,24 +7,28 @@ import androidx.paging.PagingSource
 import com.ammar.wallflow.data.db.dao.AutoWallpaperHistoryDao
 import com.ammar.wallflow.data.db.dao.FavoriteDao
 import com.ammar.wallflow.data.db.dao.ObjectDetectionModelDao
-import com.ammar.wallflow.data.db.dao.SavedSearchDao
-import com.ammar.wallflow.data.db.dao.WallpapersDao
+import com.ammar.wallflow.data.db.dao.search.SavedSearchDao
+import com.ammar.wallflow.data.db.dao.wallpaper.RedditWallpapersDao
+import com.ammar.wallflow.data.db.dao.wallpaper.WallhavenWallpapersDao
 import com.ammar.wallflow.data.db.entity.AutoWallpaperHistoryEntity
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.ObjectDetectionModelEntity
-import com.ammar.wallflow.data.db.entity.SavedSearchEntity
-import com.ammar.wallflow.data.db.entity.WallpaperEntity
-import com.ammar.wallflow.data.db.entity.WallpaperTagsEntity
-import com.ammar.wallflow.data.db.entity.WallpaperWithUploaderAndTags
+import com.ammar.wallflow.data.db.entity.search.SavedSearchEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperTagsEntity
+import com.ammar.wallflow.data.db.entity.wallpaper.RedditWallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallpaper.WallhavenWallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallpaper.WallpaperWithUploaderAndTags
+import com.ammar.wallflow.data.network.RedditNetworkDataSource
 import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
-import com.ammar.wallflow.data.network.model.NetworkResponse
-import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpaper
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenWallpaperResponse
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenWallpapersResponse
 import com.ammar.wallflow.data.repository.local.LocalWallpapersRepository
 import com.ammar.wallflow.data.repository.utils.Resource
-import com.ammar.wallflow.model.SearchQuery
 import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.local.LocalWallpaper
+import com.ammar.wallflow.model.search.RedditSearch
+import com.ammar.wallflow.model.search.WallhavenSearch
 import com.ammar.wallflow.ui.screens.local.LocalSort
 import kotlinx.coroutines.flow.Flow
 import okhttp3.Call
@@ -41,9 +45,20 @@ internal open class FakeSavedSearchDao : SavedSearchDao {
         throw RuntimeException()
     }
 
-    override suspend fun getAllByNames(names: Collection<String>): List<SavedSearchEntity> {
+    override suspend fun getAllByNames(
+        names: Collection<String>,
+    ): List<SavedSearchEntity> {
         throw RuntimeException()
     }
+
+    override suspend fun exists(id: Long) = throw RuntimeException()
+
+    override suspend fun exists(name: String) = throw RuntimeException()
+
+    override suspend fun existsExcludingId(
+        id: Long,
+        name: String,
+    ): Boolean = throw RuntimeException()
 
     override suspend fun getById(id: Long): SavedSearchEntity? {
         throw RuntimeException()
@@ -53,7 +68,7 @@ internal open class FakeSavedSearchDao : SavedSearchDao {
         throw RuntimeException()
     }
 
-    override suspend fun upsert(savedSearchDao: SavedSearchEntity) {
+    override suspend fun upsert(savedSearch: SavedSearchEntity) {
         throw RuntimeException()
     }
 
@@ -125,21 +140,25 @@ internal open class FakeObjectDetectionModelDao : ObjectDetectionModelDao {
 
 internal open class FakeWallhavenNetworkDataSource : WallhavenNetworkDataSource {
     override suspend fun search(
-        searchQuery: SearchQuery,
+        search: WallhavenSearch,
         page: Int?,
-    ): NetworkResponse<List<NetworkWallhavenWallpaper>> {
+    ): NetworkWallhavenWallpapersResponse {
         throw RuntimeException()
     }
 
     override suspend fun wallpaper(
         wallpaperWallhavenId: String,
-    ): NetworkResponse<NetworkWallhavenWallpaper> {
+    ): NetworkWallhavenWallpaperResponse {
         throw RuntimeException()
     }
 
     override suspend fun popularTags(): Document? {
         throw RuntimeException()
     }
+}
+
+internal open class FakeRedditNetworkDataSource : RedditNetworkDataSource {
+    override suspend fun search(search: RedditSearch, after: String?) = throw RuntimeException()
 }
 
 internal open class FakeFavoriteDao : FavoriteDao {
@@ -183,12 +202,12 @@ internal open class FakeFavoriteDao : FavoriteDao {
     }
 }
 
-internal open class FakeWallpapersDao : WallpapersDao {
-    override suspend fun getAll(): List<WallpaperEntity> {
+internal open class FakeWallhavenWallpapersDao : WallhavenWallpapersDao {
+    override suspend fun getAll(): List<WallhavenWallpaperEntity> {
         throw RuntimeException()
     }
 
-    override suspend fun getByWallhavenId(wallhavenId: String): WallpaperEntity? {
+    override suspend fun getByWallhavenId(wallhavenId: String): WallhavenWallpaperEntity? {
         throw RuntimeException()
     }
 
@@ -208,11 +227,13 @@ internal open class FakeWallpapersDao : WallpapersDao {
         throw RuntimeException()
     }
 
-    override suspend fun getByWallhavenIds(wallhavenIds: List<String>): List<WallpaperEntity> {
+    override suspend fun getByWallhavenIds(
+        wallhavenIds: List<String>,
+    ): List<WallhavenWallpaperEntity> {
         throw RuntimeException()
     }
 
-    override fun pagingSource(queryString: String): PagingSource<Int, WallpaperEntity> {
+    override fun pagingSource(queryString: String): PagingSource<Int, WallhavenWallpaperEntity> {
         throw RuntimeException()
     }
 
@@ -224,33 +245,35 @@ internal open class FakeWallpapersDao : WallpapersDao {
         throw RuntimeException()
     }
 
-    override suspend fun insert(vararg wallpaper: WallpaperEntity): List<Long> {
+    override suspend fun insert(vararg wallpaper: WallhavenWallpaperEntity): List<Long> {
         throw RuntimeException()
     }
 
-    override suspend fun insert(wallpapers: Collection<WallpaperEntity>): List<Long> {
+    override suspend fun insert(wallpapers: Collection<WallhavenWallpaperEntity>): List<Long> {
         throw RuntimeException()
     }
 
-    override suspend fun update(vararg wallpaper: WallpaperEntity) {
+    override suspend fun update(vararg wallpaper: WallhavenWallpaperEntity) {
         throw RuntimeException()
     }
 
-    override suspend fun upsert(vararg wallpaper: WallpaperEntity): List<Long> {
+    override suspend fun upsert(vararg wallpaper: WallhavenWallpaperEntity): List<Long> {
         throw RuntimeException()
     }
 
-    override suspend fun upsert(wallpapers: Collection<WallpaperEntity>) {
+    override suspend fun upsert(wallpapers: Collection<WallhavenWallpaperEntity>) {
         throw RuntimeException()
     }
 
-    override suspend fun getAllUniqueToSearchQueryId(searchQueryId: Long): List<WallpaperEntity> {
+    override suspend fun getAllUniqueToSearchQueryId(
+        searchQueryId: Long,
+    ): List<WallhavenWallpaperEntity> {
         throw RuntimeException()
     }
 
     override suspend fun getAllByWallhavenIds(
         wallhavenIds: Collection<String>,
-    ): List<WallpaperEntity> {
+    ): List<WallhavenWallpaperEntity> {
         throw RuntimeException()
     }
 
@@ -262,12 +285,14 @@ internal open class FakeWallpapersDao : WallpapersDao {
         throw RuntimeException()
     }
 
-    override suspend fun insertWallpaperTagMappings(vararg wallpaperTag: WallpaperTagsEntity) {
+    override suspend fun insertWallpaperTagMappings(
+        vararg wallpaperTag: WallhavenWallpaperTagsEntity,
+    ) {
         throw RuntimeException()
     }
 
     override suspend fun insertWallpaperTagMappings(
-        wallpaperTags: Collection<WallpaperTagsEntity>,
+        wallpaperTags: Collection<WallhavenWallpaperTagsEntity>,
     ) {
         throw RuntimeException()
     }
@@ -275,6 +300,36 @@ internal open class FakeWallpapersDao : WallpapersDao {
     override suspend fun deleteWallpaperTagMappings(wallpaperId: Long) {
         throw RuntimeException()
     }
+}
+
+internal open class FakeRedditWallpapersDao : RedditWallpapersDao {
+    override suspend fun getById(id: Long) = throw RuntimeException()
+
+    override suspend fun getAll() = throw RuntimeException()
+
+    override suspend fun getAllIds() = throw RuntimeException()
+
+    override suspend fun getByPostIds(postIds: Collection<String>) = throw RuntimeException()
+
+    override suspend fun getByRedditId(redditId: String) = throw RuntimeException()
+
+    override suspend fun getByRedditIds(redditIds: List<String>) = throw RuntimeException()
+
+    override suspend fun getAllRedditIds() = throw RuntimeException()
+
+    override suspend fun getAllUniqueToSearchQueryId(searchQueryId: Long) = throw RuntimeException()
+
+    override suspend fun count() = throw RuntimeException()
+
+    override fun pagingSource(queryString: String) = throw RuntimeException()
+
+    override suspend fun insert(
+        wallpapers: Collection<RedditWallpaperEntity>,
+    ) = throw RuntimeException()
+
+    override suspend fun deleteAllUniqueToSearchQueryId(
+        searchQueryId: Long,
+    ) = throw RuntimeException()
 }
 
 internal val fakeOkHttpClient = object : OkHttpClient() {

@@ -28,14 +28,14 @@ fun ProgressIndicator(
     } else {
         if (circular) {
             CircularProgressIndicator(
+                progress = { progress },
                 modifier = modifier,
-                progress = progress,
                 strokeCap = strokeCap,
             )
         } else {
             LinearProgressIndicator(
+                progress = { progress },
                 modifier = modifier,
-                progress = progress,
                 strokeCap = strokeCap,
             )
         }

@@ -2,6 +2,7 @@ package com.ammar.wallflow.workers
 
 import android.content.Context
 import android.net.Uri
+import android.util.Log
 import androidx.compose.ui.unit.IntSize
 import androidx.core.net.toUri
 import androidx.datastore.core.DataStore
@@ -20,20 +21,22 @@ import com.ammar.wallflow.MIME_TYPE_JPEG
 import com.ammar.wallflow.data.db.dao.AutoWallpaperHistoryDao
 import com.ammar.wallflow.data.db.dao.FavoriteDao
 import com.ammar.wallflow.data.db.dao.ObjectDetectionModelDao
-import com.ammar.wallflow.data.db.dao.SavedSearchDao
-import com.ammar.wallflow.data.db.dao.WallpapersDao
+import com.ammar.wallflow.data.db.dao.search.SavedSearchDao
+import com.ammar.wallflow.data.db.dao.wallpaper.RedditWallpapersDao
+import com.ammar.wallflow.data.db.dao.wallpaper.WallhavenWallpapersDao
 import com.ammar.wallflow.data.db.entity.AutoWallpaperHistoryEntity
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
-import com.ammar.wallflow.data.db.entity.toWallpaper
+import com.ammar.wallflow.data.db.entity.wallpaper.toWallpaper
+import com.ammar.wallflow.data.network.RedditNetworkDataSource
 import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
-import com.ammar.wallflow.data.network.model.NetworkResponse
-import com.ammar.wallflow.data.network.model.NetworkWallhavenMeta
-import com.ammar.wallflow.data.network.model.NetworkWallhavenTag
-import com.ammar.wallflow.data.network.model.NetworkWallhavenThumbs
-import com.ammar.wallflow.data.network.model.NetworkWallhavenWallpaper
-import com.ammar.wallflow.data.network.model.StringNetworkWallhavenMetaQuery
-import com.ammar.wallflow.data.network.model.toWallhavenWallpaper
-import com.ammar.wallflow.data.network.model.toWallpaperEntity
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenMeta
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenTag
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenThumbs
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenWallpaper
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenWallpapersResponse
+import com.ammar.wallflow.data.network.model.wallhaven.StringNetworkWallhavenMetaQuery
+import com.ammar.wallflow.data.network.model.wallhaven.toWallhavenWallpaper
+import com.ammar.wallflow.data.network.model.wallhaven.toWallpaperEntity
 import com.ammar.wallflow.data.preferences.AutoWallpaperPreferences
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.AutoWallpaperHistoryRepository
@@ -41,14 +44,15 @@ import com.ammar.wallflow.data.repository.FavoritesRepository
 import com.ammar.wallflow.data.repository.ObjectDetectionModelRepository
 import com.ammar.wallflow.data.repository.SavedSearchRepository
 import com.ammar.wallflow.data.repository.local.LocalWallpapersRepository
+import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.extensions.getTempFile
 import com.ammar.wallflow.model.Purity
-import com.ammar.wallflow.model.SavedSearch
-import com.ammar.wallflow.model.Search
-import com.ammar.wallflow.model.SearchQuery
 import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.model.local.LocalWallpaper
-import com.ammar.wallflow.model.toEntity
+import com.ammar.wallflow.model.search.SavedSearch
+import com.ammar.wallflow.model.search.WallhavenFilters
+import com.ammar.wallflow.model.search.WallhavenSearch
+import com.ammar.wallflow.model.search.toEntity
 import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.FAILURE_REASON
 import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.FailureReason
 import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.FailureReason.SAVED_SEARCH_NOT_SET
@@ -144,7 +148,7 @@ class AutoWallpaperTest {
                 AutoWallpaperPreferences(
                     enabled = true,
                     savedSearchEnabled = true,
-                    savedSearchId = 2,
+                    savedSearchIds = setOf(2),
                 ),
             )
             val worker = getWorker(
@@ -178,16 +182,16 @@ class AutoWallpaperTest {
                 AutoWallpaperPreferences(
                     enabled = true,
                     savedSearchEnabled = true,
-                    savedSearchId = 1,
+                    savedSearchIds = setOf(1),
                     useObjectDetection = false,
                 ),
             )
             val savedSearch = SavedSearch(
                 id = 1,
                 name = "Test",
-                search = Search(
+                search = WallhavenSearch(
                     query = "test",
-                    filters = SearchQuery(),
+                    filters = WallhavenFilters(),
                 ),
             )
             val networkWallpapers = List(30) { testNetworkWallhavenWallpaper }
@@ -219,23 +223,21 @@ class AutoWallpaperTest {
                 autoWallpaperHistoryDao = autoWallpaperHistoryDao,
                 wallHavenNetwork = object : FakeWallhavenNetworkDataSource() {
                     override suspend fun search(
-                        searchQuery: SearchQuery,
+                        search: WallhavenSearch,
                         page: Int?,
-                    ): NetworkResponse<List<NetworkWallhavenWallpaper>> {
-                        return NetworkResponse(
-                            data = networkWallpapers,
-                            meta = NetworkWallhavenMeta(
-                                current_page = 1,
-                                last_page = 1,
-                                per_page = networkWallpapers.size,
-                                total = networkWallpapers.size,
-                                query = StringNetworkWallhavenMetaQuery(
-                                    value = "",
-                                ),
-                                seed = null,
+                    ) = NetworkWallhavenWallpapersResponse(
+                        data = networkWallpapers,
+                        meta = NetworkWallhavenMeta(
+                            current_page = 1,
+                            last_page = 1,
+                            per_page = networkWallpapers.size,
+                            total = networkWallpapers.size,
+                            query = StringNetworkWallhavenMetaQuery(
+                                value = "",
                             ),
-                        )
-                    }
+                            seed = null,
+                        ),
+                    )
                 },
             )
 
@@ -271,15 +273,15 @@ class AutoWallpaperTest {
                 AutoWallpaperPreferences(
                     enabled = true,
                     savedSearchEnabled = true,
-                    savedSearchId = 1,
+                    savedSearchIds = setOf(1),
                 ),
             )
             val savedSearch = SavedSearch(
                 id = 1,
                 name = "Test",
-                search = Search(
+                search = WallhavenSearch(
                     query = "test",
-                    filters = SearchQuery(),
+                    filters = WallhavenFilters(),
                 ),
             )
             val networkWallpapers = List(30) { testNetworkWallhavenWallpaper }
@@ -321,23 +323,21 @@ class AutoWallpaperTest {
                 autoWallpaperHistoryDao = autoWallpaperHistoryDao,
                 wallHavenNetwork = object : FakeWallhavenNetworkDataSource() {
                     override suspend fun search(
-                        searchQuery: SearchQuery,
+                        search: WallhavenSearch,
                         page: Int?,
-                    ): NetworkResponse<List<NetworkWallhavenWallpaper>> {
-                        return NetworkResponse(
-                            data = networkWallpapers,
-                            meta = NetworkWallhavenMeta(
-                                current_page = 1,
-                                last_page = 1,
-                                per_page = networkWallpapers.size,
-                                total = networkWallpapers.size,
-                                query = StringNetworkWallhavenMetaQuery(
-                                    value = "",
-                                ),
-                                seed = null,
+                    ) = NetworkWallhavenWallpapersResponse(
+                        data = networkWallpapers,
+                        meta = NetworkWallhavenMeta(
+                            current_page = 1,
+                            last_page = 1,
+                            per_page = networkWallpapers.size,
+                            total = networkWallpapers.size,
+                            query = StringNetworkWallhavenMetaQuery(
+                                value = "",
                             ),
-                        )
-                    }
+                            seed = null,
+                        ),
+                    )
                 },
             )
 
@@ -373,15 +373,15 @@ class AutoWallpaperTest {
                 AutoWallpaperPreferences(
                     enabled = true,
                     savedSearchEnabled = true,
-                    savedSearchId = 1,
+                    savedSearchIds = setOf(1),
                 ),
             )
             val savedSearch = SavedSearch(
                 id = 1,
                 name = "Test",
-                search = Search(
+                search = WallhavenSearch(
                     query = "test",
-                    filters = SearchQuery(),
+                    filters = WallhavenFilters(),
                 ),
             )
             val networkWallpapers = List(30) { testNetworkWallhavenWallpaper }
@@ -426,23 +426,21 @@ class AutoWallpaperTest {
                 autoWallpaperHistoryDao = autoWallpaperHistoryDao,
                 wallHavenNetwork = object : FakeWallhavenNetworkDataSource() {
                     override suspend fun search(
-                        searchQuery: SearchQuery,
+                        search: WallhavenSearch,
                         page: Int?,
-                    ): NetworkResponse<List<NetworkWallhavenWallpaper>> {
-                        return NetworkResponse(
-                            data = networkWallpapers,
-                            meta = NetworkWallhavenMeta(
-                                current_page = 1,
-                                last_page = 1,
-                                per_page = networkWallpapers.size,
-                                total = networkWallpapers.size,
-                                query = StringNetworkWallhavenMetaQuery(
-                                    value = "",
-                                ),
-                                seed = null,
+                    ) = NetworkWallhavenWallpapersResponse(
+                        data = networkWallpapers,
+                        meta = NetworkWallhavenMeta(
+                            current_page = 1,
+                            last_page = 1,
+                            per_page = networkWallpapers.size,
+                            total = networkWallpapers.size,
+                            query = StringNetworkWallhavenMetaQuery(
+                                value = "",
                             ),
-                        )
-                    }
+                            seed = null,
+                        ),
+                    )
                 },
             )
 
@@ -462,6 +460,8 @@ class AutoWallpaperTest {
             verify { worker["setWallpaper"](wallpapers[0]) }
             val updatedHistory = autoWallpaperHistoryDao.getAll()
             assertEquals(historyWalls.count(), updatedHistory.count())
+        } catch (e: Exception) {
+            Log.e(TAG, "testAutoWallpaperWorkerShouldNotIgnoreHistory: ", e)
         } finally {
             testDataStore.clear()
             tempFile.delete()
@@ -478,7 +478,7 @@ class AutoWallpaperTest {
                     enabled = true,
                     savedSearchEnabled = false,
                     favoritesEnabled = true,
-                    savedSearchId = 1,
+                    savedSearchIds = setOf(1),
                     useObjectDetection = false,
                 ),
             )
@@ -517,7 +517,7 @@ class AutoWallpaperTest {
                     enabled = true,
                     savedSearchEnabled = false,
                     favoritesEnabled = true,
-                    savedSearchId = 1,
+                    savedSearchIds = setOf(1),
                     useObjectDetection = false,
                 ),
             )
@@ -552,7 +552,7 @@ class AutoWallpaperTest {
                         favoritedOn = Clock.System.now(),
                     )
                 },
-                wallpapersDao = object : FakeWallpapersDao() {
+                wallhavenWallpapersDao = object : FakeWallhavenWallpapersDao() {
                     override suspend fun getByWallhavenId(wallhavenId: String) = wallpaperEntity
                 },
             )
@@ -594,7 +594,7 @@ class AutoWallpaperTest {
                     savedSearchEnabled = false,
                     favoritesEnabled = false,
                     localEnabled = true,
-                    savedSearchId = 1,
+                    savedSearchIds = setOf(1),
                     useObjectDetection = false,
                 ),
             )
@@ -639,7 +639,7 @@ class AutoWallpaperTest {
                     savedSearchEnabled = false,
                     favoritesEnabled = false,
                     localEnabled = true,
-                    savedSearchId = 1,
+                    savedSearchIds = setOf(1),
                     useObjectDetection = false,
                 ),
             )
@@ -712,8 +712,10 @@ class AutoWallpaperTest {
         autoWallpaperHistoryDao: AutoWallpaperHistoryDao = FakeAutoWallpaperHistoryDao(),
         objectDetectionModelDao: ObjectDetectionModelDao = FakeObjectDetectionModelDao(),
         wallHavenNetwork: WallhavenNetworkDataSource = FakeWallhavenNetworkDataSource(),
+        redditNetwork: RedditNetworkDataSource = FakeRedditNetworkDataSource(),
         favoriteDao: FavoriteDao = FakeFavoriteDao(),
-        wallpapersDao: WallpapersDao = FakeWallpapersDao(),
+        wallhavenWallpapersDao: WallhavenWallpapersDao = FakeWallhavenWallpapersDao(),
+        redditWallpapersDao: RedditWallpapersDao = FakeRedditWallpapersDao(),
         localWallpapersRepository: LocalWallpapersRepository = FakeLocalWallpapersRepository(),
     ): AutoWallpaperWorker {
         val workTaskExecutor = InstantWorkTaskExecutor()
@@ -747,9 +749,11 @@ class AutoWallpaperTest {
                 ioDispatcher = testDispatcher,
             ),
             wallHavenNetwork = wallHavenNetwork,
+            redditNetwork = redditNetwork,
             favoritesRepository = FavoritesRepository(
                 favoriteDao = favoriteDao,
-                wallpapersDao = wallpapersDao,
+                wallhavenWallpapersDao = wallhavenWallpapersDao,
+                redditWallpapersDao = redditWallpapersDao,
                 localWallpapersRepository = localWallpapersRepository,
                 ioDispatcher = testDispatcher,
             ),

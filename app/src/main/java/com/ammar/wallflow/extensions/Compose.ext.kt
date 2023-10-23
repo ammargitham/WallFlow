@@ -8,12 +8,24 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
+import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.toColorInt
 
 fun Color.toHexString() = String.format("#%06X", 0xFFFFFF and this.toArgb())
 
 val Color.Companion.DELETE
     get() = Color("#d9534f".toColorInt())
+
+fun Color.blend(
+    color: Color,
+    ratio: Float = 0.2f,
+) = Color(
+    ColorUtils.blendARGB(
+        toArgb(),
+        color.toArgb(),
+        ratio,
+    ),
+)
 
 @Composable
 fun Dp.toPx() = with(LocalDensity.current) { roundToPx() }

@@ -1,23 +1,14 @@
 package com.ammar.wallflow.ui.common.searchedit
 
-import android.content.res.Configuration
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.SheetState
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -27,15 +18,11 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.ammar.wallflow.R
 import com.ammar.wallflow.extensions.toDp
-import com.ammar.wallflow.model.Search
-import com.ammar.wallflow.model.SearchQuery
-import com.ammar.wallflow.model.Sorting
-import com.ammar.wallflow.ui.theme.WallFlowTheme
+import com.ammar.wallflow.model.search.RedditSearch
+import com.ammar.wallflow.model.search.Search
+import com.ammar.wallflow.model.search.WallhavenSearch
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -45,10 +32,11 @@ fun EditSearchModalBottomSheet(
     modifier: Modifier = Modifier,
     contentModifier: Modifier = Modifier,
     state: SheetState = rememberModalBottomSheetState(),
-    search: Search = Search(),
+    search: Search = WallhavenSearch(),
     header: @Composable (ColumnScope.() -> Unit)? = null,
     showNSFW: Boolean = false,
     onChange: (Search) -> Unit = {},
+    onErrorStateChange: (Boolean) -> Unit = {},
     onDismissRequest: () -> Unit = {},
 ) {
     val imePadding = WindowInsets.ime.getBottom(LocalDensity.current).toDp()
@@ -84,12 +72,16 @@ fun EditSearchModalBottomSheet(
             search = search,
             showNSFW = showNSFW,
             onChange = onChange,
+            onErrorStateChange = onErrorStateChange,
             onMinResAddCustomResClick = { showMinResAddCustomResDialog = true },
             onResolutionsAddCustomResClick = { showResolutionsAddCustomResDialog = true },
         )
     }
 
-    if (showMinResAddCustomResDialog) {
+    if (
+        search is WallhavenSearch &&
+        showMinResAddCustomResDialog
+    ) {
         CustomResolutionDialog(
             onSave = {
                 onChange(search.copy(filters = search.filters.copy(atleast = it)))
@@ -103,7 +95,10 @@ fun EditSearchModalBottomSheet(
         )
     }
 
-    if (showResolutionsAddCustomResDialog) {
+    if (
+        search is WallhavenSearch &&
+        showResolutionsAddCustomResDialog
+    ) {
         CustomResolutionDialog(
             onSave = {
                 onChange(
@@ -127,92 +122,30 @@ fun EditSearchModalBottomSheet(
 @Composable
 fun EditSearchContent(
     modifier: Modifier = Modifier,
-    search: Search = Search(),
+    search: Search = WallhavenSearch(),
     showQueryField: Boolean = true,
     showNSFW: Boolean = false,
     onChange: (Search) -> Unit = {},
+    onErrorStateChange: (Boolean) -> Unit = {},
     onMinResAddCustomResClick: () -> Unit = {},
     onResolutionsAddCustomResClick: () -> Unit = {},
 ) {
-    Column(
-        modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-    ) {
-        if (showQueryField) {
-            OutlinedTextField(
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text(text = stringResource(R.string.query)) },
-                value = search.query,
-                onValueChange = { onChange(search.copy(query = it)) },
-            )
-        }
-        IncludedTagsFilter(
-            tags = search.filters.includedTags,
-            onChange = { onChange(search.copy(filters = search.filters.copy(includedTags = it))) },
-        )
-        ExcludedTagsFilter(
-            tags = search.filters.excludedTags,
-            onChange = { onChange(search.copy(filters = search.filters.copy(excludedTags = it))) },
-        )
-        CategoriesFilter(
-            categories = search.filters.categories,
-            onChange = { onChange(search.copy(filters = search.filters.copy(categories = it))) },
-        )
-        PurityFilter(
-            purities = search.filters.purity,
+    when (search) {
+        is WallhavenSearch -> EditWallhavenSearchContent(
+            modifier = modifier,
+            showQueryField = showQueryField,
+            search = search,
             showNSFW = showNSFW,
-            onChange = { onChange(search.copy(filters = search.filters.copy(purity = it))) },
+            onChange = onChange,
+            onMinResAddCustomResClick = onMinResAddCustomResClick,
+            onResolutionsAddCustomResClick = onResolutionsAddCustomResClick,
         )
-        SortingFilter(
-            sorting = search.filters.sorting,
-            onChange = { onChange(search.copy(filters = search.filters.copy(sorting = it))) },
+        is RedditSearch -> EditRedditSearchContent(
+            modifier = modifier,
+            search = search,
+            showQueryField = showQueryField,
+            onChange = onChange,
+            onErrorStateChange = onErrorStateChange,
         )
-        AnimatedVisibility(search.filters.sorting == Sorting.TOPLIST) {
-            TopRangeFilter(
-                topRange = search.filters.topRange,
-                onChange = { onChange(search.copy(filters = search.filters.copy(topRange = it))) },
-            )
-        }
-        OrderFilter(
-            order = search.filters.order,
-            onChange = { onChange(search.copy(filters = search.filters.copy(order = it))) },
-        )
-        MinResolutionFilter(
-            modifier = Modifier.wrapContentHeight(),
-            resolution = search.filters.atleast,
-            onChange = { onChange(search.copy(filters = search.filters.copy(atleast = it))) },
-            onAddCustomResolutionClick = onMinResAddCustomResClick,
-        )
-        ResolutionsFilter(
-            modifier = Modifier.wrapContentHeight(),
-            resolutions = search.filters.resolutions,
-            onChange = { onChange(search.copy(filters = search.filters.copy(resolutions = it))) },
-            onAddCustomResolutionClick = onResolutionsAddCustomResClick,
-        )
-        RatioFilter(
-            ratios = search.filters.ratios,
-            onChange = { onChange(search.copy(filters = search.filters.copy(ratios = it))) },
-        )
-    }
-}
-
-@Preview(device = "spec:width=1080px,height=3500px,dpi=440")
-@Preview(
-    device = "spec:width=1080px,height=3500px,dpi=440",
-    uiMode = Configuration.UI_MODE_NIGHT_YES,
-)
-@Composable
-private fun PreviewFiltersContent() {
-    WallFlowTheme {
-        Surface {
-            EditSearchContent(
-                modifier = Modifier.padding(16.dp),
-                search = Search(
-                    filters = SearchQuery(
-                        sorting = Sorting.TOPLIST,
-                    ),
-                ),
-            )
-        }
     }
 }

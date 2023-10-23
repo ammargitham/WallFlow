@@ -3,6 +3,9 @@ package com.ammar.wallflow.data.db.entity
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntSize
 import androidx.core.graphics.toColorInt
+import com.ammar.wallflow.data.db.entity.wallpaper.ThumbsEntity
+import com.ammar.wallflow.data.db.entity.wallpaper.WallhavenWallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallpaper.toWallpaper
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import kotlin.test.assertEquals
@@ -12,7 +15,7 @@ import org.junit.Test
 class WallpaperEntityTest {
     @Test
     fun convert_WallpaperEntity_to_Wallpaper() {
-        val wallpaperEntity = WallpaperEntity(
+        val wallpaperEntity = WallhavenWallpaperEntity(
             id = 0,
             wallhavenId = "85k6eo",
             url = "https://wallhaven.cc/w/85k6eo",

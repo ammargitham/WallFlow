@@ -2,6 +2,7 @@ package com.ammar.wallflow.data.repository
 
 import android.util.Log
 import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.MutablePreferences
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
@@ -22,11 +23,14 @@ import com.ammar.wallflow.data.preferences.defaultAutoWallpaperFreq
 import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.extensions.toConstraintTypeMap
 import com.ammar.wallflow.extensions.toConstraints
-import com.ammar.wallflow.model.Search
-import com.ammar.wallflow.model.SearchQuery
-import com.ammar.wallflow.model.Sorting
-import com.ammar.wallflow.model.TopRange
+import com.ammar.wallflow.json
+import com.ammar.wallflow.model.OnlineSource
 import com.ammar.wallflow.model.WallpaperTarget
+import com.ammar.wallflow.model.search.RedditSearch
+import com.ammar.wallflow.model.search.WallhavenFilters
+import com.ammar.wallflow.model.search.WallhavenSearch
+import com.ammar.wallflow.model.search.WallhavenSorting
+import com.ammar.wallflow.model.search.WallhavenTopRange
 import com.ammar.wallflow.model.serializers.constraintTypeMapSerializer
 import com.ammar.wallflow.ui.screens.local.LocalSort
 import com.ammar.wallflow.utils.objectdetection.objectsDetector
@@ -42,14 +46,13 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.DateTimePeriod
-import kotlinx.serialization.json.Json
+import kotlinx.serialization.encodeToString
 
 @Singleton
 class AppPreferencesRepository @Inject constructor(
     private val dataStore: DataStore<Preferences>,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
-
     val appPreferencesFlow: Flow<AppPreferences> = dataStore.data
         .catch { exception ->
             if (exception is IOException) {
@@ -63,75 +66,120 @@ class AppPreferencesRepository @Inject constructor(
         .flowOn(ioDispatcher)
 
     suspend fun updateWallhavenApiKey(wallhavenApiKey: String) = withContext(ioDispatcher) {
-        dataStore.edit { it[PreferencesKeys.WALLHAVEN_API_KEY] = wallhavenApiKey }
+        dataStore.edit { it.updateWallhavenApikey(wallhavenApiKey) }
     }
 
-    suspend fun updateHomeSearch(search: Search) = withContext(ioDispatcher) {
-        dataStore.edit {
-            it[PreferencesKeys.HOME_SEARCH_QUERY] = search.query
-            it[PreferencesKeys.HOME_FILTERS] = search.filters.toQueryString()
-        }
+    suspend fun updateHomeWallhavenSearch(search: WallhavenSearch) = withContext(ioDispatcher) {
+        dataStore.edit { it.updateHomeWallhavenSearch(search) }
+    }
+
+    suspend fun updateHomeRedditSearch(search: RedditSearch) = withContext(ioDispatcher) {
+        dataStore.edit { it.updateHomeRedditSearch(search) }
     }
 
     suspend fun updateBlurSketchy(blurSketchy: Boolean) = withContext(ioDispatcher) {
-        dataStore.edit { it[PreferencesKeys.BLUR_SKETCHY] = blurSketchy }
+        dataStore.edit { it.updateBlurSketchy(blurSketchy) }
     }
 
     suspend fun updateBlurNsfw(blurNsfw: Boolean) = withContext(ioDispatcher) {
-        dataStore.edit { it[PreferencesKeys.BLUR_NSFW] = blurNsfw }
+        dataStore.edit { it.updateBlurNsfw(blurNsfw) }
     }
 
-    suspend fun updateObjectDetectionPrefs(objectDetectionPreferences: ObjectDetectionPreferences) =
-        withContext(ioDispatcher) {
-            dataStore.edit {
-                with(objectDetectionPreferences) {
-                    it[PreferencesKeys.ENABLE_OBJECT_DETECTION] = enabled
-                    it[PreferencesKeys.OBJECT_DETECTION_DELEGATE] = delegate.name
-                    it[PreferencesKeys.OBJECT_DETECTION_MODEL_ID] = modelId
-                }
-            }
+    suspend fun updateObjectDetectionPrefs(
+        objectDetectionPreferences: ObjectDetectionPreferences,
+    ) = withContext(ioDispatcher) {
+        dataStore.edit {
+            it.updateObjectDetectionPrefs(objectDetectionPreferences)
         }
+    }
 
-    suspend fun updateAutoWallpaperPrefs(autoWallpaperPreferences: AutoWallpaperPreferences) =
-        withContext(ioDispatcher) {
-            dataStore.edit {
-                with(autoWallpaperPreferences) {
-                    it[PreferencesKeys.ENABLE_AUTO_WALLPAPER] = enabled
-                    it[PreferencesKeys.AUTO_WALLPAPER_SAVED_SEARCH_ENABLED] = savedSearchEnabled
-                    it[PreferencesKeys.AUTO_WALLPAPER_FAVORITES_ENABLED] = favoritesEnabled
-                    it[PreferencesKeys.AUTO_WALLPAPER_LOCAL_ENABLED] = localEnabled
-                    it[PreferencesKeys.AUTO_WALLPAPER_SAVED_SEARCH_ID] = savedSearchId
-                    it[PreferencesKeys.AUTO_WALLPAPER_USE_OBJECT_DETECTION] = useObjectDetection
-                    it[PreferencesKeys.AUTO_WALLPAPER_FREQUENCY] = frequency.toString()
-                    it[PreferencesKeys.AUTO_WALLPAPER_CONSTRAINTS] = Json.encodeToString(
-                        constraintTypeMapSerializer,
-                        constraints.toConstraintTypeMap(),
-                    )
-                    it[PreferencesKeys.AUTO_WALLPAPER_SHOW_NOTIFICATION] = showNotification
-                    it[PreferencesKeys.AUTO_WALLPAPER_TARGETS] = targets.map {
-                        it.name
-                    }.toSet()
-                    it[PreferencesKeys.AUTO_WALLPAPER_MARK_FAVORITE] = markFavorite
-                    it[PreferencesKeys.AUTO_WALLPAPER_DOWNLOAD] = download
-                }
-            }
+    suspend fun updateAutoWallpaperPrefs(
+        autoWallpaperPreferences: AutoWallpaperPreferences,
+    ) = withContext(ioDispatcher) {
+        dataStore.edit {
+            it.updateAutoWallpaperPrefs(autoWallpaperPreferences)
         }
+    }
 
-    suspend fun updateLookAndFeelPreferences(lookAndFeelPreferences: LookAndFeelPreferences) =
-        withContext(ioDispatcher) {
-            dataStore.edit {
-                with(lookAndFeelPreferences) {
-                    it[PreferencesKeys.THEME] = theme.name
-                    it[PreferencesKeys.LAYOUT_GRID_TYPE] = layoutPreferences.gridType.name
-                    it[PreferencesKeys.LAYOUT_GRID_COL_TYPE] = layoutPreferences.gridColType.name
-                    it[PreferencesKeys.LAYOUT_GRID_COL_COUNT] = layoutPreferences.gridColCount
-                    it[PreferencesKeys.LAYOUT_GRID_COL_MIN_WIDTH_PCT] =
-                        layoutPreferences.gridColMinWidthPct
-                    it[PreferencesKeys.LAYOUT_ROUNDED_CORNERS] = layoutPreferences.roundedCorners
-                    it[PreferencesKeys.SHOW_LOCAL_TAB] = showLocalTab
-                }
-            }
+    suspend fun updateLookAndFeelPreferences(
+        lookAndFeelPreferences: LookAndFeelPreferences,
+    ) = withContext(ioDispatcher) {
+        dataStore.edit {
+            it.updateLookAndFeelPreferences(lookAndFeelPreferences)
         }
+    }
+
+    private fun MutablePreferences.updateWallhavenApikey(wallhavenApiKey: String) {
+        set(PreferencesKeys.WALLHAVEN_API_KEY, wallhavenApiKey)
+    }
+
+    private fun MutablePreferences.updateHomeWallhavenSearch(search: WallhavenSearch) {
+        set(PreferencesKeys.HOME_WALLHAVEN_SEARCH, search.toJson())
+    }
+
+    private fun MutablePreferences.updateHomeRedditSearch(search: RedditSearch) {
+        set(PreferencesKeys.HOME_REDDIT_SEARCH, json.encodeToString(search))
+    }
+
+    private fun MutablePreferences.updateBlurSketchy(blurSketchy: Boolean) {
+        set(PreferencesKeys.BLUR_SKETCHY, blurSketchy)
+    }
+
+    private fun MutablePreferences.updateBlurNsfw(blurNsfw: Boolean) {
+        set(PreferencesKeys.BLUR_NSFW, blurNsfw)
+    }
+
+    private fun MutablePreferences.updateObjectDetectionPrefs(
+        objectDetectionPreferences: ObjectDetectionPreferences,
+    ) = with(objectDetectionPreferences) {
+        set(PreferencesKeys.ENABLE_OBJECT_DETECTION, enabled)
+        set(PreferencesKeys.OBJECT_DETECTION_DELEGATE, delegate.name)
+        set(PreferencesKeys.OBJECT_DETECTION_MODEL_ID, modelId)
+    }
+
+    private fun MutablePreferences.updateAutoWallpaperPrefs(
+        autoWallpaperPreferences: AutoWallpaperPreferences,
+    ) = with(autoWallpaperPreferences) {
+        set(PreferencesKeys.ENABLE_AUTO_WALLPAPER, enabled)
+        set(PreferencesKeys.AUTO_WALLPAPER_SAVED_SEARCH_ENABLED, savedSearchEnabled)
+        set(PreferencesKeys.AUTO_WALLPAPER_FAVORITES_ENABLED, favoritesEnabled)
+        set(PreferencesKeys.AUTO_WALLPAPER_LOCAL_ENABLED, localEnabled)
+        set(
+            PreferencesKeys.AUTO_WALLPAPER_SAVED_SEARCH_ID,
+            savedSearchIds.mapTo(HashSet()) { it.toString() },
+        )
+        set(PreferencesKeys.AUTO_WALLPAPER_USE_OBJECT_DETECTION, useObjectDetection)
+        set(PreferencesKeys.AUTO_WALLPAPER_FREQUENCY, frequency.toString())
+        set(
+            PreferencesKeys.AUTO_WALLPAPER_CONSTRAINTS,
+            json.encodeToString(
+                constraintTypeMapSerializer,
+                constraints.toConstraintTypeMap(),
+            ),
+        )
+        set(PreferencesKeys.AUTO_WALLPAPER_SHOW_NOTIFICATION, showNotification)
+        set(
+            PreferencesKeys.AUTO_WALLPAPER_TARGETS,
+            targets.map { it.name }.toSet(),
+        )
+        set(PreferencesKeys.AUTO_WALLPAPER_MARK_FAVORITE, markFavorite)
+        set(PreferencesKeys.AUTO_WALLPAPER_DOWNLOAD, download)
+    }
+
+    private fun MutablePreferences.updateLookAndFeelPreferences(
+        lookAndFeelPreferences: LookAndFeelPreferences,
+    ) = with(lookAndFeelPreferences) {
+        set(PreferencesKeys.THEME, theme.name)
+        set(PreferencesKeys.LAYOUT_GRID_TYPE, layoutPreferences.gridType.name)
+        set(PreferencesKeys.LAYOUT_GRID_COL_TYPE, layoutPreferences.gridColType.name)
+        set(PreferencesKeys.LAYOUT_GRID_COL_COUNT, layoutPreferences.gridColCount)
+        set(
+            PreferencesKeys.LAYOUT_GRID_COL_MIN_WIDTH_PCT,
+            layoutPreferences.gridColMinWidthPct,
+        )
+        set(PreferencesKeys.LAYOUT_ROUNDED_CORNERS, layoutPreferences.roundedCorners)
+        set(PreferencesKeys.SHOW_LOCAL_TAB, showLocalTab)
+    }
 
     suspend fun updateAutoWallpaperWorkRequestId(id: UUID?) = withContext(ioDispatcher) {
         dataStore.edit {
@@ -147,116 +195,187 @@ class AppPreferencesRepository @Inject constructor(
 
     suspend fun updateLocalWallpapersSort(sort: LocalSort) = withContext(ioDispatcher) {
         dataStore.edit {
-            it[PreferencesKeys.LOCAL_WALLPAPERS_SORT] = sort.name
+            it.updateLocalWallpapersSort(sort)
         }
     }
 
-    private fun mapAppPreferences(preferences: Preferences) = AppPreferences(
-        wallhavenApiKey = preferences[PreferencesKeys.WALLHAVEN_API_KEY] ?: "",
-        homeSearch = Search(
-            query = preferences[PreferencesKeys.HOME_SEARCH_QUERY] ?: "",
-            filters = preferences[PreferencesKeys.HOME_FILTERS]?.let {
-                SearchQuery.fromQueryString(it)
-            } ?: SearchQuery(
-                sorting = Sorting.TOPLIST,
-                topRange = TopRange.ONE_DAY,
+    private fun MutablePreferences.updateLocalWallpapersSort(sort: LocalSort) {
+        set(PreferencesKeys.LOCAL_WALLPAPERS_SORT, sort.name)
+    }
+
+    suspend fun updateHomeSources(
+        sources: Map<OnlineSource, Boolean>,
+    ) = withContext(ioDispatcher) {
+        dataStore.edit { it.updateHomeSources(sources) }
+    }
+
+    private fun MutablePreferences.updateHomeSources(sources: Map<OnlineSource, Boolean>) {
+        set(PreferencesKeys.HOME_SOURCES, json.encodeToString(sources))
+    }
+
+    private fun mapAppPreferences(preferences: Preferences): AppPreferences {
+        val homeRedditSearch = getHomeRedditSearch(preferences)
+        return AppPreferences(
+            version = preferences[PreferencesKeys.VERSION] ?: AppPreferences.CURRENT_VERSION,
+            wallhavenApiKey = getWallhavenApiKey(preferences),
+            homeWallhavenSearch = getHomeWallhavenSearch(preferences),
+            homeRedditSearch = homeRedditSearch,
+            homeSources = getHomeSources(preferences, homeRedditSearch),
+            blurSketchy = preferences[PreferencesKeys.BLUR_SKETCHY] ?: false,
+            blurNsfw = preferences[PreferencesKeys.BLUR_NSFW] ?: false,
+            objectDetectionPreferences = getObjectDetectionPreferences(preferences),
+            autoWallpaperPreferences = getAutoWallpaperPreferences(preferences),
+            lookAndFeelPreferences = getLookAndFeelPreferences(preferences),
+            changeWallpaperTileAdded = preferences[PreferencesKeys.CHANGE_WALLPAPER_TILE_ADDED]
+                ?: false,
+            localWallpapersPreferences = getLocalWallpapersPreferences(preferences),
+        )
+    }
+
+    private fun getHomeSources(
+        preferences: Preferences,
+        homeRedditSearch: RedditSearch?,
+    ) = try {
+        val sourcesStr = preferences[PreferencesKeys.HOME_SOURCES] ?: ""
+        val sources = json.decodeFromString<Map<OnlineSource, Boolean>>(sourcesStr)
+        sources.mapValues {
+            if (it.key == OnlineSource.REDDIT) {
+                it.value && homeRedditSearch != null
+            } else {
+                it.value
+            }
+        }
+    } catch (e: Exception) {
+        val mutableMap = mutableMapOf(
+            OnlineSource.WALLHAVEN to true,
+        )
+        if (homeRedditSearch != null) {
+            mutableMap[OnlineSource.REDDIT] = true
+        }
+        mutableMap
+    }
+
+    private fun getLocalWallpapersPreferences(
+        preferences: Preferences,
+    ) = LocalWallpapersPreferences(
+        sort = try {
+            LocalSort.valueOf(preferences[PreferencesKeys.LOCAL_WALLPAPERS_SORT] ?: "")
+        } catch (e: Exception) {
+            LocalSort.NO_SORT
+        },
+    )
+
+    private fun getLookAndFeelPreferences(preferences: Preferences) = LookAndFeelPreferences(
+        theme = try {
+            Theme.valueOf(preferences[PreferencesKeys.THEME] ?: "")
+        } catch (e: Exception) {
+            Theme.SYSTEM
+        },
+        layoutPreferences = getLayoutPreferences(preferences),
+        showLocalTab = preferences[PreferencesKeys.SHOW_LOCAL_TAB] ?: true,
+    )
+
+    private fun getLayoutPreferences(preferences: Preferences) = LayoutPreferences(
+        gridType = try {
+            GridType.valueOf(preferences[PreferencesKeys.LAYOUT_GRID_TYPE] ?: "")
+        } catch (e: Exception) {
+            GridType.STAGGERED
+        },
+        gridColType = try {
+            GridColType.valueOf(
+                preferences[PreferencesKeys.LAYOUT_GRID_COL_TYPE] ?: "",
+            )
+        } catch (e: Exception) {
+            GridColType.ADAPTIVE
+        },
+        gridColCount = preferences[PreferencesKeys.LAYOUT_GRID_COL_COUNT] ?: 2,
+        gridColMinWidthPct = preferences[PreferencesKeys.LAYOUT_GRID_COL_MIN_WIDTH_PCT]
+            ?: 40,
+        roundedCorners = preferences[PreferencesKeys.LAYOUT_ROUNDED_CORNERS] ?: true,
+    )
+
+    private fun getAutoWallpaperPreferences(preferences: Preferences) = with(preferences) {
+        val savedSearchIdStrings = get(PreferencesKeys.AUTO_WALLPAPER_SAVED_SEARCH_ID)
+            ?: emptySet()
+        val savedSearchIds = savedSearchIdStrings
+            .mapNotNull { it.toLongOrNull() }
+            .filterTo(HashSet()) { it > 0 }
+        val savedSearchEnabled =
+            (get(PreferencesKeys.AUTO_WALLPAPER_SAVED_SEARCH_ENABLED) ?: false) &&
+                savedSearchIds.isNotEmpty()
+        val favoritesEnabled = get(PreferencesKeys.AUTO_WALLPAPER_FAVORITES_ENABLED) ?: false
+        val localEnabled = get(PreferencesKeys.AUTO_WALLPAPER_LOCAL_ENABLED) ?: false
+        AutoWallpaperPreferences(
+            enabled = when {
+                !savedSearchEnabled && !favoritesEnabled && !localEnabled -> false
+                else -> get(PreferencesKeys.ENABLE_AUTO_WALLPAPER) ?: false
+            },
+            savedSearchEnabled = savedSearchEnabled,
+            favoritesEnabled = favoritesEnabled,
+            localEnabled = localEnabled,
+            savedSearchIds = savedSearchIds,
+            useObjectDetection = get(PreferencesKeys.AUTO_WALLPAPER_USE_OBJECT_DETECTION)
+                ?: true,
+            frequency = parseFrequency(get(PreferencesKeys.AUTO_WALLPAPER_FREQUENCY)),
+            constraints = parseConstraints(get(PreferencesKeys.AUTO_WALLPAPER_CONSTRAINTS)),
+            workRequestId = parseWorkRequestId(
+                get(PreferencesKeys.AUTO_WALLPAPER_WORK_REQUEST_ID),
             ),
-        ),
-        blurSketchy = preferences[PreferencesKeys.BLUR_SKETCHY] ?: false,
-        blurNsfw = preferences[PreferencesKeys.BLUR_NSFW] ?: false,
-        objectDetectionPreferences = with(preferences) {
-            val delegate = try {
-                val deletePref = get(PreferencesKeys.OBJECT_DETECTION_DELEGATE)
-                if (deletePref != null) {
-                    ObjectDetectionDelegate.valueOf(deletePref)
-                } else {
-                    ObjectDetectionDelegate.GPU
+            showNotification = get(PreferencesKeys.AUTO_WALLPAPER_SHOW_NOTIFICATION) ?: false,
+            targets = get(PreferencesKeys.AUTO_WALLPAPER_TARGETS)?.map {
+                try {
+                    WallpaperTarget.valueOf(it)
+                } catch (e: Exception) {
+                    WallpaperTarget.HOME
                 }
-            } catch (e: Exception) {
+            }?.toSortedSet() ?: setOf(
+                WallpaperTarget.HOME,
+                WallpaperTarget.LOCKSCREEN,
+            ),
+            markFavorite = get(PreferencesKeys.AUTO_WALLPAPER_MARK_FAVORITE) ?: false,
+            download = get(PreferencesKeys.AUTO_WALLPAPER_DOWNLOAD) ?: false,
+        )
+    }
+
+    private fun getObjectDetectionPreferences(preferences: Preferences) = with(preferences) {
+        val delegate = try {
+            val deletePref = get(PreferencesKeys.OBJECT_DETECTION_DELEGATE)
+            if (deletePref != null) {
+                ObjectDetectionDelegate.valueOf(deletePref)
+            } else {
                 ObjectDetectionDelegate.GPU
             }
-            val enabled = objectsDetector.isEnabled &&
-                get(PreferencesKeys.ENABLE_OBJECT_DETECTION) ?: false
-            ObjectDetectionPreferences(
-                enabled = enabled,
-                delegate = delegate,
-                modelId = get(PreferencesKeys.OBJECT_DETECTION_MODEL_ID) ?: 0,
-            )
-        },
-        autoWallpaperPreferences = with(preferences) {
-            val savedSearchId = get(PreferencesKeys.AUTO_WALLPAPER_SAVED_SEARCH_ID) ?: 0
-            val savedSearchEnabled =
-                (get(PreferencesKeys.AUTO_WALLPAPER_SAVED_SEARCH_ENABLED) ?: false) &&
-                    savedSearchId > 0
-            val favoritesEnabled = get(PreferencesKeys.AUTO_WALLPAPER_FAVORITES_ENABLED) ?: false
-            val localEnabled = get(PreferencesKeys.AUTO_WALLPAPER_LOCAL_ENABLED) ?: false
-            AutoWallpaperPreferences(
-                enabled = when {
-                    !savedSearchEnabled && !favoritesEnabled && !localEnabled -> false
-                    else -> get(PreferencesKeys.ENABLE_AUTO_WALLPAPER) ?: false
-                },
-                savedSearchEnabled = savedSearchEnabled,
-                favoritesEnabled = favoritesEnabled,
-                localEnabled = localEnabled,
-                savedSearchId = savedSearchId,
-                useObjectDetection = get(PreferencesKeys.AUTO_WALLPAPER_USE_OBJECT_DETECTION)
-                    ?: true,
-                frequency = parseFrequency(get(PreferencesKeys.AUTO_WALLPAPER_FREQUENCY)),
-                constraints = parseConstraints(get(PreferencesKeys.AUTO_WALLPAPER_CONSTRAINTS)),
-                workRequestId = parseWorkRequestId(
-                    get(PreferencesKeys.AUTO_WALLPAPER_WORK_REQUEST_ID),
-                ),
-                showNotification = get(PreferencesKeys.AUTO_WALLPAPER_SHOW_NOTIFICATION) ?: false,
-                targets = get(PreferencesKeys.AUTO_WALLPAPER_TARGETS)?.map {
-                    try {
-                        WallpaperTarget.valueOf(it)
-                    } catch (e: Exception) {
-                        WallpaperTarget.HOME
-                    }
-                }?.toSortedSet() ?: setOf(
-                    WallpaperTarget.HOME,
-                    WallpaperTarget.LOCKSCREEN,
-                ),
-                markFavorite = get(PreferencesKeys.AUTO_WALLPAPER_MARK_FAVORITE) ?: false,
-                download = get(PreferencesKeys.AUTO_WALLPAPER_DOWNLOAD) ?: false,
-            )
-        },
-        lookAndFeelPreferences = LookAndFeelPreferences(
-            theme = try {
-                Theme.valueOf(preferences[PreferencesKeys.THEME] ?: "")
-            } catch (e: Exception) {
-                Theme.SYSTEM
-            },
-            layoutPreferences = LayoutPreferences(
-                gridType = try {
-                    GridType.valueOf(preferences[PreferencesKeys.LAYOUT_GRID_TYPE] ?: "")
-                } catch (e: Exception) {
-                    GridType.STAGGERED
-                },
-                gridColType = try {
-                    GridColType.valueOf(
-                        preferences[PreferencesKeys.LAYOUT_GRID_COL_TYPE] ?: "",
-                    )
-                } catch (e: Exception) {
-                    GridColType.ADAPTIVE
-                },
-                gridColCount = preferences[PreferencesKeys.LAYOUT_GRID_COL_COUNT] ?: 2,
-                gridColMinWidthPct = preferences[PreferencesKeys.LAYOUT_GRID_COL_MIN_WIDTH_PCT]
-                    ?: 40,
-                roundedCorners = preferences[PreferencesKeys.LAYOUT_ROUNDED_CORNERS] ?: true,
+        } catch (e: Exception) {
+            ObjectDetectionDelegate.GPU
+        }
+        val enabled = objectsDetector.isEnabled &&
+            get(PreferencesKeys.ENABLE_OBJECT_DETECTION) ?: false
+        ObjectDetectionPreferences(
+            enabled = enabled,
+            delegate = delegate,
+            modelId = get(PreferencesKeys.OBJECT_DETECTION_MODEL_ID) ?: 0,
+        )
+    }
+
+    private fun getHomeRedditSearch(preferences: Preferences): RedditSearch? = try {
+        json.decodeFromString(preferences[PreferencesKeys.HOME_REDDIT_SEARCH] ?: "")
+    } catch (e: Exception) {
+        null
+    }
+
+    private fun getHomeWallhavenSearch(preferences: Preferences) = try {
+        WallhavenSearch.fromJson(preferences[PreferencesKeys.HOME_WALLHAVEN_SEARCH] ?: "")
+    } catch (e: Exception) {
+        WallhavenSearch(
+            filters = WallhavenFilters(
+                sorting = WallhavenSorting.TOPLIST,
+                topRange = WallhavenTopRange.ONE_DAY,
             ),
-            showLocalTab = preferences[PreferencesKeys.SHOW_LOCAL_TAB] ?: true,
-        ),
-        changeWallpaperTileAdded = preferences[PreferencesKeys.CHANGE_WALLPAPER_TILE_ADDED]
-            ?: false,
-        localWallpapersPreferences = LocalWallpapersPreferences(
-            sort = try {
-                LocalSort.valueOf(preferences[PreferencesKeys.LOCAL_WALLPAPERS_SORT] ?: "")
-            } catch (e: Exception) {
-                LocalSort.NO_SORT
-            },
-        ),
-    )
+        )
+    }
+
+    private fun getWallhavenApiKey(preferences: Preferences) =
+        preferences[PreferencesKeys.WALLHAVEN_API_KEY] ?: ""
 
     private fun parseFrequency(freqStr: String?) = try {
         if (freqStr != null) {
@@ -271,7 +390,7 @@ class AppPreferencesRepository @Inject constructor(
 
     private fun parseConstraints(constraintsStr: String?) = try {
         if (constraintsStr != null) {
-            Json.decodeFromString(
+            json.decodeFromString(
                 constraintTypeMapSerializer,
                 constraintsStr,
             ).toConstraints()
@@ -289,20 +408,32 @@ class AppPreferencesRepository @Inject constructor(
         null
     }
 
-    suspend fun getWallHavenApiKey() = mapAppPreferences(dataStore.data.first()).wallhavenApiKey
+    suspend fun getWallHavenApiKey() = getWallhavenApiKey(dataStore.data.first())
 
-    suspend fun getAutoWallHavenWorkRequestId() = mapAppPreferences(dataStore.data.first())
-        .autoWallpaperPreferences
-        .workRequestId
+    suspend fun getAutoWallHavenWorkRequestId() = getAutoWallpaperPreferences(
+        dataStore.data.first(),
+    ).workRequestId
 
     suspend fun setPreferences(appPreferences: AppPreferences) {
-        updateWallhavenApiKey(appPreferences.wallhavenApiKey)
-        updateHomeSearch(appPreferences.homeSearch)
-        updateBlurSketchy(appPreferences.blurSketchy)
-        updateBlurNsfw(appPreferences.blurNsfw)
-        updateObjectDetectionPrefs(appPreferences.objectDetectionPreferences)
-        updateAutoWallpaperPrefs(appPreferences.autoWallpaperPreferences)
-        updateLookAndFeelPreferences(appPreferences.lookAndFeelPreferences)
-        updateLocalWallpapersSort(appPreferences.localWallpapersPreferences.sort)
+        dataStore.edit {
+            it.apply {
+                set(
+                    PreferencesKeys.VERSION,
+                    appPreferences.version ?: AppPreferences.CURRENT_VERSION,
+                )
+                updateWallhavenApikey(appPreferences.wallhavenApiKey)
+                updateHomeWallhavenSearch(appPreferences.homeWallhavenSearch)
+                appPreferences.homeRedditSearch?.run {
+                    updateHomeRedditSearch(this@run)
+                }
+                updateHomeSources(appPreferences.homeSources)
+                updateBlurSketchy(appPreferences.blurSketchy)
+                updateBlurNsfw(appPreferences.blurNsfw)
+                updateObjectDetectionPrefs(appPreferences.objectDetectionPreferences)
+                updateAutoWallpaperPrefs(appPreferences.autoWallpaperPreferences)
+                updateLookAndFeelPreferences(appPreferences.lookAndFeelPreferences)
+                updateLocalWallpapersSort(appPreferences.localWallpapersPreferences.sort)
+            }
+        }
     }
 }

@@ -1,6 +1,6 @@
 package com.ammar.wallflow.data.repository.utils
 
-import com.ammar.wallflow.data.network.model.NetworkWallhavenTag
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenTag
 import java.net.URL
 import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant

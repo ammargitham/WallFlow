@@ -17,7 +17,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
@@ -56,25 +58,13 @@ fun WallpaperStaggeredGrid(
     var gridSize by remember { mutableStateOf(IntSize.Zero) }
     val gridWidthDp = gridSize.width.toDp()
     val layoutDirection = LocalLayoutDirection.current
-    val adaptiveMinWidth = remember(
+    val adaptiveMinWidth = getAdaptiveMinWidth(
         gridColType,
-        gridColMinWidthPct,
-        gridWidthDp,
         contentPadding,
-    ) {
-        if (gridColType != GridColType.ADAPTIVE) {
-            return@remember 0.dp
-        }
-        val horizontalPadding = contentPadding.let {
-            it.calculateStartPadding(layoutDirection) + it.calculateEndPadding(layoutDirection)
-        }
-        val availWidth = gridWidthDp - horizontalPadding
-        var wDp = availWidth * gridColMinWidthPct / 100
-        if (wDp <= 0.dp) {
-            wDp = 128.dp
-        }
-        return@remember wDp
-    }
+        layoutDirection,
+        gridWidthDp,
+        gridColMinWidthPct,
+    )
 
     LazyVerticalStaggeredGrid(
         modifier = modifier.onSizeChanged { gridSize = it },
@@ -120,4 +110,25 @@ fun WallpaperStaggeredGrid(
             } ?: PlaceholderWallpaperCard()
         }
     }
+}
+
+private fun getAdaptiveMinWidth(
+    gridColType: GridColType,
+    contentPadding: PaddingValues,
+    layoutDirection: LayoutDirection,
+    gridWidthDp: Dp,
+    gridColMinWidthPct: Int,
+): Dp {
+    if (gridColType != GridColType.ADAPTIVE) {
+        return 0.dp
+    }
+    val horizontalPadding = contentPadding.let {
+        it.calculateStartPadding(layoutDirection) + it.calculateEndPadding(layoutDirection)
+    }
+    val availWidth = gridWidthDp - horizontalPadding
+    var wDp = availWidth * gridColMinWidthPct / 100
+    if (wDp <= 0.dp) {
+        wDp = 128.dp
+    }
+    return wDp
 }

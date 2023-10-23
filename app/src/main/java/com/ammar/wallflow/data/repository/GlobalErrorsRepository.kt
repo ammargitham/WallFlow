@@ -1,5 +1,6 @@
 package com.ammar.wallflow.data.repository
 
+import com.ammar.wallflow.model.Source
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,10 +30,10 @@ class GlobalErrorsRepository @Inject constructor() {
 
     enum class GlobalErrorType {
         WALLHAVEN_UNAUTHORISED,
-        WALLHAVEN_RATE_LIMIT,
+        RATE_LIMIT,
     }
 
-    abstract class GlobalError {
+    sealed class GlobalError {
         abstract val type: GlobalErrorType
     }
 
@@ -40,7 +41,7 @@ class GlobalErrorsRepository @Inject constructor() {
         override val type: GlobalErrorType = GlobalErrorType.WALLHAVEN_UNAUTHORISED
     }
 
-    class WallHavenRateLimitError : GlobalError() {
-        override val type: GlobalErrorType = GlobalErrorType.WALLHAVEN_RATE_LIMIT
+    class RateLimitError(val source: Source) : GlobalError() {
+        override val type: GlobalErrorType = GlobalErrorType.RATE_LIMIT
     }
 }

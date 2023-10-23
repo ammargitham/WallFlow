@@ -1,0 +1,37 @@
+package com.ammar.wallflow.data.network.model.wallhaven
+
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenAvatarEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenUploaderEntity
+import com.ammar.wallflow.model.wallhaven.WallhavenAvatar
+import com.ammar.wallflow.model.wallhaven.WallhavenUploader
+import kotlinx.serialization.Serializable
+
+@Serializable
+data class NetworkWallhavenUploader(
+    val username: String,
+    val group: String,
+    val avatar: Map<String, String>,
+)
+
+fun NetworkWallhavenUploader.toEntity(id: Long = 0) = WallhavenUploaderEntity(
+    id = id,
+    username = username,
+    group = group,
+    avatar = WallhavenAvatarEntity(
+        large = avatar["200px"] ?: "",
+        medium = avatar["128px"] ?: "",
+        small = avatar["32px"] ?: "",
+        tiny = avatar["20px"] ?: "",
+    ),
+)
+
+fun NetworkWallhavenUploader.toWallhavenUploader() = WallhavenUploader(
+    username = username,
+    group = group,
+    avatar = WallhavenAvatar(
+        large = avatar["200px"] ?: "",
+        medium = avatar["128px"] ?: "",
+        small = avatar["32px"] ?: "",
+        tiny = avatar["20px"] ?: "",
+    ),
+)

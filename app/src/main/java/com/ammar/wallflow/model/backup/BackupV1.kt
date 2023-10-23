@@ -2,10 +2,11 @@ package com.ammar.wallflow.model.backup
 
 import android.net.Uri
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
-import com.ammar.wallflow.data.db.entity.SavedSearchEntity
-import com.ammar.wallflow.data.db.entity.TagEntity
-import com.ammar.wallflow.data.db.entity.UploaderEntity
-import com.ammar.wallflow.data.db.entity.WallpaperEntity
+import com.ammar.wallflow.data.db.entity.search.SavedSearchEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenTagEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenUploaderEntity
+import com.ammar.wallflow.data.db.entity.wallpaper.RedditWallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallpaper.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.preferences.AppPreferences
 import kotlinx.serialization.EncodeDefault
 import kotlinx.serialization.ExperimentalSerializationApi
@@ -19,12 +20,13 @@ data class BackupV1(
     val preferences: AppPreferences?,
     val favorites: List<FavoriteEntity>?,
     val wallhaven: WallhavenBackupV1?,
+    val reddit: RedditBackupV1? = null,
 ) : Backup {
     override fun getRestoreSummary(file: Uri) = RestoreSummary(
         file = file,
         settings = preferences != null,
         favorites = favorites?.size,
-        savedSearches = wallhaven?.savedSearches?.size,
+        savedSearches = (wallhaven?.savedSearches?.size ?: 0) + (reddit?.savedSearches?.size ?: 0),
         backup = this,
     )
 }
@@ -32,7 +34,13 @@ data class BackupV1(
 @Serializable
 data class WallhavenBackupV1(
     val savedSearches: List<SavedSearchEntity>?,
-    val wallpapers: List<WallpaperEntity>?,
-    val uploaders: List<UploaderEntity>?,
-    val tags: Set<TagEntity>?,
+    val wallpapers: List<WallhavenWallpaperEntity>?,
+    val uploaders: List<WallhavenUploaderEntity>?,
+    val tags: Set<WallhavenTagEntity>?,
+)
+
+@Serializable
+data class RedditBackupV1(
+    val savedSearches: List<SavedSearchEntity>?,
+    val wallpapers: List<RedditWallpaperEntity>?,
 )

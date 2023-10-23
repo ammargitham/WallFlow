@@ -2,6 +2,8 @@ package com.ammar.wallflow.extensions
 
 import java.net.URLDecoder
 import java.net.URLEncoder
+import java.util.regex.Pattern
+import org.jsoup.parser.Parser
 
 val Any.TAG: String
     get() {
@@ -39,3 +41,15 @@ fun String.capitalise() = this
     .joinToString(" ") {
         it.replaceFirstChar { c -> c.uppercaseChar() }
     }
+
+fun String.fromQueryString() = this
+    .split("&")
+    .map { it.split(Pattern.compile("="), 2) }
+    .associate {
+        Pair(
+            it[0].urlDecoded(),
+            if (it.size > 1) it[1].urlDecoded() else null,
+        )
+    }
+
+fun String.htmlUnescaped(): String = Parser.unescapeEntities(this, false)

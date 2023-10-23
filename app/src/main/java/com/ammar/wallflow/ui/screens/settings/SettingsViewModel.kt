@@ -9,8 +9,8 @@ import androidx.work.WorkInfo
 import com.ammar.wallflow.EFFICIENT_DET_LITE_0_MODEL_NAME
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.db.entity.ObjectDetectionModelEntity
+import com.ammar.wallflow.data.db.entity.search.toSavedSearch
 import com.ammar.wallflow.data.db.entity.toModel
-import com.ammar.wallflow.data.db.entity.toSavedSearch
 import com.ammar.wallflow.data.preferences.AppPreferences
 import com.ammar.wallflow.data.preferences.AutoWallpaperPreferences
 import com.ammar.wallflow.data.preferences.LookAndFeelPreferences
@@ -23,8 +23,8 @@ import com.ammar.wallflow.extensions.accessibleFolders
 import com.ammar.wallflow.extensions.getMLModelsFileIfExists
 import com.ammar.wallflow.extensions.workManager
 import com.ammar.wallflow.model.ObjectDetectionModel
-import com.ammar.wallflow.model.SavedSearch
 import com.ammar.wallflow.model.local.LocalDirectory
+import com.ammar.wallflow.model.search.SavedSearch
 import com.ammar.wallflow.services.ChangeWallpaperTileService
 import com.ammar.wallflow.utils.DownloadManager
 import com.ammar.wallflow.utils.DownloadStatus
@@ -37,6 +37,9 @@ import com.github.materiiapps.partial.partial
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.File
 import javax.inject.Inject
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -101,14 +104,14 @@ class SettingsViewModel @Inject constructor(
         localUiState.merge(
             SettingsUiState(
                 appPreferences = appPreferences,
-                objectDetectionModels = objectDetectionModels,
+                objectDetectionModels = objectDetectionModels.toPersistentList(),
                 selectedModel = selectedModel,
-                savedSearches = allSavedSearches,
-                autoWallpaperSavedSearch = allSavedSearches.find {
-                    appPreferences.autoWallpaperPreferences.savedSearchId == it.id
-                },
+                savedSearches = allSavedSearches.toPersistentList(),
+                autoWallpaperSavedSearches = allSavedSearches.filter {
+                    appPreferences.autoWallpaperPreferences.savedSearchIds.contains(it.id)
+                }.toPersistentList(),
                 autoWallpaperNextRun = autoWallpaperNextRun,
-                localDirectories = dirs,
+                localDirectories = dirs.toPersistentList(),
             ),
         )
     }.stateIn(
@@ -308,11 +311,13 @@ class SettingsViewModel @Inject constructor(
                 savedSearchRepository.delete(savedSearch)
                 // if saved search was set as the auto wallpaper source, remove it
                 val appPreferences = uiState.value.appPreferences
-                if (appPreferences.autoWallpaperPreferences.savedSearchId == savedSearch.id) {
+                val savedSearchIds = appPreferences.autoWallpaperPreferences.savedSearchIds
+                if (savedSearchIds.contains(savedSearch.id)) {
+                    val updatedSavedSearchIds = savedSearchIds - savedSearch.id
                     updateAutoWallpaperPrefs(
                         appPreferences.autoWallpaperPreferences.copy(
-                            savedSearchId = -1,
-                            savedSearchEnabled = false,
+                            savedSearchIds = updatedSavedSearchIds,
+                            savedSearchEnabled = updatedSavedSearchIds.isNotEmpty(),
                         ),
                         showSourcesDialog = false,
                     )
@@ -332,7 +337,7 @@ class SettingsViewModel @Inject constructor(
     ) {
         var prefs = autoWallpaperPreferences
         if (prefs.enabled &&
-            (!prefs.savedSearchEnabled || prefs.savedSearchId <= 0) &&
+            (!prefs.savedSearchEnabled || prefs.savedSearchIds.isEmpty()) &&
             !prefs.favoritesEnabled &&
             !prefs.localEnabled
         ) {
@@ -348,6 +353,12 @@ class SettingsViewModel @Inject constructor(
                 // disable auto wallpaper
                 prefs = prefs.copy(enabled = false)
             }
+        }
+        if (!prefs.enabled) {
+            // reset work request id
+            prefs = prefs.copy(
+                workRequestId = null,
+            )
         }
         viewModelScope.launch {
             appPreferencesRepository.updateAutoWallpaperPrefs(prefs)
@@ -439,6 +450,10 @@ class SettingsViewModel @Inject constructor(
             appPreferencesRepository.updateLookAndFeelPreferences(lookAndFeelPreferences)
         }
 
+    suspend fun checkSavedSearchNameExists(name: String, id: Long?) = id?.let {
+        savedSearchRepository.existsExcludingId(it, name)
+    } ?: savedSearchRepository.exists(name)
+
     private fun getAutoWallpaperNextRun() = application.workManager.getWorkInfosForUniqueWorkFlow(
         AutoWallpaperWorker.PERIODIC_WORK_NAME,
     ).map {
@@ -453,10 +468,11 @@ class SettingsViewModel @Inject constructor(
     }
 }
 
+@Stable
 @Partialize
 data class SettingsUiState(
     val appPreferences: AppPreferences = AppPreferences(),
-    val objectDetectionModels: List<ObjectDetectionModelEntity> = emptyList(),
+    val objectDetectionModels: ImmutableList<ObjectDetectionModelEntity> = persistentListOf(),
     val selectedModel: ObjectDetectionModel = ObjectDetectionModel.DEFAULT,
     val showObjectDetectionDelegateOptions: Boolean = false,
     val showObjectDetectionModelOptions: Boolean = false,
@@ -465,10 +481,10 @@ data class SettingsUiState(
     val modelDownloadStatus: DownloadStatus? = null,
     val deleteModel: ObjectDetectionModelEntity? = null,
     val showSavedSearches: Boolean = false,
-    val savedSearches: List<SavedSearch> = emptyList(),
+    val savedSearches: ImmutableList<SavedSearch> = persistentListOf(),
     val editSavedSearch: SavedSearch? = null,
     val deleteSavedSearch: SavedSearch? = null,
-    val autoWallpaperSavedSearch: SavedSearch? = null,
+    val autoWallpaperSavedSearches: ImmutableList<SavedSearch> = persistentListOf(),
     val showAutoWallpaperSourcesDialog: Boolean = false,
     val showAutoWallpaperFrequencyDialog: Boolean = false,
     val showAutoWallpaperConstraintsDialog: Boolean = false,
@@ -479,7 +495,7 @@ data class SettingsUiState(
     val autoWallpaperStatus: AutoWallpaperWorker.Companion.Status? = null,
     val showThemeOptionsDialog: Boolean = false,
     val showAutoWallpaperSetToDialog: Boolean = false,
-    val localDirectories: List<LocalDirectory> = emptyList(),
+    val localDirectories: ImmutableList<LocalDirectory> = persistentListOf(),
 )
 
 sealed class NextRun {

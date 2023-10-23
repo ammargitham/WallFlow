@@ -1,7 +1,10 @@
 package com.ammar.wallflow.data.network.model
 
-import com.ammar.wallflow.data.db.entity.ThumbsEntity
-import com.ammar.wallflow.data.db.entity.WallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallpaper.ThumbsEntity
+import com.ammar.wallflow.data.db.entity.wallpaper.WallhavenWallpaperEntity
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenThumbs
+import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenWallpaper
+import com.ammar.wallflow.data.network.model.wallhaven.toWallpaperEntity
 import com.ammar.wallflow.model.Purity
 import kotlin.test.assertEquals
 import kotlinx.datetime.Instant
@@ -152,7 +155,7 @@ class NetworkWallhavenWallpaperTest {
     }
 
     @Test
-    fun `convert NetworkWallpaper to WallpaperEntity`() {
+    fun `convert NetworkWallpaper to WallhavenWallpaperEntity`() {
         val networkWallhavenWallpaper = NetworkWallhavenWallpaper(
             id = "85k6eo",
             url = "https://wallhaven.cc/w/85k6eo",
@@ -179,7 +182,7 @@ class NetworkWallhavenWallpaperTest {
             ),
             tags = null,
         )
-        val expected = WallpaperEntity(
+        val expected = WallhavenWallpaperEntity(
             id = 0,
             wallhavenId = "85k6eo",
             url = "https://wallhaven.cc/w/85k6eo",

@@ -18,13 +18,13 @@ interface ObjectDetectionModelDao {
     @Query("SELECT * FROM object_detection_models WHERE name=:name")
     suspend fun getByName(name: String): ObjectDetectionModelEntity?
 
-    @Query("SELECT EXISTS(SELECT * FROM object_detection_models WHERE name=:name)")
+    @Query("SELECT EXISTS(SELECT 1 FROM object_detection_models WHERE name=:name)")
     suspend fun nameExists(name: String): Boolean
 
     @Query(
         """
         SELECT EXISTS (
-            SELECT *
+            SELECT 1
             FROM object_detection_models
             WHERE
                 id!=:id

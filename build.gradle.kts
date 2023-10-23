@@ -14,4 +14,35 @@
  * limitations under the License.
  */
 
-// Root build.gradle.kts
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
+plugins {
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.android.test) apply false
+    alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.hilt.gradle) apply false
+    alias(libs.plugins.ksp) apply false
+    alias(libs.plugins.spotless)
+    alias(libs.plugins.baselineprofile) apply false
+}
+
+subprojects {
+    tasks.withType<KotlinCompile>().configureEach {
+        kotlinOptions {
+            val pluginPrefix = "plugin:androidx.compose.compiler.plugins.kotlin"
+            val destination = "${project.buildDir.absolutePath}/compose_compiler"
+            if (project.findProperty("composeCompilerReports") == "true") {
+                freeCompilerArgs += listOf(
+                    "-P",
+                    "$pluginPrefix:reportsDestination=$destination",
+                )
+            }
+            if (project.findProperty("composeCompilerMetrics") == "true") {
+                freeCompilerArgs += listOf(
+                    "-P",
+                    "$pluginPrefix:metricsDestination=$destination",
+                )
+            }
+        }
+    }
+}

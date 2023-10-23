@@ -6,8 +6,8 @@ import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.IntSize
 import androidx.core.graphics.toColorInt
-import com.ammar.wallflow.data.db.entity.ThumbsEntity
-import com.ammar.wallflow.data.db.entity.WallpaperEntity
+import com.ammar.wallflow.data.db.entity.wallpaper.ThumbsEntity
+import com.ammar.wallflow.data.db.entity.wallpaper.WallhavenWallpaperEntity
 import com.ammar.wallflow.extensions.toHexString
 import com.ammar.wallflow.model.DownloadableWallpaper
 import com.ammar.wallflow.model.Purity
@@ -43,7 +43,7 @@ data class WallhavenWallpaper(
 fun WallhavenWallpaper.toEntity(
     id: Long = 0L,
     uploaderId: Long = 0L,
-) = WallpaperEntity(
+) = WallhavenWallpaperEntity(
     id = id,
     wallhavenId = this.id,
     url = url,

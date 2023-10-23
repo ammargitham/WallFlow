@@ -1,0 +1,146 @@
+{
+    "version": 1,
+    "preferences": {
+        "homeSearch": {
+            "query": "nature",
+            "filters": {
+                "excludedTags": [
+                    "anime"
+                ],
+                "sorting": "TOPLIST",
+                "topRange": "ONE_DAY"
+            }
+        },
+        "autoWallpaperPreferences": {
+            "enabled": true,
+            "savedSearchEnabled": true,
+            "savedSearchId": 1,
+            "useObjectDetection": false,
+            "workRequestId": "a5b42cf7-4c4e-46d0-a7ba-1428ef110970"
+        }
+    },
+    "favorites": [
+        {
+            "id": 3,
+            "sourceId": "kxjxod",
+            "source": "WALLHAVEN",
+            "favoritedOn": "2023-10-11T12:08:51.794Z"
+        },
+        {
+            "id": 2,
+            "sourceId": "zyvy1v",
+            "source": "WALLHAVEN",
+            "favoritedOn": "2023-10-11T12:08:50.834Z"
+        },
+        {
+            "id": 1,
+            "sourceId": "kxjxqd",
+            "source": "WALLHAVEN",
+            "favoritedOn": "2023-10-11T12:08:50.034Z"
+        }
+    ],
+    "wallhaven": {
+        "savedSearches": [
+            {
+                "id": 1,
+                "name": "Home",
+                "query": "nature",
+                "filters": "includedTags=&excludedTags=anime&username=&tagId=&wallpaperId=&categories=anime%2Cgeneral%2Cpeople&purity=sfw&sorting=toplist&order=desc&topRange=1d&atleast=&resolutions=&ratios=&colors=&seed="
+            }
+        ],
+        "wallpapers": [
+            {
+                "id": 4,
+                "wallhavenId": "kxjxod",
+                "url": "https://wallhaven.cc/w/kxjxod",
+                "shortUrl": "https://whvn.cc/kxjxod",
+                "uploaderId": null,
+                "views": 344,
+                "favorites": 14,
+                "source": "",
+                "purity": "SFW",
+                "category": "general",
+                "dimensionX": 1920,
+                "dimensionY": 1125,
+                "fileSize": 533895,
+                "fileType": "image/jpeg",
+                "createdAt": "2023-10-10T13:22:00Z",
+                "colors": [
+                    "#000000",
+                    "#424153",
+                    "#66cccc",
+                    "#336600",
+                    "#996633"
+                ],
+                "path": "https://w.wallhaven.cc/full/kx/wallhaven-kxjxod.jpg",
+                "thumbs": {
+                    "large": "https://th.wallhaven.cc/lg/kx/kxjxod.jpg",
+                    "original": "https://th.wallhaven.cc/orig/kx/kxjxod.jpg",
+                    "small": "https://th.wallhaven.cc/small/kx/kxjxod.jpg"
+                }
+            },
+            {
+                "id": 1,
+                "wallhavenId": "kxjxqd",
+                "url": "https://wallhaven.cc/w/kxjxqd",
+                "shortUrl": "https://whvn.cc/kxjxqd",
+                "uploaderId": null,
+                "views": 773,
+                "favorites": 48,
+                "source": "",
+                "purity": "SFW",
+                "category": "people",
+                "dimensionX": 1148,
+                "dimensionY": 1440,
+                "fileSize": 561994,
+                "fileType": "image/jpeg",
+                "createdAt": "2023-10-10T12:16:36Z",
+                "colors": [
+                    "#cccccc",
+                    "#999999",
+                    "#424153",
+                    "#996633",
+                    "#000000"
+                ],
+                "path": "https://w.wallhaven.cc/full/kx/wallhaven-kxjxqd.jpg",
+                "thumbs": {
+                    "large": "https://th.wallhaven.cc/lg/kx/kxjxqd.jpg",
+                    "original": "https://th.wallhaven.cc/orig/kx/kxjxqd.jpg",
+                    "small": "https://th.wallhaven.cc/small/kx/kxjxqd.jpg"
+                }
+            },
+            {
+                "id": 3,
+                "wallhavenId": "zyvy1v",
+                "url": "https://wallhaven.cc/w/zyvy1v",
+                "shortUrl": "https://whvn.cc/zyvy1v",
+                "uploaderId": null,
+                "views": 350,
+                "favorites": 8,
+                "source": "",
+                "purity": "SFW",
+                "category": "general",
+                "dimensionX": 5472,
+                "dimensionY": 3648,
+                "fileSize": 1385178,
+                "fileType": "image/jpeg",
+                "createdAt": "2023-10-10T22:48:35Z",
+                "colors": [
+                    "#0066cc",
+                    "#333399",
+                    "#66cccc",
+                    "#0099cc",
+                    "#abbcda"
+                ],
+                "path": "https://w.wallhaven.cc/full/zy/wallhaven-zyvy1v.jpg",
+                "thumbs": {
+                    "large": "https://th.wallhaven.cc/lg/zy/zyvy1v.jpg",
+                    "original": "https://th.wallhaven.cc/orig/zy/zyvy1v.jpg",
+                    "small": "https://th.wallhaven.cc/small/zy/zyvy1v.jpg"
+                }
+            }
+        ],
+        "uploaders": [],
+        "tags": []
+    }
+}

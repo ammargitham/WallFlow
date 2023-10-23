@@ -30,15 +30,16 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.ammar.wallflow.extensions.rememberLazyStaggeredGridState
 import com.ammar.wallflow.extensions.search
-import com.ammar.wallflow.model.Search
-import com.ammar.wallflow.model.SearchSaver
-import com.ammar.wallflow.model.TagSearchMeta
-import com.ammar.wallflow.model.UploaderSearchMeta
+import com.ammar.wallflow.model.OnlineSource
 import com.ammar.wallflow.model.Wallpaper
+import com.ammar.wallflow.model.search.RedditSearch
+import com.ammar.wallflow.model.search.SearchSaver
+import com.ammar.wallflow.model.search.WallhavenSearch
+import com.ammar.wallflow.model.search.WallhavenTagSearchMeta
+import com.ammar.wallflow.model.search.WallhavenUploaderSearchMeta
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.SearchBar
@@ -51,6 +52,11 @@ import com.ammar.wallflow.ui.common.searchedit.SaveAsDialog
 import com.ammar.wallflow.ui.common.searchedit.SavedSearchesDialog
 import com.ammar.wallflow.ui.common.topWindowInsets
 import com.ammar.wallflow.ui.screens.destinations.WallpaperScreenDestination
+import com.ammar.wallflow.ui.screens.home.composables.HomeFiltersBottomSheetHeader
+import com.ammar.wallflow.ui.screens.home.composables.ManageSourcesDialog
+import com.ammar.wallflow.ui.screens.home.composables.RedditInitDialog
+import com.ammar.wallflow.ui.screens.home.composables.header
+import com.ammar.wallflow.ui.screens.home.composables.wallhavenHeader
 import com.ammar.wallflow.ui.wallpaperviewer.WallpaperViewerViewModel
 import com.ammar.wallflow.utils.applyWallpaper
 import com.ammar.wallflow.utils.getStartBottomPadding
@@ -58,7 +64,7 @@ import com.ammar.wallflow.utils.shareWallpaper
 import com.ammar.wallflow.utils.shareWallpaperUrl
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.navigate
-import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 
 @OptIn(
@@ -71,16 +77,14 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeScreen(
     navController: NavController,
-    nestedScrollConnection: NestedScrollConnection,
-    modifier: Modifier = Modifier,
-    viewModel: HomeViewModel = hiltViewModel(),
-    viewerViewModel: WallpaperViewerViewModel = hiltViewModel(),
+    nestedScrollConnectionGetter: () -> NestedScrollConnection,
 ) {
+    val viewModel: HomeViewModel = hiltViewModel()
+    val viewerViewModel: WallpaperViewerViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val viewerUiState by viewerViewModel.uiState.collectAsStateWithLifecycle()
     val wallpapers = viewModel.wallpapers.collectAsLazyPagingItems()
     val gridState = wallpapers.rememberLazyStaggeredGridState()
-    val refreshing = wallpapers.loadState.refresh == LoadState.Loading
     val refreshState = rememberPullRefreshState(
         refreshing = false,
         onRefresh = {
@@ -95,35 +99,31 @@ fun HomeScreen(
     val context = LocalContext.current
     val bottomWindowInsets = bottomWindowInsets
     val navigationBarsInsets = WindowInsets.navigationBars
-    val bottomPadding = remember(
-        bottomBarController.state.value,
+    val bottomPadding = getStartBottomPadding(
         density,
-        bottomWindowInsets.getBottom(density),
-        navigationBarsInsets.getBottom(density),
-    ) {
-        getStartBottomPadding(
-            density,
-            bottomBarController,
-            bottomWindowInsets,
-            navigationBarsInsets,
-        )
-    }
+        bottomBarController,
+        bottomWindowInsets,
+        navigationBarsInsets,
+    )
     val systemState by systemController.state
-
-    LaunchedEffect(refreshing) {
-        viewModel.setWallpapersLoading(refreshing)
-    }
 
     LaunchedEffect(Unit) {
         systemController.resetBarsState()
         bottomBarController.update { it.copy(visible = true) }
     }
 
-    LaunchedEffect(uiState.mainSearch) {
+    LaunchedEffect(uiState.mainSearch, uiState.selectedSource) {
         searchBarController.update {
             it.copy(
                 visible = true,
-                search = uiState.mainSearch ?: MainSearchBar.Defaults.search,
+                search = uiState.mainSearch
+                    ?: when (uiState.selectedSource) {
+                        OnlineSource.WALLHAVEN -> MainSearchBar.Defaults.wallhavenSearch
+                        OnlineSource.REDDIT -> MainSearchBar.Defaults.redditSearch(
+                            subreddits = uiState.reddit.subreddits,
+                        )
+                    },
+                source = uiState.selectedSource,
             )
         }
     }
@@ -150,11 +150,13 @@ fun HomeScreen(
         }
     }
 
-    val onTagClick: (wallhavenTag: WallhavenTag) -> Unit = remember {
+    val onTagClick: (wallhavenTag: WallhavenTag) -> Unit = remember(
+        searchBarController.state.value.search,
+    ) {
         fn@{
-            val search = Search(
+            val search = WallhavenSearch(
                 query = "id:${it.id}",
-                meta = TagSearchMeta(it),
+                meta = WallhavenTagSearchMeta(it),
             )
             if (searchBarController.state.value.search == search) {
                 return@fn
@@ -166,14 +168,14 @@ fun HomeScreen(
     val onFilterFABClick = remember { { viewModel.showFilters(true) } }
 
     Box(
-        modifier = modifier
+        modifier = Modifier
             .fillMaxSize()
             .windowInsetsPadding(topWindowInsets)
             .pullRefresh(state = refreshState),
     ) {
         HomeScreenContent(
             modifier = Modifier.fillMaxSize(),
-            nestedScrollConnection = nestedScrollConnection,
+            nestedScrollConnectionGetter = nestedScrollConnectionGetter,
             isExpanded = systemState.isExpanded,
             gridState = gridState,
             contentPadding = PaddingValues(
@@ -182,9 +184,36 @@ fun HomeScreen(
                 top = SearchBar.Defaults.height,
                 bottom = bottomPadding + 8.dp,
             ),
-            wallhavenTags = if (uiState.isHome) uiState.wallhavenTags else persistentListOf(),
-            isTagsLoading = uiState.areTagsLoading,
             wallpapers = wallpapers,
+            header = if (uiState.isHome) {
+                {
+                    header(
+                        sources = uiState.sources
+                            .filter { it.value }
+                            .keys
+                            .toImmutableList(),
+                        selectedSource = uiState.selectedSource,
+                        sourceHeader = when (uiState.selectedSource) {
+                            OnlineSource.WALLHAVEN -> {
+                                {
+                                    wallhavenHeader(
+                                        wallhavenTags = uiState.wallhaven.wallhavenTags,
+                                        isTagsLoading = uiState.wallhaven.areTagsLoading,
+                                        onTagClick = onTagClick,
+                                    )
+                                }
+                            }
+                            OnlineSource.REDDIT -> null
+                        },
+                        onSourceClick = viewModel::changeSource,
+                        onManageSourcesClick = {
+                            viewModel.showManageSourcesDialog(true)
+                        },
+                    )
+                }
+            } else {
+                null
+            },
             favorites = uiState.favorites,
             blurSketchy = uiState.blurSketchy,
             blurNsfw = uiState.blurNsfw,
@@ -228,9 +257,9 @@ fun HomeScreen(
                 }
             },
             onFullWallpaperUploaderClick = {
-                val search = Search(
+                val search = WallhavenSearch(
                     query = "@${it.username}",
-                    meta = UploaderSearchMeta(wallhavenUploader = it),
+                    meta = WallhavenUploaderSearchMeta(uploader = it),
                 )
                 if (searchBarController.state.value.search == search) {
                     return@HomeScreenContent
@@ -245,63 +274,102 @@ fun HomeScreen(
             refreshing = false,
             state = refreshState,
         )
+    }
 
-        if (uiState.showFilters) {
-            val state = rememberModalBottomSheetState()
-            val scope = rememberCoroutineScope()
-            var localSearch by rememberSaveable(
-                uiState.homeSearch,
-                stateSaver = SearchSaver,
-            ) { mutableStateOf(uiState.homeSearch) }
+    if (uiState.showFilters) {
+        val state = rememberModalBottomSheetState(
+            skipPartiallyExpanded = uiState.selectedSource == OnlineSource.REDDIT,
+        )
+        val scope = rememberCoroutineScope()
+        var localSearch by rememberSaveable(
+            uiState.homeSearch,
+            stateSaver = SearchSaver,
+        ) { mutableStateOf(uiState.homeSearch) }
+        var hasError by rememberSaveable {
+            mutableStateOf(false)
+        }
 
-            EditSearchModalBottomSheet(
-                state = state,
-                search = localSearch,
-                header = {
-                    HomeFiltersBottomSheetHeader(
-                        modifier = Modifier.padding(
-                            start = 22.dp,
-                            end = 22.dp,
-                            bottom = 16.dp,
-                        ),
-                        saveEnabled = localSearch != uiState.homeSearch,
-                        onSaveClick = {
-                            viewModel.updateHomeSearch(localSearch)
-                            scope.launch { state.hide() }.invokeOnCompletion {
-                                if (!state.isVisible) {
-                                    viewModel.showFilters(false)
-                                }
+        EditSearchModalBottomSheet(
+            state = state,
+            search = localSearch,
+            header = {
+                HomeFiltersBottomSheetHeader(
+                    modifier = Modifier.padding(
+                        start = 22.dp,
+                        end = 22.dp,
+                        bottom = 16.dp,
+                    ),
+                    source = when (localSearch) {
+                        is WallhavenSearch -> OnlineSource.WALLHAVEN
+                        is RedditSearch -> OnlineSource.REDDIT
+                    },
+                    saveEnabled = !hasError && localSearch != uiState.homeSearch,
+                    onSaveClick = {
+                        viewModel.updateHomeSearch(localSearch)
+                        scope.launch { state.hide() }.invokeOnCompletion {
+                            if (!state.isVisible) {
+                                viewModel.showFilters(false)
                             }
-                        },
-                        onSaveAsClick = { viewModel.showSaveSearchAsDialog(localSearch) },
-                        onLoadClick = viewModel::showSavedSearches,
-                    )
-                },
-                showNSFW = uiState.showNSFW,
-                onChange = { localSearch = it },
-                onDismissRequest = { viewModel.showFilters(false) },
-            )
-        }
+                        }
+                    },
+                    onSaveAsClick = { viewModel.showSaveSearchAsDialog(localSearch) },
+                    onLoadClick = viewModel::showSavedSearches,
+                )
+            },
+            showNSFW = uiState.showNSFW,
+            onChange = { localSearch = it },
+            onErrorStateChange = { hasError = it },
+            onDismissRequest = { viewModel.showFilters(false) },
+        )
+    }
 
-        uiState.saveSearchAsSearch?.run {
-            SaveAsDialog(
-                onSave = {
-                    viewModel.saveSearchAs(it, this)
-                    viewModel.showSaveSearchAsDialog(null)
-                },
-                onDismissRequest = { viewModel.showSaveSearchAsDialog(null) },
-            )
-        }
+    if (uiState.showSaveAsDialog) {
+        SaveAsDialog(
+            checkNameExists = viewModel::checkSavedSearchNameExists,
+            onSave = {
+                val search = uiState.saveSearchAsSearch ?: return@SaveAsDialog
+                viewModel.saveSearchAs(it, search)
+                viewModel.showSaveSearchAsDialog(null)
+            },
+            onDismissRequest = { viewModel.showSaveSearchAsDialog(null) },
+        )
+    }
 
-        if (uiState.showSavedSearchesDialog) {
-            SavedSearchesDialog(
-                savedSearches = uiState.savedSearches,
-                onSelect = {
-                    viewModel.updateHomeSearch(it.search)
-                    viewModel.showSavedSearches(false)
-                },
-                onDismissRequest = { viewModel.showSavedSearches(false) },
-            )
-        }
+    if (uiState.showSavedSearchesDialog) {
+        SavedSearchesDialog(
+            savedSearches = uiState.savedSearches.filter {
+                when (uiState.selectedSource) {
+                    OnlineSource.WALLHAVEN -> it.search is WallhavenSearch
+                    OnlineSource.REDDIT -> it.search is RedditSearch
+                }
+            },
+            onSelect = {
+                viewModel.updateHomeSearch(it.search)
+                viewModel.showSavedSearches(false)
+            },
+            onDismissRequest = { viewModel.showSavedSearches(false) },
+        )
+    }
+
+    if (uiState.manageSourcesState.showDialog) {
+        ManageSourcesDialog(
+            currentSources = uiState.manageSourcesState.currentSources,
+            saveEnabled = uiState.manageSourcesState.saveEnabled,
+            onAddSourceClick = viewModel::addSource,
+            onVisibilityChange = { source, visible ->
+                val updated = uiState.manageSourcesState.currentSources.toMutableMap()
+                updated[source] = visible
+                viewModel.updateManageSourcesDialogSources(updated)
+            },
+            onSaveClick = viewModel::saveManageSources,
+            onDismissRequest = { viewModel.showManageSourcesDialog(false) },
+        )
+    }
+
+    if (uiState.showRedditInitDialog) {
+        RedditInitDialog(
+            onSaveClick = { viewModel.updateRedditConfigAndCloseDialog(it) },
+            onDismissRequest = { viewModel.showRedditInitDialog(false) },
+        )
     }
 }

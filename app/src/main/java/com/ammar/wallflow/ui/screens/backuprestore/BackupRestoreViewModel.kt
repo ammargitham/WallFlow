@@ -1,23 +1,25 @@
 package com.ammar.wallflow.ui.screens.backuprestore
 
-import com.ammar.wallflow.model.backup.FileNotFoundException as BackupFileNotFoundException
 import android.app.Application
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.ammar.wallflow.data.db.dao.FavoriteDao
-import com.ammar.wallflow.data.db.dao.SavedSearchDao
-import com.ammar.wallflow.data.db.dao.UploadersDao
-import com.ammar.wallflow.data.db.dao.WallpapersDao
+import com.ammar.wallflow.data.db.dao.search.SavedSearchDao
+import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenUploadersDao
+import com.ammar.wallflow.data.db.dao.wallpaper.RedditWallpapersDao
+import com.ammar.wallflow.data.db.dao.wallpaper.WallhavenWallpapersDao
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.FavoritesRepository
 import com.ammar.wallflow.data.repository.SavedSearchRepository
-import com.ammar.wallflow.data.repository.WallhavenRepository
+import com.ammar.wallflow.data.repository.reddit.RedditRepository
+import com.ammar.wallflow.data.repository.wallhaven.WallhavenRepository
 import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.extensions.readFromUri
 import com.ammar.wallflow.extensions.writeToUri
 import com.ammar.wallflow.model.backup.BackupOptions
+import com.ammar.wallflow.model.backup.FileNotFoundException as BackupFileNotFoundException
 import com.ammar.wallflow.model.backup.InvalidJsonException
 import com.ammar.wallflow.model.backup.RestoreException
 import com.ammar.wallflow.model.backup.RestoreSummary
@@ -39,12 +41,14 @@ class BackupRestoreViewModel @Inject constructor(
     private val application: Application,
     private val appPreferencesRepository: AppPreferencesRepository,
     private val favoriteDao: FavoriteDao,
-    private val wallpapersDao: WallpapersDao,
+    private val wallhavenWallpapersDao: WallhavenWallpapersDao,
+    private val redditWallpapersDao: RedditWallpapersDao,
     private val savedSearchDao: SavedSearchDao,
     private val savedSearchRepository: SavedSearchRepository,
     private val wallhavenRepository: WallhavenRepository,
+    private val redditRepository: RedditRepository,
     private val favoritesRepository: FavoritesRepository,
-    private val uploadersDao: UploadersDao,
+    private val uploadersDao: WallhavenUploadersDao,
 ) : AndroidViewModel(
     application = application,
 ) {
@@ -141,7 +145,8 @@ class BackupRestoreViewModel @Inject constructor(
                 options = options,
                 appPreferencesRepository = appPreferencesRepository,
                 favoriteDao = favoriteDao,
-                wallpapersDao = wallpapersDao,
+                wallhavenWallpapersDao = wallhavenWallpapersDao,
+                redditWallpapersDao = redditWallpapersDao,
                 savedSearchDao = savedSearchDao,
             ) ?: return@launch
             try {
@@ -202,9 +207,11 @@ class BackupRestoreViewModel @Inject constructor(
                     appPreferencesRepository = appPreferencesRepository,
                     savedSearchRepository = savedSearchRepository,
                     wallhavenRepository = wallhavenRepository,
+                    redditRepository = redditRepository,
                     favoritesRepository = favoritesRepository,
                     uploadersDao = uploadersDao,
-                    wallpapersDao = wallpapersDao,
+                    wallhavenWallpapersDao = wallhavenWallpapersDao,
+                    redditWallpapersDao = redditWallpapersDao,
                 )
                 localUiState.update {
                     it.copy(

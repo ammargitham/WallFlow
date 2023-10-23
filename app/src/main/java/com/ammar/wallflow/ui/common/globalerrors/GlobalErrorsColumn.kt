@@ -8,8 +8,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.repository.GlobalErrorsRepository.GlobalError
-import com.ammar.wallflow.data.repository.GlobalErrorsRepository.WallHavenRateLimitError
+import com.ammar.wallflow.data.repository.GlobalErrorsRepository.RateLimitError
 import com.ammar.wallflow.data.repository.GlobalErrorsRepository.WallHavenUnauthorisedError
+import com.ammar.wallflow.model.Source
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -23,10 +24,14 @@ fun GlobalErrorsColumn(
         items(globalErrors) {
             val errorMsg = when (it) {
                 is WallHavenUnauthorisedError -> stringResource(R.string.invalid_api_key_provided)
-                is WallHavenRateLimitError -> stringResource(
+                is RateLimitError -> stringResource(
                     R.string.rate_limited_please_try_again_after_some_time,
+                    when (it.source) {
+                        Source.WALLHAVEN -> stringResource(R.string.wallhaven_cc)
+                        Source.REDDIT -> stringResource(R.string.reddit)
+                        Source.LOCAL -> "" // will never be local
+                    },
                 )
-                else -> stringResource(R.string.error)
             }
             val actionText = when (it) {
                 is WallHavenUnauthorisedError -> stringResource(R.string.fix)

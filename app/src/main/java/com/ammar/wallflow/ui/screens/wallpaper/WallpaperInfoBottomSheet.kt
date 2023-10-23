@@ -28,6 +28,8 @@ import com.ammar.wallflow.R
 import com.ammar.wallflow.extensions.capitalise
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.local.LocalWallpaper
+import com.ammar.wallflow.model.reddit.RedditWallpaper
+import com.ammar.wallflow.model.reddit.redditWallpaper1
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import com.ammar.wallflow.model.wallhaven.wallhavenWallpaper1
@@ -98,6 +100,7 @@ fun WallpaperInfoBottomSheetContent(
     onSourceClick: () -> Unit = {},
 ) {
     val context = LocalContext.current
+    val sourceUrl = getSource(wallpaper)
 
     Column(
         modifier = modifier,
@@ -143,9 +146,7 @@ fun WallpaperInfoBottomSheetContent(
                     }
                 }
             }
-            if (wallpaper is WallhavenWallpaper &&
-                wallpaper.wallhavenSource.isNotBlank()
-            ) {
+            if (!sourceUrl.isNullOrEmpty()) {
                 PropertyRow(title = stringResource(R.string.source)) {
                     Box(
                         modifier = Modifier
@@ -156,20 +157,38 @@ fun WallpaperInfoBottomSheetContent(
                             modifier = Modifier.clickable(onClick = onSourceClick),
                             color = MaterialTheme.colorScheme.primary,
                             textDecoration = TextDecoration.Underline,
-                            text = wallpaper.wallhavenSource,
+                            text = sourceUrl,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
                     }
                 }
             }
-            if (wallpaper is WallhavenWallpaper &&
-                wallpaper.uploader != null
-            ) {
-                UploaderRow(
-                    wallhavenUploader = wallpaper.uploader,
-                    onClick = onUploaderClick,
+            // reddit post title
+            if (wallpaper is RedditWallpaper) {
+                PropertyRow(
+                    title = stringResource(R.string.title),
+                    text = wallpaper.postTitle,
                 )
+            }
+            // uploader or author
+            when (wallpaper) {
+                is WallhavenWallpaper -> {
+                    if (wallpaper.uploader != null) {
+                        WallhavenUploaderRow(
+                            wallhavenUploader = wallpaper.uploader,
+                            onClick = onUploaderClick,
+                        )
+                    }
+                }
+                is RedditWallpaper -> {
+                    if (wallpaper.author.isNotEmpty()) {
+                        PropertyRow(
+                            title = stringResource(R.string.user),
+                            text = "/u/${wallpaper.author}",
+                        )
+                    }
+                }
             }
             if (wallpaper is WallhavenWallpaper) {
                 PropertyRow(title = stringResource(R.string.category)) {
@@ -188,10 +207,12 @@ fun WallpaperInfoBottomSheetContent(
                 title = stringResource(R.string.resolution),
                 text = wallpaper.resolution.toString(),
             )
-            PropertyRow(
-                title = stringResource(R.string.size),
-                text = Formatter.formatShortFileSize(context, wallpaper.fileSize),
-            )
+            if (wallpaper.fileSize > 0) {
+                PropertyRow(
+                    title = stringResource(R.string.size),
+                    text = Formatter.formatShortFileSize(context, wallpaper.fileSize),
+                )
+            }
             if (wallpaper is WallhavenWallpaper) {
                 PropertyRow(
                     title = stringResource(R.string.views),
@@ -206,15 +227,35 @@ fun WallpaperInfoBottomSheetContent(
     }
 }
 
+private fun getSource(wallpaper: Wallpaper) = when (wallpaper) {
+    is WallhavenWallpaper -> wallpaper.wallhavenSource
+    is RedditWallpaper -> wallpaper.postUrl
+    else -> null
+}
+
 @Preview
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun PreviewWallpaperInfoBottomSheetContent() {
+private fun PreviewWallhavenWallpaperInfoBottomSheetContent() {
     WallFlowTheme {
         Surface {
             WallpaperInfoBottomSheetContent(
                 modifier = Modifier.padding(16.dp),
                 wallpaper = wallhavenWallpaper1,
+            )
+        }
+    }
+}
+
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun PreviewRedditWallpaperInfoBottomSheetContent() {
+    WallFlowTheme {
+        Surface {
+            WallpaperInfoBottomSheetContent(
+                modifier = Modifier.padding(16.dp),
+                wallpaper = redditWallpaper1,
             )
         }
     }

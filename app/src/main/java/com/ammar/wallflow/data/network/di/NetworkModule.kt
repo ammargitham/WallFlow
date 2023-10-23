@@ -2,12 +2,16 @@ package com.ammar.wallflow.data.network.di
 
 import com.ammar.wallflow.BuildConfig
 import com.ammar.wallflow.MIME_TYPE_JSON
+import com.ammar.wallflow.REDDIT_BASE_URL
 import com.ammar.wallflow.WALLHAVEN_BASE_URL
+import com.ammar.wallflow.data.network.RedditNetworkDataSource
 import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
 import com.ammar.wallflow.data.network.retrofit.DocumentConverterFactory
 import com.ammar.wallflow.data.network.retrofit.RetrofitWallhavenNetwork
 import com.ammar.wallflow.data.network.retrofit.WallhavenInterceptor
 import com.ammar.wallflow.data.network.retrofit.api.WallhavenNetworkApi
+import com.ammar.wallflow.data.network.retrofit.reddit.RedditNetworkApi
+import com.ammar.wallflow.data.network.retrofit.reddit.RetrofitRedditNetwork
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
 import dagger.Provides
@@ -64,7 +68,28 @@ object NetworkModule {
 
     @Provides
     @Singleton
-    fun providesWallHavenNetworkDataSource(
-        wallHavenNetworkApi: WallhavenNetworkApi,
-    ): WallhavenNetworkDataSource = RetrofitWallhavenNetwork(wallHavenNetworkApi)
+    fun providesWallhavenNetworkDataSource(
+        wallhavenNetworkApi: WallhavenNetworkApi,
+    ): WallhavenNetworkDataSource = RetrofitWallhavenNetwork(wallhavenNetworkApi)
+
+    @Provides
+    @Singleton
+    fun providesRedditNetworkApi(
+        networkJson: Json,
+        okHttpClient: OkHttpClient,
+    ): RedditNetworkApi = Retrofit.Builder().apply {
+        baseUrl(REDDIT_BASE_URL)
+        client(okHttpClient)
+        addConverterFactory(
+            networkJson.asConverterFactory(MIME_TYPE_JSON.toMediaType()),
+        )
+    }
+        .build()
+        .create(RedditNetworkApi::class.java)
+
+    @Provides
+    @Singleton
+    fun providesRedditNetworkDataSource(
+        redditNetworkApi: RedditNetworkApi,
+    ): RedditNetworkDataSource = RetrofitRedditNetwork(redditNetworkApi)
 }

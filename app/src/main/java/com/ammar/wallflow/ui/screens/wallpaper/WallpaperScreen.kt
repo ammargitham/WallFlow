@@ -20,10 +20,10 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import com.ammar.wallflow.extensions.search
-import com.ammar.wallflow.model.Search
 import com.ammar.wallflow.model.Source
-import com.ammar.wallflow.model.TagSearchMeta
-import com.ammar.wallflow.model.UploaderSearchMeta
+import com.ammar.wallflow.model.search.WallhavenSearch
+import com.ammar.wallflow.model.search.WallhavenTagSearchMeta
+import com.ammar.wallflow.model.search.WallhavenUploaderSearchMeta
 import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.TopBar
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
@@ -57,11 +57,6 @@ fun WallpaperScreen(
     val sheetColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
         BottomSheetDefaults.Elevation,
     )
-    // TODO: Use Color.Transparent for nav bar
-    // fully transparent nav bar will require setting some extra flags,
-    // so setting alpha 0.01 as current workaround
-    val navigationBarColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.01f)
-    // val navigationBarColor = Color.Transparent
     val searchBarController = LocalMainSearchBarController.current
     val bottomBarController = LocalBottomBarController.current
     val systemController = LocalSystemController.current
@@ -76,8 +71,7 @@ fun WallpaperScreen(
             systemController.update {
                 it.copy(
                     statusBarColor = Color.Transparent,
-                    lightStatusBars = false,
-                    navigationBarColor = navigationBarColor,
+                    navigationBarColor = Color.Transparent,
                 )
             }
         }
@@ -98,7 +92,11 @@ fun WallpaperScreen(
             it.copy(
                 statusBarVisible = uiState.systemBarsVisible,
                 navigationBarVisible = uiState.systemBarsVisible,
-                navigationBarColor = if (viewerUiState.showInfo) sheetColor else navigationBarColor,
+                navigationBarColor = if (viewerUiState.showInfo) {
+                    sheetColor
+                } else {
+                    Color.Transparent
+                },
             )
         }
     }
@@ -136,9 +134,9 @@ fun WallpaperScreen(
                 applyWallpaper(context, viewerViewModel, wallpaper)
             },
             onTagClick = {
-                val search = Search(
+                val search = WallhavenSearch(
                     query = "id:${it.id}",
-                    meta = TagSearchMeta(wallhavenTag = it),
+                    meta = WallhavenTagSearchMeta(tag = it),
                 )
                 if (searchBarController.state.value.search == search) {
                     return@WallpaperViewer
@@ -146,9 +144,9 @@ fun WallpaperScreen(
                 navController.search(search)
             },
             onUploaderClick = {
-                val search = Search(
+                val search = WallhavenSearch(
                     query = "@${it.username}",
-                    meta = UploaderSearchMeta(wallhavenUploader = it),
+                    meta = WallhavenUploaderSearchMeta(uploader = it),
                 )
                 if (searchBarController.state.value.search == search) {
                     return@WallpaperViewer

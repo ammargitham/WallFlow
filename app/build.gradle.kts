@@ -19,6 +19,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.room)
     alias(libs.plugins.spotless)
+    alias(libs.plugins.baselineprofile)
 }
 
 fun getAbi() = if (hasProperty("abi")) {
@@ -187,35 +188,18 @@ android {
     lint {
         warning += "AutoboxingStateCreation"
     }
+
+    sourceSets {
+        getByName("androidTest").assets.srcDir("$projectDir/schemas")
+    }
 }
 
 room {
     schemaDirectory("$projectDir/schemas/")
 }
 
-spotless {
-    ratchetFrom = "origin/main"
-    kotlin {
-        target("src/**/*.kt")
-        ktlint(libs.versions.ktlint.get())
-    }
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    kotlinOptions {
-        if (project.findProperty("composeCompilerReports") == "true") {
-            freeCompilerArgs += listOf(
-                "-P",
-                "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=${project.buildDir.absolutePath}/compose_compiler",
-            )
-        }
-        if (project.findProperty("composeCompilerMetrics") == "true") {
-            freeCompilerArgs += listOf(
-                "-P",
-                "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=${project.buildDir.absolutePath}/compose_compiler",
-            )
-        }
-    }
+baselineProfile {
+    mergeIntoMain = true
 }
 
 val plusImplementation by configurations
@@ -251,6 +235,7 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
+    androidTestImplementation(libs.androidx.room.testing)
 
     // Compose
     implementation(libs.androidx.compose.ui)
@@ -288,7 +273,6 @@ dependencies {
 
     // Accompanist
     implementation(libs.accompanist.adaptive)
-    implementation(libs.accompanist.placeholder.material)
 
     // jsoup
     implementation(libs.jsoup)
@@ -339,6 +323,10 @@ dependencies {
     // LeakCanary
     debugImplementation(libs.leakcanary.android)
 
+    // Baseline Profiles
+    implementation(libs.androidx.profileinstaller)
+    baselineProfile(project(":benchmarks"))
+
     // Local tests: jUnit, coroutines, Android runner
     testImplementation(libs.junit)
     testImplementation(libs.kotlinx.coroutines.test)
@@ -353,6 +341,14 @@ dependencies {
 
     // mockk
     androidTestImplementation(libs.mockk.android)
+}
+
+spotless {
+    ratchetFrom = "origin/main"
+    kotlin {
+        target("src/**/*.kt")
+        ktlint(libs.versions.ktlint.get())
+    }
 }
 
 aboutLibraries {

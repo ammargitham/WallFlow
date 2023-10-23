@@ -21,7 +21,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.platform.LocalContext
@@ -30,18 +34,25 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.R
 import com.ammar.wallflow.model.MenuItem
-import com.ammar.wallflow.model.Search
-import com.ammar.wallflow.model.SearchQuery
-import com.ammar.wallflow.model.Sorting
-import com.ammar.wallflow.model.TagSearchMeta
-import com.ammar.wallflow.model.UploaderSearchMeta
+import com.ammar.wallflow.model.search.Filters
+import com.ammar.wallflow.model.search.RedditFilters
+import com.ammar.wallflow.model.search.RedditSearch
+import com.ammar.wallflow.model.search.RedditSort
+import com.ammar.wallflow.model.search.RedditTimeRange
+import com.ammar.wallflow.model.search.Search
+import com.ammar.wallflow.model.search.WallhavenFilters
+import com.ammar.wallflow.model.search.WallhavenSearch
+import com.ammar.wallflow.model.search.WallhavenSearchMeta
+import com.ammar.wallflow.model.search.WallhavenSorting
+import com.ammar.wallflow.model.search.WallhavenTagSearchMeta
+import com.ammar.wallflow.model.search.WallhavenUploaderSearchMeta
 import com.ammar.wallflow.ui.common.OverflowMenu
 import com.ammar.wallflow.ui.common.SearchBar
 import com.ammar.wallflow.ui.common.Suggestion
 import com.ammar.wallflow.ui.common.TagChip
 import com.ammar.wallflow.ui.common.UploaderChip
 import com.ammar.wallflow.ui.common.searchedit.EditSearchContent
-import com.ammar.wallflow.ui.screens.home.SearchBarFiltersToggle
+import com.ammar.wallflow.ui.screens.home.composables.SearchBarFiltersToggle
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 
 object MainSearchBar {
@@ -51,7 +62,7 @@ object MainSearchBar {
         useDocked: Boolean = false,
         visible: Boolean = true,
         active: Boolean = false,
-        search: Search = Defaults.search,
+        search: Search = Defaults.wallhavenSearch,
         query: String = "",
         suggestions: List<Suggestion<Search>> = emptyList(),
         showFilters: Boolean = false,
@@ -67,16 +78,27 @@ object MainSearchBar {
         onSuggestionDeleteRequest: (suggestion: Suggestion<Search>) -> Unit = {},
         onActiveChange: (active: Boolean) -> Unit = {},
         onShowFiltersChange: (show: Boolean) -> Unit = {},
-        onFiltersChange: (searchQuery: SearchQuery) -> Unit = {},
+        onFiltersChange: (filters: Filters) -> Unit = {},
         onDeleteSuggestionConfirmClick: () -> Unit = {},
         onDeleteSuggestionDismissRequest: () -> Unit = {},
         onSaveAsClick: () -> Unit = {},
         onLoadClick: () -> Unit = {},
     ) {
-        val placeholder: @Composable () -> Unit = remember {
+        val placeholder: @Composable () -> Unit = remember(search) {
             {
-                Text(text = stringResource(R.string.search))
+                Text(
+                    text = stringResource(
+                        R.string.search_source,
+                        when (search) {
+                            is WallhavenSearch -> stringResource(R.string.wallhaven_cc)
+                            is RedditSearch -> stringResource(R.string.reddit)
+                        },
+                    ),
+                )
             }
+        }
+        var hasError by rememberSaveable {
+            mutableStateOf(false)
         }
 
         AnimatedVisibility(
@@ -91,7 +113,7 @@ object MainSearchBar {
                 placeholder = when {
                     active -> placeholder
                     else -> when (search.meta) {
-                        is TagSearchMeta, is UploaderSearchMeta -> null
+                        is WallhavenTagSearchMeta, is WallhavenUploaderSearchMeta -> null
                         else -> placeholder
                     }
                 },
@@ -100,22 +122,25 @@ object MainSearchBar {
                 extraLeadingContent = when {
                     active -> null
                     else -> when (search.meta) {
-                        is TagSearchMeta -> {
-                            { TagChip(wallhavenTag = search.meta.wallhavenTag) }
-                        }
-                        is UploaderSearchMeta -> {
-                            { UploaderChip(wallhavenUploader = search.meta.wallhavenUploader) }
-                        }
+                        is WallhavenSearchMeta -> getWallhavenSearchMetaContent(
+                            search.meta as WallhavenSearchMeta,
+                        )
                         else -> null
                     }
                 },
+                enabled = !hasError,
                 onQueryChange = onQueryChange,
                 onBackClick = onBackClick,
                 onSearch = onSearch,
                 onSuggestionClick = onSuggestionClick,
                 onSuggestionInsert = onSuggestionInsert,
                 onSuggestionDeleteRequest = onSuggestionDeleteRequest,
-                onActiveChange = onActiveChange,
+                onActiveChange = {
+                    if (!it) {
+                        hasError = false
+                    }
+                    onActiveChange(it)
+                },
                 trailingIcon = {
                     Crossfade(
                         targetState = active,
@@ -129,6 +154,7 @@ object MainSearchBar {
                                 )
                                 ActiveOverflowIcon(
                                     query = query,
+                                    onSaveAsDisabled = hasError,
                                     onSaveAsClick = onSaveAsClick,
                                     onLoadClick = onLoadClick,
                                 )
@@ -157,6 +183,7 @@ object MainSearchBar {
                                 search = search,
                                 showNSFW = showNSFW,
                                 onChange = { onFiltersChange(it.filters) },
+                                onErrorStateChange = { hasError = it },
                             )
                         }
                     }
@@ -184,11 +211,32 @@ object MainSearchBar {
     }
 
     object Defaults {
-        val search = Search(
-            filters = SearchQuery(
-                sorting = Sorting.RELEVANCE,
+        val wallhavenSearch = WallhavenSearch(
+            filters = WallhavenFilters(
+                sorting = WallhavenSorting.RELEVANCE,
             ),
         )
+
+        fun redditSearch(subreddits: Set<String>) = RedditSearch(
+            filters = RedditFilters(
+                subreddits = subreddits,
+                includeNsfw = false,
+                sort = RedditSort.RELEVANCE,
+                timeRange = RedditTimeRange.ALL,
+            ),
+        )
+    }
+}
+
+@Composable
+internal fun getWallhavenSearchMetaContent(
+    meta: WallhavenSearchMeta,
+): @Composable () -> Unit = when (meta) {
+    is WallhavenTagSearchMeta -> {
+        { TagChip(wallhavenTag = meta.tag) }
+    }
+    is WallhavenUploaderSearchMeta -> {
+        { UploaderChip(wallhavenUploader = meta.uploader) }
     }
 }
 
@@ -196,17 +244,22 @@ object MainSearchBar {
 fun ActiveOverflowIcon(
     modifier: Modifier = Modifier,
     query: String = "",
+    onSaveAsDisabled: Boolean = false,
     onSaveAsClick: () -> Unit = {},
     onLoadClick: () -> Unit = {},
 ) {
     val context = LocalContext.current
-    val menuItems = remember(context, query.isNotBlank()) {
+    val menuItems = remember(
+        context,
+        query.isNotBlank(),
+        onSaveAsDisabled,
+    ) {
         listOf(
             MenuItem(
                 text = context.getString(R.string.save_as),
                 value = "save_as",
                 onClick = onSaveAsClick,
-                enabled = query.isNotBlank(),
+                enabled = !onSaveAsDisabled && query.isNotBlank(),
             ),
             MenuItem(
                 text = context.getString(R.string.load),

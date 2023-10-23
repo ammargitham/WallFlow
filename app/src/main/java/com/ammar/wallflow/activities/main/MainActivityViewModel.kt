@@ -3,8 +3,8 @@ package com.ammar.wallflow.activities.main
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.ammar.wallflow.data.db.entity.toSavedSearch
-import com.ammar.wallflow.data.db.entity.toSearch
+import com.ammar.wallflow.data.db.entity.search.toSavedSearch
+import com.ammar.wallflow.data.db.entity.search.toSearch
 import com.ammar.wallflow.data.preferences.Theme
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.GlobalErrorsRepository
@@ -12,9 +12,12 @@ import com.ammar.wallflow.data.repository.GlobalErrorsRepository.GlobalError
 import com.ammar.wallflow.data.repository.SavedSearchRepository
 import com.ammar.wallflow.data.repository.SearchHistoryRepository
 import com.ammar.wallflow.extensions.trimAll
-import com.ammar.wallflow.model.SavedSearch
-import com.ammar.wallflow.model.Search
-import com.ammar.wallflow.model.getSupportingText
+import com.ammar.wallflow.model.OnlineSource
+import com.ammar.wallflow.model.search.RedditSearch
+import com.ammar.wallflow.model.search.SavedSearch
+import com.ammar.wallflow.model.search.Search
+import com.ammar.wallflow.model.search.WallhavenSearch
+import com.ammar.wallflow.model.search.getSupportingText
 import com.ammar.wallflow.ui.common.Suggestion
 import com.ammar.wallflow.ui.common.mainsearch.MainSearchBar
 import com.github.materiiapps.partial.Partialize
@@ -56,16 +59,34 @@ class MainActivityViewModel @Inject constructor(
                         localQuery.isBlank() ||
                             it.query.trimAll().lowercase().contains(localQuery)
                     }
-                    .map { s ->
-                        val search = s.toSearch()
-                        Suggestion(
-                            value = search,
-                            headline = s.query,
-                            supportingText = search.getSupportingText(application),
-                        )
+                    .map { it.toSearch() }
+                    .filter {
+                        when (local.searchBarSource.getOrNull()) {
+                            OnlineSource.WALLHAVEN -> it is WallhavenSearch
+                            OnlineSource.REDDIT -> it is RedditSearch
+                            null -> false
+                        }
+                    }
+                    .map {
+                        when (it) {
+                            is WallhavenSearch -> Suggestion(
+                                value = it,
+                                source = OnlineSource.WALLHAVEN,
+                                headline = it.query,
+                                supportingText = it.getSupportingText(application),
+                            )
+                            is RedditSearch -> Suggestion(
+                                value = it,
+                                source = OnlineSource.REDDIT,
+                                headline = it.query,
+                                supportingText = null,
+                            )
+                        }
                     },
                 globalErrors = errors,
-                savedSearches = savedSearchEntities.map { entity -> entity.toSavedSearch() },
+                savedSearches = savedSearchEntities.map { entity ->
+                    entity.toSavedSearch()
+                },
                 theme = appPreferences.lookAndFeelPreferences.theme,
                 searchBarShowNSFW = appPreferences.wallhavenApiKey.isNotBlank(),
                 showLocalTab = appPreferences.lookAndFeelPreferences.showLocalTab,
@@ -87,6 +108,10 @@ class MainActivityViewModel @Inject constructor(
         it.copy(searchBarSearch = partial(search))
     }
 
+    fun setSearchBarSource(source: OnlineSource) = localUiState.update {
+        it.copy(searchBarSource = partial(source))
+    }
+
     fun onSearch(search: Search) {
         localUiState.update { it.copy(searchBarSearch = partial(search)) }
         viewModelScope.launch {
@@ -104,8 +129,18 @@ class MainActivityViewModel @Inject constructor(
     }
 
     fun onSearchBarQueryChange(query: String) = localUiState.update {
-        val currentSearch = it.searchBarSearch.getOrElse { MainSearchBar.Defaults.search }
-        it.copy(searchBarSearch = partial(currentSearch.copy(query = query)))
+        val updated = when (
+            val currentSearch =
+                it.searchBarSearch.getOrElse { MainSearchBar.Defaults.wallhavenSearch }
+        ) {
+            is RedditSearch -> currentSearch.copy(
+                query = query,
+            )
+            is WallhavenSearch -> currentSearch.copy(
+                query = query,
+            )
+        }
+        it.copy(searchBarSearch = partial(updated))
     }
 
     fun deleteSearch(search: Search) = viewModelScope.launch {
@@ -129,13 +164,16 @@ class MainActivityViewModel @Inject constructor(
     fun showSavedSearches(show: Boolean = true) = localUiState.update {
         it.copy(showSavedSearchesDialog = partial(show))
     }
+
+    suspend fun checkSavedSearchNameExists(name: String) = savedSearchRepository.exists(name)
 }
 
 @Partialize
 data class MainUiState(
     val globalErrors: List<GlobalError> = emptyList(),
     val searchBarActive: Boolean = false,
-    val searchBarSearch: Search = MainSearchBar.Defaults.search,
+    val searchBarSearch: Search = MainSearchBar.Defaults.wallhavenSearch,
+    val searchBarSource: OnlineSource = OnlineSource.WALLHAVEN,
     val searchBarSuggestions: List<Suggestion<Search>> = emptyList(),
     val showSearchBarFilters: Boolean = false,
     val searchBarDeleteSuggestion: Search? = null,
