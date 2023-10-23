@@ -123,6 +123,7 @@ fun HomeScreen(
                             subreddits = uiState.reddit.subreddits,
                         )
                     },
+                source = uiState.selectedSource,
             )
         }
     }

@@ -59,18 +59,26 @@ class MainActivityViewModel @Inject constructor(
                         localQuery.isBlank() ||
                             it.query.trimAll().lowercase().contains(localQuery)
                     }
-                    .map { s ->
-                        when (val search = s.toSearch()) {
+                    .map { it.toSearch() }
+                    .filter {
+                        when (local.searchBarSource.getOrNull()) {
+                            OnlineSource.WALLHAVEN -> it is WallhavenSearch
+                            OnlineSource.REDDIT -> it is RedditSearch
+                            null -> false
+                        }
+                    }
+                    .map {
+                        when (it) {
                             is WallhavenSearch -> Suggestion(
-                                value = search,
+                                value = it,
                                 source = OnlineSource.WALLHAVEN,
-                                headline = s.query,
-                                supportingText = search.getSupportingText(application),
+                                headline = it.query,
+                                supportingText = it.getSupportingText(application),
                             )
                             is RedditSearch -> Suggestion(
-                                value = search,
+                                value = it,
                                 source = OnlineSource.REDDIT,
-                                headline = s.query,
+                                headline = it.query,
                                 supportingText = null,
                             )
                         }
@@ -98,6 +106,10 @@ class MainActivityViewModel @Inject constructor(
 
     fun setSearchBarSearch(search: Search) = localUiState.update {
         it.copy(searchBarSearch = partial(search))
+    }
+
+    fun setSearchBarSource(source: OnlineSource) = localUiState.update {
+        it.copy(searchBarSource = partial(source))
     }
 
     fun onSearch(search: Search) {
@@ -161,6 +173,7 @@ data class MainUiState(
     val globalErrors: List<GlobalError> = emptyList(),
     val searchBarActive: Boolean = false,
     val searchBarSearch: Search = MainSearchBar.Defaults.wallhavenSearch,
+    val searchBarSource: OnlineSource = OnlineSource.WALLHAVEN,
     val searchBarSuggestions: List<Suggestion<Search>> = emptyList(),
     val showSearchBarFilters: Boolean = false,
     val searchBarDeleteSuggestion: Search? = null,

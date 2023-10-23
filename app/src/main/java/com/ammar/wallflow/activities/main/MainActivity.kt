@@ -174,6 +174,10 @@ class MainActivity : ComponentActivity() {
             viewModel.setSearchBarSearch(searchBarControllerState.search)
         }
 
+        LaunchedEffect(searchBarControllerState.source) {
+            viewModel.setSearchBarSource(searchBarControllerState.source)
+        }
+
         LaunchedEffect(useNavRail) {
             bottomBarController.update { it.copy(isRail = useNavRail) }
         }
