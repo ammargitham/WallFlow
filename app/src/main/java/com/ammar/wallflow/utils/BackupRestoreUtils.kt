@@ -43,6 +43,7 @@ import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.JsonPrimitive
 import kotlinx.serialization.json.decodeFromJsonElement
 import kotlinx.serialization.json.intOrNull
+import kotlinx.serialization.json.jsonArray
 import kotlinx.serialization.json.jsonObject
 import kotlinx.serialization.json.jsonPrimitive
 import kotlinx.serialization.json.longOrNull
@@ -345,14 +346,44 @@ private fun migratePrefs(prefsJson: JsonObject): JsonObject {
 private fun migratePrefs1To2(prefsJson: JsonObject): JsonObject {
     return JsonObject(
         prefsJson.toMutableMap().apply root@{
-            // convert key `homeSearch` to `homeWallhavenSearch`
             val homeSearchKey = "homeSearch"
             val homeSearchJson = this[homeSearchKey]
-            // insert new key
-            if (homeSearchJson != null) {
-                put("homeWallhavenSearch", homeSearchJson)
+            // fix types for CategoryWallhavenRatio and SizeWallhavenRatio
+            val mutableHomeSearchJson = homeSearchJson?.jsonObject?.toMutableMap()
+            val ratios = homeSearchJson?.jsonObject
+                ?.get("filters")?.jsonObject
+                ?.get("ratios")?.jsonArray
+            val mutableRatios = ratios?.toMutableList()
+            ratios?.forEachIndexed { i, ele ->
+                val ratio = ele.jsonObject
+                val type = ratio["type"]?.jsonPrimitive?.content
+                if (type != null) {
+                    val newType = when (type) {
+                        "com.ammar.wallflow.model.Ratio.CategoryRatio" ->
+                            "com.ammar.wallflow.model.search.WallhavenRatio.CategoryWallhavenRatio"
+                        "com.ammar.wallflow.model.Ratio.SizeRatio" ->
+                            "com.ammar.wallflow.model.search.WallhavenRatio.SizeWallhavenRatio"
+                        else -> null
+                    }
+                    if (newType != null) {
+                        val mutableRatio = ratio.toMutableMap()
+                        mutableRatio["type"] = JsonPrimitive(newType)
+                        mutableRatios?.set(i, JsonObject(mutableRatio))
+                    }
+                }
             }
-            // remove old key
+            if (mutableHomeSearchJson != null && mutableRatios != null) {
+                val mutableFilters = mutableHomeSearchJson["filters"]?.jsonObject?.toMutableMap()
+                mutableFilters?.set("ratios", JsonArray(mutableRatios))
+                if (mutableFilters != null) {
+                    mutableHomeSearchJson["filters"] = JsonObject(mutableFilters)
+                }
+            }
+
+            // convert key `homeSearch` to `homeWallhavenSearch`
+            if (mutableHomeSearchJson != null) {
+                put("homeWallhavenSearch", JsonObject(mutableHomeSearchJson))
+            }
             remove(homeSearchKey)
 
             // convert autoWallpaperPreferences.savedSearchId to savedSearchIds

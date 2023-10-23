@@ -8,7 +8,13 @@
                     "anime"
                 ],
                 "sorting": "TOPLIST",
-                "topRange": "ONE_DAY"
+                "topRange": "ONE_DAY",
+                "ratios": [
+                    {
+                        "type": "com.ammar.wallflow.model.Ratio.CategoryRatio",
+                        "category": "PORTRAIT"
+                    }
+                ]
             }
         },
         "autoWallpaperPreferences": {

@@ -13,6 +13,7 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
@@ -52,7 +53,7 @@ class PreferencesMigrationTest {
                 it[homeFiltersPrefKey] =
                     "includedTags=&excludedTags=&username=&tagId=&wallpaperId=" +
                     "&categories=anime%2Cgeneral%2Cpeople&purity=sfw&sorting=toplist&order=desc" +
-                    "&topRange=1d&atleast=&resolutions=&ratios=&colors=&seed="
+                    "&topRange=1d&atleast=&resolutions=&ratios=portrait&colors=&seed="
                 it[prevAutoWallpaperSavedSearchIdKey] = 1
             }
             val migrateAppPrefs1To2 = migrateAppPrefs1To2()
@@ -64,10 +65,30 @@ class PreferencesMigrationTest {
             assertEquals(2, updatedPrefs[PreferencesKeys.VERSION])
             val homeWallhavenSearchPrefKey = stringPreferencesKey("home_wallhaven_search")
             assertTrue(updatedPrefs.contains(homeWallhavenSearchPrefKey))
+            val homeWallhavenSearchStr = updatedPrefs[homeWallhavenSearchPrefKey]
+            assertNotNull(homeWallhavenSearchStr)
+            // language=json
             assertEquals(
-                "{\"query\":\"test\"," +
-                    "\"filters\":{\"sorting\":\"TOPLIST\",\"topRange\":\"ONE_DAY\"}}",
-                updatedPrefs[homeWallhavenSearchPrefKey],
+                """
+                    {
+                      "query": "test",
+                      "filters": {
+                        "sorting": "TOPLIST",
+                        "topRange": "ONE_DAY",
+                        "ratios": [
+                          {
+                            "type": "com.ammar.wallflow.model.search.WallhavenRatio.CategoryWallhavenRatio",
+                            "category": "PORTRAIT"
+                          }
+                        ]
+                      }
+                    }
+                """.trimIndent().replace(
+                    // language=regexp
+                    "\\s(?=[\\s\":{}\\[\\]])".toRegex(),
+                    "",
+                ),
+                homeWallhavenSearchStr,
             )
             val autoWallpaperSavedSearchIdKey = stringSetPreferencesKey(
                 "auto_wallpaper_saved_search_id",
