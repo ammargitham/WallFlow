@@ -8,9 +8,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -147,7 +147,7 @@ private fun ManageSourcesDialogContent(
                     )
                 },
                 trailingContent = {
-                    IconToggleButton(
+                    Checkbox(
                         checked = it.value,
                         enabled = if (!it.value) {
                             // if this source is set to hidden, keep it enabled
@@ -160,20 +160,7 @@ private fun ManageSourcesDialogContent(
                         onCheckedChange = { visibility ->
                             onVisibilityChange(it.key, visibility)
                         },
-                    ) {
-                        Icon(
-                            painter = painterResource(
-                                if (it.value) {
-                                    R.drawable.baseline_visibility_off_24
-                                } else {
-                                    R.drawable.baseline_visibility_24
-                                },
-                            ),
-                            contentDescription = stringResource(
-                                R.string.source_home_visibility_toggle,
-                            ),
-                        )
-                    }
+                    )
                 },
             )
         }
