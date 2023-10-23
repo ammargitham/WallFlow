@@ -51,8 +51,8 @@ class PreferencesMigrationTest {
                 it[homeSearchQueryPrefKey] = "test"
                 it[homeFiltersPrefKey] =
                     "includedTags=&excludedTags=&username=&tagId=&wallpaperId=" +
-                        "&categories=anime%2Cgeneral%2Cpeople&purity=sfw&sorting=toplist&order=desc" +
-                        "&topRange=1d&atleast=&resolutions=&ratios=&colors=&seed="
+                    "&categories=anime%2Cgeneral%2Cpeople&purity=sfw&sorting=toplist&order=desc" +
+                    "&topRange=1d&atleast=&resolutions=&ratios=&colors=&seed="
                 it[prevAutoWallpaperSavedSearchIdKey] = 1
             }
             val migrateAppPrefs1To2 = migrateAppPrefs1To2()
