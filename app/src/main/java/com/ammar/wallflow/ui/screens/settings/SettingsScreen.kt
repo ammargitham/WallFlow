@@ -585,7 +585,7 @@ private fun getSourcesSummary(
     if (savedSearchEnabled) {
         add(
             "${context.getString(R.string.saved_search)} (${
-                savedSearches.joinToString(",") { it.name }
+                savedSearches.joinToString(", ") { it.name }
             })",
         )
     }
