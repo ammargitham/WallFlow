@@ -27,10 +27,12 @@ object MockFactory {
         size: Int = 10,
         random: Random = Random,
         clock: Clock = Clock.System,
+        allUploadersNull: Boolean = false,
     ) = List(size) {
         generateNetworkWallhavenWallpaper(
             random = random,
             clock = clock,
+            uploaderNull = allUploadersNull,
         )
     }
 
@@ -38,8 +40,27 @@ object MockFactory {
         random: Random = Random,
         clock: Clock = Clock.System,
         idNumber: Int = random.nextInt().absoluteValue,
+        uploaderNull: Boolean = false,
     ): NetworkWallhavenWallpaper {
         val id = idNumber + 1
+        val uploader = if (uploaderNull) {
+            null
+        } else {
+            // randomly choose null for uploader
+            listOf(
+                NetworkWallhavenUploader(
+                    username = "uploader$id",
+                    group = "test",
+                    avatar = mapOf(
+                        "large" to "https://example.com/uploader$id/large",
+                        "medium" to "https://example.com/uploader$id/medium",
+                        "small" to "https://example.com/uploader$id/small",
+                        "tiny" to "https://example.com/uploader$id/tiny",
+                    ),
+                ),
+                null,
+            ).random()
+        }
         return NetworkWallhavenWallpaper(
             id = "wallpaper$id",
             url = "https://example.com/wallpaper$id",
@@ -63,16 +84,7 @@ object MockFactory {
                 original = "https://example.com/wallpaper$id/original",
                 small = "https://example.com/wallpaper$id/small",
             ),
-            uploader = NetworkWallhavenUploader(
-                username = "uploader$id",
-                group = "test",
-                avatar = mapOf(
-                    "large" to "https://example.com/uploader$id/large",
-                    "medium" to "https://example.com/uploader$id/medium",
-                    "small" to "https://example.com/uploader$id/small",
-                    "tiny" to "https://example.com/uploader$id/tiny",
-                ),
-            ),
+            uploader = uploader,
             tags = List(random.nextInt(5)) {
                 NetworkWallhavenTag(
                     id = (it + id).toLong(),

@@ -265,16 +265,18 @@ suspend fun restoreBackupV1(
                     uploaderIdUpdateMap[oldId] = newId
                 }
             }
-            // restore wallpapers
+            var updatedWallhavenWallpapers = wallhavenWallpapers
+            // restore wallpaper uploaderIds
             if (uploaderIdUpdateMap.isNotEmpty()) {
                 // uploader id map cannot be empty while inserting wallpapers
-                val updatedWallhavenWallpapers = wallhavenWallpapers.map {
+                updatedWallhavenWallpapers = wallhavenWallpapers.map {
                     it.copy(
                         uploaderId = uploaderIdUpdateMap[it.uploaderId],
                     )
                 }
-                wallhavenRepository.insertWallpaperEntities(updatedWallhavenWallpapers)
             }
+            // restore wallpapers
+            wallhavenRepository.insertWallpaperEntities(updatedWallhavenWallpapers)
         }
         // 2. Reddit wallpapers
         val redditWallpapers = backup.reddit?.wallpapers
