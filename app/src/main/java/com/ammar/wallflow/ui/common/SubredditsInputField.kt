@@ -54,9 +54,13 @@ fun SubredditsInputField(
     val regex = remember { "[ ,\\r\\n]+".toRegex() }
 
     LaunchedEffect(localSubreddits) {
+        val updatedSubreddits = localSubreddits.mapTo(LinkedHashSet()) { it.first }
+        if (subreddits == updatedSubreddits) {
+            return@LaunchedEffect
+        }
         isDirty = true
         onChange(
-            localSubreddits.mapTo(LinkedHashSet()) { it.first },
+            updatedSubreddits,
             hasError,
         )
     }

@@ -36,6 +36,7 @@ import com.ammar.wallflow.ui.common.UnpaddedAlertDialogContent
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -269,6 +270,7 @@ private fun RedditInitDialogContent(
     val focusRequester = remember { FocusRequester() }
 
     LaunchedEffect(Unit) {
+        delay(200)
         focusRequester.requestFocus()
     }
 
