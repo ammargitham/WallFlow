@@ -160,7 +160,10 @@ fun <T> DropdownMultiple(
             colors = ExposedDropdownMenuDefaults.textFieldColors(),
             placeholder = placeholder,
             getTagString = { it.text },
-            onRemoveTag = { selectedOptions -= it },
+            onRemoveTag = {
+                selectedOptions -= it
+                onChange(selectedOptions.map { o -> o.value }.toSet())
+            },
             getLeadingIcon = { it.icon },
         )
         ExposedDropdownMenu(
