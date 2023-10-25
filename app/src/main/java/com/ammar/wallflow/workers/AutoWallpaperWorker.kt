@@ -263,7 +263,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
         nextWallpaper: Wallpaper,
     ): Pair<Boolean, Uri?> {
         val uri: Uri = when (nextWallpaper) {
-            is WallhavenWallpaper -> {
+            is DownloadableWallpaper -> {
                 val wallpaperFile = safeDownloadWallpaper(nextWallpaper) ?: return false to null
                 try {
                     val notification = notificationBuilder.apply {
@@ -332,12 +332,15 @@ class AutoWallpaperWorker @AssistedInject constructor(
             scale to detectionWithBitmaps.firstOrNull()
         }
 
-    private suspend fun safeDownloadWallpaper(wallhavenWallpaper: WallhavenWallpaper): File? {
+    private suspend fun safeDownloadWallpaper(wallpaper: DownloadableWallpaper): File? {
         var downloadTries = 0
         while (true) {
-            val wallpaperFile = downloadWallpaper(wallhavenWallpaper)
-            // check if file size matches
-            if (wallpaperFile.length() == wallhavenWallpaper.fileSize) {
+            val wallpaperFile = downloadWallpaper(wallpaper)
+            if (wallpaper !is WallhavenWallpaper) {
+                return wallpaperFile
+            }
+            // check if file size matches (only for wallhaven, as reddit does not return fileSize)
+            if (wallpaperFile.length() == wallpaper.fileSize) {
                 // file was correctly downloaded
                 return wallpaperFile
             }

@@ -2,9 +2,9 @@ package com.ammar.wallflow.model.reddit
 
 import androidx.compose.ui.unit.IntSize
 import androidx.core.util.PatternsCompat
+import com.ammar.wallflow.model.DownloadableWallpaper
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.Source
-import com.ammar.wallflow.model.Wallpaper
 
 data class RedditWallpaper(
     override val source: Source = Source.REDDIT,
@@ -22,7 +22,7 @@ data class RedditWallpaper(
     val postUrl: String,
     val author: String,
     val galleryPosition: Int? = null,
-) : Wallpaper()
+) : DownloadableWallpaper()
 
 // Examples
 val redditWallpaper1 = RedditWallpaper(
