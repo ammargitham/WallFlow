@@ -124,7 +124,7 @@ android {
             variant.outputs.forEach { output ->
                 val abi = if (hasProperty("fdroid")) {
                     getAbi()
-                } else if (hasProperty("github")) {
+                } else if (project.android.splits.abi.isEnable) {
                     output.filters.find { it.filterType == ABI }?.identifier
                 } else {
                     null
