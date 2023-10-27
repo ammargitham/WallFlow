@@ -84,6 +84,7 @@ class MainActivity : ComponentActivity() {
         RegexOption.IGNORE_CASE,
     )
     private lateinit var navController: NavHostController
+    private var consumedIntent = false
 
     @Inject
     @MainDispatcher
@@ -91,6 +92,13 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (savedInstanceState != null) {
+            consumedIntent = savedInstanceState.getBoolean(
+                SAVED_INSTANCE_STATE_CONSUMED_INTENT,
+                false,
+            )
+        }
 
         setContent {
             CompositionLocalProvider(
@@ -388,12 +396,20 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putBoolean(SAVED_INSTANCE_STATE_CONSUMED_INTENT, true)
+    }
+
     override fun onNewIntent(intent: Intent?) {
         super.onNewIntent(intent)
         handleIntent(intent ?: return)
     }
 
     private fun handleIntent(intent: Intent) {
+        if (consumedIntent) {
+            return
+        }
         val handled = navController.handleDeepLink(intent)
         if (handled) {
             return
@@ -420,5 +436,10 @@ class MainActivity : ComponentActivity() {
         }
         viewModel.onSearch(search)
         navController.search(search)
+    }
+
+    companion object {
+        private const val SAVED_INSTANCE_STATE_CONSUMED_INTENT =
+            "SAVED_INSTANCE_STATE_CONSUMED_INTENT"
     }
 }
