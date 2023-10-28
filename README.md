@@ -21,7 +21,7 @@
   </div>
   <br/>
   <p>
-  A wallpaper app for Android with beautiful wallpapers from <a href="https://wallhaven.cc/">wallhaven.cc</a> (more sources to be added in the future). Designed with <a href="https://m3.material.io/">Material Design 3</a> and supports wide screen devices like tablets.
+  A wallpaper app for Android with beautiful wallpapers from <a href="https://wallhaven.cc/">wallhaven.cc</a>, <a href="https://reddit.com/">Reddit</a>. Designed with <a href="https://m3.material.io/">Material Design 3</a> and supports wide screen devices like tablets.
   </p>
 </div>
 <br/>
@@ -44,18 +44,19 @@
 
 <div align="center">
 
-| <img src="./src/base/fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" alt="Home" width="150"> | <img src="./src/base/fastlane/metadata/android/en-US/images/phoneScreenshots/2_dark.png" alt="Filters" width="150"> | <img src="./src/base/fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" alt="Wallpaper Info" width="150"> | <img src="./src/base/fastlane/metadata/android/en-US/images/phoneScreenshots/4.png" alt="Search History" width="150"> |
-|:-----------------------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------:|
-|                                                 <b>Home</b>                                                 |                                                   <b>Filters</b>                                                    |                                                 <b>Wallpaper Info</b>                                                 |                                                 <b>Search History</b>                                                 |
+| <img src="./src/base/fastlane/metadata/android/en-US/images/phoneScreenshots/1.png" alt="Home" width="150"> | <img src="./src/base/fastlane/metadata/android/en-US/images/phoneScreenshots/2.png" alt="Filters" width="150"> | <img src="./src/base/fastlane/metadata/android/en-US/images/phoneScreenshots/2_reddit.png" alt="Filters" width="150"> | <img src="./src/base/fastlane/metadata/android/en-US/images/phoneScreenshots/3.png" alt="Wallpaper Info" width="150"> |
+|:-----------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------:|:---------------------------------------------------------------------------------------------------------------------:|
+|                                                 <b>Home</b>                                                 |                                            <b>Wallhaven Filters</b>                                            |                                                 <b>Reddit Filters</b>                                                 |                                                 <b>Wallpaper Info</b>                                                 |
 
-| <img src="./src/base/fastlane/metadata/android/en-US/images/phoneScreenshots/5.png" alt="Crop and Set Wallpaper" width="150"> | <img src="./src/base/fastlane/metadata/android/en-US/images/phoneScreenshots/6.png" alt="Settings 1" width="150"> |
-|:-----------------------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------------------------:|
-|                                                 <b>Crop and Set Wallpaper</b>                                                 |                                                  <b>Settings</b>                                                  |
+| <img src="./src/base/fastlane/metadata/android/en-US/images/phoneScreenshots/4.png" alt="Search History" width="150"> | <img src="./src/base/fastlane/metadata/android/en-US/images/phoneScreenshots/5.png" alt="Crop and Set Wallpaper" width="150"> | <img src="./src/base/fastlane/metadata/android/en-US/images/phoneScreenshots/6.png" alt="Settings 1" width="150"> |
+|:---------------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------------------------------------:|:-----------------------------------------------------------------------------------------------------------------:|
+|                                                 <b>Search History</b>                                                 |                                                 <b>Crop and Set Wallpaper</b>                                                 |                                                  <b>Settings</b>                                                  |
 
 </div>
 
 ## Features
 
+- Supports wallhaven.cc and Reddit
 - Multi-pane layout for tablets and other wide screen devices
 - Auto wallpaper changer
 - Save searches
@@ -63,7 +64,6 @@
 - Local Wallpapers
 - Use saved searches, favorites, and local wallpapers for auto wallpaper changer
 - Search history
-- Supports all filters provided by wallhaven.cc
 - [Plus] Smart wallpaper cropping using on-device object detection powered by [Tensorflow Lite](https://www.tensorflow.org/lite/).
   - Supports adding your own TFLite models. You can find more models [here](https://tfhub.dev/s?deployment-format=lite&module-type=image-object-detection/).
 - Search results caching to reduce api calls
@@ -95,7 +95,6 @@ ADB command:
 
 ## Roadmap
 
-- [ ] Add more sources
 - [ ] Support foldables inner and outer screens together
 - [ ] More theme colors
 - [ ] Learn from favorites (on-device) and suggest wallpapers

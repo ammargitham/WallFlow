@@ -1,0 +1,11 @@
+What's New
+* Added option to use Reddit subreddits as a wallpaper source
+* Added baseline profiles for smoother experience
+* Now you can use multiple saved searches for auto wallpaper
+* Traditional Chinese translations (thanks to @abc0922001)
+* Few more UX improvements
+
+Bug Fixes
+* Fixed a bug where sometimes an old screen would pop up on configuration change
+* Fixed a bug where backup restore would failed if all wallhaven wallpapers had no uploaders attached
+* Few more under the hood fixes

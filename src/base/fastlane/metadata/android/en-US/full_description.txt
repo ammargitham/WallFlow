@@ -1,7 +1,8 @@
-Beautiful wallpapers from wallhaven.cc (more sources to be added in the future). Designed with Material Design 3 and supports wide screen devices like tablets.
+Beautiful wallpapers from wallhaven.cc and Reddit. Designed with Material Design 3 and supports wide screen devices like tablets.
 
 Features
 
+* Supports wallhaven.cc and Reddit
 * Multi-pane layout for tablets and other wide screen devices
 * Auto wallpaper changer
 * Save searches
@@ -9,7 +10,6 @@ Features
 * Local Wallpapers
 * Use saved searches, favorites, and local wallpapers in auto wallpaper
 * Search history
-* Supports all filters provided by wallhaven.cc
 * Search results caching to reduce api calls
 * Options to tweak the wallpaper grid layout
 * Dynamic theme (Material You)
