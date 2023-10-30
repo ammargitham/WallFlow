@@ -18,6 +18,9 @@
     <a href="https://github.com/ammargitham/WallFlow/actions/workflows/codeql.yml">
       <img src="https://img.shields.io/github/actions/workflow/status/ammargitham/wallflow/codeql.yml?style=for-the-badge&label=CodeQL" alt="CodeQL" title="CodeQL">
     </a>
+    <a href="https://hosted.weblate.org/projects/wallflow/">
+      <img src="https://img.shields.io/weblate/progress/wallflow?style=for-the-badge" alt="Weblate" title="Weblate">
+    </a>
   </div>
   <br/>
   <p>
@@ -30,8 +33,10 @@
 </div>
 
 ## Downloads
-
-[<img height="80" alt="Get it on GitHub" title="Get it on GitHub" src="./.github/assets/get-it-on-github.png" />](https://github.com/ammargitham/WallFlow/releases/latest)
+<div align="center">
+<a href="https://github.com/ammargitham/WallFlow/releases/latest">
+  <img height="80" alt="Get it on GitHub" title="Get it on GitHub" src="./.github/assets/get-it-on-github.png" />
+</a>
 
 |                                                                                                           Regular                                                                                                           |                                                                                                               Plus                                                                                                               |
 |:---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
@@ -39,6 +44,8 @@
 | [<img height="80" alt="Get it on IzzyOnDroid" title="Get it on IzzyOnDroid" src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png" />](https://apt.izzysoft.de/fdroid/index/apk/com.ammar.wallflow/) | [<img height="80" alt="Get it on IzzyOnDroid" title="Get it on IzzyOnDroid" src="https://gitlab.com/IzzyOnDroid/repo/-/raw/master/assets/IzzyOnDroid.png" />](https://apt.izzysoft.de/fdroid/index/apk/com.ammar.wallflow.plus/) |
 
 \*[_What's the difference between Regular and Plus?_](#regular-vs-plus)
+
+</div>
 
 ## Screenshots
 
@@ -99,6 +106,11 @@ ADB command:
 - [ ] More theme colors
 - [ ] Learn from favorites (on-device) and suggest wallpapers
 - [ ] Support Windows using [Kotlin multiplatform](https://kotlinlang.org/docs/multiplatform.html).
+
+## Help with translations
+<a href="https://hosted.weblate.org/engage/wallflow/">
+  <img src="https://hosted.weblate.org/widget/wallflow/287x66-grey.png" alt="Translation status" />
+</a>
 
 ## Built using
 
