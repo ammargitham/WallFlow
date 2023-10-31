@@ -178,6 +178,8 @@ internal open class FakeFavoriteDao : FavoriteDao {
         throw RuntimeException()
     }
 
+    override fun observeExists(sourceId: String, source: Source) = throw RuntimeException()
+
     override suspend fun getBySourceIdAndType(
         sourceId: String,
         source: Source,
