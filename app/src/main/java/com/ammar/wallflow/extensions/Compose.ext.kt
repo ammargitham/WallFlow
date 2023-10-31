@@ -1,6 +1,7 @@
 package com.ammar.wallflow.extensions
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
@@ -44,3 +45,19 @@ fun Rect.constrainOffset(bounds: Rect): Rect {
     if (y < bounds.top) y += bounds.top - y
     return Rect(Offset(x, y), size)
 }
+
+val IntSize.Companion.Saver
+    get() = listSaver(
+        save = {
+            listOf(
+                it.height,
+                it.width,
+            )
+        },
+        restore = {
+            IntSize(
+                height = it[0],
+                width = it[1],
+            )
+        },
+    )
