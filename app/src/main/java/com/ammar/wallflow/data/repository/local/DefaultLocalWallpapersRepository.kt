@@ -8,7 +8,7 @@ import androidx.paging.LoadState
 import androidx.paging.LoadStates
 import androidx.paging.PagingData
 import com.ammar.wallflow.IoDispatcher
-import com.ammar.wallflow.data.repository.local.LocalWallpapersRepository.Companion.SUPPORTED_MIME_TYPES
+import com.ammar.wallflow.SUPPORTED_MIME_TYPES
 import com.ammar.wallflow.data.repository.utils.Resource
 import com.ammar.wallflow.extensions.deepListFiles
 import com.ammar.wallflow.model.Wallpaper

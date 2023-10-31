@@ -1,8 +1,10 @@
 package com.ammar.wallflow.data.network.model.reddit
 
+import com.ammar.wallflow.SUPPORTED_MIME_TYPES
 import com.ammar.wallflow.data.db.entity.wallpaper.RedditWallpaperEntity
 import com.ammar.wallflow.data.network.model.serializers.NetworkRedditPostCreatedUtcSerializer
 import com.ammar.wallflow.extensions.htmlUnescaped
+import com.ammar.wallflow.extensions.parseMimeType
 import com.ammar.wallflow.model.Purity
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
@@ -39,18 +41,18 @@ data class NetworkRedditPreview(
 @Serializable
 @OptIn(ExperimentalSerializationApi::class)
 data class NetworkRedditPreviewImage(
-    val id: String,
+    val id: String? = null,
     val m: String? = null, // mime type (eg.: "image/jpg", "image/png")
     @JsonNames("s")
-    val source: NetworkRedditResolution,
+    val source: NetworkRedditResolution? = null,
     @JsonNames("p")
-    val resolutions: List<NetworkRedditResolution>,
+    val resolutions: List<NetworkRedditResolution>? = null,
 )
 
 @Serializable
 @OptIn(ExperimentalSerializationApi::class)
 data class NetworkRedditResolution(
-    @JsonNames("u")
+    @JsonNames("u", "gif")
     val url: String,
     @JsonNames("x")
     val width: Int,
@@ -77,7 +79,14 @@ fun NetworkRedditPost.toWallpaperEntities(): List<RedditWallpaperEntity> {
         galleryItems.mapIndexed { i, item ->
             val mediaId = item.media_id
             val media = mediaMetadata[mediaId] ?: return@mapIndexed null
-            val source = media.source
+            val source = media.source ?: return@mapIndexed null
+            val thumbnailUrl = media.resolutions?.last()?.url?.htmlUnescaped()
+                ?: return@mapIndexed null
+            val url = source.url.htmlUnescaped()
+            val mimeType = media.m ?: parseMimeType(url)
+            if (mimeType !in SUPPORTED_MIME_TYPES) {
+                return@mapIndexed null
+            }
             RedditWallpaperEntity(
                 id = 0,
                 subreddit = subreddit,
@@ -86,8 +95,8 @@ fun NetworkRedditPost.toWallpaperEntities(): List<RedditWallpaperEntity> {
                 postUrl = permalink,
                 purity = if (over_18) Purity.NSFW else Purity.SFW,
                 author = author,
-                url = source.url.htmlUnescaped(),
-                thumbnailUrl = media.resolutions.last().url.htmlUnescaped(),
+                url = url,
+                thumbnailUrl = thumbnailUrl,
                 width = source.width,
                 height = source.height,
                 mimeType = media.m,
@@ -98,19 +107,25 @@ fun NetworkRedditPost.toWallpaperEntities(): List<RedditWallpaperEntity> {
     } else {
         val preview = preview ?: return emptyList()
         val previewImage = preview.images.first()
-        val source = previewImage.source
-        val thumbnail = previewImage.resolutions.last()
+        val source = previewImage.source ?: return emptyList()
+        val redditId = previewImage.id ?: return emptyList()
+        val thumbnail = previewImage.resolutions?.last() ?: return emptyList()
+        val url = source.url.htmlUnescaped()
+        val mimeType = parseMimeType(url)
+        if (mimeType !in SUPPORTED_MIME_TYPES) {
+            return emptyList()
+        }
         listOf(
             RedditWallpaperEntity(
                 id = 0,
-                redditId = previewImage.id,
+                redditId = redditId,
                 subreddit = subreddit,
                 postId = id,
                 postTitle = title,
                 postUrl = permalink,
                 purity = if (over_18) Purity.NSFW else Purity.SFW,
                 author = author,
-                url = source.url.htmlUnescaped(),
+                url = url,
                 thumbnailUrl = thumbnail.url.htmlUnescaped(),
                 width = source.width,
                 height = source.height,

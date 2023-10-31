@@ -95,13 +95,17 @@ fun Context.setWallpaper(
     return createDisplayContext(display).setWallpaper(bitmap, targets)
 }
 
-private fun getBitmapRegionDecoder(`is`: InputStream) =
+private fun getBitmapRegionDecoder(`is`: InputStream) = try {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
         BitmapRegionDecoder.newInstance(`is`)
     } else {
         @Suppress("DEPRECATION")
         BitmapRegionDecoder.newInstance(`is`, false)
     }
+} catch (e: Exception) {
+    Log.e("getBitmapRegionDecoder", "Error: ", e)
+    null
+}
 
 fun Context.setWallpaper(
     bitmap: Bitmap,
