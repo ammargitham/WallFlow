@@ -279,9 +279,15 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="title">Title</string>
     <string name="required_one_subreddit">Atleast 1 subreddit is required</string>
     <string name="source_home_visibility_toggle">Source home visibility toggle</string>
+    <string name="minutes">minutes</string>
+    <string name="frequency_min_val_error">Frequency cannot be less than 15 minutes</string>
     <plurals name="every_x_hrs">
         <item quantity="one">Every %d hour</item>
         <item quantity="other">Every %d hours</item>
+    </plurals>
+    <plurals name="every_x_mins">
+        <item quantity="one">Every %d minute</item>
+        <item quantity="other">Every %d minutes</item>
     </plurals>
     <plurals name="num_detected_objects">
         <item quantity="one">%d object</item>
