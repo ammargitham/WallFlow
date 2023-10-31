@@ -8,9 +8,9 @@ import com.ammar.wallflow.data.repository.reddit.RedditRepository
 import com.ammar.wallflow.data.repository.utils.Resource
 import com.ammar.wallflow.data.repository.utils.successOr
 import com.ammar.wallflow.data.repository.wallhaven.WallhavenRepository
+import com.ammar.wallflow.model.DownloadableWallpaper
 import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.model.Wallpaper
-import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import com.ammar.wallflow.utils.DownloadManager
 import com.ammar.wallflow.utils.DownloadStatus
 import com.github.materiiapps.partial.Partialize
@@ -107,7 +107,7 @@ class WallpaperViewerViewModel @Inject constructor(
         var job: Job? = null
         job = viewModelScope.launch {
             uiState.value.wallpaper?.run {
-                if (this !is WallhavenWallpaper) {
+                if (this !is DownloadableWallpaper) {
                     return@run
                 }
                 val workName = downloadManager.requestDownload(
@@ -129,7 +129,7 @@ class WallpaperViewerViewModel @Inject constructor(
 
     fun downloadForSharing(onResult: (file: File?) -> Unit) {
         uiState.value.wallpaper?.run {
-            if (this !is WallhavenWallpaper) {
+            if (this !is DownloadableWallpaper) {
                 return@run
             }
             var job: Job? = null

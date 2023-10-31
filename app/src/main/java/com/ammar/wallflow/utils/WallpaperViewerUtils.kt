@@ -9,8 +9,11 @@ import com.ammar.wallflow.extensions.getFileNameFromUrl
 import com.ammar.wallflow.extensions.getUriForFile
 import com.ammar.wallflow.extensions.parseMimeType
 import com.ammar.wallflow.extensions.share
+import com.ammar.wallflow.model.DownloadableWallpaper
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.local.LocalWallpaper
+import com.ammar.wallflow.model.reddit.RedditWallpaper
+import com.ammar.wallflow.model.reddit.withRedditDomainPrefix
 import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import com.ammar.wallflow.ui.wallpaperviewer.WallpaperViewerViewModel
 
@@ -18,10 +21,12 @@ fun shareWallpaperUrl(
     context: Context,
     wallpaper: Wallpaper,
 ) {
-    if (wallpaper !is WallhavenWallpaper) {
-        return
+    val url = when (wallpaper) {
+        is WallhavenWallpaper -> wallpaper.url
+        is RedditWallpaper -> wallpaper.postUrl.withRedditDomainPrefix()
+        else -> return
     }
-    context.share(wallpaper.url)
+    context.share(url)
 }
 
 fun shareWallpaper(
@@ -33,11 +38,12 @@ fun shareWallpaper(
         is WallhavenWallpaper -> wallpaper.mimeType.ifBlank {
             parseMimeType(wallpaper.data)
         }
+        is RedditWallpaper -> parseMimeType(wallpaper.data)
         is LocalWallpaper -> wallpaper.mimeType ?: MIME_TYPE_JPEG
         else -> return
     }
     val title = when (wallpaper) {
-        is WallhavenWallpaper -> wallpaper.data.getFileNameFromUrl()
+        is DownloadableWallpaper -> wallpaper.data.getFileNameFromUrl()
         is LocalWallpaper -> wallpaper.name
         else -> return
     }

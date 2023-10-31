@@ -247,7 +247,8 @@ fun WallpaperViewer(
                 applyWallpaperEnabled = applyWallpaperEnabled,
                 showFullScreenAction = showFullScreenAction,
                 showDownloadAction = wallpaper is DownloadableWallpaper,
-                showShareLinkAction = wallpaper is WallhavenWallpaper,
+                showShareLinkAction = wallpaper is WallhavenWallpaper ||
+                    wallpaper is RedditWallpaper,
                 onInfoClick = onInfoClick,
                 onDownloadClick = { downloadPermissionsState.launchMultiplePermissionRequest() },
                 onShareLinkClick = onShareLinkClick,
