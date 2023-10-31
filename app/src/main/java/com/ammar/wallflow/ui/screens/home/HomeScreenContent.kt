@@ -74,6 +74,7 @@ internal fun HomeScreenContent(
     fullWallpaperDownloadStatus: DownloadStatus? = null,
     fullWallpaperLoading: Boolean = false,
     showFullWallpaperInfo: Boolean = false,
+    isFullWallpaperFavorite: Boolean = false,
     header: (LazyStaggeredGridScope.() -> Unit)? = null,
     onWallpaperClick: (wallpaper: Wallpaper) -> Unit = {},
     onWallpaperFavoriteClick: (wallpaper: Wallpaper) -> Unit = {},
@@ -123,6 +124,7 @@ internal fun HomeScreenContent(
                 thumbData = selectedWallpaper?.thumbData,
                 showFullScreenAction = isExpanded,
                 showInfo = showFullWallpaperInfo,
+                isFavorite = isFullWallpaperFavorite,
                 onWallpaperTransform = onFullWallpaperTransform,
                 onWallpaperTap = onFullWallpaperTap,
                 onInfoClick = onFullWallpaperInfoClick,
@@ -134,6 +136,11 @@ internal fun HomeScreenContent(
                 onDownloadPermissionsGranted = onFullWallpaperDownloadPermissionsGranted,
                 onUploaderClick = onFullWallpaperUploaderClick,
                 onTagClick = onTagClick,
+                onFavoriteToggle = {
+                    if (fullWallpaper != null) {
+                        onWallpaperFavoriteClick(fullWallpaper)
+                    }
+                },
             )
         },
     )

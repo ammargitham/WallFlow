@@ -59,6 +59,7 @@ internal fun LocalScreenContent(
     fullWallpaperActionsVisible: Boolean = true,
     fullWallpaperLoading: Boolean = false,
     showFullWallpaperInfo: Boolean = false,
+    isFullWallpaperFavorite: Boolean = false,
     onWallpaperClick: (wallpaper: Wallpaper) -> Unit = {},
     onWallpaperFavoriteClick: (wallpaper: Wallpaper) -> Unit = {},
     onFABClick: () -> Unit = {},
@@ -100,6 +101,7 @@ internal fun LocalScreenContent(
                 thumbData = selectedWallpaper?.thumbData,
                 showFullScreenAction = true,
                 showInfo = showFullWallpaperInfo,
+                isFavorite = isFullWallpaperFavorite,
                 onWallpaperTransform = onFullWallpaperTransform,
                 onWallpaperTap = onFullWallpaperTap,
                 onInfoClick = onFullWallpaperInfoClick,
@@ -111,6 +113,11 @@ internal fun LocalScreenContent(
                 onDownloadPermissionsGranted = {},
                 onUploaderClick = {},
                 onTagClick = {},
+                onFavoriteToggle = {
+                    if (fullWallpaper != null) {
+                        onWallpaperFavoriteClick(fullWallpaper)
+                    }
+                },
             )
         },
     )

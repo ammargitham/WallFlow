@@ -79,6 +79,7 @@ fun WallpaperViewer(
     thumbData: String? = null,
     showInfo: Boolean = false,
     showFullScreenAction: Boolean = false,
+    isFavorite: Boolean = false,
     onWallpaperTransform: () -> Unit = {},
     onWallpaperTap: () -> Unit = {},
     onInfoClick: () -> Unit = {},
@@ -90,6 +91,7 @@ fun WallpaperViewer(
     onDownloadPermissionsGranted: () -> Unit = {},
     onTagClick: (WallhavenTag) -> Unit = {},
     onUploaderClick: (WallhavenUploader) -> Unit = {},
+    onFavoriteToggle: (Boolean) -> Unit = {},
 ) {
     var showRationale by rememberSaveable { mutableStateOf(false) }
     var containerIntSize by remember { mutableStateOf(IntSize.Zero) }
@@ -249,12 +251,14 @@ fun WallpaperViewer(
                 showDownloadAction = wallpaper is DownloadableWallpaper,
                 showShareLinkAction = wallpaper is WallhavenWallpaper ||
                     wallpaper is RedditWallpaper,
+                isFavorite = isFavorite,
                 onInfoClick = onInfoClick,
                 onDownloadClick = { downloadPermissionsState.launchMultiplePermissionRequest() },
                 onShareLinkClick = onShareLinkClick,
                 onShareImageClick = onShareImageClick,
                 onApplyWallpaperClick = onApplyWallpaperClick,
                 onFullScreenClick = onFullScreenClick,
+                onFavoriteToggle = onFavoriteToggle,
             )
         }
 

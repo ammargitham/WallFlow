@@ -111,6 +111,7 @@ fun WallpaperScreen(
             loading = viewerUiState.loading,
             thumbData = viewerUiState.thumbData,
             showInfo = viewerUiState.showInfo,
+            isFavorite = viewerUiState.isFavorite,
             onWallpaperTransform = {
                 viewModel.onWallpaperTransform()
                 viewerViewModel.onWallpaperTransform()
@@ -154,6 +155,7 @@ fun WallpaperScreen(
                 navController.search(search)
             },
             onDownloadPermissionsGranted = viewerViewModel::download,
+            onFavoriteToggle = { viewerViewModel.toggleFavorite() },
         )
 
         TopBar(
