@@ -1,5 +1,7 @@
 package com.ammar.wallflow.extensions
 
+import java.net.MalformedURLException
+import java.net.URL
 import java.net.URLDecoder
 import java.net.URLEncoder
 import java.util.regex.Pattern
@@ -31,10 +33,36 @@ fun String.urlDecoded(): String = URLDecoder.decode(this, "UTF-8")
 
 fun String.quoteIfSpaced() = if (this.contains(" ")) "\"$this\"" else this
 
-fun String.getFileNameFromUrl() = substring(
-    lastIndexOf('/') + 1,
-    length,
-)
+// https://stackoverflow.com/a/11576046/1436766
+fun String.getFileNameFromUrl(): String {
+    try {
+        val resource = URL(this)
+        val host = resource.host
+        if (host.isNotEmpty() && this.endsWith(host)) {
+            // handle ...example.com
+            return ""
+        }
+    } catch (e: MalformedURLException) {
+        return ""
+    }
+    val startIndex = lastIndexOf('/') + 1
+
+    // find end index for ?
+    var lastQMPos = lastIndexOf('?')
+    if (lastQMPos == -1) {
+        lastQMPos = length
+    }
+
+    // find end index for #
+    var lastHashPos = lastIndexOf('#')
+    if (lastHashPos == -1) {
+        lastHashPos = length
+    }
+
+    // calculate the end index
+    val endIndex = lastQMPos.coerceAtMost(lastHashPos)
+    return substring(startIndex, endIndex)
+}
 
 fun String.capitalise() = this
     .split(" ")

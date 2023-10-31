@@ -138,6 +138,7 @@ fun LocalScreen(
         fullWallpaperActionsVisible = viewerUiState.actionsVisible,
         fullWallpaperLoading = viewerUiState.loading,
         showFullWallpaperInfo = viewerUiState.showInfo,
+        isFullWallpaperFavorite = viewerUiState.isFavorite,
         onWallpaperClick = onWallpaperClick,
         onWallpaperFavoriteClick = viewModel::toggleFavorite,
         onFullWallpaperTransform = viewerViewModel::onWallpaperTransform,

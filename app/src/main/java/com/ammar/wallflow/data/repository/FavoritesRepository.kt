@@ -150,4 +150,9 @@ class FavoritesRepository @Inject constructor(
         }
         favoriteDao.insertAll(insertFavorites)
     }
+
+    fun observeIsFavorite(
+        source: Source,
+        sourceId: String,
+    ) = favoriteDao.observeExists(source = source, sourceId = sourceId)
 }

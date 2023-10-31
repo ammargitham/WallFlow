@@ -28,6 +28,14 @@ interface FavoriteDao {
         source: Source,
     ): Boolean
 
+    @Query(
+        "SELECT EXISTS(SELECT 1 FROM favorites WHERE source_id = :sourceId AND source = :source)",
+    )
+    fun observeExists(
+        sourceId: String,
+        source: Source,
+    ): Flow<Boolean>
+
     @Query("SELECT * FROM favorites WHERE source_id = :sourceId AND source = :source")
     suspend fun getBySourceIdAndType(
         sourceId: String,

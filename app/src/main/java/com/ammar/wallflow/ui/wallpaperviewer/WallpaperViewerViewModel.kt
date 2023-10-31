@@ -3,14 +3,15 @@ package com.ammar.wallflow.ui.wallpaperviewer
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.ammar.wallflow.data.repository.FavoritesRepository
 import com.ammar.wallflow.data.repository.local.LocalWallpapersRepository
 import com.ammar.wallflow.data.repository.reddit.RedditRepository
 import com.ammar.wallflow.data.repository.utils.Resource
 import com.ammar.wallflow.data.repository.utils.successOr
 import com.ammar.wallflow.data.repository.wallhaven.WallhavenRepository
+import com.ammar.wallflow.model.DownloadableWallpaper
 import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.model.Wallpaper
-import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import com.ammar.wallflow.utils.DownloadManager
 import com.ammar.wallflow.utils.DownloadStatus
 import com.github.materiiapps.partial.Partialize
@@ -38,6 +39,7 @@ class WallpaperViewerViewModel @Inject constructor(
     private val redditRepository: RedditRepository,
     private val localWallpapersRepository: LocalWallpapersRepository,
     private val downloadManager: DownloadManager,
+    private val favoritesRepository: FavoritesRepository,
 ) : AndroidViewModel(
     application = application,
 ) {
@@ -57,16 +59,27 @@ class WallpaperViewerViewModel @Inject constructor(
         }
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val isFavoriteFlow = wallpaperFlow.flatMapLatest {
+        val wallpaper = it.successOr(null) ?: return@flatMapLatest flowOf(false)
+        return@flatMapLatest favoritesRepository.observeIsFavorite(
+            source = wallpaper.source,
+            sourceId = wallpaper.id,
+        )
+    }
+
     val uiState = combine(
         localUiState,
         wallpaperFlow,
         argsFlow,
-    ) { local, wallpaper, args ->
+        isFavoriteFlow,
+    ) { local, wallpaper, args, isFavorite ->
         local.merge(
             WallpaperViewerUiState(
                 wallpaper = wallpaper.successOr(null),
                 thumbData = args.thumbData,
                 loading = wallpaper is Resource.Loading,
+                isFavorite = isFavorite,
             ),
         )
     }.stateIn(
@@ -107,7 +120,7 @@ class WallpaperViewerViewModel @Inject constructor(
         var job: Job? = null
         job = viewModelScope.launch {
             uiState.value.wallpaper?.run {
-                if (this !is WallhavenWallpaper) {
+                if (this !is DownloadableWallpaper) {
                     return@run
                 }
                 val workName = downloadManager.requestDownload(
@@ -129,7 +142,7 @@ class WallpaperViewerViewModel @Inject constructor(
 
     fun downloadForSharing(onResult: (file: File?) -> Unit) {
         uiState.value.wallpaper?.run {
-            if (this !is WallhavenWallpaper) {
+            if (this !is DownloadableWallpaper) {
                 return@run
             }
             var job: Job? = null
@@ -148,6 +161,14 @@ class WallpaperViewerViewModel @Inject constructor(
             }
         }
     }
+
+    fun toggleFavorite() = viewModelScope.launch {
+        val wallpaper = uiState.value.wallpaper ?: return@launch
+        favoritesRepository.toggleFavorite(
+            sourceId = wallpaper.id,
+            source = wallpaper.source,
+        )
+    }
 }
 
 @Partialize
@@ -158,6 +179,7 @@ data class WallpaperViewerUiState(
     val showInfo: Boolean = false,
     val downloadStatus: DownloadStatus? = null,
     val loading: Boolean = true,
+    val isFavorite: Boolean = false,
 )
 
 data class WallpaperViewerArgs(

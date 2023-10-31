@@ -111,6 +111,7 @@ fun FavoritesScreen(
             fullWallpaperDownloadStatus = viewerUiState.downloadStatus,
             fullWallpaperLoading = viewerUiState.loading,
             showFullWallpaperInfo = viewerUiState.showInfo,
+            isFullWallpaperFavorite = viewerUiState.isFavorite,
             onWallpaperClick = onWallpaperClick,
             onWallpaperFavoriteClick = viewModel::toggleFavorite,
             onFullWallpaperTransform = viewerViewModel::onWallpaperTransform,
@@ -183,6 +184,7 @@ private fun FavoritesScreenContent(
     fullWallpaperDownloadStatus: DownloadStatus? = null,
     fullWallpaperLoading: Boolean = false,
     showFullWallpaperInfo: Boolean = false,
+    isFullWallpaperFavorite: Boolean = false,
     onWallpaperClick: (wallpaper: Wallpaper) -> Unit = {},
     onWallpaperFavoriteClick: (wallpaper: Wallpaper) -> Unit = {},
     onFullWallpaperTransform: () -> Unit = {},
@@ -229,6 +231,7 @@ private fun FavoritesScreenContent(
                     thumbData = selectedWallpaper?.thumbData,
                     showFullScreenAction = true,
                     showInfo = showFullWallpaperInfo,
+                    isFavorite = isFullWallpaperFavorite,
                     onWallpaperTransform = onFullWallpaperTransform,
                     onWallpaperTap = onFullWallpaperTap,
                     onInfoClick = onFullWallpaperInfoClick,
@@ -240,6 +243,11 @@ private fun FavoritesScreenContent(
                     onTagClick = onFullWallpaperTagClick,
                     onUploaderClick = onFullWallpaperUploaderClick,
                     onDownloadPermissionsGranted = onFullWallpaperDownloadPermissionsGranted,
+                    onFavoriteToggle = {
+                        if (fullWallpaper != null) {
+                            onWallpaperFavoriteClick(fullWallpaper)
+                        }
+                    },
                 )
             },
         )

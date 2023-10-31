@@ -577,9 +577,10 @@ class AutoWallpaperWorker @AssistedInject constructor(
             appPreferencesRepository: AppPreferencesRepository,
         ) {
             Log.i(TAG, "Scheduling auto wallpaper worker...")
+            val minutes = interval.hours * 60 + interval.minutes
             val request = PeriodicWorkRequestBuilder<AutoWallpaperWorker>(
-                interval.hours.toLong(),
-                TimeUnit.HOURS,
+                minutes.toLong(),
+                TimeUnit.MINUTES,
             ).apply {
                 setConstraints(constraints)
             }.build()

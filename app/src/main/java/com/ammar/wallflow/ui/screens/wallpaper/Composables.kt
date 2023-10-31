@@ -33,6 +33,7 @@ import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
+import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.Surface
@@ -77,12 +78,14 @@ fun WallpaperActions(
     showFullScreenAction: Boolean = false,
     showDownloadAction: Boolean = true,
     showShareLinkAction: Boolean = true,
+    isFavorite: Boolean = false,
     onInfoClick: () -> Unit = {},
     onDownloadClick: () -> Unit = {},
     onShareLinkClick: () -> Unit = {},
     onShareImageClick: () -> Unit = {},
     onApplyWallpaperClick: () -> Unit = {},
     onFullScreenClick: () -> Unit = {},
+    onFavoriteToggle: (Boolean) -> Unit = {},
 ) {
     BottomAppBar(
         modifier = modifier,
@@ -92,6 +95,10 @@ fun WallpaperActions(
                 FullScreenButton(onClick = onFullScreenClick)
             }
             InfoButton(onClick = onInfoClick)
+            FavoriteButton(
+                isFavorite = isFavorite,
+                onToggle = onFavoriteToggle,
+            )
             if (showDownloadAction) {
                 DownloadButton(
                     downloadStatus = downloadStatus,
@@ -212,6 +219,7 @@ private fun PreviewWallpaperActions() {
                     totalBytes = 100,
                 ),
                 showFullScreenAction = true,
+                isFavorite = false,
             )
         }
     }
@@ -401,6 +409,46 @@ private fun ShareButton(
                         contentDescription = null,
                     )
                 },
+            )
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun FavoriteButton(
+    modifier: Modifier = Modifier,
+    isFavorite: Boolean = false,
+    onToggle: (Boolean) -> Unit = {},
+) {
+    TooltipBox(
+        modifier = modifier,
+        positionProvider = rememberPlainTooltipPositionProvider(),
+        state = rememberTooltipState(),
+        tooltip = {
+            PlainTooltip {
+                Text(text = stringResource(R.string.favorite))
+            }
+        },
+    ) {
+        IconToggleButton(
+            modifier = modifier,
+            checked = isFavorite,
+            colors = IconButtonDefaults.iconToggleButtonColors(
+                checkedContentColor = Color.Red,
+            ),
+            onCheckedChange = onToggle,
+        ) {
+            Icon(
+                modifier = Modifier.size(24.dp),
+                painter = painterResource(
+                    if (isFavorite) {
+                        R.drawable.baseline_favorite_24
+                    } else {
+                        R.drawable.outline_favorite_border_24
+                    },
+                ),
+                contentDescription = stringResource(R.string.favorite),
             )
         }
     }
