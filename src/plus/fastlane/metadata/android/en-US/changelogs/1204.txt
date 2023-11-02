@@ -1,0 +1,9 @@
+What's New
+* Allow auto wallpaper frequency in minutes
+* Add favorite button to image viewer
+* Animate grid item positions
+
+Bug Fixes
+* Fix apply, download and share buttons not working for Reddit
+* Handle some non-standard reddit json responses and filter out gifs
+* Fix an issue where image viewer actions automatically hides when it should not
