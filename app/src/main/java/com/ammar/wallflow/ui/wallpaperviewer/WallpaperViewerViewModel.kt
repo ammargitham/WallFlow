@@ -106,11 +106,12 @@ class WallpaperViewerViewModel @Inject constructor(
         )
     }
 
-    fun onWallpaperTransform() = localUiState.update {
-        it.copy(
-            actionsVisible = partial(false),
-        )
-    }
+    // fun onWallpaperTransform() = localUiState.update {
+    //     it.copy(
+    //         actionsVisible = partial(false),
+    //     )
+    // }
+    fun onWallpaperTransform() {}
 
     fun showInfo(show: Boolean = true) = localUiState.update {
         it.copy(showInfo = partial(show))

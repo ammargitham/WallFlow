@@ -19,11 +19,12 @@ class WallpaperViewModel @Inject constructor() : ViewModel() {
         )
     }
 
-    fun onWallpaperTransform() = _uiState.update {
-        it.copy(
-            systemBarsVisible = false,
-        )
-    }
+    // fun onWallpaperTransform() = _uiState.update {
+    //     it.copy(
+    //         systemBarsVisible = false,
+    //     )
+    // }
+    fun onWallpaperTransform() {}
 }
 
 data class WallpaperUiState(
