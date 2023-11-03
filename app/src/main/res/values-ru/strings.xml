@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">WallFlow</string>
     <string name="home">"Главная"</string>
@@ -269,4 +270,29 @@
         <item quantity="few">"%d объекта"</item>
         <item quantity="many">"%d объектов"</item>
     </plurals>
+    <string name="title">Название</string>
+    <string name="user">Пользователь</string>
+    <string name="posts_from">Посты от</string>
+    <string name="search_source">Поиск %1s</string>
+    <string name="all">Все</string>
+    <string name="manage_sources">Управление источниками</string>
+    <string name="frequency_min_val_error">Частота не может быть меньше 15 минут</string>
+    <string name="new_sources">Новые источники</string>
+    <plurals name="every_x_mins">
+        <item quantity="one">Каждую %d минуту</item>
+        <item quantity="few">Каждые %d минуты</item>
+        <item quantity="many">Каждые %d минут</item>
+        <item quantity="other">Каждые %d минут</item>
+    </plurals>
+    <string name="subreddit_input_support_text">Нажмите пробел, запятую или введите для подтверждения</string>
+    <string name="sort_new">Новое</string>
+    <string name="reddit">Reddit</string>
+    <string name="subreddit_input_error_support_text">Один из сабреддитов содержит неверное имя</string>
+    <string name="current_sources">Текущие источники</string>
+    <string name="minutes">минуты</string>
+    <string name="required_one_subreddit">Требуется хотя бы 1 сабреддит</string>
+    <string name="one_hour">1 час</string>
+    <string name="configure_reddit">Настроить Реддит</string>
+    <string name="comments">Комментарии</string>
+    <string name="subreddits">Сабреддиты</string>
 </resources>
