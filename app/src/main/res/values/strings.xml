@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">WallFlow</string>
     <string name="home">Home</string>
-    <string name="explore">Explore</string>
     <string name="popular_tags">Popular tags</string>
     <string name="info">Info</string>
     <string name="download">Download</string>
@@ -13,7 +12,6 @@
     <string name="wallhaven_api_key_desc">Required to view NSFW content.</string>
     <string name="confirm">Confirm</string>
     <string name="dismiss">Dismiss</string>
-    <string name="properties">Properties</string>
     <string name="date_added">Date added</string>
     <string name="relevance">Relevance</string>
     <string name="random">Random</string>
