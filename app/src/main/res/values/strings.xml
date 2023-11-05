@@ -279,6 +279,9 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="source_home_visibility_toggle">Source home visibility toggle</string>
     <string name="minutes">minutes</string>
     <string name="frequency_min_val_error">Frequency cannot be less than 15 minutes</string>
+    <string name="success">Success</string>
+    <string name="menu">Menu</string>
+    <string name="remove_from_favorites">Remove from favorites</string>
     <plurals name="every_x_hrs">
         <item quantity="one">Every %d hour</item>
         <item quantity="other">Every %d hours</item>

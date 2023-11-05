@@ -5,6 +5,9 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 
 @Composable
 fun ProgressIndicator(
@@ -16,12 +19,12 @@ fun ProgressIndicator(
     if (progress <= -1F) {
         if (circular) {
             CircularProgressIndicator(
-                modifier = modifier,
+                modifier = modifier.testTag("circular-progress"),
                 strokeCap = strokeCap,
             )
         } else {
             LinearProgressIndicator(
-                modifier = modifier,
+                modifier = modifier.testTag("linear-progress"),
                 strokeCap = strokeCap,
             )
         }
@@ -29,13 +32,17 @@ fun ProgressIndicator(
         if (circular) {
             CircularProgressIndicator(
                 progress = { progress },
-                modifier = modifier,
+                modifier = modifier
+                    .testTag("circular-progress")
+                    .semantics { contentDescription = "Progress $progress" },
                 strokeCap = strokeCap,
             )
         } else {
             LinearProgressIndicator(
                 progress = { progress },
-                modifier = modifier,
+                modifier = modifier
+                    .testTag("linear-progress")
+                    .semantics { contentDescription = "Progress $progress" },
                 strokeCap = strokeCap,
             )
         }

@@ -50,8 +50,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
@@ -227,11 +231,12 @@ private fun PreviewWallpaperActions() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun DownloadButton(
+internal fun DownloadButton(
     modifier: Modifier = Modifier,
     downloadStatus: DownloadStatus? = null,
     onClick: () -> Unit = {},
 ) {
+    val context = LocalContext.current
     val progress by animateFloatAsState(
         when (downloadStatus) {
             is DownloadStatus.Running -> downloadStatus.progress
@@ -274,6 +279,15 @@ private fun DownloadButton(
         }
     }
 
+    val iconContentDescription = stringResource(
+        when (downloadStatus) {
+            is DownloadStatus.Paused -> R.string.paused
+            is DownloadStatus.Failed -> R.string.failed
+            is DownloadStatus.Success -> R.string.success
+            else -> R.string.download
+        },
+    )
+
     TooltipBox(
         modifier = modifier,
         positionProvider = rememberPlainTooltipPositionProvider(),
@@ -285,7 +299,9 @@ private fun DownloadButton(
         },
     ) {
         IconButton(
-            modifier = modifier,
+            modifier = modifier.semantics {
+                contentDescription = context.getString(R.string.download)
+            },
             onClick = if (clickable) {
                 onClick
             } else {
@@ -302,7 +318,7 @@ private fun DownloadButton(
             ) {
                 Icon(
                     painter = painterResource(it),
-                    contentDescription = stringResource(R.string.download),
+                    contentDescription = iconContentDescription,
                 )
             }
         }
@@ -346,12 +362,13 @@ private fun PreviewDownloadButton(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ShareButton(
+internal fun ShareButton(
     modifier: Modifier = Modifier,
     showShareLinkAction: Boolean = true,
     onLinkClick: () -> Unit = {},
     onImageClick: () -> Unit = {},
 ) {
+    val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
 
     TooltipBox(
@@ -380,7 +397,11 @@ private fun ShareButton(
             )
         }
         DropdownMenu(
-            modifier = Modifier.widthIn(min = 150.dp),
+            modifier = Modifier
+                .widthIn(min = 150.dp)
+                .semantics {
+                    contentDescription = context.getString(R.string.menu)
+                },
             expanded = expanded,
             onDismissRequest = { expanded = false },
         ) {
@@ -416,7 +437,7 @@ private fun ShareButton(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun FavoriteButton(
+internal fun FavoriteButton(
     modifier: Modifier = Modifier,
     isFavorite: Boolean = false,
     onToggle: (Boolean) -> Unit = {},
@@ -432,7 +453,13 @@ private fun FavoriteButton(
         },
     ) {
         IconToggleButton(
-            modifier = modifier,
+            modifier = Modifier.testTag(
+                if (isFavorite) {
+                    "baseline_favorite_24"
+                } else {
+                    "outline_favorite_border_24"
+                },
+            ),
             checked = isFavorite,
             colors = IconButtonDefaults.iconToggleButtonColors(
                 checkedContentColor = Color.Red,

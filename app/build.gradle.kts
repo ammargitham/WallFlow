@@ -255,6 +255,7 @@ dependencies {
     // Compose Destinations
     implementation(libs.compose.destinations.core)
     ksp(libs.compose.destinations.ksp)
+    androidTestImplementation(libs.androidx.navigation.testing)
 
     // Retrofit
     implementation(libs.kotlinx.datetime)
