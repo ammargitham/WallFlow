@@ -43,7 +43,6 @@
     <string name="no_sources_set">Ingen kilder valgt</string>
     <string name="downloading">Laster ned</string>
     <string name="invalid_width">Ugyldig bredde</string>
-    <string name="explore">Utforsk</string>
     <string name="add_resolution">Legg til oppløsning</string>
     <string name="height">Høyde</string>
     <string name="info">Info</string>
@@ -52,7 +51,6 @@
     <string name="set_wallpaper">Bruk som bakgrunnsbilde</string>
     <string name="wide">Bredt</string>
     <string name="edit">Rediger</string>
-    <string name="properties">Egenskaper</string>
     <string name="restore">Gjenopprett</string>
     <string name="manage_sources">Håndter kilder</string>
     <string name="set_to">Sett til</string>
