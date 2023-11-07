@@ -295,4 +295,7 @@
     <string name="configure_reddit">Настроить Реддит</string>
     <string name="comments">Комментарии</string>
     <string name="subreddits">Сабреддиты</string>
+    <string name="success">Успех</string>
+    <string name="menu">Меню</string>
+    <string name="remove_from_favorites">Удалить из Избранных</string>
 </resources>
