@@ -41,17 +41,18 @@ interface WallhavenWallpapersDao : WallpapersDao {
 
     @Query(
         """
-            SELECT *
-            FROM wallhaven_wallpapers
-            WHERE id IN (
-                SELECT wsqw.wallpaper_id
-                FROM wallhaven_search_query_wallpapers wsqw
-                WHERE wsqw.search_query_id = (
-                    SELECT sq.id
-                    FROM search_query sq
-                    WHERE query_string = :queryString
-                )
+            SELECT
+                ww.*,
+                COALESCE(wsqw.`order`, ww.ROWID) AS query_order
+            FROM wallhaven_wallpapers ww
+            INNER JOIN wallhaven_search_query_wallpapers wsqw
+                ON ww.id = wsqw.wallpaper_id
+            WHERE wsqw.search_query_id = (
+                SELECT sq.id
+                FROM search_query sq
+                WHERE query_string = :queryString
             )
+            ORDER BY query_order
         """,
     )
     fun pagingSource(queryString: String): PagingSource<Int, WallhavenWallpaperEntity>

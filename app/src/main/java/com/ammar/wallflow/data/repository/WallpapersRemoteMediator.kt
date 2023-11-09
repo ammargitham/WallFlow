@@ -25,6 +25,7 @@ import com.ammar.wallflow.data.network.model.reddit.NetworkRedditSearchResponse
 import com.ammar.wallflow.data.network.model.reddit.toWallpaperEntities
 import com.ammar.wallflow.data.network.model.wallhaven.NetworkWallhavenWallpapersResponse
 import com.ammar.wallflow.data.network.model.wallhaven.toWallpaperEntity
+import com.ammar.wallflow.extensions.indexMap
 import com.ammar.wallflow.json
 import com.ammar.wallflow.model.search.RedditSearch
 import com.ammar.wallflow.model.search.Search
@@ -161,30 +162,50 @@ class WallpapersRemoteMediator<T : Search, U : OnlineSourceWallpaperEntity>(
                     )
                 remoteKeysDao.insertOrReplace(updatedRemoteKey)
 
-                val wallpaperEntities = insertWallpapers(response)
+                val (wallpaperEntities, idMap) = insertWallpapers(response)
 
                 // update mapping table
                 when (searchQueryWallpapersDao) {
                     is WallhavenSearchQueryWallpapersDao -> {
+                        val lastOrder = if (loadType == LoadType.REFRESH) {
+                            0
+                        } else {
+                            searchQueryWallpapersDao.getMaxOrderBySearchQueryId(
+                                searchQueryId = searchQueryId,
+                            ) ?: 0
+                        }
                         searchQueryWallpapersDao.insert(
                             @Suppress("UNCHECKED_CAST")
-                            (wallpaperEntities as List<WallhavenWallpaperEntity>).map {
-                                WallhavenSearchQueryWallpaperEntity(
-                                    searchQueryId = searchQueryId,
-                                    wallpaperId = it.id,
-                                )
-                            },
+                            (wallpaperEntities as List<WallhavenWallpaperEntity>)
+                                .sortedBy { idMap[it.wallhavenId] }
+                                .mapIndexed { i, entity ->
+                                    WallhavenSearchQueryWallpaperEntity(
+                                        searchQueryId = searchQueryId,
+                                        wallpaperId = entity.id,
+                                        order = i + lastOrder + 1,
+                                    )
+                                },
                         )
                     }
                     is RedditSearchQueryWallpapersDao -> {
+                        val lastOrder = if (loadType == LoadType.REFRESH) {
+                            0
+                        } else {
+                            searchQueryWallpapersDao.getMaxOrderBySearchQueryId(
+                                searchQueryId = searchQueryId,
+                            ) ?: 0
+                        }
                         searchQueryWallpapersDao.insert(
                             @Suppress("UNCHECKED_CAST")
-                            (wallpaperEntities as List<RedditWallpaperEntity>).map {
-                                RedditSearchQueryWallpaperEntity(
-                                    searchQueryId = searchQueryId,
-                                    wallpaperId = it.id,
-                                )
-                            },
+                            (wallpaperEntities as List<RedditWallpaperEntity>)
+                                .sortedBy { idMap[it.redditId] }
+                                .mapIndexed { i, entity ->
+                                    RedditSearchQueryWallpaperEntity(
+                                        searchQueryId = searchQueryId,
+                                        wallpaperId = entity.id,
+                                        order = i + lastOrder + 1,
+                                    )
+                                },
                         )
                     }
                 }
@@ -200,7 +221,7 @@ class WallpapersRemoteMediator<T : Search, U : OnlineSourceWallpaperEntity>(
 
     private suspend fun insertWallpapers(
         response: OnlineSourceWallpapersNetworkResponse,
-    ): List<OnlineSourceWallpaperEntity> {
+    ): Pair<List<OnlineSourceWallpaperEntity>, Map<String, Int>> {
         return when (response) {
             is NetworkWallhavenWallpapersResponse -> insertWallhavenWallpapers(response)
             is NetworkRedditSearchResponse -> insertRedditWallpapers(response)
@@ -210,18 +231,19 @@ class WallpapersRemoteMediator<T : Search, U : OnlineSourceWallpaperEntity>(
 
     private suspend fun insertWallhavenWallpapers(
         response: NetworkWallhavenWallpapersResponse,
-    ): List<WallhavenWallpaperEntity> {
+    ): Pair<List<WallhavenWallpaperEntity>, Map<String, Int>> {
         val networkWallpapers = response.data
         val wallhavenWallpaperIds = networkWallpapers.map { it.id }
         (wallpapersDao as WallhavenWallpapersDao).insert(
             networkWallpapers.map { it.toWallpaperEntity() },
         )
-        return wallpapersDao.getByWallhavenIds(wallhavenWallpaperIds)
+        val entities = wallpapersDao.getByWallhavenIds(wallhavenWallpaperIds)
+        return entities to wallhavenWallpaperIds.indexMap()
     }
 
     private suspend fun insertRedditWallpapers(
         response: NetworkRedditSearchResponse,
-    ): List<RedditWallpaperEntity> {
+    ): Pair<List<RedditWallpaperEntity>, Map<String, Int>> {
         val redditData = response.data
         val entities = redditData.children
             .filter {
@@ -233,6 +255,7 @@ class WallpapersRemoteMediator<T : Search, U : OnlineSourceWallpaperEntity>(
             }
         val redditIds = entities.map { it.redditId }
         (wallpapersDao as RedditWallpapersDao).insert(entities)
-        return wallpapersDao.getByRedditIds(redditIds)
+        val entities1 = wallpapersDao.getByRedditIds(redditIds)
+        return entities1 to redditIds.indexMap()
     }
 }

@@ -31,6 +31,7 @@ import com.ammar.wallflow.model.search.WallhavenFilters
 import com.ammar.wallflow.model.search.WallhavenSearch
 import kotlin.test.assertEquals
 import kotlin.test.assertFalse
+import kotlin.test.assertNotEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -182,6 +183,18 @@ class WallpapersRemoteMediatorTest {
         val search = WallhavenSearch(
             filters = WallhavenFilters(includedTags = setOf("test")),
         )
+        var mockNetworkWallpapers = MockFactory.generateNetworkWallhavenWallpapers(20)
+        fakeWallhavenNetworkApi.setWallpapersForQuery(
+            query = search.getApiQueryString(),
+            networkWallhavenWallpapers = mockNetworkWallpapers,
+            meta = NetworkWallhavenMeta(
+                query = StringNetworkWallhavenMetaQuery(""),
+                current_page = 1,
+                last_page = 10,
+                per_page = 20,
+                total = 198,
+            ),
+        )
         val remoteMediator = WallpapersRemoteMediator<WallhavenSearch, WallhavenWallpaperEntity>(
             search,
             fakeDb,
@@ -199,8 +212,27 @@ class WallpapersRemoteMediatorTest {
             search.toJson(),
         )
         assertNotNull(searchQueryEntity)
+        var wallpaperCount = wallhavenWallpapersDao.count()
+        var searchQueryCount = searchQueryDao.count()
+        val prevWallpaperIds = wallhavenWallpapersDao.getAllWallhavenIds()
+
+        assertEquals(20, wallpaperCount)
+        assertEquals(1, searchQueryCount)
         val lastUpdated = searchQueryEntity.lastUpdatedOn
         // refresh again
+        fakeWallhavenNetworkApi.clearFakeData()
+        mockNetworkWallpapers = MockFactory.generateNetworkWallhavenWallpapers(20)
+        fakeWallhavenNetworkApi.setWallpapersForQuery(
+            query = search.getApiQueryString(),
+            networkWallhavenWallpapers = mockNetworkWallpapers,
+            meta = NetworkWallhavenMeta(
+                query = StringNetworkWallhavenMetaQuery(""),
+                current_page = 1,
+                last_page = 10,
+                per_page = 20,
+                total = 198,
+            ),
+        )
         val refreshResult = remoteMediator.load(LoadType.REFRESH, pagingState)
         assertTrue { refreshResult is MediatorResult.Success }
         val refreshSearchQueryEntity = searchQueryDao.getBySearchQuery(
@@ -209,6 +241,13 @@ class WallpapersRemoteMediatorTest {
         assertNotNull(refreshSearchQueryEntity)
         val refreshLastUpdated = refreshSearchQueryEntity.lastUpdatedOn
         assertTrue { refreshLastUpdated > lastUpdated }
+        wallpaperCount = wallhavenWallpapersDao.count()
+        searchQueryCount = searchQueryDao.count()
+        val newWallpaperIds = wallhavenWallpapersDao.getAllWallhavenIds()
+
+        assertEquals(20, wallpaperCount)
+        assertEquals(1, searchQueryCount)
+        assertNotEquals(prevWallpaperIds, newWallpaperIds)
     }
 
     @Test

@@ -34,4 +34,5 @@ import com.ammar.wallflow.data.db.entity.wallpaper.WallhavenWallpaperEntity
 data class WallhavenSearchQueryWallpaperEntity(
     @ColumnInfo(name = "search_query_id") val searchQueryId: Long,
     @ColumnInfo(name = "wallpaper_id") val wallpaperId: Long,
+    val order: Int? = null,
 )

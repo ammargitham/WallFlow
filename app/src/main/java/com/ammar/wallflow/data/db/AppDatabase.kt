@@ -59,9 +59,10 @@ import com.ammar.wallflow.data.db.entity.wallpaper.WallhavenWallpaperEntity
         RedditWallpaperEntity::class,
         RedditSearchQueryWallpaperEntity::class,
     ],
-    version = 4,
+    version = 5,
     autoMigrations = [
         AutoMigration(from = 2, to = 3),
+        AutoMigration(from = 4, to = 5),
     ],
 )
 @TypeConverters(Converters::class)

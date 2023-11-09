@@ -61,17 +61,18 @@ interface RedditWallpapersDao : WallpapersDao {
 
     @Query(
         """
-            SELECT *
-            FROM reddit_wallpapers
-            WHERE id IN (
-                SELECT rsqw.wallpaper_id
-                FROM reddit_search_query_wallpapers rsqw
-                WHERE rsqw.search_query_id = (
-                    SELECT sq.id
-                    FROM search_query sq
-                    WHERE query_string = :queryString
-                )
+            SELECT
+                rw.*,
+                COALESCE(rsqw.`order`, rw.ROWID) AS query_order
+            FROM reddit_wallpapers rw
+            INNER JOIN reddit_search_query_wallpapers rsqw
+                ON rw.id = rsqw.wallpaper_id
+            WHERE rsqw.search_query_id = (
+                SELECT sq.id
+                FROM search_query sq
+                WHERE query_string = :queryString
             )
+            ORDER BY query_order
         """,
     )
     fun pagingSource(queryString: String): PagingSource<Int, RedditWallpaperEntity>
