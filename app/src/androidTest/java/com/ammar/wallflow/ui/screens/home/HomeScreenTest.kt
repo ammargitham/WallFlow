@@ -41,10 +41,12 @@ import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
+@Ignore("Incomplete test")
 @RunWith(AndroidJUnit4::class)
 class HomeScreenTest {
 
@@ -106,19 +108,27 @@ class HomeScreenTest {
                 TODO("Not yet implemented")
             }
 
-            override fun wallpaper(wallpaperWallhavenId: String): Flow<Resource<WallhavenWallpaper?>> {
+            override fun wallpaper(
+                wallpaperWallhavenId: String,
+            ): Flow<Resource<WallhavenWallpaper?>> {
                 TODO("Not yet implemented")
             }
 
-            override suspend fun insertTagEntities(tags: Collection<WallhavenTagEntity>) {
+            override suspend fun insertTagEntities(
+                tags: Collection<WallhavenTagEntity>,
+            ) {
                 TODO("Not yet implemented")
             }
 
-            override suspend fun insertUploaderEntities(uploaders: Collection<WallhavenUploaderEntity>) {
+            override suspend fun insertUploaderEntities(
+                uploaders: Collection<WallhavenUploaderEntity>,
+            ) {
                 TODO("Not yet implemented")
             }
 
-            override suspend fun insertWallpaperEntities(entities: Collection<WallhavenWallpaperEntity>) {
+            override suspend fun insertWallpaperEntities(
+                entities: Collection<WallhavenWallpaperEntity>,
+            ) {
                 TODO("Not yet implemented")
             }
         },
@@ -136,7 +146,9 @@ class HomeScreenTest {
                 TODO("Not yet implemented")
             }
 
-            override suspend fun insertWallpaperEntities(entities: Collection<RedditWallpaperEntity>) {
+            override suspend fun insertWallpaperEntities(
+                entities: Collection<RedditWallpaperEntity>,
+            ) {
                 TODO("Not yet implemented")
             }
         },

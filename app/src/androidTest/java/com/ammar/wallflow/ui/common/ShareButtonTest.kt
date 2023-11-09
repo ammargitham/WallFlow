@@ -144,4 +144,3 @@ class ShareButtonTest {
         assert(imageClickCount.size == 1)
     }
 }
-

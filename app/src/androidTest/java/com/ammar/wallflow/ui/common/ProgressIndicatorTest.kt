@@ -88,4 +88,3 @@ class ProgressIndicatorTest {
             .assertIsDisplayed()
     }
 }
-

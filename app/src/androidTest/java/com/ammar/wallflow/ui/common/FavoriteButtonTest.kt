@@ -106,4 +106,3 @@ class FavoriteButtonTest {
             .assertIsDisplayed()
     }
 }
-
