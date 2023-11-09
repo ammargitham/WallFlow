@@ -300,9 +300,6 @@ dependencies {
     implementation(libs.partial)
     ksp(libs.partial.ksp)
 
-    // modern storage permissions
-    implementation(libs.modernstorage.permissions)
-
     // cloudy
     implementation(libs.cloudy)
 

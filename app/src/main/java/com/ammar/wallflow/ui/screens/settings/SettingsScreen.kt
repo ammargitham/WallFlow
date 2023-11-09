@@ -79,9 +79,9 @@ import com.ammar.wallflow.ui.screens.settings.composables.generalSection
 import com.ammar.wallflow.ui.screens.settings.composables.lookAndFeelSection
 import com.ammar.wallflow.ui.screens.settings.composables.objectDetectionSection
 import com.ammar.wallflow.ui.theme.WallFlowTheme
+import com.ammar.wallflow.utils.StoragePermissions
 import com.ammar.wallflow.utils.objectdetection.objectsDetector
 import com.ammar.wallflow.workers.AutoWallpaperWorker
-import com.google.modernstorage.permissions.StoragePermissions
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.navigate
 import kotlinx.collections.immutable.ImmutableList

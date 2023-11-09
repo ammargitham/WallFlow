@@ -17,11 +17,11 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import com.ammar.wallflow.extensions.wallpaperManager
-import com.google.modernstorage.permissions.StoragePermissions
+import com.ammar.wallflow.utils.StoragePermissions
 
 @Stable
 sealed interface PermissionStatus {
-    object Granted : PermissionStatus
+    data object Granted : PermissionStatus
     data class Denied(
         val shouldShowRationale: Boolean,
     ) : PermissionStatus
