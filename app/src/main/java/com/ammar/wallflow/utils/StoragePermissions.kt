@@ -54,7 +54,8 @@ class StoragePermissions(private val context: Context) {
                             else -> {
                                 when (action) {
                                     Action.READ -> permissionMask or READ_EXTERNAL_STORAGE_MASK
-                                    Action.READ_AND_WRITE -> permissionMask or WRITE_EXTERNAL_STORAGE_MASK
+                                    Action.READ_AND_WRITE ->
+                                        permissionMask or WRITE_EXTERNAL_STORAGE_MASK
                                 }
                             }
                         }
@@ -68,7 +69,8 @@ class StoragePermissions(private val context: Context) {
                             else -> {
                                 when (action) {
                                     Action.READ -> permissionMask or READ_EXTERNAL_STORAGE_MASK
-                                    Action.READ_AND_WRITE -> permissionMask or WRITE_EXTERNAL_STORAGE_MASK
+                                    Action.READ_AND_WRITE ->
+                                        permissionMask or WRITE_EXTERNAL_STORAGE_MASK
                                 }
                             }
                         }
@@ -82,7 +84,8 @@ class StoragePermissions(private val context: Context) {
                             else -> {
                                 when (action) {
                                     Action.READ -> permissionMask or READ_EXTERNAL_STORAGE_MASK
-                                    Action.READ_AND_WRITE -> permissionMask or WRITE_EXTERNAL_STORAGE_MASK
+                                    Action.READ_AND_WRITE ->
+                                        permissionMask or WRITE_EXTERNAL_STORAGE_MASK
                                 }
                             }
                         }
@@ -96,7 +99,8 @@ class StoragePermissions(private val context: Context) {
                             else -> {
                                 when (action) {
                                     Action.READ -> permissionMask or READ_EXTERNAL_STORAGE_MASK
-                                    Action.READ_AND_WRITE -> permissionMask or WRITE_EXTERNAL_STORAGE_MASK
+                                    Action.READ_AND_WRITE ->
+                                        permissionMask or WRITE_EXTERNAL_STORAGE_MASK
                                 }
                             }
                         }
@@ -119,22 +123,36 @@ class StoragePermissions(private val context: Context) {
             val permissionMask = getPermissionMask(action, types, createdBy)
             val requiredPermissions = mutableListOf<String>()
 
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && permissionMask and MANAGE_EXTERNAL_STORAGE_MASK == MANAGE_EXTERNAL_STORAGE_MASK) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
+                permissionMask and MANAGE_EXTERNAL_STORAGE_MASK == MANAGE_EXTERNAL_STORAGE_MASK
+            ) {
                 requiredPermissions.add(Manifest.permission.MANAGE_EXTERNAL_STORAGE)
             } else {
                 when {
-                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && permissionMask and MANAGE_EXTERNAL_STORAGE_MASK == MANAGE_EXTERNAL_STORAGE_MASK -> requiredPermissions.add(
-                        Manifest.permission.MANAGE_EXTERNAL_STORAGE,
-                    )
-                    permissionMask and SCOPED_STORAGE_READ_EXTERNAL_STORAGE_MASK == SCOPED_STORAGE_READ_EXTERNAL_STORAGE_MASK -> requiredPermissions.add(
-                        Manifest.permission.READ_EXTERNAL_STORAGE,
-                    )
-                    permissionMask and WRITE_EXTERNAL_STORAGE_MASK == WRITE_EXTERNAL_STORAGE_MASK -> requiredPermissions.add(
-                        Manifest.permission.WRITE_EXTERNAL_STORAGE,
-                    )
-                    permissionMask and READ_EXTERNAL_STORAGE_MASK == READ_EXTERNAL_STORAGE_MASK -> requiredPermissions.add(
-                        Manifest.permission.READ_EXTERNAL_STORAGE,
-                    )
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
+                        permissionMask and
+                        MANAGE_EXTERNAL_STORAGE_MASK == MANAGE_EXTERNAL_STORAGE_MASK ->
+                        requiredPermissions.add(
+                            Manifest.permission.MANAGE_EXTERNAL_STORAGE,
+                        )
+                    permissionMask and
+                        SCOPED_STORAGE_READ_EXTERNAL_STORAGE_MASK
+                        == SCOPED_STORAGE_READ_EXTERNAL_STORAGE_MASK ->
+                        requiredPermissions.add(
+                            Manifest.permission.READ_EXTERNAL_STORAGE,
+                        )
+                    permissionMask and
+                        WRITE_EXTERNAL_STORAGE_MASK
+                        == WRITE_EXTERNAL_STORAGE_MASK ->
+                        requiredPermissions.add(
+                            Manifest.permission.WRITE_EXTERNAL_STORAGE,
+                        )
+                    permissionMask and
+                        READ_EXTERNAL_STORAGE_MASK
+                        == READ_EXTERNAL_STORAGE_MASK ->
+                        requiredPermissions.add(
+                            Manifest.permission.READ_EXTERNAL_STORAGE,
+                        )
                 }
             }
 
@@ -201,7 +219,9 @@ class StoragePermissions(private val context: Context) {
      * Check if app can access shared files
      */
     fun hasAccess(action: Action, types: List<FileType>, createdBy: CreatedBy): Boolean {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && Environment.isExternalStorageManager()) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R &&
+            Environment.isExternalStorageManager()
+        ) {
             return true
         }
 
@@ -232,4 +252,3 @@ class StoragePermissions(private val context: Context) {
         return hasAccess(Action.READ_AND_WRITE, types, createdBy)
     }
 }
-
