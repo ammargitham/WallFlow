@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 import com.android.build.api.variant.FilterConfiguration.FilterType.ABI
 import java.util.Properties
 
@@ -191,6 +193,10 @@ android {
 
     sourceSets {
         getByName("androidTest").assets.srcDir("$projectDir/schemas")
+    }
+
+    androidResources {
+        generateLocaleConfig = true
     }
 }
 
