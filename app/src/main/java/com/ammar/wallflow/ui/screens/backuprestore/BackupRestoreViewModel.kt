@@ -7,7 +7,6 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.ammar.wallflow.data.db.dao.FavoriteDao
 import com.ammar.wallflow.data.db.dao.search.SavedSearchDao
-import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenUploadersDao
 import com.ammar.wallflow.data.db.dao.wallpaper.RedditWallpapersDao
 import com.ammar.wallflow.data.db.dao.wallpaper.WallhavenWallpapersDao
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
@@ -48,7 +47,6 @@ class BackupRestoreViewModel @Inject constructor(
     private val wallhavenRepository: WallhavenRepository,
     private val redditRepository: RedditRepository,
     private val favoritesRepository: FavoritesRepository,
-    private val uploadersDao: WallhavenUploadersDao,
 ) : AndroidViewModel(
     application = application,
 ) {
@@ -209,7 +207,6 @@ class BackupRestoreViewModel @Inject constructor(
                     wallhavenRepository = wallhavenRepository,
                     redditRepository = redditRepository,
                     favoritesRepository = favoritesRepository,
-                    uploadersDao = uploadersDao,
                     wallhavenWallpapersDao = wallhavenWallpapersDao,
                     redditWallpapersDao = redditWallpapersDao,
                 )

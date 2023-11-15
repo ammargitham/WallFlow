@@ -9,6 +9,7 @@ import androidx.room.Transaction
 import androidx.room.Update
 import androidx.room.Upsert
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperTagsEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperUploaderEntity
 import com.ammar.wallflow.data.db.entity.wallpaper.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.db.entity.wallpaper.WallpaperWithUploaderAndTags
 
@@ -136,6 +137,11 @@ interface WallhavenWallpapersDao : WallpapersDao {
         """,
     )
     suspend fun deleteAllUniqueToSearchQueryId(searchQueryId: Long)
+
+    @Upsert
+    suspend fun upsertWallpaperUploaderMappings(
+        vararg wallpaperUploader: WallhavenWallpaperUploaderEntity,
+    )
 
     @Insert
     suspend fun insertWallpaperTagMappings(vararg wallpaperTag: WallhavenWallpaperTagsEntity)

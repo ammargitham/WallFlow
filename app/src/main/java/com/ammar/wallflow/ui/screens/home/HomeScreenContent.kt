@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridScope
-import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridState
 import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
@@ -57,7 +56,6 @@ import kotlinx.datetime.Clock
 
 @Composable
 internal fun HomeScreenContent(
-    gridState: LazyStaggeredGridState,
     wallpapers: LazyPagingItems<Wallpaper>,
     nestedScrollConnectionGetter: () -> NestedScrollConnection,
     modifier: Modifier = Modifier,
@@ -99,7 +97,6 @@ internal fun HomeScreenContent(
                 modifier = Modifier
                     .fillMaxSize()
                     .nestedScroll(nestedScrollConnectionGetter()),
-                gridState = gridState,
                 contentPadding = contentPadding,
                 wallpapers = wallpapers,
                 favorites = favorites,
@@ -181,7 +178,6 @@ private fun HomeScreenContent(
 @SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 private fun Feed(
-    gridState: LazyStaggeredGridState,
     wallpapers: LazyPagingItems<Wallpaper>,
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(8.dp),
@@ -197,6 +193,7 @@ private fun Feed(
     onWallpaperFavoriteClick: (wallpaper: Wallpaper) -> Unit = {},
     onFABClick: () -> Unit = {},
 ) {
+    val gridState = rememberLazyStaggeredGridState()
     Scaffold(
         modifier = modifier,
         contentWindowInsets = WindowInsets(0.dp),
@@ -261,9 +258,7 @@ private fun DefaultPreview() {
             val nestedScrollConnection = remember {
                 object : NestedScrollConnection {}
             }
-            val gridState = rememberLazyStaggeredGridState()
             HomeScreenContent(
-                gridState = gridState,
                 header = {
                     header(
                         sources = persistentListOf(OnlineSource.WALLHAVEN),

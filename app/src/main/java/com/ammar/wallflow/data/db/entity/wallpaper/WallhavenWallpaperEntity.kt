@@ -13,6 +13,7 @@ import androidx.room.Relation
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenTagEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenUploaderEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperTagsEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperUploaderEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.asTag
 import com.ammar.wallflow.data.db.entity.wallhaven.asUploader
 import com.ammar.wallflow.model.Purity
@@ -35,7 +36,6 @@ data class WallhavenWallpaperEntity(
     @ColumnInfo(name = "wallhaven_id") val wallhavenId: String,
     val url: String,
     @ColumnInfo(name = "short_url") val shortUrl: String,
-    @ColumnInfo(name = "uploader_id") val uploaderId: Long?,
     val views: Int,
     val favorites: Int,
     val source: String,
@@ -54,8 +54,13 @@ data class WallhavenWallpaperEntity(
 data class WallpaperWithUploaderAndTags(
     @Embedded val wallpaper: WallhavenWallpaperEntity,
     @Relation(
-        parentColumn = "uploader_id",
+        parentColumn = "id",
         entityColumn = "id",
+        associateBy = Junction(
+            value = WallhavenWallpaperUploaderEntity::class,
+            parentColumn = "wallpaper_id",
+            entityColumn = "uploader_id",
+        ),
     )
     val uploader: WallhavenUploaderEntity?,
     @Relation(

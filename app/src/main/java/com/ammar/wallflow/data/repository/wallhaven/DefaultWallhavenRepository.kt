@@ -14,6 +14,7 @@ import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenPopularTagEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenTagEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenUploaderEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperTagsEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperUploaderEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.asTag
 import com.ammar.wallflow.data.db.entity.wallpaper.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.db.entity.wallpaper.WallpaperWithUploaderAndTags
@@ -172,19 +173,18 @@ class DefaultWallhavenRepository @Inject constructor(
                 }
                 // insert or update wallpaper in db
                 val existingWallpaper = wallpapersDao.getByWallhavenId(wallpaperWallhavenId)
-                val wallpaperDbId: Long
-                if (existingWallpaper != null) {
-                    wallpaperDbId = existingWallpaper.id
-                    wallpapersDao.update(
-                        fetchResult.toWallpaperEntity(
-                            id = wallpaperDbId,
+                val wallpaperDbId: Long = existingWallpaper?.id
+                    ?: wallpapersDao.insert(
+                        fetchResult.toWallpaperEntity(),
+                    ).first()
+                // insert wallpaper uploader mapping
+                if (uploaderId != null) {
+                    wallpapersDao.upsertWallpaperUploaderMappings(
+                        WallhavenWallpaperUploaderEntity(
+                            wallpaperId = wallpaperDbId,
                             uploaderId = uploaderId,
                         ),
                     )
-                } else {
-                    wallpaperDbId = wallpapersDao.insert(
-                        fetchResult.toWallpaperEntity(uploaderId = uploaderId),
-                    ).first()
                 }
                 if (existingWallpaper != null) {
                     // delete existing wallpaper tag mappings

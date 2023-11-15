@@ -4,6 +4,7 @@ import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.ammar.wallflow.data.db.automigrations.AutoMigration6To7
 import com.ammar.wallflow.data.db.converters.Converters
 import com.ammar.wallflow.data.db.dao.AutoWallpaperHistoryDao
 import com.ammar.wallflow.data.db.dao.FavoriteDao
@@ -36,6 +37,7 @@ import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenSearchQueryWallpaper
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenTagEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenUploaderEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperTagsEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperUploaderEntity
 import com.ammar.wallflow.data.db.entity.wallpaper.RedditWallpaperEntity
 import com.ammar.wallflow.data.db.entity.wallpaper.WallhavenWallpaperEntity
 
@@ -50,6 +52,7 @@ import com.ammar.wallflow.data.db.entity.wallpaper.WallhavenWallpaperEntity
         WallhavenUploaderEntity::class,
         WallhavenTagEntity::class,
         WallhavenWallpaperTagsEntity::class,
+        WallhavenWallpaperUploaderEntity::class,
         SearchHistoryEntity::class,
         ObjectDetectionModelEntity::class,
         SavedSearchEntity::class,
@@ -59,10 +62,15 @@ import com.ammar.wallflow.data.db.entity.wallpaper.WallhavenWallpaperEntity
         RedditWallpaperEntity::class,
         RedditSearchQueryWallpaperEntity::class,
     ],
-    version = 5,
+    version = 7,
     autoMigrations = [
         AutoMigration(from = 2, to = 3),
         AutoMigration(from = 4, to = 5),
+        AutoMigration(
+            from = 6,
+            to = 7,
+            spec = AutoMigration6To7::class,
+        ),
     ],
 )
 @TypeConverters(Converters::class)

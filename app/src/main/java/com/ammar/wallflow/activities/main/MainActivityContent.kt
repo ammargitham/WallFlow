@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -299,10 +298,8 @@ private fun PreviewContent(
                 val nestedScrollConnection = remember {
                     object : NestedScrollConnection {}
                 }
-                val gridState = rememberLazyStaggeredGridState()
                 HomeScreenContent(
                     modifier = Modifier.windowInsetsPadding(topWindowInsets),
-                    gridState = gridState,
                     header = {
                         header(
                             sources = persistentListOf(OnlineSource.WALLHAVEN),

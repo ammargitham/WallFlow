@@ -9,6 +9,7 @@ import com.ammar.wallflow.IoDispatcher
 import com.ammar.wallflow.data.db.AppDatabase
 import com.ammar.wallflow.data.db.manualmigrations.MIGRATION_1_2
 import com.ammar.wallflow.data.db.manualmigrations.MIGRATION_3_4
+import com.ammar.wallflow.data.db.manualmigrations.MIGRATION_5_6
 import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.model.ObjectDetectionModel
 import com.ammar.wallflow.model.toEntity
@@ -22,6 +23,12 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+
+val allManualMigrations = arrayOf(
+    MIGRATION_1_2,
+    MIGRATION_3_4,
+    MIGRATION_5_6,
+)
 
 @Module
 @InstallIn(SingletonComponent::class)
@@ -91,10 +98,7 @@ class DatabaseModule {
             AppDatabase::class.java,
             "app",
         ).apply {
-            addMigrations(
-                MIGRATION_1_2,
-                MIGRATION_3_4,
-            )
+            addMigrations(*allManualMigrations)
             addCallback(
                 object : RoomDatabase.Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {

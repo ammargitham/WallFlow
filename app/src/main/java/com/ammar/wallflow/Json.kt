@@ -29,4 +29,5 @@ val json = Json {
 val safeJson = Json {
     serializersModule = module
     coerceInputValues = true
+    ignoreUnknownKeys = true
 }

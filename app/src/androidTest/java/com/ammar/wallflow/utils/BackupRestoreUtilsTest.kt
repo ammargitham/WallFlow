@@ -112,10 +112,7 @@ class BackupRestoreUtilsTest {
         val redditEntities = insertRedditEntities()
 
         // favorites 4 wallhaven and reddit wallpapers
-        val wallhavenEntitiesWithoutUploaders = wallhavenEntities.filter { it.uploaderId == null }
-        val wallhavenEntitiesWithUploaders = wallhavenEntities.filter { it.uploaderId != null }
-        val favoriteWallhavenEntities = wallhavenEntitiesWithoutUploaders.shuffled().take(2) +
-            wallhavenEntitiesWithUploaders.shuffled().take(2)
+        val favoriteWallhavenEntities = wallhavenEntities.shuffled().take(4)
         val favoriteRedditEntities = redditEntities.shuffled().take(4)
         val favoriteEntities = favoriteWallhavenEntities.map {
             FavoriteEntity(
@@ -158,16 +155,8 @@ class BackupRestoreUtilsTest {
 
         uploadersDao.insert(networkUploaders.map { it.toEntity() })
 
-        val dbUploaderUsernameMap = uploadersDao.getAll().associateBy { it.username }
-        val whIdToUploaderUsernameMap = networkWallhavenWallpapers.associate {
-            it.id to it.uploader?.username
-        }
         val wallpaperEntities = networkWallhavenWallpapers.map {
-            val uploaderUsername = whIdToUploaderUsernameMap[it.id]
-            val uploaderId = dbUploaderUsernameMap[uploaderUsername]?.id
-            it.toWallpaperEntity(
-                uploaderId = uploaderId,
-            )
+            it.toWallpaperEntity()
         }
         wallhavenWallpapersDao.insert(wallpaperEntities)
 
@@ -301,12 +290,6 @@ class BackupRestoreUtilsTest {
             val oldDbWallhavenWallpapers = oldDbFavWallpapersWithUploaderAndTags.map {
                 it.wallpaper
             }
-            val oldDbWallhavenUploaders = oldDbFavWallpapersWithUploaderAndTags.mapNotNull {
-                it.uploader
-            }
-            val oldDbWallhavenTags = oldDbFavWallpapersWithUploaderAndTags.flatMap {
-                it.tags ?: emptyList()
-            }
             val oldFavRedditIds = oldDbFavorites
                 .filter { it.source == Source.REDDIT }
                 .map { it.sourceId }
@@ -366,12 +349,9 @@ class BackupRestoreUtilsTest {
                 ),
                 wallhavenWallpapersDao = wallhavenWallpapersDao,
                 redditWallpapersDao = redditWallpapersDao,
-                uploadersDao = uploadersDao,
             )
             val preferences = appPreferencesRepository.appPreferencesFlow.firstOrNull()
             val dbWallhavenWallpapers = wallhavenWallpapersDao.getAll()
-            val dbUploaders = uploadersDao.getAll()
-            val dbTags = tagsDao.getAll()
             val dbFavorites = favoriteDao.getAll()
             val dbRedditWallpapers = redditWallpapersDao.getAll()
             val dbSavedSearches = savedSearchDao.getAll()
@@ -379,27 +359,11 @@ class BackupRestoreUtilsTest {
             // need to reset db ids before comparing
             assertEquals(
                 oldDbWallhavenWallpapers
-                    .map { it.copy(id = 0, uploaderId = 0) }
+                    .map { it.copy(id = 0) }
                     .sortedBy { it.wallhavenId },
                 dbWallhavenWallpapers
-                    .map { it.copy(id = 0, uploaderId = 0) }
-                    .sortedBy { it.wallhavenId },
-            )
-            assertEquals(
-                oldDbWallhavenTags
                     .map { it.copy(id = 0) }
                     .sortedBy { it.wallhavenId },
-                dbTags
-                    .map { it.copy(id = 0) }
-                    .sortedBy { it.wallhavenId },
-            )
-            assertEquals(
-                oldDbWallhavenUploaders
-                    .map { it.copy(id = 0) }
-                    .sortedBy { it.username },
-                dbUploaders
-                    .map { it.copy(id = 0) }
-                    .sortedBy { it.username },
             )
             assertEquals(
                 oldDbFavorites
@@ -524,7 +488,6 @@ class BackupRestoreUtilsTest {
                 ),
                 wallhavenWallpapersDao = wallhavenWallpapersDao,
                 redditWallpapersDao = redditWallpapersDao,
-                uploadersDao = uploadersDao,
             )
             val preferences = appPreferencesRepository.appPreferencesFlow.firstOrNull()
             assertEquals(oldPreferences, preferences)
@@ -600,7 +563,6 @@ class BackupRestoreUtilsTest {
                 ),
                 wallhavenWallpapersDao = wallhavenWallpapersDao,
                 redditWallpapersDao = redditWallpapersDao,
-                uploadersDao = uploadersDao,
             )
             val preferences = appPreferencesRepository.appPreferencesFlow.firstOrNull()
             assertNotNull(preferences)
@@ -680,7 +642,6 @@ class BackupRestoreUtilsTest {
                 ),
                 wallhavenWallpapersDao = wallhavenWallpapersDao,
                 redditWallpapersDao = redditWallpapersDao,
-                uploadersDao = uploadersDao,
             )
             val preferences = appPreferencesRepository.appPreferencesFlow.firstOrNull()
             assertEquals(oldPreferences, preferences)
@@ -756,7 +717,6 @@ class BackupRestoreUtilsTest {
                 ),
                 wallhavenWallpapersDao = wallhavenWallpapersDao,
                 redditWallpapersDao = redditWallpapersDao,
-                uploadersDao = uploadersDao,
             )
             val dbFavorites = favoriteDao.getAll()
             val dbFavWallhavenIds = dbFavorites.map { it.sourceId }
@@ -771,10 +731,10 @@ class BackupRestoreUtilsTest {
             // need to reset db ids before comparing
             assertEquals(
                 oldDbWallpapers
-                    .map { it.copy(id = 0, uploaderId = 0) }
+                    .map { it.copy(id = 0) }
                     .sortedBy { it.wallhavenId },
                 dbWallpapers
-                    .map { it.copy(id = 0, uploaderId = 0) }
+                    .map { it.copy(id = 0) }
                     .sortedBy { it.wallhavenId },
             )
             assertEquals(
@@ -830,12 +790,6 @@ class BackupRestoreUtilsTest {
                     .filter { it.wallpaper.wallhavenId in oldFavWallhavenIds }
             val oldDbWallhavenWallpapers = oldDbFavWallpapersWithUploaderAndTags.map {
                 it.wallpaper
-            }
-            val oldDbWallhavenUploaders = oldDbFavWallpapersWithUploaderAndTags.mapNotNull {
-                it.uploader
-            }
-            val oldDbWallhavenTags = oldDbFavWallpapersWithUploaderAndTags.flatMap {
-                it.tags ?: emptyList()
             }
             val oldFavRedditIds = oldDbFavorites
                 .filter { it.source == Source.REDDIT }
@@ -896,12 +850,9 @@ class BackupRestoreUtilsTest {
                 ),
                 wallhavenWallpapersDao = wallhavenWallpapersDao,
                 redditWallpapersDao = redditWallpapersDao,
-                uploadersDao = uploadersDao,
             )
             val preferences = appPreferencesRepository.appPreferencesFlow.firstOrNull()
             val dbWallhavenWallpapers = wallhavenWallpapersDao.getAll()
-            val dbUploaders = uploadersDao.getAll()
-            val dbTags = tagsDao.getAll()
             val dbFavorites = favoriteDao.getAll()
             val dbRedditWallpapers = redditWallpapersDao.getAll()
             val dbSavedSearches = savedSearchDao.getAll()
@@ -909,27 +860,11 @@ class BackupRestoreUtilsTest {
             // need to reset db ids before comparing
             assertEquals(
                 oldDbWallhavenWallpapers
-                    .map { it.copy(id = 0, uploaderId = 0) }
+                    .map { it.copy(id = 0) }
                     .sortedBy { it.wallhavenId },
                 dbWallhavenWallpapers
-                    .map { it.copy(id = 0, uploaderId = 0) }
-                    .sortedBy { it.wallhavenId },
-            )
-            assertEquals(
-                oldDbWallhavenTags
                     .map { it.copy(id = 0) }
                     .sortedBy { it.wallhavenId },
-                dbTags
-                    .map { it.copy(id = 0) }
-                    .sortedBy { it.wallhavenId },
-            )
-            assertEquals(
-                oldDbWallhavenUploaders
-                    .map { it.copy(id = 0) }
-                    .sortedBy { it.username },
-                dbUploaders
-                    .map { it.copy(id = 0) }
-                    .sortedBy { it.username },
             )
             assertEquals(
                 oldDbFavorites

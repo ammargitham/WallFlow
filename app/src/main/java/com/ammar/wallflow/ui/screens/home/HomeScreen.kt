@@ -31,7 +31,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.ammar.wallflow.extensions.rememberLazyStaggeredGridState
 import com.ammar.wallflow.extensions.search
 import com.ammar.wallflow.model.OnlineSource
 import com.ammar.wallflow.model.Wallpaper
@@ -84,7 +83,6 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val viewerUiState by viewerViewModel.uiState.collectAsStateWithLifecycle()
     val wallpapers = viewModel.wallpapers.collectAsLazyPagingItems()
-    val gridState = wallpapers.rememberLazyStaggeredGridState()
     val refreshState = rememberPullRefreshState(
         refreshing = false,
         onRefresh = {
@@ -177,7 +175,6 @@ fun HomeScreen(
             modifier = Modifier.fillMaxSize(),
             nestedScrollConnectionGetter = nestedScrollConnectionGetter,
             isExpanded = systemState.isExpanded,
-            gridState = gridState,
             contentPadding = PaddingValues(
                 start = 8.dp,
                 end = 8.dp,

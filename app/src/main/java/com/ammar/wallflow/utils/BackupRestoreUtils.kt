@@ -5,14 +5,10 @@ import android.util.Log
 import androidx.core.net.toUri
 import com.ammar.wallflow.data.db.dao.FavoriteDao
 import com.ammar.wallflow.data.db.dao.search.SavedSearchDao
-import com.ammar.wallflow.data.db.dao.wallhaven.WallhavenUploadersDao
 import com.ammar.wallflow.data.db.dao.wallpaper.RedditWallpapersDao
 import com.ammar.wallflow.data.db.dao.wallpaper.WallhavenWallpapersDao
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.search.toSavedSearch
-import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenTagEntity
-import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenUploaderEntity
-import com.ammar.wallflow.data.db.entity.wallpaper.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.preferences.AppPreferences
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.FavoritesRepository
@@ -66,8 +62,6 @@ suspend fun getBackupV1Json(
     var favorites: List<FavoriteEntity>? = null
     var wallhavenBackupV1 = WallhavenBackupV1(
         wallpapers = null,
-        uploaders = null,
-        tags = null,
         savedSearches = null,
     )
     var redditBackupV1 = RedditBackupV1(
@@ -86,24 +80,9 @@ suspend fun getBackupV1Json(
             .filter { it.source == Source.WALLHAVEN }
             .map { it.sourceId }
         if (wallhavenWallpaperIds.isNotEmpty()) {
-            val wallpapersWithUploaderAndTags = wallhavenWallpapersDao
-                .getAllWithUploaderAndTagsByWallhavenIds(wallhavenWallpaperIds)
-            val wallpapers = mutableListOf<WallhavenWallpaperEntity>()
-            val uploaders = mutableListOf<WallhavenUploaderEntity>()
-            val tags = mutableSetOf<WallhavenTagEntity>()
-            wallpapersWithUploaderAndTags.forEach {
-                wallpapers.add(it.wallpaper)
-                if (it.uploader != null) {
-                    uploaders.add(it.uploader)
-                }
-                if (it.tags != null) {
-                    tags.addAll(it.tags)
-                }
-            }
+            val wallpapers = wallhavenWallpapersDao.getAllByWallhavenIds(wallhavenWallpaperIds)
             wallhavenBackupV1 = wallhavenBackupV1.copy(
                 wallpapers = wallpapers,
-                uploaders = uploaders,
-                tags = tags,
             )
         }
 
@@ -182,7 +161,6 @@ suspend fun restoreBackup(
     favoritesRepository: FavoritesRepository,
     wallhavenWallpapersDao: WallhavenWallpapersDao,
     redditWallpapersDao: RedditWallpapersDao,
-    uploadersDao: WallhavenUploadersDao,
 ) {
     when (backup.version) {
         1 -> restoreBackupV1(
@@ -196,7 +174,6 @@ suspend fun restoreBackup(
             favoritesRepository = favoritesRepository,
             wallhavenWallpapersDao = wallhavenWallpapersDao,
             redditWallpapersDao = redditWallpapersDao,
-            uploadersDao = uploadersDao,
         )
         else -> throw InvalidJsonException("Invalid version!")
     }
@@ -213,7 +190,6 @@ suspend fun restoreBackupV1(
     favoritesRepository: FavoritesRepository,
     wallhavenWallpapersDao: WallhavenWallpapersDao,
     redditWallpapersDao: RedditWallpapersDao,
-    uploadersDao: WallhavenUploadersDao,
 ) {
     if (!options.atleastOneChosen) {
         return
@@ -236,47 +212,11 @@ suspend fun restoreBackupV1(
     if (options.favorites && backup.favorites?.isNotEmpty() == true) {
         // restore sources first
         // 1. Wallhaven
-        //    - Tags
-        //    - Uploaders
         //    - Wallpapers
         val wallhavenWallpapers = backup.wallhaven?.wallpapers
         if (wallhavenWallpapers?.isNotEmpty() == true) {
-            // restore tags
-            val tags = backup.wallhaven.tags
-            if (tags != null) {
-                wallhavenRepository.insertTagEntities(tags)
-            }
-            // restore uploaders
-            val uploaders = backup.wallhaven.uploaders
-            val uploaderIdUpdateMap = mutableMapOf<Long, Long>()
-            if (uploaders != null) {
-                val uploaderUsernameMap = uploaders.associate {
-                    it.username to it.id
-                }
-                wallhavenRepository.insertUploaderEntities(uploaders)
-                // we need new uploader db ids to update field in wallpaper entities
-                val uploadersByUsernames = uploadersDao.getByUsernames(uploaderUsernameMap.keys)
-                val newUsernameMap = uploadersByUsernames.associate {
-                    it.username to it.id
-                }
-                uploaderUsernameMap.entries.forEach {
-                    val newId = newUsernameMap[it.key] ?: return@forEach
-                    val oldId = it.value
-                    uploaderIdUpdateMap[oldId] = newId
-                }
-            }
-            var updatedWallhavenWallpapers = wallhavenWallpapers
-            // restore wallpaper uploaderIds
-            if (uploaderIdUpdateMap.isNotEmpty()) {
-                // uploader id map cannot be empty while inserting wallpapers
-                updatedWallhavenWallpapers = wallhavenWallpapers.map {
-                    it.copy(
-                        uploaderId = uploaderIdUpdateMap[it.uploaderId],
-                    )
-                }
-            }
             // restore wallpapers
-            wallhavenRepository.insertWallpaperEntities(updatedWallhavenWallpapers)
+            wallhavenRepository.insertWallpaperEntities(wallhavenWallpapers)
         }
         // 2. Reddit wallpapers
         val redditWallpapers = backup.reddit?.wallpapers
@@ -335,7 +275,7 @@ fun migrateBackupJson(currentJson: JsonObject) = try {
 
 private fun migratePrefs(prefsJson: JsonObject): JsonObject {
     val version = prefsJson["version"]?.jsonPrimitive?.intOrNull ?: 1
-    if (version == 2) {
+    if (version >= 2) {
         // no migration needed
         return prefsJson
     }
@@ -345,71 +285,69 @@ private fun migratePrefs(prefsJson: JsonObject): JsonObject {
     }
 }
 
-private fun migratePrefs1To2(prefsJson: JsonObject): JsonObject {
-    return JsonObject(
-        prefsJson.toMutableMap().apply root@{
-            val homeSearchKey = "homeSearch"
-            val homeSearchJson = this[homeSearchKey]
-            // fix types for CategoryWallhavenRatio and SizeWallhavenRatio
-            val mutableHomeSearchJson = homeSearchJson?.jsonObject?.toMutableMap()
-            val ratios = homeSearchJson?.jsonObject
-                ?.get("filters")?.jsonObject
-                ?.get("ratios")?.jsonArray
-            val mutableRatios = ratios?.toMutableList()
-            ratios?.forEachIndexed { i, ele ->
-                val ratio = ele.jsonObject
-                val type = ratio["type"]?.jsonPrimitive?.content
-                if (type != null) {
-                    val newType = when (type) {
-                        "com.ammar.wallflow.model.Ratio.CategoryRatio" ->
-                            "com.ammar.wallflow.model.search.WallhavenRatio.CategoryWallhavenRatio"
-                        "com.ammar.wallflow.model.Ratio.SizeRatio" ->
-                            "com.ammar.wallflow.model.search.WallhavenRatio.SizeWallhavenRatio"
-                        else -> null
-                    }
-                    if (newType != null) {
-                        val mutableRatio = ratio.toMutableMap()
-                        mutableRatio["type"] = JsonPrimitive(newType)
-                        mutableRatios?.set(i, JsonObject(mutableRatio))
-                    }
+private fun migratePrefs1To2(prefsJson: JsonObject) = JsonObject(
+    prefsJson.toMutableMap().apply root@{
+        val homeSearchKey = "homeSearch"
+        val homeSearchJson = this[homeSearchKey]
+        // fix types for CategoryWallhavenRatio and SizeWallhavenRatio
+        val mutableHomeSearchJson = homeSearchJson?.jsonObject?.toMutableMap()
+        val ratios = homeSearchJson?.jsonObject
+            ?.get("filters")?.jsonObject
+            ?.get("ratios")?.jsonArray
+        val mutableRatios = ratios?.toMutableList()
+        ratios?.forEachIndexed { i, ele ->
+            val ratio = ele.jsonObject
+            val type = ratio["type"]?.jsonPrimitive?.content
+            if (type != null) {
+                val newType = when (type) {
+                    "com.ammar.wallflow.model.Ratio.CategoryRatio" ->
+                        "com.ammar.wallflow.model.search.WallhavenRatio.CategoryWallhavenRatio"
+                    "com.ammar.wallflow.model.Ratio.SizeRatio" ->
+                        "com.ammar.wallflow.model.search.WallhavenRatio.SizeWallhavenRatio"
+                    else -> null
+                }
+                if (newType != null) {
+                    val mutableRatio = ratio.toMutableMap()
+                    mutableRatio["type"] = JsonPrimitive(newType)
+                    mutableRatios?.set(i, JsonObject(mutableRatio))
                 }
             }
-            if (mutableHomeSearchJson != null && mutableRatios != null) {
-                val mutableFilters = mutableHomeSearchJson["filters"]?.jsonObject?.toMutableMap()
-                mutableFilters?.set("ratios", JsonArray(mutableRatios))
-                if (mutableFilters != null) {
-                    mutableHomeSearchJson["filters"] = JsonObject(mutableFilters)
-                }
+        }
+        if (mutableHomeSearchJson != null && mutableRatios != null) {
+            val mutableFilters = mutableHomeSearchJson["filters"]?.jsonObject?.toMutableMap()
+            mutableFilters?.set("ratios", JsonArray(mutableRatios))
+            if (mutableFilters != null) {
+                mutableHomeSearchJson["filters"] = JsonObject(mutableFilters)
             }
+        }
 
-            // convert key `homeSearch` to `homeWallhavenSearch`
-            if (mutableHomeSearchJson != null) {
-                put("homeWallhavenSearch", JsonObject(mutableHomeSearchJson))
+        // convert key `homeSearch` to `homeWallhavenSearch`
+        if (mutableHomeSearchJson != null) {
+            put("homeWallhavenSearch", JsonObject(mutableHomeSearchJson))
+        }
+        remove(homeSearchKey)
+
+        // convert autoWallpaperPreferences.savedSearchId to savedSearchIds
+        val autoWallpaperPrefs = this["autoWallpaperPreferences"]?.jsonObject
+        if (autoWallpaperPrefs != null) {
+            val savedSearchIdKey = "savedSearchId"
+            val savedSearchIdValue = autoWallpaperPrefs[savedSearchIdKey]
+                ?.jsonPrimitive
+                ?.longOrNull
+            if (savedSearchIdValue != null) {
+                val updatedAutoWallpaperPrefsJson = JsonObject(
+                    autoWallpaperPrefs.toMutableMap().apply autoWall@{
+                        this["savedSearchIds"] = JsonArray(
+                            listOf(JsonPrimitive(savedSearchIdValue)),
+                        )
+                        this.remove(savedSearchIdKey)
+                    },
+                )
+                this@root["autoWallpaperPreferences"] = updatedAutoWallpaperPrefsJson
             }
-            remove(homeSearchKey)
+        }
 
-            // convert autoWallpaperPreferences.savedSearchId to savedSearchIds
-            val autoWallpaperPrefs = this["autoWallpaperPreferences"]?.jsonObject
-            if (autoWallpaperPrefs != null) {
-                val savedSearchIdKey = "savedSearchId"
-                val savedSearchIdValue = autoWallpaperPrefs[savedSearchIdKey]
-                    ?.jsonPrimitive
-                    ?.longOrNull
-                if (savedSearchIdValue != null) {
-                    val updatedAutoWallpaperPrefsJson = JsonObject(
-                        autoWallpaperPrefs.toMutableMap().apply autoWall@{
-                            this["savedSearchIds"] = JsonArray(
-                                listOf(JsonPrimitive(savedSearchIdValue)),
-                            )
-                            this.remove(savedSearchIdKey)
-                        },
-                    )
-                    this@root["autoWallpaperPreferences"] = updatedAutoWallpaperPrefsJson
-                }
-            }
-
-            // set version to 2
-            put("version", JsonPrimitive(2))
-        },
-    )
-}
+        // set version to 2
+        put("version", JsonPrimitive(2))
+    },
+)

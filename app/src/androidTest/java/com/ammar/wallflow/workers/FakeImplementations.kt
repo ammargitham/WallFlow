@@ -15,6 +15,7 @@ import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.ObjectDetectionModelEntity
 import com.ammar.wallflow.data.db.entity.search.SavedSearchEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperTagsEntity
+import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperUploaderEntity
 import com.ammar.wallflow.data.db.entity.wallpaper.RedditWallpaperEntity
 import com.ammar.wallflow.data.db.entity.wallpaper.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.db.entity.wallpaper.WallpaperWithUploaderAndTags
@@ -284,6 +285,12 @@ internal open class FakeWallhavenWallpapersDao : WallhavenWallpapersDao {
     }
 
     override suspend fun deleteAllUniqueToSearchQueryId(searchQueryId: Long) {
+        throw RuntimeException()
+    }
+
+    override suspend fun upsertWallpaperUploaderMappings(
+        vararg wallpaperUploader: WallhavenWallpaperUploaderEntity,
+    ) {
         throw RuntimeException()
     }
 

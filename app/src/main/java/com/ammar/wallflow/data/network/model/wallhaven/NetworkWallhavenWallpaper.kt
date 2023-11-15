@@ -58,12 +58,10 @@ fun NetworkWallhavenWallpaper.toWallhavenWallpaper() = WallhavenWallpaper(
 
 fun NetworkWallhavenWallpaper.toWallpaperEntity(
     id: Long = 0,
-    uploaderId: Long? = null,
 ) = WallhavenWallpaperEntity(
     id = id,
     wallhavenId = this.id,
     url = url,
-    uploaderId = uploaderId,
     shortUrl = short_url,
     views = views,
     favorites = favorites,

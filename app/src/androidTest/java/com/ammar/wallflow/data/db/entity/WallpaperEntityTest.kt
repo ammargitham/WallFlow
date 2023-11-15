@@ -20,7 +20,6 @@ class WallpaperEntityTest {
             wallhavenId = "85k6eo",
             url = "https://wallhaven.cc/w/85k6eo",
             shortUrl = "https://whvn.cc/85k6eo",
-            uploaderId = null,
             views = 444,
             favorites = 43,
             source = "",

@@ -42,13 +42,11 @@ data class WallhavenWallpaper(
 
 fun WallhavenWallpaper.toEntity(
     id: Long = 0L,
-    uploaderId: Long = 0L,
 ) = WallhavenWallpaperEntity(
     id = id,
     wallhavenId = this.id,
     url = url,
     shortUrl = shortUrl,
-    uploaderId = uploaderId,
     views = views,
     favorites = favorites,
     source = wallhavenSource,
