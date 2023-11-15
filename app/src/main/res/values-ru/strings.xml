@@ -1,15 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">WallFlow</string>
     <string name="home">"Главная"</string>
     <string name="popular_tags">"Популярные теги"</string>
     <string name="info">"Информация"</string>
-    <string name="download">"Загрузки"</string>
+    <string name="download">Скачать</string>
     <string name="apply_wallpaper">"Применить обои"</string>
     <string name="more">"Опции"</string>
     <string name="settings">"Настройки"</string>
     <string name="back">"Назад"</string>
     <string name="wallhaven_api_key">"Ключ API Wallhaven"</string>
-    <string name="wallhaven_api_key_desc">"Необходим для просмотра NSFW контента"</string>
+    <string name="wallhaven_api_key_desc">Необходим для просмотра NSFW контента.</string>
     <string name="confirm">"Подтвердить"</string>
     <string name="dismiss">"Отклонить"</string>
     <string name="date_added">"Дата добавления"</string>
@@ -116,7 +117,7 @@
     <string name="changing_wallpaper">"Изменение обоев"</string>
     <string name="change_now">"Изменить сейчас"</string>
     <string name="not_scheduled">"Не планируется"</string>
-    <string name="next_run_at">"Следующий запуск на %1 (<i>приблизительно</i>)"</string>
+    <string name="next_run_at">Следующий запуск на %1s (<i>приблизительно</i>)</string>
     <string name="next_run_time_info">
         "Это первый момент, когда система рассматривает возможность запуска смены обоев.
 Смена обоев в настоящее время почти никогда не запускается. Это зависит от многих факторов, таких как базовый системный планировщик, режимы сна и энергосбережения ОС, а также соответствие любым настроенным ограничениям."
@@ -167,7 +168,7 @@
     <string name="delete_saved_search_dialog_title">"Удалить сохранённый запрос \'%1s\'?"</string>
     <string name="permission_is_required">"Требуется %1s"</string>
     <string name="invalid_api_key_provided">"Предоставлен неверный ключ API."</string>
-    <string name="rate_limited_please_try_again_after_some_time">Частота ограничена. Пожалуйста, повторите попытку через некоторое время.</string>
+    <string name="rate_limited_please_try_again_after_some_time">%s: Частота ограничена. Пожалуйста, повторите попытку через некоторое время.</string>
     <string name="error">"Ошибка"</string>
     <string name="fix">"Исправление"</string>
     <string name="delete_suggestion_dialog_text">"Удалить из истории?"</string>
@@ -206,7 +207,7 @@
     <string name="cleanup_channel_name">"Очистка кеша"</string>
     <string name="cleanup_channel_description">"Канал для отображения старого кеша и уведомления о ходе очистки файлов"</string>
     <string name="cache_clean_up">"Кеш очищен"</string>
-    <string name="object_detection_setting_warning">"Примечание: Если при обнаружении объекта вы столкнулись с какими-либо ошибками или сбоями, попробуйте выбрать другого делегата. Если ни один из делегатов не работает на вашем устройстве, отключите обнаружение объектов."</string>
+    <string name="object_detection_setting_warning">Примечание: Если при обнаружении объекта вы столкнулись с какими-либо ошибками или сбоями, попробуйте выбрать другого делегата. Если ни один из делегатов не работает на вашем устройстве, отключите обнаружение объектов</string>
     <string name="grid_col_type">"Тип столбца сетки"</string>
     <string name="adaptive">"Адаптивный"</string>
     <string name="fixed">"Фиксированный"</string>
@@ -216,9 +217,9 @@
     <string name="favorite">"Избранное"</string>
     <string name="sources">"Источники"</string>
     <string name="wallhaven_cc">wallhaven.cc</string>
-    <string name="saved_search">"Сохранённые запросы"</string>
+    <string name="saved_search">Сохранённый запрос</string>
     <string name="no_options">"Нет опций"</string>
-    <string name="set_to">"Установить в"</string>
+    <string name="set_to">Установить на</string>
     <string name="version">"Версия"</string>
     <string name="open_source_licenses">"Лицензии с открытым исходным кодом"</string>
     <string name="local">"Локальные"</string>
@@ -256,7 +257,7 @@
     <string name="manage_local">"Управление локальными"</string>
     <string name="dirs">"Каталоги"</string>
     <string name="sort">"Сортировка"</string>
-    <string name="no_sort">"Без сортировки"</string>
+    <string name="no_sort">Отключена</string>
     <string name="last_modified">"Последнее изменение"</string>
     <string name="manage">"Управление"</string>
     <plurals name="every_x_hrs">
@@ -269,4 +270,33 @@
         <item quantity="few">"%d объекта"</item>
         <item quantity="many">"%d объектов"</item>
     </plurals>
+    <string name="title">Название</string>
+    <string name="user">Пользователь</string>
+    <string name="posts_from">Посты от</string>
+    <string name="search_source">Поиск %1s</string>
+    <string name="all">Все</string>
+    <string name="manage_sources">Управление источниками</string>
+    <string name="frequency_min_val_error">Частота не может быть меньше 15 минут</string>
+    <string name="new_sources">Новые источники</string>
+    <plurals name="every_x_mins">
+        <item quantity="one">Каждую %d минуту</item>
+        <item quantity="few">Каждые %d минуты</item>
+        <item quantity="many">Каждые %d минут</item>
+        <item quantity="other">Каждые %d минут</item>
+    </plurals>
+    <string name="subreddit_input_support_text">Нажмите пробел, запятую или введите для подтверждения</string>
+    <string name="sort_new">Новое</string>
+    <string name="reddit">Reddit</string>
+    <string name="subreddit_input_error_support_text">Один из сабреддитов содержит неверное имя</string>
+    <string name="current_sources">Текущие источники</string>
+    <string name="minutes">минуты</string>
+    <string name="required_one_subreddit">Требуется хотя бы 1 сабреддит</string>
+    <string name="one_hour">1 час</string>
+    <string name="configure_reddit">Настроить Реддит</string>
+    <string name="comments">Комментарии</string>
+    <string name="subreddits">Сабреддиты</string>
+    <string name="success">Успех</string>
+    <string name="menu">Меню</string>
+    <string name="remove_from_favorites">Удалить из Избранных</string>
+    <string name="source_home_visibility_toggle">Видимость главной вкладки</string>
 </resources>
