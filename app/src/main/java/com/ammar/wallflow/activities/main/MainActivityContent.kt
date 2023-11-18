@@ -33,7 +33,6 @@ import com.ammar.wallflow.extensions.toPx
 import com.ammar.wallflow.model.OnlineSource
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.Wallpaper
-import com.ammar.wallflow.model.search.Filters
 import com.ammar.wallflow.model.search.Search
 import com.ammar.wallflow.model.search.WallhavenSearch
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
@@ -71,10 +70,10 @@ fun MainActivityContent(
     searchBarSearch: Search = WallhavenSearch(),
     searchBarQuery: String = "",
     searchBarSuggestions: List<Suggestion<Search>> = emptyList(),
-    showSearchBarFilters: Boolean = false,
+    // showSearchBarFilters: Boolean = false,
     searchBarDeleteSuggestion: Search? = null,
     searchBarOverflowIcon: @Composable (() -> Unit)? = null,
-    searchBarShowNSFW: Boolean = false,
+    // searchBarShowNSFW: Boolean = false,
     searchBarShowQuery: Boolean = true,
     showLocalTab: Boolean = true,
     onBackClick: () -> Unit = {},
@@ -88,8 +87,8 @@ fun MainActivityContent(
     onSearchBarSuggestionClick: (suggestion: Suggestion<Search>) -> Unit = {},
     onSearchBarSuggestionInsert: (suggestion: Suggestion<Search>) -> Unit = {},
     onSearchBarSuggestionDeleteRequest: (suggestion: Suggestion<Search>) -> Unit = {},
-    onSearchBarShowFiltersChange: (show: Boolean) -> Unit = {},
-    onSearchBarFiltersChange: (searchQuery: Filters) -> Unit = {},
+    // onSearchBarShowFiltersChange: (show: Boolean) -> Unit = {},
+    // onSearchBarFiltersChange: (searchQuery: Filters) -> Unit = {},
     onDeleteSearchBarSuggestionConfirmClick: () -> Unit = {},
     onDeleteSearchBarSuggestionDismissRequest: () -> Unit = {},
     onSearchBarSaveAsClick: () -> Unit = {},
@@ -123,10 +122,10 @@ fun MainActivityContent(
                 search = searchBarSearch,
                 query = searchBarQuery,
                 suggestions = searchBarSuggestions,
-                showFilters = showSearchBarFilters,
+                // showFilters = showSearchBarFilters,
                 deleteSuggestion = searchBarDeleteSuggestion,
                 overflowIcon = searchBarOverflowIcon,
-                showNSFW = searchBarShowNSFW,
+                // showNSFW = searchBarShowNSFW,
                 showQuery = searchBarShowQuery,
                 onQueryChange = onSearchBarQueryChange,
                 onBackClick = if (showBackButton) onBackClick else null,
@@ -135,8 +134,8 @@ fun MainActivityContent(
                 onSuggestionInsert = onSearchBarSuggestionInsert,
                 onSuggestionDeleteRequest = onSearchBarSuggestionDeleteRequest,
                 onActiveChange = onSearchBarActiveChange,
-                onShowFiltersChange = onSearchBarShowFiltersChange,
-                onFiltersChange = onSearchBarFiltersChange,
+                // onShowFiltersChange = onSearchBarShowFiltersChange,
+                // onFiltersChange = onSearchBarFiltersChange,
                 onDeleteSuggestionConfirmClick = onDeleteSearchBarSuggestionConfirmClick,
                 onDeleteSuggestionDismissRequest = onDeleteSearchBarSuggestionDismissRequest,
                 onSaveAsClick = onSearchBarSaveAsClick,

@@ -239,10 +239,10 @@ class MainActivity : ComponentActivity() {
                     searchBarSearch = uiState.searchBarSearch,
                     searchBarQuery = searchBarQuery,
                     searchBarSuggestions = uiState.searchBarSuggestions,
-                    showSearchBarFilters = uiState.showSearchBarFilters,
+                    // showSearchBarFilters = uiState.showSearchBarFilters,
                     searchBarDeleteSuggestion = uiState.searchBarDeleteSuggestion,
                     searchBarOverflowIcon = searchBarControllerState.overflowIcon,
-                    searchBarShowNSFW = uiState.searchBarShowNSFW,
+                    // searchBarShowNSFW = uiState.searchBarShowNSFW,
                     searchBarShowQuery = searchBarControllerState.showQuery,
                     showLocalTab = uiState.showLocalTab,
                     onSearchBarQueryChange = viewModel::onSearchBarQueryChange,
@@ -306,18 +306,18 @@ class MainActivity : ComponentActivity() {
                         }
                         searchBarControllerState.onActiveChange(active)
                     },
-                    onSearchBarShowFiltersChange = viewModel::setShowSearchBarFilters,
-                    onSearchBarFiltersChange = {
-                        val updated = when (val searchBarSearch = uiState.searchBarSearch) {
-                            is RedditSearch -> searchBarSearch.copy(
-                                filters = it as RedditFilters,
-                            )
-                            is WallhavenSearch -> searchBarSearch.copy(
-                                filters = it as WallhavenFilters,
-                            )
-                        }
-                        viewModel.setSearchBarSearch(updated)
-                    },
+                    // onSearchBarShowFiltersChange = viewModel::setShowSearchBarFilters,
+                    // onSearchBarFiltersChange = {
+                    //     val updated = when (val searchBarSearch = uiState.searchBarSearch) {
+                    //         is RedditSearch -> searchBarSearch.copy(
+                    //             filters = it as RedditFilters,
+                    //         )
+                    //         is WallhavenSearch -> searchBarSearch.copy(
+                    //             filters = it as WallhavenFilters,
+                    //         )
+                    //     }
+                    //     viewModel.setSearchBarSearch(updated)
+                    // },
                     onDeleteSearchBarSuggestionConfirmClick = {
                         uiState.searchBarDeleteSuggestion?.run {
                             viewModel.deleteSearch(this)

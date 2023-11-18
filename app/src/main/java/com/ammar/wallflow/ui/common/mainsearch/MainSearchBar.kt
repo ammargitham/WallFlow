@@ -5,16 +5,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.ime
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Surface
@@ -27,14 +18,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.R
 import com.ammar.wallflow.model.MenuItem
-import com.ammar.wallflow.model.search.Filters
 import com.ammar.wallflow.model.search.RedditFilters
 import com.ammar.wallflow.model.search.RedditSearch
 import com.ammar.wallflow.model.search.RedditSort
@@ -51,8 +39,6 @@ import com.ammar.wallflow.ui.common.SearchBar
 import com.ammar.wallflow.ui.common.Suggestion
 import com.ammar.wallflow.ui.common.TagChip
 import com.ammar.wallflow.ui.common.UploaderChip
-import com.ammar.wallflow.ui.common.searchedit.EditSearchContent
-import com.ammar.wallflow.ui.screens.home.composables.SearchBarFiltersToggle
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 
 object MainSearchBar {
@@ -65,10 +51,10 @@ object MainSearchBar {
         search: Search = Defaults.wallhavenSearch,
         query: String = "",
         suggestions: List<Suggestion<Search>> = emptyList(),
-        showFilters: Boolean = false,
+        // showFilters: Boolean = false,
         deleteSuggestion: Search? = null,
         overflowIcon: @Composable (() -> Unit)? = null,
-        showNSFW: Boolean = false,
+        // showNSFW: Boolean = false,
         showQuery: Boolean = true,
         onQueryChange: (String) -> Unit = {},
         onBackClick: (() -> Unit)? = null,
@@ -77,8 +63,8 @@ object MainSearchBar {
         onSuggestionInsert: (suggestion: Suggestion<Search>) -> Unit = {},
         onSuggestionDeleteRequest: (suggestion: Suggestion<Search>) -> Unit = {},
         onActiveChange: (active: Boolean) -> Unit = {},
-        onShowFiltersChange: (show: Boolean) -> Unit = {},
-        onFiltersChange: (filters: Filters) -> Unit = {},
+        // onShowFiltersChange: (show: Boolean) -> Unit = {},
+        // onFiltersChange: (filters: Filters) -> Unit = {},
         onDeleteSuggestionConfirmClick: () -> Unit = {},
         onDeleteSuggestionDismissRequest: () -> Unit = {},
         onSaveAsClick: () -> Unit = {},
@@ -148,10 +134,10 @@ object MainSearchBar {
                     ) {
                         if (it) {
                             Row {
-                                SearchBarFiltersToggle(
-                                    checked = showFilters,
-                                    onCheckedChange = onShowFiltersChange,
-                                )
+                                // SearchBarFiltersToggle(
+                                //     checked = showFilters,
+                                //     onCheckedChange = onShowFiltersChange,
+                                // )
                                 ActiveOverflowIcon(
                                     query = query,
                                     onSaveAsDisabled = hasError,
@@ -164,30 +150,30 @@ object MainSearchBar {
                         overflowIcon?.invoke()
                     }
                 },
-                extraContent = {
-                    AnimatedVisibility(
-                        modifier = Modifier.clipToBounds(),
-                        visible = showFilters,
-                        enter = slideInVertically(initialOffsetY = { -it }),
-                        exit = slideOutVertically(targetOffsetY = { -it }),
-                    ) {
-                        Surface(
-                            modifier = Modifier.fillMaxSize(),
-                        ) {
-                            EditSearchContent(
-                                modifier = Modifier
-                                    .verticalScroll(rememberScrollState())
-                                    .windowInsetsPadding(WindowInsets.ime)
-                                    .padding(16.dp),
-                                showQueryField = false,
-                                search = search,
-                                showNSFW = showNSFW,
-                                onChange = { onFiltersChange(it.filters) },
-                                onErrorStateChange = { hasError = it },
-                            )
-                        }
-                    }
-                },
+                // extraContent = {
+                //     AnimatedVisibility(
+                //         modifier = Modifier.clipToBounds(),
+                //         visible = showFilters,
+                //         enter = slideInVertically(initialOffsetY = { -it }),
+                //         exit = slideOutVertically(targetOffsetY = { -it }),
+                //     ) {
+                //         Surface(
+                //             modifier = Modifier.fillMaxSize(),
+                //         ) {
+                //             EditSearchContent(
+                //                 modifier = Modifier
+                //                     .verticalScroll(rememberScrollState())
+                //                     .windowInsetsPadding(WindowInsets.ime)
+                //                     .padding(16.dp),
+                //                 showQueryField = false,
+                //                 search = search,
+                //                 showNSFW = showNSFW,
+                //                 onChange = { onFiltersChange(it.filters) },
+                //                 onErrorStateChange = { hasError = it },
+                //             )
+                //         }
+                //     }
+                // },
             )
         }
 
