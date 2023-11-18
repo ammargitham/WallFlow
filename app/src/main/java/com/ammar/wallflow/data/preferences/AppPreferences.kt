@@ -49,6 +49,8 @@ data class AppPreferences(
     val lookAndFeelPreferences: LookAndFeelPreferences = LookAndFeelPreferences(),
     val changeWallpaperTileAdded: Boolean = false,
     val localWallpapersPreferences: LocalWallpapersPreferences = LocalWallpapersPreferences(),
+    val mainWallhavenSearch: WallhavenSearch? = null,
+    val mainRedditSearch: RedditSearch? = null,
 ) {
     companion object {
         const val CURRENT_VERSION = 2

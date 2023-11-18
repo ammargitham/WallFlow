@@ -11,6 +11,8 @@ import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.FavoritesRepository
 import com.ammar.wallflow.model.Favorite
 import com.ammar.wallflow.model.Wallpaper
+import com.ammar.wallflow.model.search.RedditSearch
+import com.ammar.wallflow.model.search.WallhavenSearch
 import com.github.materiiapps.partial.Partialize
 import com.github.materiiapps.partial.partial
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -49,6 +51,8 @@ class FavoritesViewModel @Inject constructor(
                 blurNsfw = appPreferences.blurNsfw,
                 layoutPreferences = appPreferences.lookAndFeelPreferences.layoutPreferences,
                 favorites = favorites.map { it.toFavorite() }.toImmutableList(),
+                prevMainWallhavenSearch = appPreferences.mainWallhavenSearch,
+                prevMainRedditSearch = appPreferences.mainRedditSearch,
             ),
         )
     }.stateIn(
@@ -77,4 +81,6 @@ data class FavoritesUiState(
     val selectedWallpaper: Wallpaper? = null,
     val layoutPreferences: LayoutPreferences = LayoutPreferences(),
     val favorites: ImmutableList<Favorite> = persistentListOf(),
+    val prevMainWallhavenSearch: WallhavenSearch? = null,
+    val prevMainRedditSearch: RedditSearch? = null,
 )

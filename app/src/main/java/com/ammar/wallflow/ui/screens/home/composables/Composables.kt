@@ -344,9 +344,10 @@ fun SearchBarFiltersToggle(
 // }
 
 @Composable
-fun HomeFiltersBottomSheetHeader(
+fun FiltersBottomSheetHeader(
     source: OnlineSource,
     modifier: Modifier = Modifier,
+    title: String = stringResource(R.string.home_filters),
     saveEnabled: Boolean = true,
     onSaveClick: () -> Unit = {},
     onSaveAsClick: () -> Unit = {},
@@ -376,7 +377,7 @@ fun HomeFiltersBottomSheetHeader(
             modifier = Modifier.weight(1f),
         ) {
             Text(
-                text = stringResource(R.string.home_filters),
+                text = title,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.headlineMedium,
@@ -422,7 +423,7 @@ private fun PreviewEditSearchBottomSheetHeader() {
     WallFlowTheme {
         Surface {
             Column {
-                HomeFiltersBottomSheetHeader(
+                FiltersBottomSheetHeader(
                     source = OnlineSource.WALLHAVEN,
                 )
             }

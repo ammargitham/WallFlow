@@ -27,6 +27,7 @@ import com.ammar.wallflow.json
 import com.ammar.wallflow.model.OnlineSource
 import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.model.search.RedditSearch
+import com.ammar.wallflow.model.search.Search
 import com.ammar.wallflow.model.search.WallhavenFilters
 import com.ammar.wallflow.model.search.WallhavenSearch
 import com.ammar.wallflow.model.search.WallhavenSorting
@@ -213,6 +214,18 @@ class AppPreferencesRepository @Inject constructor(
         set(PreferencesKeys.HOME_SOURCES, json.encodeToString(sources))
     }
 
+    suspend fun updateMainSearch(search: Search) = withContext(ioDispatcher) {
+        dataStore.edit { it.updateMainSearch(search) }
+    }
+
+    private fun MutablePreferences.updateMainSearch(search: Search) {
+        if (search is WallhavenSearch) {
+            set(PreferencesKeys.MAIN_WALLHAVEN_SEARCH, json.encodeToString(search))
+        } else if (search is RedditSearch) {
+            set(PreferencesKeys.MAIN_REDDIT_SEARCH, json.encodeToString(search))
+        }
+    }
+
     private fun mapAppPreferences(preferences: Preferences): AppPreferences {
         val homeRedditSearch = getHomeRedditSearch(preferences)
         return AppPreferences(
@@ -229,6 +242,8 @@ class AppPreferencesRepository @Inject constructor(
             changeWallpaperTileAdded = preferences[PreferencesKeys.CHANGE_WALLPAPER_TILE_ADDED]
                 ?: false,
             localWallpapersPreferences = getLocalWallpapersPreferences(preferences),
+            mainWallhavenSearch = getMainWallhavenSearch(preferences),
+            mainRedditSearch = getMainRedditSearch(preferences),
         )
     }
 
@@ -374,6 +389,18 @@ class AppPreferencesRepository @Inject constructor(
         )
     }
 
+    private fun getMainWallhavenSearch(preferences: Preferences): WallhavenSearch? = try {
+        json.decodeFromString(preferences[PreferencesKeys.MAIN_WALLHAVEN_SEARCH] ?: "")
+    } catch (e: Exception) {
+        null
+    }
+
+    private fun getMainRedditSearch(preferences: Preferences): RedditSearch? = try {
+        json.decodeFromString(preferences[PreferencesKeys.MAIN_REDDIT_SEARCH] ?: "")
+    } catch (e: Exception) {
+        null
+    }
+
     private fun getWallhavenApiKey(preferences: Preferences) =
         preferences[PreferencesKeys.WALLHAVEN_API_KEY] ?: ""
 
@@ -433,6 +460,12 @@ class AppPreferencesRepository @Inject constructor(
                 updateAutoWallpaperPrefs(appPreferences.autoWallpaperPreferences)
                 updateLookAndFeelPreferences(appPreferences.lookAndFeelPreferences)
                 updateLocalWallpapersSort(appPreferences.localWallpapersPreferences.sort)
+                if (appPreferences.mainWallhavenSearch != null) {
+                    updateMainSearch(appPreferences.mainWallhavenSearch)
+                }
+                if (appPreferences.mainRedditSearch != null) {
+                    updateMainSearch(appPreferences.mainRedditSearch)
+                }
             }
         }
     }

@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -21,13 +22,15 @@ import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.NavController
 import com.ammar.wallflow.extensions.search
 import com.ammar.wallflow.model.Source
-import com.ammar.wallflow.model.search.WallhavenSearch
 import com.ammar.wallflow.model.search.WallhavenTagSearchMeta
 import com.ammar.wallflow.model.search.WallhavenUploaderSearchMeta
+import com.ammar.wallflow.model.wallhaven.WallhavenTag
+import com.ammar.wallflow.model.wallhaven.WallhavenUploader
 import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.TopBar
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
 import com.ammar.wallflow.ui.common.mainsearch.LocalMainSearchBarController
+import com.ammar.wallflow.ui.common.mainsearch.MainSearchBar
 import com.ammar.wallflow.ui.wallpaperviewer.WallpaperViewer
 import com.ammar.wallflow.ui.wallpaperviewer.WallpaperViewerViewModel
 import com.ammar.wallflow.utils.applyWallpaper
@@ -101,6 +104,42 @@ fun WallpaperScreen(
         }
     }
 
+    val onTagClick: (wallhavenTag: WallhavenTag) -> Unit = remember(
+        searchBarController.state.value.search,
+        uiState.prevMainWallhavenSearch,
+    ) {
+        fn@{
+            val prevSearch = uiState.prevMainWallhavenSearch
+                ?: MainSearchBar.Defaults.wallhavenSearch
+            val search = prevSearch.copy(
+                query = "id:${it.id}",
+                meta = WallhavenTagSearchMeta(it),
+            )
+            if (searchBarController.state.value.search == search) {
+                return@fn
+            }
+            navController.search(search)
+        }
+    }
+
+    val onUploaderClick: (WallhavenUploader) -> Unit = remember(
+        searchBarController.state.value.search,
+        uiState.prevMainWallhavenSearch,
+    ) {
+        fn@{
+            val prevSearch = uiState.prevMainWallhavenSearch
+                ?: MainSearchBar.Defaults.wallhavenSearch
+            val search = prevSearch.copy(
+                query = "@${it.username}",
+                meta = WallhavenUploaderSearchMeta(uploader = it),
+            )
+            if (searchBarController.state.value.search == search) {
+                return@fn
+            }
+            navController.search(search)
+        }
+    }
+
     Box(
         modifier = Modifier.fillMaxSize(),
     ) {
@@ -134,26 +173,8 @@ fun WallpaperScreen(
                 val wallpaper = viewerUiState.wallpaper ?: return@WallpaperViewer
                 applyWallpaper(context, viewerViewModel, wallpaper)
             },
-            onTagClick = {
-                val search = WallhavenSearch(
-                    query = "id:${it.id}",
-                    meta = WallhavenTagSearchMeta(tag = it),
-                )
-                if (searchBarController.state.value.search == search) {
-                    return@WallpaperViewer
-                }
-                navController.search(search)
-            },
-            onUploaderClick = {
-                val search = WallhavenSearch(
-                    query = "@${it.username}",
-                    meta = WallhavenUploaderSearchMeta(uploader = it),
-                )
-                if (searchBarController.state.value.search == search) {
-                    return@WallpaperViewer
-                }
-                navController.search(search)
-            },
+            onTagClick = onTagClick,
+            onUploaderClick = onUploaderClick,
             onDownloadPermissionsGranted = viewerViewModel::download,
             onFavoriteToggle = { viewerViewModel.toggleFavorite() },
         )

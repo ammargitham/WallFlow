@@ -25,6 +25,8 @@ object PreferencesKeys {
     val HOME_WALLHAVEN_SEARCH = stringPreferencesKey("home_wallhaven_search")
     val HOME_REDDIT_SEARCH = stringPreferencesKey("home_reddit_search")
     val HOME_SOURCES = stringPreferencesKey("home_sources")
+    val MAIN_WALLHAVEN_SEARCH = stringPreferencesKey("main_wallhaven_search")
+    val MAIN_REDDIT_SEARCH = stringPreferencesKey("main_reddit_search")
     val BLUR_SKETCHY = booleanPreferencesKey("blur_sketchy")
     val BLUR_NSFW = booleanPreferencesKey("blur_nsfw")
     val ENABLE_OBJECT_DETECTION = booleanPreferencesKey("enable_object_detection")

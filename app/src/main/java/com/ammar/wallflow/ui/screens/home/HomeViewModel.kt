@@ -121,6 +121,12 @@ class HomeViewModel @Inject constructor(
     }.cachedIn(viewModelScope)
 
     init {
+        if (mainSearch != null) {
+            // save search to app prefs
+            viewModelScope.launch {
+                appPreferencesRepository.updateMainSearch(mainSearch)
+            }
+        }
         viewModelScope.launch {
             localUiState.update {
                 val appPreferences = appPreferencesRepository.appPreferencesFlow.first()
@@ -180,6 +186,8 @@ class HomeViewModel @Inject constructor(
                 layoutPreferences = appPreferences.lookAndFeelPreferences.layoutPreferences,
                 favorites = favorites.map(FavoriteEntity::toFavorite).toImmutableList(),
                 sources = appPreferences.homeSources.toImmutableMap(),
+                prevMainWallhavenSearch = appPreferences.mainWallhavenSearch,
+                prevMainRedditSearch = appPreferences.mainRedditSearch,
             ),
         )
     }.stateIn(
@@ -375,6 +383,8 @@ data class HomeUiState(
     val favorites: ImmutableList<Favorite> = persistentListOf(),
     val showRedditInitDialog: Boolean = false,
     val manageSourcesState: ManageSourcesState = ManageSourcesState(),
+    val prevMainWallhavenSearch: WallhavenSearch? = null,
+    val prevMainRedditSearch: RedditSearch? = null,
 ) {
     val isHome = mainSearch == null
     val showSaveAsDialog = saveSearchAsSearch != null

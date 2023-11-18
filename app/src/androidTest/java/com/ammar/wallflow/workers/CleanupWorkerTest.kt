@@ -1,7 +1,6 @@
 package com.ammar.wallflow.workers
 
 import android.content.Context
-import android.util.Log
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.LoadType
 import androidx.paging.PagingConfig
@@ -29,7 +28,6 @@ import com.ammar.wallflow.data.network.retrofit.reddit.RetrofitRedditNetwork
 import com.ammar.wallflow.data.repository.FakeRedditNetworkApi
 import com.ammar.wallflow.data.repository.FakeWallhavenNetworkApi
 import com.ammar.wallflow.data.repository.WallpapersRemoteMediator
-import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.extensions.getFileNameFromUrl
 import com.ammar.wallflow.extensions.getTempDir
 import com.ammar.wallflow.extensions.getTempFile
@@ -869,7 +867,6 @@ class CleanupWorkerTest {
                 is RedditWallpaperEntity -> it.url.getFileNameFromUrl()
             }
         }
-        Log.d(TAG, "createTempFiles: $fileNames")
         fileNames.forEach {
             val tempFile = context.getTempFile(it)
             tempFile.createNewFile()

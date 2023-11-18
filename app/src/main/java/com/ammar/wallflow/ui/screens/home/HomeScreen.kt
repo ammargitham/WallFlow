@@ -26,11 +26,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.ammar.wallflow.R
 import com.ammar.wallflow.extensions.search
 import com.ammar.wallflow.model.OnlineSource
 import com.ammar.wallflow.model.Wallpaper
@@ -40,6 +42,7 @@ import com.ammar.wallflow.model.search.WallhavenSearch
 import com.ammar.wallflow.model.search.WallhavenTagSearchMeta
 import com.ammar.wallflow.model.search.WallhavenUploaderSearchMeta
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
+import com.ammar.wallflow.model.wallhaven.WallhavenUploader
 import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.SearchBar
 import com.ammar.wallflow.ui.common.bottomWindowInsets
@@ -51,7 +54,7 @@ import com.ammar.wallflow.ui.common.searchedit.SaveAsDialog
 import com.ammar.wallflow.ui.common.searchedit.SavedSearchesDialog
 import com.ammar.wallflow.ui.common.topWindowInsets
 import com.ammar.wallflow.ui.screens.destinations.WallpaperScreenDestination
-import com.ammar.wallflow.ui.screens.home.composables.HomeFiltersBottomSheetHeader
+import com.ammar.wallflow.ui.screens.home.composables.FiltersBottomSheetHeader
 import com.ammar.wallflow.ui.screens.home.composables.ManageSourcesDialog
 import com.ammar.wallflow.ui.screens.home.composables.RedditInitDialog
 import com.ammar.wallflow.ui.screens.home.composables.header
@@ -111,16 +114,23 @@ fun HomeScreen(
     }
 
     LaunchedEffect(uiState.mainSearch, uiState.selectedSource) {
+        val search = uiState.mainSearch
+            ?: when (uiState.selectedSource) {
+                OnlineSource.WALLHAVEN -> uiState.prevMainWallhavenSearch?.copy(
+                    query = "",
+                    meta = null,
+                ) ?: MainSearchBar.Defaults.wallhavenSearch
+                OnlineSource.REDDIT -> uiState.prevMainRedditSearch?.copy(
+                    query = "",
+                    meta = null,
+                ) ?: MainSearchBar.Defaults.redditSearch(
+                    subreddits = uiState.reddit.subreddits,
+                )
+            }
         searchBarController.update {
             it.copy(
                 visible = true,
-                search = uiState.mainSearch
-                    ?: when (uiState.selectedSource) {
-                        OnlineSource.WALLHAVEN -> MainSearchBar.Defaults.wallhavenSearch
-                        OnlineSource.REDDIT -> MainSearchBar.Defaults.redditSearch(
-                            subreddits = uiState.reddit.subreddits,
-                        )
-                    },
+                search = search,
                 source = uiState.selectedSource,
             )
         }
@@ -150,11 +160,32 @@ fun HomeScreen(
 
     val onTagClick: (wallhavenTag: WallhavenTag) -> Unit = remember(
         searchBarController.state.value.search,
+        uiState.prevMainWallhavenSearch,
     ) {
         fn@{
-            val search = WallhavenSearch(
+            val prevSearch = uiState.prevMainWallhavenSearch
+                ?: MainSearchBar.Defaults.wallhavenSearch
+            val search = prevSearch.copy(
                 query = "id:${it.id}",
                 meta = WallhavenTagSearchMeta(it),
+            )
+            if (searchBarController.state.value.search == search) {
+                return@fn
+            }
+            navController.search(search)
+        }
+    }
+
+    val onUploaderClick: (WallhavenUploader) -> Unit = remember(
+        searchBarController.state.value.search,
+        uiState.prevMainWallhavenSearch,
+    ) {
+        fn@{
+            val prevSearch = uiState.prevMainWallhavenSearch
+                ?: MainSearchBar.Defaults.wallhavenSearch
+            val search = prevSearch.copy(
+                query = "@${it.username}",
+                meta = WallhavenUploaderSearchMeta(uploader = it),
             )
             if (searchBarController.state.value.search == search) {
                 return@fn
@@ -216,7 +247,6 @@ fun HomeScreen(
             blurNsfw = uiState.blurNsfw,
             selectedWallpaper = uiState.selectedWallpaper,
             layoutPreferences = uiState.layoutPreferences,
-            showFAB = uiState.isHome,
             fullWallpaper = viewerUiState.wallpaper,
             fullWallpaperActionsVisible = viewerUiState.actionsVisible,
             fullWallpaperDownloadStatus = viewerUiState.downloadStatus,
@@ -254,16 +284,7 @@ fun HomeScreen(
                     )
                 }
             },
-            onFullWallpaperUploaderClick = {
-                val search = WallhavenSearch(
-                    query = "@${it.username}",
-                    meta = WallhavenUploaderSearchMeta(uploader = it),
-                )
-                if (searchBarController.state.value.search == search) {
-                    return@HomeScreenContent
-                }
-                navController.search(search)
-            },
+            onFullWallpaperUploaderClick = onUploaderClick,
             onFullWallpaperDownloadPermissionsGranted = viewerViewModel::download,
         )
 
@@ -279,10 +300,19 @@ fun HomeScreen(
             skipPartiallyExpanded = uiState.selectedSource == OnlineSource.REDDIT,
         )
         val scope = rememberCoroutineScope()
-        var localSearch by rememberSaveable(
-            uiState.homeSearch,
-            stateSaver = SearchSaver,
-        ) { mutableStateOf(uiState.homeSearch) }
+        val initialSearch = if (uiState.isHome) {
+            uiState.homeSearch
+        } else {
+            uiState.mainSearch ?: when (uiState.selectedSource) {
+                OnlineSource.WALLHAVEN -> MainSearchBar.Defaults.wallhavenSearch
+                OnlineSource.REDDIT -> MainSearchBar.Defaults.redditSearch(
+                    subreddits = uiState.reddit.subreddits,
+                )
+            }
+        }
+        var localSearch by rememberSaveable(initialSearch, stateSaver = SearchSaver) {
+            mutableStateOf(initialSearch)
+        }
         var hasError by rememberSaveable {
             mutableStateOf(false)
         }
@@ -291,22 +321,33 @@ fun HomeScreen(
             state = state,
             search = localSearch,
             header = {
-                HomeFiltersBottomSheetHeader(
+                FiltersBottomSheetHeader(
                     modifier = Modifier.padding(
                         start = 22.dp,
                         end = 22.dp,
                         bottom = 16.dp,
                     ),
+                    title = stringResource(
+                        if (uiState.isHome) {
+                            R.string.home_filters
+                        } else {
+                            R.string.search_filters
+                        },
+                    ),
                     source = when (localSearch) {
                         is WallhavenSearch -> OnlineSource.WALLHAVEN
                         is RedditSearch -> OnlineSource.REDDIT
                     },
-                    saveEnabled = !hasError && localSearch != uiState.homeSearch,
+                    saveEnabled = !hasError && localSearch != initialSearch,
                     onSaveClick = {
-                        viewModel.updateHomeSearch(localSearch)
                         scope.launch { state.hide() }.invokeOnCompletion {
                             if (!state.isVisible) {
                                 viewModel.showFilters(false)
+                                if (uiState.isHome) {
+                                    viewModel.updateHomeSearch(localSearch)
+                                } else {
+                                    navController.search(localSearch)
+                                }
                             }
                         }
                     },
@@ -314,6 +355,7 @@ fun HomeScreen(
                     onLoadClick = viewModel::showSavedSearches,
                 )
             },
+            showQueryField = uiState.isHome,
             showNSFW = uiState.showNSFW,
             onChange = { localSearch = it },
             onErrorStateChange = { hasError = it },
