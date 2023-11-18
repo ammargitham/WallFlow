@@ -67,6 +67,7 @@ internal fun HomeScreenContent(
     selectedWallpaper: Wallpaper? = null,
     layoutPreferences: LayoutPreferences = LayoutPreferences(),
     showFAB: Boolean = true,
+    isHome: Boolean = true,
     fullWallpaper: Wallpaper? = null,
     fullWallpaperActionsVisible: Boolean = true,
     fullWallpaperDownloadStatus: DownloadStatus? = null,
@@ -107,6 +108,7 @@ internal fun HomeScreenContent(
                 showSelection = isExpanded,
                 layoutPreferences = layoutPreferences,
                 showFAB = showFAB,
+                isHome = isHome,
                 onWallpaperClick = onWallpaperClick,
                 onWallpaperFavoriteClick = onWallpaperFavoriteClick,
                 onFABClick = onFABClick,
@@ -187,6 +189,7 @@ private fun Feed(
     blurNsfw: Boolean = false,
     showSelection: Boolean = false,
     selectedWallpaper: Wallpaper? = null,
+    isHome: Boolean = true,
     showFAB: Boolean = true,
     header: (LazyStaggeredGridScope.() -> Unit)? = null,
     onWallpaperClick: (wallpaper: Wallpaper) -> Unit = {},
@@ -213,7 +216,17 @@ private fun Feed(
                             contentDescription = stringResource(R.string.filters),
                         )
                     },
-                    text = { Text(text = stringResource(R.string.filters)) },
+                    text = {
+                        Text(
+                            text = stringResource(
+                                if (isHome) {
+                                    R.string.home_filters
+                                } else {
+                                    R.string.search_filters
+                                },
+                            ),
+                        )
+                    },
                 )
             }
         },

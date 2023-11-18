@@ -253,6 +253,7 @@ fun HomeScreen(
             fullWallpaperLoading = viewerUiState.loading,
             showFullWallpaperInfo = viewerUiState.showInfo,
             isFullWallpaperFavorite = viewerUiState.isFavorite,
+            isHome = uiState.isHome,
             onWallpaperClick = onWallpaperClick,
             onWallpaperFavoriteClick = viewModel::toggleFavorite,
             onTagClick = onTagClick,
