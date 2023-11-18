@@ -136,4 +136,5 @@
     <string name="change_wallpaper_tile_label">Змяніць шпалеры</string>
     <string name="tag_id_supp">тэг: %1$s</string>
     <string name="subreddits">Субрэдыты</string>
+    <string name="search_filters">Пошукавыя фільтры</string>
 </resources>
