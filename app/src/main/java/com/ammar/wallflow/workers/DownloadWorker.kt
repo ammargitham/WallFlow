@@ -13,6 +13,8 @@ import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import coil.annotation.ExperimentalCoilApi
+import coil.imageLoader
 import com.ammar.wallflow.IoDispatcher
 import com.ammar.wallflow.R
 import com.ammar.wallflow.extensions.TAG
@@ -154,13 +156,20 @@ class DownloadWorker @AssistedInject constructor(
         wallpaperId: String,
         source: Source,
     ): File {
-        val file = download(
-            okHttpClient = okHttpClient,
+        var file = getFromCache(
             url = url,
             dir = dir,
             fileName = fileName,
-            progressCallback = this::notifyProgress,
         )
+        if (file == null) {
+            file = download(
+                okHttpClient = okHttpClient,
+                url = url,
+                dir = dir,
+                fileName = fileName,
+                progressCallback = this::notifyProgress,
+            )
+        }
         if (inputData.getBoolean(INPUT_KEY_SCAN_FILE, false)) {
             scanFile(context, file)
         }
@@ -169,6 +178,21 @@ class DownloadWorker @AssistedInject constructor(
         } catch (e: Exception) {
             Log.e(TAG, "download: Error notifying success", e)
         }
+        return file
+    }
+
+    @OptIn(ExperimentalCoilApi::class)
+    private fun getFromCache(
+        url: String,
+        dir: String,
+        fileName: String?,
+    ): File? {
+        val cacheFile = context.imageLoader.diskCache?.openSnapshot(url)?.use {
+            it.data.toFile()
+        } ?: return null
+        val fileNameActual = fileName ?: url.getFileNameFromUrl()
+        val file = createFile(dir, fileNameActual)
+        copyFiles(cacheFile, file)
         return file
     }
 

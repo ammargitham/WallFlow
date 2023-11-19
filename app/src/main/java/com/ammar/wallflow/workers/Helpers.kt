@@ -65,7 +65,7 @@ private fun createFile(
     dir: String,
     fileName: String?,
 ): File {
-    var fName = when {
+    val fName = when {
         fileName != null -> fileName
         else -> {
             val contentDispositionStr = response.header("Content-Disposition")
@@ -77,14 +77,22 @@ private fun createFile(
                 ?: throw IllegalArgumentException(parseExceptionMsg)
         }
     }
-    var tempFile = File(dir, fName)
+    return createFile(dir, fName)
+}
+
+fun createFile(
+    dir: String,
+    fileName: String,
+): File {
+    var fileName1 = fileName
+    var tempFile = File(dir, fileName1)
     val extension = tempFile.extension
     val nameWoExt = tempFile.nameWithoutExtension
     var suffix = 0
     while (tempFile.exists()) {
         suffix++
-        fName = "$nameWoExt-$suffix${if (extension.isNotEmpty()) ".$extension" else ""}"
-        tempFile = File(dir, fName)
+        fileName1 = "$nameWoExt-$suffix${if (extension.isNotEmpty()) ".$extension" else ""}"
+        tempFile = File(dir, fileName1)
     }
     tempFile.parentFile?.mkdirs()
     tempFile.createNewFile()
@@ -101,6 +109,16 @@ fun copyFiles(
         it.source().use { a ->
             dest.sink().buffer().use { b -> b.writeAll(a) }
         }
+    }
+}
+
+@Throws(IOException::class)
+fun copyFiles(
+    source: File,
+    dest: File,
+) {
+    source.source().use { a ->
+        dest.sink().buffer().use { b -> b.writeAll(a) }
     }
 }
 
