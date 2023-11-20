@@ -31,6 +31,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.ModalBottomSheetDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -229,6 +230,10 @@ internal fun DetectionsBottomSheet(
         modifier = modifier,
         onDismissRequest = onDismissRequest,
         sheetState = bottomSheetState,
+        properties = ModalBottomSheetDefaults.properties(
+            isFocusable = true,
+            shouldDismissOnBackPress = true,
+        ),
     ) {
         DetectionsBottomSheetContent(
             detections = detections,

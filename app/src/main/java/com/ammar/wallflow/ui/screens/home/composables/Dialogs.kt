@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -49,7 +50,7 @@ internal fun ManageSourcesDialog(
     onAddSourceClick: (OnlineSource) -> Unit = {},
     onSaveClick: () -> Unit = {},
 ) {
-    AlertDialog(
+    BasicAlertDialog(
         modifier = modifier,
         onDismissRequest = onDismissRequest,
     ) {

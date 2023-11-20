@@ -24,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenuItem
@@ -122,7 +123,7 @@ fun ObjectDetectionDelegateOptionsDialog(
     var localSelectedDelegate by remember(selectedDelegate) {
         mutableStateOf(selectedDelegate ?: ObjectDetectionDelegate.NONE)
     }
-    AlertDialog(
+    BasicAlertDialog(
         modifier = modifier,
         onDismissRequest = onDismissRequest,
     ) {
@@ -209,7 +210,7 @@ fun ObjectDetectionModelOptionsDialog(
     var localSelectedModel by remember(selectedModelId) {
         mutableStateOf(models.find { it.id == selectedModelId } ?: models.firstOrNull())
     }
-    AlertDialog(
+    BasicAlertDialog(
         modifier = modifier,
         onDismissRequest = onDismissRequest,
     ) {
@@ -371,7 +372,7 @@ fun ObjectDetectionModelEditDialog(
         nameExists.value = checkNameExists(nameState.text.trimAll(), model?.id)
     }
 
-    AlertDialog(
+    BasicAlertDialog(
         modifier = modifier,
         onDismissRequest = onDismissRequest,
     ) {
@@ -696,7 +697,7 @@ fun AutoWallpaperSourceOptionsDialog(
         }
     }
 
-    AlertDialog(
+    BasicAlertDialog(
         modifier = modifier,
         onDismissRequest = onDismissRequest,
     ) {
@@ -753,7 +754,6 @@ fun AutoWallpaperSourceOptionsDialog(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun AutoWallpaperSourceOptionsDialogContent(
     modifier: Modifier = Modifier,
@@ -1098,7 +1098,7 @@ fun ConstraintOptionsDialog(
 ) {
     var localConstraints by remember(constraints) { mutableStateOf(constraints) }
 
-    AlertDialog(
+    BasicAlertDialog(
         modifier = modifier,
         onDismissRequest = onDismissRequest,
     ) {
@@ -1294,7 +1294,7 @@ fun ThemeOptionsDialog(
 ) {
     var localSelectedTheme by remember(theme) { mutableStateOf(theme) }
 
-    AlertDialog(
+    BasicAlertDialog(
         modifier = modifier,
         onDismissRequest = onDismissRequest,
     ) {
@@ -1395,7 +1395,7 @@ fun AutoWallpaperSetToDialog(
         }
     }
 
-    AlertDialog(
+    BasicAlertDialog(
         modifier = modifier,
         onDismissRequest = onDismissRequest,
     ) {

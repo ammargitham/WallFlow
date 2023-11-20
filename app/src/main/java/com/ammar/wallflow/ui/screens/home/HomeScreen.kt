@@ -86,6 +86,7 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val viewerUiState by viewerViewModel.uiState.collectAsStateWithLifecycle()
     val wallpapers = viewModel.wallpapers.collectAsLazyPagingItems()
+    // TODO: Replace with M3 PullToRefresh
     val refreshState = rememberPullRefreshState(
         refreshing = false,
         onRefresh = {
