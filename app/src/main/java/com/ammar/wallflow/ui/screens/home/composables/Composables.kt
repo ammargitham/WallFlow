@@ -307,23 +307,23 @@ private fun PreviewPopularTagsRow() {
     }
 }
 
-@Composable
-fun SearchBarFiltersToggle(
-    modifier: Modifier = Modifier,
-    checked: Boolean = false,
-    onCheckedChange: (Boolean) -> Unit = {},
-) {
-    IconToggleButton(
-        modifier = modifier,
-        checked = checked,
-        onCheckedChange = onCheckedChange,
-    ) {
-        Icon(
-            painterResource(R.drawable.baseline_filter_alt_24),
-            contentDescription = null,
-        )
-    }
-}
+// @Composable
+// fun SearchBarFiltersToggle(
+//     modifier: Modifier = Modifier,
+//     checked: Boolean = false,
+//     onCheckedChange: (Boolean) -> Unit = {},
+// ) {
+//     IconToggleButton(
+//         modifier = modifier,
+//         checked = checked,
+//         onCheckedChange = onCheckedChange,
+//     ) {
+//         Icon(
+//             painterResource(R.drawable.baseline_filter_alt_24),
+//             contentDescription = null,
+//         )
+//     }
+// }
 
 // @Composable
 // fun SearchBarOverflowMenu(
