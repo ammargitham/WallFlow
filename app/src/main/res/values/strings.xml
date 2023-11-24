@@ -285,6 +285,7 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="search_filters">Search filters</string>
     <string name="image_url">Image URL</string>
     <string name="url_copied">URL Copied!</string>
+    <string name="tag_copied">Tag copied!</string>
     <plurals name="every_x_hrs">
         <item quantity="one">Every %d hour</item>
         <item quantity="other">Every %d hours</item>

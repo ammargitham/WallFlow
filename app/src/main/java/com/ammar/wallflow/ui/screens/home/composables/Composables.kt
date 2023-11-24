@@ -30,7 +30,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -118,6 +117,7 @@ internal fun LazyStaggeredGridScope.wallhavenHeader(
     wallhavenTags: ImmutableList<WallhavenTag> = persistentListOf(),
     isTagsLoading: Boolean = false,
     onTagClick: (wallhavenTag: WallhavenTag) -> Unit = {},
+    onTagLongClick: (wallhavenTag: WallhavenTag) -> Unit = {},
 ) {
     if (wallhavenTags.isNotEmpty()) {
         item(span = StaggeredGridItemSpan.FullLine) {
@@ -125,6 +125,7 @@ internal fun LazyStaggeredGridScope.wallhavenHeader(
                 wallhavenTags = wallhavenTags,
                 loading = isTagsLoading,
                 onTagClick = onTagClick,
+                onTagLongClick = onTagLongClick,
             )
         }
     }
@@ -260,6 +261,7 @@ fun PopularTagsRow(
     wallhavenTags: ImmutableList<WallhavenTag> = persistentListOf(),
     loading: Boolean = false,
     onTagClick: (wallhavenTag: WallhavenTag) -> Unit = {},
+    onTagLongClick: (wallhavenTag: WallhavenTag) -> Unit = {},
 ) {
     LazyRow(
         modifier = modifier,
@@ -276,6 +278,7 @@ fun PopularTagsRow(
                 wallhavenTag = it,
                 loading = loading,
                 onClick = { onTagClick(it) },
+                onLongClick = { onTagLongClick(it) },
             )
         }
     }

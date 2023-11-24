@@ -129,6 +129,10 @@ fun WallpaperInfoBottomSheetContent(
                 modifier = Modifier.fillMaxWidth(),
                 wallhavenTags = wallpaper.tags,
                 onTagClick = onTagClick,
+                onTagLongClick = {
+                    clipboardManager.setText(AnnotatedString("#${it.name}"))
+                    context.toast(context.getString(R.string.tag_copied))
+                },
             )
         }
 

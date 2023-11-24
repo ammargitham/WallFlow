@@ -537,6 +537,7 @@ fun TagsRow(
     modifier: Modifier = Modifier,
     wallhavenTags: List<WallhavenTag>,
     onTagClick: (wallhavenTag: WallhavenTag) -> Unit = {},
+    onTagLongClick: (wallhavenTag: WallhavenTag) -> Unit = {},
 ) {
     FlowRow(
         modifier = modifier,
@@ -549,6 +550,7 @@ fun TagsRow(
             TagChip(
                 wallhavenTag = it,
                 onClick = { onTagClick(it) },
+                onLongClick = { onTagLongClick(it) },
             )
         }
     }

@@ -24,9 +24,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -34,6 +36,7 @@ import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.ammar.wallflow.R
 import com.ammar.wallflow.extensions.search
+import com.ammar.wallflow.extensions.toast
 import com.ammar.wallflow.model.OnlineSource
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.search.RedditSearch
@@ -108,6 +111,7 @@ fun HomeScreen(
         navigationBarsInsets,
     )
     val systemState by systemController.state
+    val clipboardManager = LocalClipboardManager.current
 
     LaunchedEffect(Unit) {
         systemController.resetBarsState()
@@ -229,6 +233,12 @@ fun HomeScreen(
                                         wallhavenTags = uiState.wallhaven.wallhavenTags,
                                         isTagsLoading = uiState.wallhaven.areTagsLoading,
                                         onTagClick = onTagClick,
+                                        onTagLongClick = {
+                                            clipboardManager.setText(
+                                                AnnotatedString("#${it.name}"),
+                                            )
+                                            context.toast(context.getString(R.string.tag_copied))
+                                        },
                                     )
                                 }
                             }
