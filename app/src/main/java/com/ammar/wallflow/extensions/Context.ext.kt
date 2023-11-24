@@ -30,6 +30,7 @@ import androidx.core.provider.DocumentsContractCompat
 import androidx.work.WorkManager
 import com.ammar.wallflow.FILE_PROVIDER_AUTHORITY
 import com.ammar.wallflow.R
+import com.ammar.wallflow.WEB_URL_REGEX
 import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.model.toWhichInt
 import com.ammar.wallflow.ui.common.permissions.checkSetWallpaperPermission
@@ -45,11 +46,11 @@ import okio.source
 import okio.use
 
 fun Context.openUrl(url: String) {
-    var tempUrl = url
-    if (!tempUrl.startsWith("https://") && !tempUrl.startsWith("http://")) {
-        tempUrl = "http://$tempUrl"
+    if (!url.matches(WEB_URL_REGEX)) {
+        toast(getString(R.string.invalid_url))
+        return
     }
-    val intent = Intent(Intent.ACTION_VIEW, tempUrl.toUri())
+    val intent = Intent(Intent.ACTION_VIEW, url.toUri())
     if (intent.resolveActivity(packageManager) == null) return
     try {
         startActivity(intent)

@@ -1,6 +1,7 @@
 package com.ammar.wallflow
 
 import androidx.compose.ui.unit.IntSize
+import androidx.core.util.PatternsCompat
 
 const val WALLHAVEN_BASE_URL = "https://wallhaven.cc/api/v1/"
 const val REDDIT_BASE_URL = "https://reddit.com/"
@@ -60,3 +61,4 @@ val SUPPORTED_MIME_TYPES = setOf(
 )
 
 val SUBREDDIT_REGEX = "(?>/?r/)?([a-z0-9][_a-z0-9]{2,20})(?>\\Z|\\s)".toRegex()
+val WEB_URL_REGEX = PatternsCompat.WEB_URL.toRegex()

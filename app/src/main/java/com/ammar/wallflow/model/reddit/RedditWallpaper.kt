@@ -1,7 +1,7 @@
 package com.ammar.wallflow.model.reddit
 
 import androidx.compose.ui.unit.IntSize
-import androidx.core.util.PatternsCompat
+import com.ammar.wallflow.WEB_URL_REGEX
 import com.ammar.wallflow.model.DownloadableWallpaper
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.Source
@@ -39,8 +39,6 @@ val redditWallpaper1 = RedditWallpaper(
     galleryPosition = 1,
     thumbData = "https://example.com/thumb1.jpg",
 )
-
-private val WEB_URL_REGEX = PatternsCompat.WEB_URL.toRegex()
 
 fun String.withRedditDomainPrefix(): String {
     // if already a correct url, do nothing

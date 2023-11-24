@@ -283,6 +283,8 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="menu">Menu</string>
     <string name="remove_from_favorites">Remove from favorites</string>
     <string name="search_filters">Search filters</string>
+    <string name="image_url">Image URL</string>
+    <string name="url_copied">URL Copied!</string>
     <plurals name="every_x_hrs">
         <item quantity="one">Every %d hour</item>
         <item quantity="other">Every %d hours</item>

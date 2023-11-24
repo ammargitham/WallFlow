@@ -2,7 +2,8 @@ package com.ammar.wallflow.ui.screens.wallpaper
 
 import android.content.res.Configuration
 import android.text.format.Formatter
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,14 +20,19 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.R
 import com.ammar.wallflow.extensions.capitalise
+import com.ammar.wallflow.extensions.openUrl
+import com.ammar.wallflow.extensions.toast
+import com.ammar.wallflow.model.DownloadableWallpaper
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.local.LocalWallpaper
 import com.ammar.wallflow.model.reddit.RedditWallpaper
@@ -48,6 +54,7 @@ fun WallpaperInfoBottomSheet(
     onTagClick: (wallhavenTag: WallhavenTag) -> Unit = {},
     onUploaderClick: () -> Unit = {},
     onSourceClick: () -> Unit = {},
+    onSourceLongClick: () -> Unit = {},
 ) {
     val coroutineScope = rememberCoroutineScope()
     val bottomSheetState = rememberModalBottomSheetState(
@@ -92,10 +99,12 @@ fun WallpaperInfoBottomSheet(
                 onSourceClick()
                 dismissSheet()
             },
+            onSourceLongClick = onSourceLongClick,
         )
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun WallpaperInfoBottomSheetContent(
     modifier: Modifier = Modifier,
@@ -103,8 +112,10 @@ fun WallpaperInfoBottomSheetContent(
     onTagClick: (wallhavenTag: WallhavenTag) -> Unit = {},
     onUploaderClick: () -> Unit = {},
     onSourceClick: () -> Unit = {},
+    onSourceLongClick: () -> Unit = {},
 ) {
     val context = LocalContext.current
+    val clipboardManager = LocalClipboardManager.current
     val sourceUrl = getSource(wallpaper)
 
     Column(
@@ -159,10 +170,39 @@ fun WallpaperInfoBottomSheetContent(
                             .weight(3f),
                     ) {
                         Text(
-                            modifier = Modifier.clickable(onClick = onSourceClick),
+                            modifier = Modifier.combinedClickable(
+                                onClick = onSourceClick,
+                                onLongClick = onSourceLongClick,
+                            ),
                             color = MaterialTheme.colorScheme.primary,
                             textDecoration = TextDecoration.Underline,
                             text = sourceUrl,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                        )
+                    }
+                }
+            }
+            if (wallpaper is DownloadableWallpaper) {
+                PropertyRow(title = stringResource(R.string.image_url)) {
+                    Box(
+                        modifier = Modifier
+                            .alignByBaseline()
+                            .weight(3f),
+                    ) {
+                        Text(
+                            modifier = Modifier.combinedClickable(
+                                onClick = {
+                                    context.openUrl(wallpaper.data)
+                                },
+                                onLongClick = {
+                                    clipboardManager.setText(AnnotatedString(wallpaper.data))
+                                    context.toast(context.getString(R.string.url_copied))
+                                },
+                            ),
+                            color = MaterialTheme.colorScheme.primary,
+                            textDecoration = TextDecoration.Underline,
+                            text = wallpaper.data,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )

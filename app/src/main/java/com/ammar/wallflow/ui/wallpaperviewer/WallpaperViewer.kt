@@ -30,10 +30,12 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.ScaleFactor
 import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImagePainter
@@ -93,6 +95,7 @@ fun WallpaperViewer(
     onUploaderClick: (WallhavenUploader) -> Unit = {},
     onFavoriteToggle: (Boolean) -> Unit = {},
 ) {
+    val clipboardManager = LocalClipboardManager.current
     var showRationale by rememberSaveable { mutableStateOf(false) }
     var containerIntSize by remember { mutableStateOf(IntSize.Zero) }
 
@@ -289,14 +292,13 @@ fun WallpaperViewer(
                     }
                 },
                 onSourceClick = {
-                    val url = when (this) {
-                        is WallhavenWallpaper -> wallhavenSource
-                        is RedditWallpaper -> postUrl.withRedditDomainPrefix()
-                        else -> null
-                    }
-                    if (url != null) {
-                        context.openUrl(url)
-                    }
+                    val url = getSourceUrl() ?: return@WallpaperInfoBottomSheet
+                    context.openUrl(url)
+                },
+                onSourceLongClick = {
+                    val url = getSourceUrl() ?: return@WallpaperInfoBottomSheet
+                    clipboardManager.setText(AnnotatedString(url))
+                    context.toast(context.getString(R.string.url_copied))
                 },
             )
         }
@@ -308,6 +310,15 @@ fun WallpaperViewer(
             onConfirmOrDismiss = { showRationale = false },
         )
     }
+}
+
+private fun Wallpaper.getSourceUrl(): String? {
+    val url = when (this) {
+        is WallhavenWallpaper -> wallhavenSource
+        is RedditWallpaper -> postUrl.withRedditDomainPrefix()
+        else -> null
+    }
+    return url
 }
 
 @Composable
