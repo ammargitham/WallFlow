@@ -120,6 +120,12 @@ class AppPreferencesRepository @Inject constructor(
 
     private fun MutablePreferences.updateHomeRedditSearch(search: RedditSearch) {
         set(PreferencesKeys.HOME_REDDIT_SEARCH, json.encodeToString(search))
+        updateHomeSources(
+            mapOf(
+                OnlineSource.WALLHAVEN to true,
+                OnlineSource.REDDIT to true,
+            ),
+        )
     }
 
     private fun MutablePreferences.updateBlurSketchy(blurSketchy: Boolean) {
