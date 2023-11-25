@@ -3,6 +3,7 @@ package com.ammar.wallflow.ui.wallpaperviewer
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.FavoritesRepository
 import com.ammar.wallflow.data.repository.local.LocalWallpapersRepository
 import com.ammar.wallflow.data.repository.reddit.RedditRepository
@@ -12,8 +13,10 @@ import com.ammar.wallflow.data.repository.wallhaven.WallhavenRepository
 import com.ammar.wallflow.model.DownloadableWallpaper
 import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.model.Wallpaper
+import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import com.ammar.wallflow.utils.DownloadManager
 import com.ammar.wallflow.utils.DownloadStatus
+import com.ammar.wallflow.utils.ExifWriteType
 import com.github.materiiapps.partial.Partialize
 import com.github.materiiapps.partial.getOrElse
 import com.github.materiiapps.partial.partial
@@ -40,6 +43,7 @@ class WallpaperViewerViewModel @Inject constructor(
     private val localWallpapersRepository: LocalWallpapersRepository,
     private val downloadManager: DownloadManager,
     private val favoritesRepository: FavoritesRepository,
+    appPreferencesRepository: AppPreferencesRepository,
 ) : AndroidViewModel(
     application = application,
 ) {
@@ -73,13 +77,16 @@ class WallpaperViewerViewModel @Inject constructor(
         wallpaperFlow,
         argsFlow,
         isFavoriteFlow,
-    ) { local, wallpaper, args, isFavorite ->
+        appPreferencesRepository.appPreferencesFlow,
+    ) { local, wallpaper, args, isFavorite, appPreferences ->
         local.merge(
             WallpaperViewerUiState(
                 wallpaper = wallpaper.successOr(null),
                 thumbData = args.thumbData,
                 loading = wallpaper is Resource.Loading,
                 isFavorite = isFavorite,
+                writeTagsToExif = appPreferences.writeTagsToExif,
+                tagsExifWriteType = appPreferences.tagsExifWriteType,
             ),
         )
     }.stateIn(
@@ -120,13 +127,21 @@ class WallpaperViewerViewModel @Inject constructor(
     fun download() {
         var job: Job? = null
         job = viewModelScope.launch {
-            uiState.value.wallpaper?.run {
+            val uiState = uiState.value
+            uiState.wallpaper?.run {
                 if (this !is DownloadableWallpaper) {
                     return@run
+                }
+                val tags = if (uiState.writeTagsToExif && this is WallhavenWallpaper) {
+                    this.tags?.map { it.name }
+                } else {
+                    null
                 }
                 val workName = downloadManager.requestDownload(
                     context = application,
                     wallpaper = this,
+                    tags = tags,
+                    tagsExifWriteType = uiState.tagsExifWriteType,
                 )
                 downloadManager.getProgress(
                     context = application,
@@ -181,6 +196,8 @@ data class WallpaperViewerUiState(
     val downloadStatus: DownloadStatus? = null,
     val loading: Boolean = true,
     val isFavorite: Boolean = false,
+    val writeTagsToExif: Boolean = false,
+    val tagsExifWriteType: ExifWriteType = ExifWriteType.APPEND,
 )
 
 data class WallpaperViewerArgs(

@@ -6,6 +6,7 @@ import androidx.compose.ui.res.stringResource
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.preferences.ObjectDetectionDelegate
 import com.ammar.wallflow.model.WallpaperTarget
+import com.ammar.wallflow.utils.ExifWriteType
 import kotlinx.datetime.DateTimePeriod
 
 @Composable
@@ -68,3 +69,11 @@ internal fun getFrequencyString(
         value,
     )
 }
+
+@Composable
+internal fun exifWriteTypeString(writeType: ExifWriteType) = stringResource(
+    when (writeType) {
+        ExifWriteType.APPEND -> R.string.append
+        ExifWriteType.OVERWRITE -> R.string.overwrite
+    },
+)

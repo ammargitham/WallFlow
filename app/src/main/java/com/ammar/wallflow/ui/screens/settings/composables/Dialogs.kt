@@ -101,6 +101,7 @@ import com.ammar.wallflow.ui.common.nameStateSaver
 import com.ammar.wallflow.ui.common.urlStateSaver
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import com.ammar.wallflow.utils.DownloadStatus
+import com.ammar.wallflow.utils.ExifWriteType
 import kotlin.math.roundToInt
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.ImmutableSet
@@ -1456,6 +1457,82 @@ private fun PreviewAutoWallpaperSetToDialog() {
     WallFlowTheme {
         Surface {
             AutoWallpaperSetToDialog()
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ExifWriteTypeOptionsDialog(
+    modifier: Modifier = Modifier,
+    selectedExifWriteType: ExifWriteType = ExifWriteType.APPEND,
+    onSaveClick: (exifWriteType: ExifWriteType) -> Unit = {},
+    onDismissRequest: () -> Unit = {},
+) {
+    var localSelectedWriteType by remember(selectedExifWriteType) {
+        mutableStateOf(selectedExifWriteType)
+    }
+    BasicAlertDialog(
+        modifier = modifier,
+        onDismissRequest = onDismissRequest,
+    ) {
+        UnpaddedAlertDialogContent(
+            title = { Text(text = stringResource(R.string.exif_write_type)) },
+            text = {
+                ExifWriteTypeOptionsContent(
+                    selectedExifWriteType = localSelectedWriteType,
+                    onOptionClick = { localSelectedWriteType = it },
+                )
+            },
+            buttons = {
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                ) {
+                    TextButton(onClick = onDismissRequest) {
+                        Text(text = stringResource(R.string.cancel))
+                    }
+                    TextButton(onClick = { onSaveClick(localSelectedWriteType) }) {
+                        Text(text = stringResource(R.string.save))
+                    }
+                }
+            },
+        )
+    }
+}
+
+@Composable
+private fun ExifWriteTypeOptionsContent(
+    modifier: Modifier = Modifier,
+    selectedExifWriteType: ExifWriteType = ExifWriteType.APPEND,
+    onOptionClick: (exifWriteType: ExifWriteType) -> Unit = {},
+) {
+    Column(modifier = modifier) {
+        ExifWriteType.entries
+            .map {
+                ListItem(
+                    modifier = Modifier
+                        .clickable(onClick = { onOptionClick(it) })
+                        .padding(horizontal = 8.dp),
+                    headlineContent = { Text(text = exifWriteTypeString(it)) },
+                    leadingContent = {
+                        RadioButton(
+                            modifier = Modifier.size(24.dp),
+                            selected = selectedExifWriteType == it,
+                            onClick = { onOptionClick(it) },
+                        )
+                    },
+                )
+            }
+    }
+}
+
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun PreviewExifWriteTypeOptionsDialog() {
+    WallFlowTheme {
+        Surface {
+            ExifWriteTypeOptionsDialog()
         }
     }
 }

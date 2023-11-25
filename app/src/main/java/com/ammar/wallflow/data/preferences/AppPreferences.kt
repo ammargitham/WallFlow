@@ -24,6 +24,7 @@ import com.ammar.wallflow.model.serializers.ConstraintsSerializer
 import com.ammar.wallflow.model.serializers.DateTimePeriodSerializer
 import com.ammar.wallflow.model.serializers.UUIDSerializer
 import com.ammar.wallflow.ui.screens.local.LocalSort
+import com.ammar.wallflow.utils.ExifWriteType
 import java.util.UUID
 import kotlinx.datetime.DateTimePeriod
 import kotlinx.serialization.Serializable
@@ -44,6 +45,8 @@ data class AppPreferences(
     val homeSources: Map<OnlineSource, Boolean> = mapOf(OnlineSource.WALLHAVEN to true),
     val blurSketchy: Boolean = false,
     val blurNsfw: Boolean = false,
+    val writeTagsToExif: Boolean = false,
+    val tagsExifWriteType: ExifWriteType = ExifWriteType.APPEND,
     val objectDetectionPreferences: ObjectDetectionPreferences = ObjectDetectionPreferences(),
     val autoWallpaperPreferences: AutoWallpaperPreferences = AutoWallpaperPreferences(),
     val lookAndFeelPreferences: LookAndFeelPreferences = LookAndFeelPreferences(),

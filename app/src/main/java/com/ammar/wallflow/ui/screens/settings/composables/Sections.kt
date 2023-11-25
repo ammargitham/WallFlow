@@ -5,6 +5,10 @@ import android.text.format.DateFormat
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateValueAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,6 +43,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
@@ -58,6 +63,7 @@ import com.ammar.wallflow.ui.common.ProgressIndicator
 import com.ammar.wallflow.ui.common.getPaddingValuesConverter
 import com.ammar.wallflow.ui.screens.settings.NextRun
 import com.ammar.wallflow.ui.theme.WallFlowTheme
+import com.ammar.wallflow.utils.ExifWriteType
 import com.ammar.wallflow.utils.objectdetection.objectsDetector
 import com.ammar.wallflow.workers.AutoWallpaperWorker
 import java.util.Locale
@@ -189,8 +195,12 @@ private fun PreviewAccountSection() {
 internal fun LazyListScope.generalSection(
     blurSketchy: Boolean = false,
     blurNsfw: Boolean = false,
+    writeTagsToExif: Boolean = false,
+    tagsExifWriteType: ExifWriteType = ExifWriteType.APPEND,
     onBlurSketchyCheckChange: (checked: Boolean) -> Unit = {},
     onBlurNsfwCheckChange: (checked: Boolean) -> Unit = {},
+    onWriteTagsToExifCheckChange: (checked: Boolean) -> Unit = {},
+    onTagsWriteTypeClick: () -> Unit = {},
     onManageSavedSearchesClick: () -> Unit = {},
 ) {
     item { Header(stringResource(R.string.general)) }
@@ -222,6 +232,50 @@ internal fun LazyListScope.generalSection(
     }
     item {
         ListItem(
+            modifier = Modifier.clickable { onWriteTagsToExifCheckChange(!writeTagsToExif) },
+            headlineContent = {
+                Text(text = stringResource(R.string.write_tags_to_exif))
+            },
+            supportingContent = {
+                Text(text = stringResource(R.string.write_tags_to_exif_desc))
+            },
+            trailingContent = {
+                Switch(
+                    modifier = Modifier.height(24.dp),
+                    checked = writeTagsToExif,
+                    onCheckedChange = onWriteTagsToExifCheckChange,
+                )
+            },
+        )
+    }
+    item {
+        AnimatedVisibility(
+            modifier = Modifier.clipToBounds(),
+            visible = writeTagsToExif,
+            enter = slideInVertically() + fadeIn(),
+            exit = slideOutVertically() + fadeOut(),
+            label = "EXIF write type",
+        ) {
+            ListItem(
+                modifier = Modifier.clickable(onClick = onTagsWriteTypeClick),
+                headlineContent = {
+                    Text(text = stringResource(R.string.exif_write_type))
+                },
+                supportingContent = {
+                    Text(
+                        text = stringResource(
+                            when (tagsExifWriteType) {
+                                ExifWriteType.APPEND -> R.string.append
+                                ExifWriteType.OVERWRITE -> R.string.overwrite
+                            },
+                        ),
+                    )
+                },
+            )
+        }
+    }
+    item {
+        ListItem(
             modifier = Modifier.clickable(onClick = onManageSavedSearchesClick),
             headlineContent = { Text(text = stringResource(R.string.manager_saved_searches)) },
         )
@@ -235,7 +289,9 @@ private fun PreviewGeneralSection() {
     WallFlowTheme {
         Surface {
             LazyColumn {
-                generalSection()
+                generalSection(
+                    writeTagsToExif = true,
+                )
             }
         }
     }

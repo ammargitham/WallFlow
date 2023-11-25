@@ -65,12 +65,14 @@ import com.ammar.wallflow.ui.common.permissions.checkNotificationPermission
 import com.ammar.wallflow.ui.screens.crop.getCropRect
 import com.ammar.wallflow.ui.screens.crop.getMaxCropSize
 import com.ammar.wallflow.ui.screens.wallpaper.getWallpaperScreenPendingIntent
+import com.ammar.wallflow.utils.ExifWriteType
 import com.ammar.wallflow.utils.NotificationChannels
 import com.ammar.wallflow.utils.NotificationIds.AUTO_WALLPAPER_NOTIFICATION_ID
 import com.ammar.wallflow.utils.NotificationIds.AUTO_WALLPAPER_SUCCESS_NOTIFICATION_ID
 import com.ammar.wallflow.utils.decodeSampledBitmapFromUri
 import com.ammar.wallflow.utils.getPublicDownloadsFile
 import com.ammar.wallflow.utils.objectdetection.detectObjects
+import com.ammar.wallflow.utils.writeTagsToFile
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.io.File
@@ -195,7 +197,12 @@ class AutoWallpaperWorker @AssistedInject constructor(
                 markFavorite(nextWallpaper)
             }
             if (autoWallpaperPreferences.download) {
-                saveWallpaperToDownloads(nextWallpaper, uri)
+                saveWallpaperToDownloads(
+                    wallpaper = nextWallpaper,
+                    uri = uri,
+                    writeTagsToExif = appPreferences.writeTagsToExif,
+                    tagsExifWriteType = appPreferences.tagsExifWriteType,
+                )
             }
             if (autoWallpaperPreferences.showNotification) {
                 showSuccessNotification(nextWallpaper, uri)
@@ -533,6 +540,8 @@ class AutoWallpaperWorker @AssistedInject constructor(
     private fun saveWallpaperToDownloads(
         wallpaper: Wallpaper,
         uri: Uri,
+        writeTagsToExif: Boolean,
+        tagsExifWriteType: ExifWriteType,
     ) {
         if (wallpaper.source == Source.LOCAL) {
             // Don't save Local files
@@ -549,6 +558,16 @@ class AutoWallpaperWorker @AssistedInject constructor(
             val fileName = url.getFileNameFromUrl()
             val dest = getPublicDownloadsFile(fileName)
             copyFiles(context, uri, dest)
+            if (writeTagsToExif &&
+                wallpaper is WallhavenWallpaper &&
+                wallpaper.tags != null
+            ) {
+                writeTagsToFile(
+                    file = dest,
+                    tags = wallpaper.tags.map { it.name },
+                    exifWriteType = tagsExifWriteType,
+                )
+            }
             scanFile(context, dest)
         } catch (e: Exception) {
             Log.e(TAG, "saveWallpaperToDownloads: ", e)

@@ -31,6 +31,8 @@ class DownloadManager @Inject constructor() {
         wallpaper: DownloadableWallpaper,
         notificationType: NotificationType = NotificationType.VISIBLE_SUCCESS,
         downloadLocation: DownloadLocation = DownloadLocation.DOWNLOADS,
+        tags: List<String>? = null,
+        tagsExifWriteType: ExifWriteType = ExifWriteType.APPEND,
     ) = requestDownload(
         context = context,
         url = wallpaper.data,
@@ -39,6 +41,8 @@ class DownloadManager @Inject constructor() {
         extraWorkerData = arrayOf(
             DownloadWorker.INPUT_KEY_WALLPAPER_ID to wallpaper.id,
             DownloadWorker.INPUT_KEY_WALLPAPER_SOURCE to wallpaper.source.name,
+            DownloadWorker.INPUT_KEY_TAGS to tags?.toTypedArray(),
+            DownloadWorker.INPUT_KEY_TAGS_WRITE_TYPE to tagsExifWriteType.name,
         ),
     )
 
@@ -115,6 +119,8 @@ class DownloadManager @Inject constructor() {
     suspend fun downloadWallpaperAsync(
         context: Application,
         wallpaper: DownloadableWallpaper,
+        tags: List<String>? = null,
+        tagsExifWriteType: ExifWriteType = ExifWriteType.APPEND,
         onLoadingChange: (loading: Boolean) -> Unit = {},
         onResult: (file: File?) -> Unit,
     ) {
@@ -132,6 +138,8 @@ class DownloadManager @Inject constructor() {
                 wallpaper = wallpaper,
                 downloadLocation = DownloadLocation.APP_TEMP,
                 notificationType = NotificationType.SILENT,
+                tags = tags,
+                tagsExifWriteType = tagsExifWriteType,
             )
             getProgress(context, workName).collectLatest { state ->
                 if (!state.isSuccessOrFail()) return@collectLatest
@@ -145,7 +153,7 @@ class DownloadManager @Inject constructor() {
                 )
             }
         } catch (e: Exception) {
-            Log.e(TAG, "shareImage: ", e)
+            Log.e(TAG, "downloadWallpaperAsync: ", e)
             onLoadingChange(false)
             onResult(null)
         }

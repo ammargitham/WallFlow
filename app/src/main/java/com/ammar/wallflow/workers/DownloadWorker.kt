@@ -26,8 +26,10 @@ import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.services.DownloadSuccessActionsService
 import com.ammar.wallflow.ui.common.permissions.checkNotificationPermission
 import com.ammar.wallflow.ui.screens.wallpaper.getWallpaperScreenPendingIntent
+import com.ammar.wallflow.utils.ExifWriteType
 import com.ammar.wallflow.utils.NotificationChannels.DOWNLOADS_CHANNEL_ID
 import com.ammar.wallflow.utils.decodeSampledBitmapFromFile
+import com.ammar.wallflow.utils.writeTagsToFile
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import java.io.File
@@ -127,6 +129,27 @@ class DownloadWorker @AssistedInject constructor(
                     progressCallback = this@DownloadWorker::notifyProgress,
                 )
             }
+            if (wallpaperId != null) {
+                val tags = inputData.getStringArray(INPUT_KEY_TAGS) ?: emptyArray()
+                if (tags.isNotEmpty()) {
+                    // write tags to file
+                    val writeTypeStr = inputData.getString(INPUT_KEY_TAGS_WRITE_TYPE)
+                    val exifWriteType = if (writeTypeStr != null) {
+                        try {
+                            ExifWriteType.valueOf(writeTypeStr)
+                        } catch (e: Exception) {
+                            ExifWriteType.APPEND
+                        }
+                    } else {
+                        ExifWriteType.APPEND
+                    }
+                    writeTagsToFile(
+                        file = file,
+                        tags = tags.asList(),
+                        exifWriteType = exifWriteType,
+                    )
+                }
+            }
             Result.success(
                 workDataOf(OUTPUT_KEY_FILE_PATH to file.absolutePath),
             )
@@ -156,7 +179,7 @@ class DownloadWorker @AssistedInject constructor(
         wallpaperId: String,
         source: Source,
     ): File {
-        var file = getFromCache(
+        var file = copyFromCache(
             url = url,
             dir = dir,
             fileName = fileName,
@@ -182,7 +205,7 @@ class DownloadWorker @AssistedInject constructor(
     }
 
     @OptIn(ExperimentalCoilApi::class)
-    private fun getFromCache(
+    private fun copyFromCache(
         url: String,
         dir: String,
         fileName: String?,
@@ -299,6 +322,8 @@ class DownloadWorker @AssistedInject constructor(
         const val INPUT_KEY_WALLPAPER_ID = "wallpaper_id"
         const val INPUT_KEY_WALLPAPER_SOURCE = "wallpaper_source"
         const val INPUT_KEY_SCAN_FILE = "scan_file"
+        const val INPUT_KEY_TAGS = "tags"
+        const val INPUT_KEY_TAGS_WRITE_TYPE = "tags_write_type"
         const val OUTPUT_KEY_ERROR = "error"
         const val OUTPUT_KEY_FILE_PATH = "output_file_path"
         const val PROGRESS_KEY_TOTAL = "total"

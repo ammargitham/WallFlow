@@ -34,6 +34,7 @@ import com.ammar.wallflow.model.search.WallhavenSorting
 import com.ammar.wallflow.model.search.WallhavenTopRange
 import com.ammar.wallflow.model.serializers.constraintTypeMapSerializer
 import com.ammar.wallflow.ui.screens.local.LocalSort
+import com.ammar.wallflow.utils.ExifWriteType
 import com.ammar.wallflow.utils.objectdetection.objectsDetector
 import java.io.IOException
 import java.util.UUID
@@ -86,6 +87,14 @@ class AppPreferencesRepository @Inject constructor(
         dataStore.edit { it.updateBlurNsfw(blurNsfw) }
     }
 
+    suspend fun updateWriteTagsToExif(writeTagsToExif: Boolean) = withContext(ioDispatcher) {
+        dataStore.edit { it.updateWriteTagsToExif(writeTagsToExif) }
+    }
+
+    suspend fun updateTagsWriteType(tagsExifWriteType: ExifWriteType) = withContext(ioDispatcher) {
+        dataStore.edit { it.updateTagsWriteType(tagsExifWriteType) }
+    }
+
     suspend fun updateObjectDetectionPrefs(
         objectDetectionPreferences: ObjectDetectionPreferences,
     ) = withContext(ioDispatcher) {
@@ -134,6 +143,14 @@ class AppPreferencesRepository @Inject constructor(
 
     private fun MutablePreferences.updateBlurNsfw(blurNsfw: Boolean) {
         set(PreferencesKeys.BLUR_NSFW, blurNsfw)
+    }
+
+    private fun MutablePreferences.updateWriteTagsToExif(writeTagsToExif: Boolean) {
+        set(PreferencesKeys.WRITE_TAGS_TO_EXIF, writeTagsToExif)
+    }
+
+    private fun MutablePreferences.updateTagsWriteType(exifWriteType: ExifWriteType) {
+        set(PreferencesKeys.TAGS_WRITE_TYPE, exifWriteType.name)
     }
 
     private fun MutablePreferences.updateObjectDetectionPrefs(
@@ -242,6 +259,8 @@ class AppPreferencesRepository @Inject constructor(
             homeSources = getHomeSources(preferences, homeRedditSearch),
             blurSketchy = preferences[PreferencesKeys.BLUR_SKETCHY] ?: false,
             blurNsfw = preferences[PreferencesKeys.BLUR_NSFW] ?: false,
+            writeTagsToExif = preferences[PreferencesKeys.WRITE_TAGS_TO_EXIF] ?: false,
+            tagsExifWriteType = getTagsWriteType(preferences),
             objectDetectionPreferences = getObjectDetectionPreferences(preferences),
             autoWallpaperPreferences = getAutoWallpaperPreferences(preferences),
             lookAndFeelPreferences = getLookAndFeelPreferences(preferences),
@@ -251,6 +270,19 @@ class AppPreferencesRepository @Inject constructor(
             mainWallhavenSearch = getMainWallhavenSearch(preferences),
             mainRedditSearch = getMainRedditSearch(preferences),
         )
+    }
+
+    private fun getTagsWriteType(preferences: Preferences): ExifWriteType {
+        val tagsWriteTypeStr = preferences[PreferencesKeys.TAGS_WRITE_TYPE]
+        return if (tagsWriteTypeStr != null) {
+            try {
+                ExifWriteType.valueOf(tagsWriteTypeStr)
+            } catch (e: Exception) {
+                ExifWriteType.APPEND
+            }
+        } else {
+            ExifWriteType.APPEND
+        }
     }
 
     private fun getHomeSources(
@@ -462,6 +494,8 @@ class AppPreferencesRepository @Inject constructor(
                 updateHomeSources(appPreferences.homeSources)
                 updateBlurSketchy(appPreferences.blurSketchy)
                 updateBlurNsfw(appPreferences.blurNsfw)
+                updateWriteTagsToExif(appPreferences.writeTagsToExif)
+                updateTagsWriteType(appPreferences.tagsExifWriteType)
                 updateObjectDetectionPrefs(appPreferences.objectDetectionPreferences)
                 updateAutoWallpaperPrefs(appPreferences.autoWallpaperPreferences)
                 updateLookAndFeelPreferences(appPreferences.lookAndFeelPreferences)

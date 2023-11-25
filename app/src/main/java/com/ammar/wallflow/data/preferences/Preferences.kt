@@ -29,6 +29,8 @@ object PreferencesKeys {
     val MAIN_REDDIT_SEARCH = stringPreferencesKey("main_reddit_search")
     val BLUR_SKETCHY = booleanPreferencesKey("blur_sketchy")
     val BLUR_NSFW = booleanPreferencesKey("blur_nsfw")
+    val WRITE_TAGS_TO_EXIF = booleanPreferencesKey("write_tags_to_exif")
+    val TAGS_WRITE_TYPE = stringPreferencesKey("tags_write_type")
     val ENABLE_OBJECT_DETECTION = booleanPreferencesKey("enable_object_detection")
     val OBJECT_DETECTION_DELEGATE = stringPreferencesKey("object_detection_delegate")
     val OBJECT_DETECTION_MODEL_ID = longPreferencesKey("object_detection_model_id")

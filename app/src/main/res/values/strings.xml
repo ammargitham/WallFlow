@@ -286,6 +286,11 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="image_url">Image URL</string>
     <string name="url_copied">URL Copied!</string>
     <string name="tag_copied">Tag copied!</string>
+    <string name="write_tags_to_exif">Write tags to EXIF metadata</string>
+    <string name="write_tags_to_exif_desc">Wallpaper tags will be written to the \'UserComment\' EXIF tag when downloaded</string>
+    <string name="exif_write_type">"EXIF write type "</string>
+    <string name="append">Append</string>
+    <string name="overwrite">Overwrite</string>
     <plurals name="every_x_hrs">
         <item quantity="one">Every %d hour</item>
         <item quantity="other">Every %d hours</item>

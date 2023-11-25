@@ -28,6 +28,7 @@ import com.ammar.wallflow.model.search.SavedSearch
 import com.ammar.wallflow.services.ChangeWallpaperTileService
 import com.ammar.wallflow.utils.DownloadManager
 import com.ammar.wallflow.utils.DownloadStatus
+import com.ammar.wallflow.utils.ExifWriteType
 import com.ammar.wallflow.utils.combine
 import com.ammar.wallflow.utils.getRealPath
 import com.ammar.wallflow.workers.AutoWallpaperWorker
@@ -126,6 +127,14 @@ class SettingsViewModel @Inject constructor(
 
     fun setBlurNsfw(blur: Boolean) = viewModelScope.launch {
         appPreferencesRepository.updateBlurNsfw(blur)
+    }
+
+    fun updateWriteTagsToExif(enabled: Boolean) = viewModelScope.launch {
+        appPreferencesRepository.updateWriteTagsToExif(enabled)
+    }
+
+    fun updateTagsWriteType(writeType: ExifWriteType) = viewModelScope.launch {
+        appPreferencesRepository.updateTagsWriteType(writeType)
     }
 
     fun updateSubjectDetectionPrefs(objectDetectionPreferences: ObjectDetectionPreferences) =
@@ -466,6 +475,10 @@ class SettingsViewModel @Inject constructor(
             else -> NextRun.NotScheduled
         }
     }
+
+    fun showTagsWriteTypeDialog(show: Boolean) = localUiStateFlow.update {
+        it.copy(showTagsWriteTypeDialog = partial(show))
+    }
 }
 
 @Stable
@@ -496,6 +509,7 @@ data class SettingsUiState(
     val showThemeOptionsDialog: Boolean = false,
     val showAutoWallpaperSetToDialog: Boolean = false,
     val localDirectories: ImmutableList<LocalDirectory> = persistentListOf(),
+    val showTagsWriteTypeDialog: Boolean = false,
 )
 
 sealed class NextRun {

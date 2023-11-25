@@ -65,6 +65,7 @@ import com.ammar.wallflow.ui.screens.settings.composables.AutoWallpaperSourceOpt
 import com.ammar.wallflow.ui.screens.settings.composables.ConstraintOptionsDialog
 import com.ammar.wallflow.ui.screens.settings.composables.DeleteSavedSearchConfirmDialog
 import com.ammar.wallflow.ui.screens.settings.composables.EditSavedSearchBottomSheetHeader
+import com.ammar.wallflow.ui.screens.settings.composables.ExifWriteTypeOptionsDialog
 import com.ammar.wallflow.ui.screens.settings.composables.FrequencyDialog
 import com.ammar.wallflow.ui.screens.settings.composables.NextRunInfoDialog
 import com.ammar.wallflow.ui.screens.settings.composables.ObjectDetectionDelegateOptionsDialog
@@ -173,6 +174,8 @@ fun SettingsScreen(
             showLocalTab = uiState.appPreferences.lookAndFeelPreferences.showLocalTab,
             onBlurSketchyCheckChange = viewModel::setBlurSketchy,
             onBlurNsfwCheckChange = viewModel::setBlurNsfw,
+            onWriteTagsToExifCheckChange = viewModel::updateWriteTagsToExif,
+            onTagsWriteTypeClick = { viewModel.showTagsWriteTypeDialog(true) },
             onWallhavenApiKeyItemClick = {
                 navController.navigate(WallhavenApiKeyDialogDestination)
             },
@@ -419,6 +422,16 @@ fun SettingsScreen(
             onDismissRequest = { viewModel.showAutoWallpaperSetToDialog(false) },
         )
     }
+
+    if (uiState.showTagsWriteTypeDialog) {
+        ExifWriteTypeOptionsDialog(
+            selectedExifWriteType = uiState.appPreferences.tagsExifWriteType,
+            onSaveClick = {
+                viewModel.updateTagsWriteType(it)
+                viewModel.showTagsWriteTypeDialog(false)
+            },
+        )
+    }
 }
 
 @Composable
@@ -433,6 +446,8 @@ fun SettingsScreenContent(
     showLocalTab: Boolean = true,
     onBlurSketchyCheckChange: (checked: Boolean) -> Unit = {},
     onBlurNsfwCheckChange: (checked: Boolean) -> Unit = {},
+    onWriteTagsToExifCheckChange: (checked: Boolean) -> Unit = {},
+    onTagsWriteTypeClick: () -> Unit = {},
     onWallhavenApiKeyItemClick: () -> Unit = {},
     onObjectDetectionPrefsChange: (objectDetectionPrefs: ObjectDetectionPreferences) -> Unit = {},
     onObjectDetectionDelegateClick: () -> Unit = {},
@@ -460,8 +475,12 @@ fun SettingsScreenContent(
             generalSection(
                 blurSketchy = appPreferences.blurSketchy,
                 blurNsfw = appPreferences.blurNsfw,
+                writeTagsToExif = appPreferences.writeTagsToExif,
+                tagsExifWriteType = appPreferences.tagsExifWriteType,
                 onBlurSketchyCheckChange = onBlurSketchyCheckChange,
                 onBlurNsfwCheckChange = onBlurNsfwCheckChange,
+                onWriteTagsToExifCheckChange = onWriteTagsToExifCheckChange,
+                onTagsWriteTypeClick = onTagsWriteTypeClick,
                 onManageSavedSearchesClick = onManageSavedSearchesClick,
             )
             dividerItem()
