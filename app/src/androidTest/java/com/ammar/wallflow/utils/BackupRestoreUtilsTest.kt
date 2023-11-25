@@ -437,6 +437,8 @@ class BackupRestoreUtilsTest {
                     OnlineSource.REDDIT to false,
                 ),
             )
+            appPreferencesRepository.updateWriteTagsToExif(true)
+            appPreferencesRepository.updateTagsWriteType(ExifWriteType.OVERWRITE)
             val oldPreferences = appPreferencesRepository.appPreferencesFlow.firstOrNull()
             val json = getBackupV1Json(
                 options = BackupOptions(
