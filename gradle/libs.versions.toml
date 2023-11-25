@@ -139,7 +139,7 @@ tflite-task-vision = { module = "org.tensorflow:tensorflow-lite-task-vision", ve
 about-libraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "aboutLibraries" }
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 android-test = { id = "com.android.test", version.ref = "androidGradlePlugin" }
-baselineprofile = { id = "androidx.baselineprofile", version.ref = "androidxBenchmark"}
+baselineprofile = { id = "androidx.baselineprofile", version.ref = "androidxBenchmark" }
 #android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 hilt-gradle = { id = "com.google.dagger.hilt.android", version.ref = "daggerHilt" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
