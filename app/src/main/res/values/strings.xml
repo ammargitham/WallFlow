@@ -92,15 +92,11 @@
     <string name="ratio">Ratio</string>
     <string name="auto_wallpaper">Auto wallpaper</string>
     <string name="enable_auto_wallpaper">Enable auto wallpaper</string>
-    <string name="search">Search</string>
     <string name="search_source">Search %1s</string>
     <string name="use_object_detection">Use object detection</string>
     <string name="use_object_detection_desc">Crop wallpaper using object detection</string>
-    <string name="search_to_use">Search to use</string>
     <string name="constraints">Constraints</string>
     <string name="constraints_desc">Constraints when auto wallpaper will run</string>
-    <string name="choose_saved_search">Choose a saved search</string>
-    <string name="no_saved_searches_desc">To save a search, go to Home and search for wallpapers. Tap the search options and save the search.</string>
     <string name="frequency">Frequency</string>
     <string name="hours">hours</string>
     <string name="on_wifi">On Wi-Fi</string>
@@ -200,7 +196,6 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="system">System</string>
     <string name="light">Light</string>
     <string name="dark">Dark</string>
-    <string name="displays">Displays</string>
     <string name="select_display">Select display</string>
     <string name="failed_to_change_wallpaper">Failed to change wallpaper!</string>
     <string name="set_wallpaper">Set as wallpaper</string>
@@ -223,7 +218,6 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="version">Version</string>
     <string name="open_source_licenses">Open source licenses</string>
     <string name="local">Local</string>
-    <string name="manage_dirs">Manage Directories</string>
     <string name="add_dir">Add Directory</string>
     <string name="location">Location</string>
     <string name="show_local_tab">Show Local tab</string>
@@ -251,7 +245,6 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="auto_wallpaper_download_desc">Download wallpaper when used in auto wallpaper</string>
     <string name="change_wallpaper_tile_label">Change Wallpaper</string>
     <string name="no_sources_set">No sources set</string>
-    <string name="set_sources">Set Sources</string>
     <string name="tap_to_change_wallpaper">Tap to change wallpaper</string>
     <string name="changing">Changing…</string>
     <string name="manage_local">Manage Local</string>
@@ -276,12 +269,10 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="user">User</string>
     <string name="title">Title</string>
     <string name="required_one_subreddit">Atleast 1 subreddit is required</string>
-    <string name="source_home_visibility_toggle">Source home visibility toggle</string>
     <string name="minutes">minutes</string>
     <string name="frequency_min_val_error">Frequency cannot be less than 15 minutes</string>
     <string name="success">Success</string>
     <string name="menu">Menu</string>
-    <string name="remove_from_favorites">Remove from favorites</string>
     <string name="search_filters">Search filters</string>
     <string name="image_url">Image URL</string>
     <string name="url_copied">URL Copied!</string>
