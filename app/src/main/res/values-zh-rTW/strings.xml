@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">WallFlow</string>
     <string name="home">首頁</string>
@@ -93,14 +94,10 @@
     <string name="ratio">螢幕比例</string>
     <string name="auto_wallpaper">自動更換桌布</string>
     <string name="enable_auto_wallpaper">啟用自動更換桌布</string>
-    <string name="search">搜尋</string>
     <string name="use_object_detection">使用物件偵測</string>
     <string name="use_object_detection_desc">利用物件偵測來裁切桌布</string>
-    <string name="search_to_use">選擇搜尋結果套用</string>
     <string name="constraints">自動更換限制</string>
     <string name="constraints_desc">設定自動更換桌布的執行條件</string>
-    <string name="choose_saved_search">選擇已儲存的搜尋結果</string>
-    <string name="no_saved_searches_desc">欲儲存搜尋結果，請前往主頁面進行桌布搜尋，然後儲存搜尋選項。</string>
     <string name="frequency">更換頻率</string>
     <string name="hours">小時</string>
     <string name="on_wifi">僅限 Wi-Fi</string>
@@ -198,7 +195,6 @@
     <string name="system">系統預設</string>
     <string name="light">明亮主題</string>
     <string name="dark">暗黑主題</string>
-    <string name="displays">顯示選項</string>
     <string name="select_display">選擇顯示器</string>
     <string name="failed_to_change_wallpaper">桌布更換失敗！</string>
     <string name="set_wallpaper">設為桌布</string>
@@ -221,7 +217,6 @@
     <string name="version">目前版本</string>
     <string name="open_source_licenses">查看開放原始碼授權</string>
     <string name="local">本機</string>
-    <string name="manage_dirs">管理儲存資料夾</string>
     <string name="add_dir">新增儲存資料夾</string>
     <string name="location">選擇位置</string>
     <string name="show_local_tab">開啟本機分頁</string>
@@ -249,7 +244,6 @@
     <string name="auto_wallpaper_download_desc">使用自動更換桌布功能時，自動下載該桌布</string>
     <string name="change_wallpaper_tile_label">點此更換手機桌布</string>
     <string name="no_sources_set">尚未設定桌布來源</string>
-    <string name="set_sources">選擇桌布來源</string>
     <string name="tap_to_change_wallpaper">輕觸以變更桌布</string>
     <string name="changing">正在更換桌布…</string>
     <string name="manage_local">管理本機桌布</string>
