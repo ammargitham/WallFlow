@@ -4,15 +4,18 @@ import android.content.Context
 import android.util.Log
 import androidx.core.net.toUri
 import com.ammar.wallflow.data.db.dao.FavoriteDao
+import com.ammar.wallflow.data.db.dao.ViewedDao
 import com.ammar.wallflow.data.db.dao.search.SavedSearchDao
 import com.ammar.wallflow.data.db.dao.wallpaper.RedditWallpapersDao
 import com.ammar.wallflow.data.db.dao.wallpaper.WallhavenWallpapersDao
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
+import com.ammar.wallflow.data.db.entity.ViewedEntity
 import com.ammar.wallflow.data.db.entity.search.toSavedSearch
 import com.ammar.wallflow.data.preferences.AppPreferences
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.FavoritesRepository
 import com.ammar.wallflow.data.repository.SavedSearchRepository
+import com.ammar.wallflow.data.repository.ViewedRepository
 import com.ammar.wallflow.data.repository.reddit.RedditRepository
 import com.ammar.wallflow.data.repository.wallhaven.WallhavenRepository
 import com.ammar.wallflow.extensions.format
@@ -54,12 +57,14 @@ suspend fun getBackupV1Json(
     wallhavenWallpapersDao: WallhavenWallpapersDao,
     redditWallpapersDao: RedditWallpapersDao,
     savedSearchDao: SavedSearchDao,
+    viewedDao: ViewedDao,
 ): String? {
     if (!options.atleastOneChosen) {
         return null
     }
     var appPreferences: AppPreferences? = null
     var favorites: List<FavoriteEntity>? = null
+    var viewed: List<ViewedEntity>? = null
     var wallhavenBackupV1 = WallhavenBackupV1(
         wallpapers = null,
         savedSearches = null,
@@ -98,6 +103,10 @@ suspend fun getBackupV1Json(
         }
     }
 
+    if (options.viewed) {
+        viewed = viewedDao.getAll()
+    }
+
     if (options.savedSearches) {
         val savedSearches = savedSearchDao.getAll()
         val map = savedSearches.groupBy {
@@ -117,6 +126,7 @@ suspend fun getBackupV1Json(
     val backupV1 = BackupV1(
         preferences = appPreferences,
         favorites = favorites,
+        viewed = viewed,
         wallhaven = wallhavenBackupV1,
         reddit = redditBackupV1,
     )
@@ -161,6 +171,7 @@ suspend fun restoreBackup(
     favoritesRepository: FavoritesRepository,
     wallhavenWallpapersDao: WallhavenWallpapersDao,
     redditWallpapersDao: RedditWallpapersDao,
+    viewedRepository: ViewedRepository,
 ) {
     when (backup.version) {
         1 -> restoreBackupV1(
@@ -174,6 +185,7 @@ suspend fun restoreBackup(
             favoritesRepository = favoritesRepository,
             wallhavenWallpapersDao = wallhavenWallpapersDao,
             redditWallpapersDao = redditWallpapersDao,
+            viewedRepository = viewedRepository,
         )
         else -> throw InvalidJsonException("Invalid version!")
     }
@@ -190,6 +202,7 @@ suspend fun restoreBackupV1(
     favoritesRepository: FavoritesRepository,
     wallhavenWallpapersDao: WallhavenWallpapersDao,
     redditWallpapersDao: RedditWallpapersDao,
+    viewedRepository: ViewedRepository,
 ) {
     if (!options.atleastOneChosen) {
         return
@@ -238,6 +251,9 @@ suspend fun restoreBackupV1(
             }
         }
         favoritesRepository.insertEntities(favoritesToInsert)
+    }
+    if (options.viewed && backup.viewed?.isNotEmpty() == true) {
+        viewedRepository.insertEntities(backup.viewed)
     }
     if (options.settings && backup.preferences != null) {
         // update saved search ids depending on whether they exist

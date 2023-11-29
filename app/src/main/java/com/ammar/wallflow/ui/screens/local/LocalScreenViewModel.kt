@@ -5,13 +5,18 @@ import androidx.compose.runtime.Stable
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
+import com.ammar.wallflow.data.db.entity.ViewedEntity
 import com.ammar.wallflow.data.db.entity.toFavorite
+import com.ammar.wallflow.data.db.entity.toViewed
 import com.ammar.wallflow.data.preferences.LayoutPreferences
+import com.ammar.wallflow.data.preferences.ViewedWallpapersLook
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.FavoritesRepository
+import com.ammar.wallflow.data.repository.ViewedRepository
 import com.ammar.wallflow.data.repository.local.LocalWallpapersRepository
 import com.ammar.wallflow.extensions.accessibleFolders
 import com.ammar.wallflow.model.Favorite
+import com.ammar.wallflow.model.Viewed
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.local.LocalDirectory
 import com.ammar.wallflow.utils.getRealPath
@@ -41,6 +46,7 @@ class LocalScreenViewModel @Inject constructor(
     private val localWallpapersRepository: LocalWallpapersRepository,
     private val favoritesRepository: FavoritesRepository,
     private val appPreferencesRepository: AppPreferencesRepository,
+    viewedRepository: ViewedRepository,
 ) : AndroidViewModel(application) {
     private val localUiState = MutableStateFlow(LocalScreenUiStatePartial())
     private val foldersFlow = localUiState
@@ -71,11 +77,19 @@ class LocalScreenViewModel @Inject constructor(
         localUiState,
         favoritesRepository.observeAll(),
         appPreferencesFlow,
-    ) { local, favorites, appPrefs ->
+        viewedRepository.observeAll(),
+    ) {
+            local,
+            favorites,
+            appPreferences,
+            viewedList,
+        ->
         local.merge(
             LocalScreenUiState(
                 favorites = favorites.map { it.toFavorite() }.toImmutableList(),
-                sort = appPrefs.localWallpapersPreferences.sort,
+                viewedList = viewedList.map(ViewedEntity::toViewed).toImmutableList(),
+                viewedWallpapersLook = appPreferences.viewedWallpapersPreferences.look,
+                sort = appPreferences.localWallpapersPreferences.sort,
             ),
         )
     }.stateIn(
@@ -133,6 +147,8 @@ data class LocalScreenUiState(
     val selectedWallpaper: Wallpaper? = null,
     val layoutPreferences: LayoutPreferences = LayoutPreferences(),
     val favorites: ImmutableList<Favorite> = persistentListOf(),
+    val viewedList: ImmutableList<Viewed> = persistentListOf(),
+    val viewedWallpapersLook: ViewedWallpapersLook = ViewedWallpapersLook.DIM_WITH_LABEL,
     val sort: LocalSort = LocalSort.NO_SORT,
 )
 

@@ -5,11 +5,16 @@ import androidx.compose.runtime.Stable
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
+import com.ammar.wallflow.data.db.entity.ViewedEntity
 import com.ammar.wallflow.data.db.entity.toFavorite
+import com.ammar.wallflow.data.db.entity.toViewed
 import com.ammar.wallflow.data.preferences.LayoutPreferences
+import com.ammar.wallflow.data.preferences.ViewedWallpapersLook
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.FavoritesRepository
+import com.ammar.wallflow.data.repository.ViewedRepository
 import com.ammar.wallflow.model.Favorite
+import com.ammar.wallflow.model.Viewed
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.search.RedditSearch
 import com.ammar.wallflow.model.search.WallhavenSearch
@@ -32,6 +37,7 @@ class FavoritesViewModel @Inject constructor(
     application: Application,
     private val favoritesRepository: FavoritesRepository,
     appPreferencesRepository: AppPreferencesRepository,
+    viewedRepository: ViewedRepository,
 ) : AndroidViewModel(
     application = application,
 ) {
@@ -44,13 +50,21 @@ class FavoritesViewModel @Inject constructor(
         localUiState,
         appPreferencesRepository.appPreferencesFlow,
         favoritesRepository.observeAll(),
-    ) { local, appPreferences, favorites ->
+        viewedRepository.observeAll(),
+    ) {
+            local,
+            appPreferences,
+            favorites,
+            viewedList,
+        ->
         local.merge(
             FavoritesUiState(
                 blurSketchy = appPreferences.blurSketchy,
                 blurNsfw = appPreferences.blurNsfw,
                 layoutPreferences = appPreferences.lookAndFeelPreferences.layoutPreferences,
                 favorites = favorites.map { it.toFavorite() }.toImmutableList(),
+                viewedList = viewedList.map(ViewedEntity::toViewed).toImmutableList(),
+                viewedWallpapersLook = appPreferences.viewedWallpapersPreferences.look,
                 prevMainWallhavenSearch = appPreferences.mainWallhavenSearch,
                 prevMainRedditSearch = appPreferences.mainRedditSearch,
             ),
@@ -81,6 +95,8 @@ data class FavoritesUiState(
     val selectedWallpaper: Wallpaper? = null,
     val layoutPreferences: LayoutPreferences = LayoutPreferences(),
     val favorites: ImmutableList<Favorite> = persistentListOf(),
+    val viewedList: ImmutableList<Viewed> = persistentListOf(),
+    val viewedWallpapersLook: ViewedWallpapersLook = ViewedWallpapersLook.DIM_WITH_LABEL,
     val prevMainWallhavenSearch: WallhavenSearch? = null,
     val prevMainRedditSearch: RedditSearch? = null,
 )

@@ -19,8 +19,10 @@ import androidx.navigation.NavController
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.ammar.wallflow.data.preferences.LayoutPreferences
+import com.ammar.wallflow.data.preferences.ViewedWallpapersLook
 import com.ammar.wallflow.extensions.search
 import com.ammar.wallflow.model.Favorite
+import com.ammar.wallflow.model.Viewed
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.search.WallhavenTagSearchMeta
 import com.ammar.wallflow.model.search.WallhavenUploaderSearchMeta
@@ -137,6 +139,8 @@ fun FavoritesScreen(
             gridState = gridState,
             wallpapers = wallpapers,
             favorites = uiState.favorites,
+            viewedList = uiState.viewedList,
+            viewedWallpapersLook = uiState.viewedWallpapersLook,
             blurSketchy = uiState.blurSketchy,
             blurNsfw = uiState.blurNsfw,
             selectedWallpaper = uiState.selectedWallpaper,
@@ -192,6 +196,8 @@ private fun FavoritesScreenContent(
     gridState: LazyStaggeredGridState = rememberLazyStaggeredGridState(),
     contentPadding: PaddingValues = PaddingValues(8.dp),
     favorites: ImmutableList<Favorite> = persistentListOf(),
+    viewedList: ImmutableList<Viewed> = persistentListOf(),
+    viewedWallpapersLook: ViewedWallpapersLook = ViewedWallpapersLook.DIM_WITH_LABEL,
     blurSketchy: Boolean = false,
     blurNsfw: Boolean = false,
     selectedWallpaper: Wallpaper? = null,
@@ -227,6 +233,8 @@ private fun FavoritesScreenContent(
                     contentPadding = contentPadding,
                     wallpapers = wallpapers,
                     favorites = favorites,
+                    viewedList = viewedList,
+                    viewedWallpapersLook = viewedWallpapersLook,
                     blurSketchy = blurSketchy,
                     blurNsfw = blurNsfw,
                     selectedWallpaper = selectedWallpaper,
@@ -276,6 +284,8 @@ private fun FavoritesScreenContent(
             contentPadding = contentPadding,
             wallpapers = wallpapers,
             favorites = favorites,
+            viewedList = viewedList,
+            viewedWallpapersLook = viewedWallpapersLook,
             blurSketchy = blurSketchy,
             blurNsfw = blurNsfw,
             selectedWallpaper = selectedWallpaper,

@@ -254,6 +254,8 @@ fun HomeScreen(
                 null
             },
             favorites = uiState.favorites,
+            viewedList = uiState.viewedList,
+            viewedWallpapersLook = uiState.viewedWallpapersLook,
             blurSketchy = uiState.blurSketchy,
             blurNsfw = uiState.blurNsfw,
             selectedWallpaper = uiState.selectedWallpaper,

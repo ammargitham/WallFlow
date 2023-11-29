@@ -66,4 +66,6 @@ object PreferencesKeys {
     val SHOW_LOCAL_TAB = booleanPreferencesKey("show_local_tab")
     val CHANGE_WALLPAPER_TILE_ADDED = booleanPreferencesKey("change_wallpaper_tile_added")
     val LOCAL_WALLPAPERS_SORT = stringPreferencesKey("local_wallpapers_sort")
+    val VIEWED_WALLPAPERS_ENABLED = booleanPreferencesKey("viewed_wallpapers_enabled")
+    val VIEWED_WALLPAPERS_LOOK = stringPreferencesKey("viewed_wallpapers_look")
 }

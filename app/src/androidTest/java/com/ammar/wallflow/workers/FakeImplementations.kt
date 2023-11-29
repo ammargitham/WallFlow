@@ -7,12 +7,14 @@ import androidx.paging.PagingSource
 import com.ammar.wallflow.data.db.dao.AutoWallpaperHistoryDao
 import com.ammar.wallflow.data.db.dao.FavoriteDao
 import com.ammar.wallflow.data.db.dao.ObjectDetectionModelDao
+import com.ammar.wallflow.data.db.dao.ViewedDao
 import com.ammar.wallflow.data.db.dao.search.SavedSearchDao
 import com.ammar.wallflow.data.db.dao.wallpaper.RedditWallpapersDao
 import com.ammar.wallflow.data.db.dao.wallpaper.WallhavenWallpapersDao
 import com.ammar.wallflow.data.db.entity.AutoWallpaperHistoryEntity
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
 import com.ammar.wallflow.data.db.entity.ObjectDetectionModelEntity
+import com.ammar.wallflow.data.db.entity.ViewedEntity
 import com.ammar.wallflow.data.db.entity.search.SavedSearchEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperTagsEntity
 import com.ammar.wallflow.data.db.entity.wallhaven.WallhavenWallpaperUploaderEntity
@@ -370,4 +372,21 @@ internal open class FakeLocalWallpapersRepository : LocalWallpapersRepository {
     ): Wallpaper? {
         throw RuntimeException()
     }
+}
+
+internal open class FakeViewedDao : ViewedDao {
+    override fun observeAll() = throw RuntimeException()
+
+    override suspend fun getAll() = throw RuntimeException()
+
+    override suspend fun getBySourceIdAndSource(
+        sourceId: String,
+        source: Source,
+    ) = throw RuntimeException()
+
+    override suspend fun insertAll(entities: Collection<ViewedEntity>) = throw RuntimeException()
+
+    override suspend fun upsert(viewedEntity: ViewedEntity) = throw RuntimeException()
+
+    override suspend fun deleteAll() = throw RuntimeException()
 }

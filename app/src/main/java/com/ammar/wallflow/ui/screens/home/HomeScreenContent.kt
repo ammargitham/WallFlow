@@ -33,9 +33,11 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.preferences.LayoutPreferences
+import com.ammar.wallflow.data.preferences.ViewedWallpapersLook
 import com.ammar.wallflow.model.Favorite
 import com.ammar.wallflow.model.OnlineSource
 import com.ammar.wallflow.model.Purity
+import com.ammar.wallflow.model.Viewed
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.model.wallhaven.WallhavenUploader
@@ -62,6 +64,8 @@ internal fun HomeScreenContent(
     contentPadding: PaddingValues = PaddingValues(8.dp),
     isExpanded: Boolean = false,
     favorites: ImmutableList<Favorite> = persistentListOf(),
+    viewedList: ImmutableList<Viewed> = persistentListOf(),
+    viewedWallpapersLook: ViewedWallpapersLook = ViewedWallpapersLook.DIM_WITH_LABEL,
     blurSketchy: Boolean = false,
     blurNsfw: Boolean = false,
     selectedWallpaper: Wallpaper? = null,
@@ -101,6 +105,8 @@ internal fun HomeScreenContent(
                 contentPadding = contentPadding,
                 wallpapers = wallpapers,
                 favorites = favorites,
+                viewedList = viewedList,
+                viewedWallpapersLook = viewedWallpapersLook,
                 blurSketchy = blurSketchy,
                 blurNsfw = blurNsfw,
                 header = header,
@@ -185,6 +191,8 @@ private fun Feed(
     contentPadding: PaddingValues = PaddingValues(8.dp),
     layoutPreferences: LayoutPreferences = LayoutPreferences(),
     favorites: ImmutableList<Favorite> = persistentListOf(),
+    viewedList: ImmutableList<Viewed> = persistentListOf(),
+    viewedWallpapersLook: ViewedWallpapersLook = ViewedWallpapersLook.DIM_WITH_LABEL,
     blurSketchy: Boolean = false,
     blurNsfw: Boolean = false,
     showSelection: Boolean = false,
@@ -237,6 +245,8 @@ private fun Feed(
             contentPadding = contentPadding,
             wallpapers = wallpapers,
             favorites = favorites,
+            viewedList = viewedList,
+            viewedWallpapersLook = viewedWallpapersLook,
             blurSketchy = blurSketchy,
             blurNsfw = blurNsfw,
             header = header,

@@ -62,6 +62,7 @@ import com.ammar.wallflow.ui.screens.destinations.LayoutSettingsScreenDestinatio
 import com.ammar.wallflow.ui.screens.destinations.WallhavenApiKeyDialogDestination
 import com.ammar.wallflow.ui.screens.settings.composables.AutoWallpaperSetToDialog
 import com.ammar.wallflow.ui.screens.settings.composables.AutoWallpaperSourceOptionsDialog
+import com.ammar.wallflow.ui.screens.settings.composables.ClearViewedWallpapersConfirmDialog
 import com.ammar.wallflow.ui.screens.settings.composables.ConstraintOptionsDialog
 import com.ammar.wallflow.ui.screens.settings.composables.DeleteSavedSearchConfirmDialog
 import com.ammar.wallflow.ui.screens.settings.composables.EditSavedSearchBottomSheetHeader
@@ -73,12 +74,14 @@ import com.ammar.wallflow.ui.screens.settings.composables.ObjectDetectionModelDe
 import com.ammar.wallflow.ui.screens.settings.composables.ObjectDetectionModelEditDialog
 import com.ammar.wallflow.ui.screens.settings.composables.ObjectDetectionModelOptionsDialog
 import com.ammar.wallflow.ui.screens.settings.composables.ThemeOptionsDialog
+import com.ammar.wallflow.ui.screens.settings.composables.ViewedWallpapersLookOptionsDialog
 import com.ammar.wallflow.ui.screens.settings.composables.accountSection
 import com.ammar.wallflow.ui.screens.settings.composables.autoWallpaperSection
 import com.ammar.wallflow.ui.screens.settings.composables.dividerItem
 import com.ammar.wallflow.ui.screens.settings.composables.generalSection
 import com.ammar.wallflow.ui.screens.settings.composables.lookAndFeelSection
 import com.ammar.wallflow.ui.screens.settings.composables.objectDetectionSection
+import com.ammar.wallflow.ui.screens.settings.composables.viewedWallpapersSection
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import com.ammar.wallflow.utils.StoragePermissions
 import com.ammar.wallflow.utils.objectdetection.objectsDetector
@@ -212,6 +215,11 @@ fun SettingsScreen(
                         showLocalTab = it,
                     ),
                 )
+            },
+            onViewedWallpapersEnabledChange = viewModel::updateRememberViewedWallpapers,
+            onViewedWallpapersLookClick = { viewModel.showViewedWallpapersLookDialog(true) },
+            onViewedWallpapersClearClick = {
+                viewModel.showClearViewedWallpapersConfirmDialog(true)
             },
         )
     }
@@ -430,6 +438,30 @@ fun SettingsScreen(
                 viewModel.updateTagsWriteType(it)
                 viewModel.showTagsWriteTypeDialog(false)
             },
+            onDismissRequest = { viewModel.showTagsWriteTypeDialog(false) },
+        )
+    }
+
+    if (uiState.showViewedWallpapersLookDialog) {
+        ViewedWallpapersLookOptionsDialog(
+            selectedViewedWallpapersLook = uiState.appPreferences.viewedWallpapersPreferences.look,
+            onSaveClick = {
+                viewModel.updateViewedWallpapersLook(it)
+                viewModel.showViewedWallpapersLookDialog(false)
+            },
+            onDismissRequest = { viewModel.showViewedWallpapersLookDialog(false) },
+        )
+    }
+
+    if (uiState.showClearViewedWallpapersConfirmDialog) {
+        ClearViewedWallpapersConfirmDialog(
+            onConfirmClick = {
+                viewModel.clearViewedWallpapers()
+                viewModel.showClearViewedWallpapersConfirmDialog(false)
+            },
+            onDismissRequest = {
+                viewModel.showClearViewedWallpapersConfirmDialog(false)
+            },
         )
     }
 }
@@ -463,6 +495,9 @@ fun SettingsScreenContent(
     onThemeClick: () -> Unit = {},
     onLayoutClick: () -> Unit = {},
     onShowLocalTabChange: (Boolean) -> Unit = {},
+    onViewedWallpapersEnabledChange: (Boolean) -> Unit = {},
+    onViewedWallpapersLookClick: () -> Unit = {},
+    onViewedWallpapersClearClick: () -> Unit = {},
 ) {
     val context = LocalContext.current
 
@@ -482,6 +517,14 @@ fun SettingsScreenContent(
                 onWriteTagsToExifCheckChange = onWriteTagsToExifCheckChange,
                 onTagsWriteTypeClick = onTagsWriteTypeClick,
                 onManageSavedSearchesClick = onManageSavedSearchesClick,
+            )
+            dividerItem()
+            viewedWallpapersSection(
+                enabled = appPreferences.viewedWallpapersPreferences.enabled,
+                look = appPreferences.viewedWallpapersPreferences.look,
+                onEnabledChange = onViewedWallpapersEnabledChange,
+                onViewedWallpapersLookClick = onViewedWallpapersLookClick,
+                onClearClick = onViewedWallpapersClearClick,
             )
             dividerItem()
             lookAndFeelSection(

@@ -20,6 +20,7 @@ import com.ammar.wallflow.data.db.entity.wallpaper.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.FavoritesRepository
 import com.ammar.wallflow.data.repository.SavedSearchRepository
+import com.ammar.wallflow.data.repository.ViewedRepository
 import com.ammar.wallflow.data.repository.reddit.RedditRepository
 import com.ammar.wallflow.data.repository.utils.Resource
 import com.ammar.wallflow.data.repository.wallhaven.WallhavenRepository
@@ -34,6 +35,7 @@ import com.ammar.wallflow.workers.FakeFavoriteDao
 import com.ammar.wallflow.workers.FakeLocalWallpapersRepository
 import com.ammar.wallflow.workers.FakeRedditWallpapersDao
 import com.ammar.wallflow.workers.FakeSavedSearchDao
+import com.ammar.wallflow.workers.FakeViewedDao
 import com.ammar.wallflow.workers.FakeWallhavenWallpapersDao
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -168,6 +170,10 @@ class HomeScreenTest {
             ioDispatcher = coroutineDispatcher,
         ),
         savedStateHandle = SavedStateHandle(),
+        viewedRepository = ViewedRepository(
+            viewedDao = FakeViewedDao(),
+            ioDispatcher = coroutineDispatcher,
+        ),
     )
 
     companion object {

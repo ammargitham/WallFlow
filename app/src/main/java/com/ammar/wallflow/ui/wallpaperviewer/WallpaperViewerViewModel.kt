@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.FavoritesRepository
+import com.ammar.wallflow.data.repository.ViewedRepository
 import com.ammar.wallflow.data.repository.local.LocalWallpapersRepository
 import com.ammar.wallflow.data.repository.reddit.RedditRepository
 import com.ammar.wallflow.data.repository.utils.Resource
@@ -44,6 +45,7 @@ class WallpaperViewerViewModel @Inject constructor(
     private val downloadManager: DownloadManager,
     private val favoritesRepository: FavoritesRepository,
     appPreferencesRepository: AppPreferencesRepository,
+    private val viewedRepository: ViewedRepository,
 ) : AndroidViewModel(
     application = application,
 ) {
@@ -87,6 +89,7 @@ class WallpaperViewerViewModel @Inject constructor(
                 isFavorite = isFavorite,
                 writeTagsToExif = appPreferences.writeTagsToExif,
                 tagsExifWriteType = appPreferences.tagsExifWriteType,
+                rememberViewedWallpapers = appPreferences.viewedWallpapersPreferences.enabled,
             ),
         )
     }.stateIn(
@@ -94,6 +97,27 @@ class WallpaperViewerViewModel @Inject constructor(
         started = SharingStarted.WhileSubscribed(5000),
         initialValue = WallpaperViewerUiState(),
     )
+
+    init {
+        viewModelScope.launch {
+            combine(
+                wallpaperFlow,
+                appPreferencesRepository.appPreferencesFlow,
+            ) { wallpaper, appPreferences ->
+                wallpaper to appPreferences.viewedWallpapersPreferences.enabled
+            }.collectLatest {
+                val (wallpaperResource, rememberViewed) = it
+                if (!rememberViewed) {
+                    return@collectLatest
+                }
+                val wallpaper = wallpaperResource.successOr(null) ?: return@collectLatest
+                viewedRepository.upsert(
+                    sourceId = wallpaper.id,
+                    source = wallpaper.source,
+                )
+            }
+        }
+    }
 
     fun setWallpaper(
         source: Source,
@@ -198,6 +222,7 @@ data class WallpaperViewerUiState(
     val isFavorite: Boolean = false,
     val writeTagsToExif: Boolean = false,
     val tagsExifWriteType: ExifWriteType = ExifWriteType.APPEND,
+    val rememberViewedWallpapers: Boolean = false,
 )
 
 data class WallpaperViewerArgs(

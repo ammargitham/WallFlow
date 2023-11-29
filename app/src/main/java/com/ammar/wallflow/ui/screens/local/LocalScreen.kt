@@ -132,6 +132,8 @@ fun LocalScreen(
         ),
         gridState = gridState,
         favorites = uiState.favorites,
+        viewedList = uiState.viewedList,
+        viewedWallpapersLook = uiState.viewedWallpapersLook,
         selectedWallpaper = uiState.selectedWallpaper,
         layoutPreferences = uiState.layoutPreferences,
         fullWallpaper = viewerUiState.wallpaper,

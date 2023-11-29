@@ -6,13 +6,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.cachedIn
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
+import com.ammar.wallflow.data.db.entity.ViewedEntity
 import com.ammar.wallflow.data.db.entity.search.SavedSearchEntity
 import com.ammar.wallflow.data.db.entity.search.toSavedSearch
 import com.ammar.wallflow.data.db.entity.toFavorite
+import com.ammar.wallflow.data.db.entity.toViewed
 import com.ammar.wallflow.data.preferences.LayoutPreferences
+import com.ammar.wallflow.data.preferences.ViewedWallpapersLook
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.FavoritesRepository
 import com.ammar.wallflow.data.repository.SavedSearchRepository
+import com.ammar.wallflow.data.repository.ViewedRepository
 import com.ammar.wallflow.data.repository.reddit.RedditRepository
 import com.ammar.wallflow.data.repository.utils.Resource
 import com.ammar.wallflow.data.repository.utils.successOr
@@ -20,6 +24,7 @@ import com.ammar.wallflow.data.repository.wallhaven.WallhavenRepository
 import com.ammar.wallflow.model.Favorite
 import com.ammar.wallflow.model.OnlineSource
 import com.ammar.wallflow.model.Purity
+import com.ammar.wallflow.model.Viewed
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.search.RedditFilters
 import com.ammar.wallflow.model.search.RedditSearch
@@ -69,6 +74,7 @@ class HomeViewModel @Inject constructor(
     private val appPreferencesRepository: AppPreferencesRepository,
     private val savedSearchRepository: SavedSearchRepository,
     private val favoritesRepository: FavoritesRepository,
+    viewedRepository: ViewedRepository,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
     private val mainSearch = savedStateHandle.navArgs<HomeScreenNavArgs>().search
@@ -150,6 +156,7 @@ class HomeViewModel @Inject constructor(
         localUiState,
         savedSearchRepository.observeAll(),
         favoritesRepository.observeAll(),
+        viewedRepository.observeAll(),
     ) {
             tags,
             homeSearch,
@@ -157,6 +164,7 @@ class HomeViewModel @Inject constructor(
             local,
             savedSearchEntities,
             favorites,
+            viewedList,
         ->
         local.merge(
             HomeUiState(
@@ -185,6 +193,8 @@ class HomeViewModel @Inject constructor(
                 showNSFW = appPreferences.wallhavenApiKey.isNotBlank(),
                 layoutPreferences = appPreferences.lookAndFeelPreferences.layoutPreferences,
                 favorites = favorites.map(FavoriteEntity::toFavorite).toImmutableList(),
+                viewedList = viewedList.map(ViewedEntity::toViewed).toImmutableList(),
+                viewedWallpapersLook = appPreferences.viewedWallpapersPreferences.look,
                 sources = appPreferences.homeSources.toImmutableMap(),
                 prevMainWallhavenSearch = appPreferences.mainWallhavenSearch,
                 prevMainRedditSearch = appPreferences.mainRedditSearch,
@@ -381,6 +391,8 @@ data class HomeUiState(
     val showSavedSearchesDialog: Boolean = false,
     val layoutPreferences: LayoutPreferences = LayoutPreferences(),
     val favorites: ImmutableList<Favorite> = persistentListOf(),
+    val viewedList: ImmutableList<Viewed> = persistentListOf(),
+    val viewedWallpapersLook: ViewedWallpapersLook = ViewedWallpapersLook.DIM_WITH_LABEL,
     val showRedditInitDialog: Boolean = false,
     val manageSourcesState: ManageSourcesState = ManageSourcesState(),
     val prevMainWallhavenSearch: WallhavenSearch? = null,

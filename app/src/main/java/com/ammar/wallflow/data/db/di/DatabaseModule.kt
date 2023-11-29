@@ -85,6 +85,9 @@ class DatabaseModule {
     @Provides
     fun providesRedditWallpaperDao(appDatabase: AppDatabase) = appDatabase.redditWallpapersDao()
 
+    @Provides
+    fun providesViewedDao(appDatabase: AppDatabase) = appDatabase.viewedDao()
+
     lateinit var appDatabase: AppDatabase
 
     @Provides

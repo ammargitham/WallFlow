@@ -5,6 +5,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.preferences.ObjectDetectionDelegate
+import com.ammar.wallflow.data.preferences.ViewedWallpapersLook
 import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.utils.ExifWriteType
 import kotlinx.datetime.DateTimePeriod
@@ -75,5 +76,19 @@ internal fun exifWriteTypeString(writeType: ExifWriteType) = stringResource(
     when (writeType) {
         ExifWriteType.APPEND -> R.string.append
         ExifWriteType.OVERWRITE -> R.string.overwrite
+    },
+)
+
+@Composable
+internal fun viewedWallpapersLookString(
+    viewedWallpapersLook: ViewedWallpapersLook,
+) = stringResource(
+    when (viewedWallpapersLook) {
+        ViewedWallpapersLook.NONE -> R.string.none
+        ViewedWallpapersLook.DIM -> R.string.dim
+        ViewedWallpapersLook.DIM_WITH_LABEL -> R.string.dim_with_label
+        ViewedWallpapersLook.DIM_WITH_ICON -> R.string.dim_with_icon
+        ViewedWallpapersLook.LABEL -> R.string.label
+        ViewedWallpapersLook.ICON -> R.string.icon
     },
 )

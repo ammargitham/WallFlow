@@ -15,9 +15,11 @@ import com.ammar.wallflow.data.preferences.AppPreferences
 import com.ammar.wallflow.data.preferences.AutoWallpaperPreferences
 import com.ammar.wallflow.data.preferences.LookAndFeelPreferences
 import com.ammar.wallflow.data.preferences.ObjectDetectionPreferences
+import com.ammar.wallflow.data.preferences.ViewedWallpapersLook
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.ObjectDetectionModelRepository
 import com.ammar.wallflow.data.repository.SavedSearchRepository
+import com.ammar.wallflow.data.repository.ViewedRepository
 import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.extensions.accessibleFolders
 import com.ammar.wallflow.extensions.getMLModelsFileIfExists
@@ -60,6 +62,7 @@ class SettingsViewModel @Inject constructor(
     private val objectDetectionModelRepository: ObjectDetectionModelRepository,
     private val downloadManager: DownloadManager,
     private val savedSearchRepository: SavedSearchRepository,
+    private val viewedRepository: ViewedRepository,
 ) : AndroidViewModel(application) {
     private val localUiStateFlow = MutableStateFlow(SettingsUiStatePartial())
     private val autoWallpaperNextRunFlow = getAutoWallpaperNextRun()
@@ -479,6 +482,34 @@ class SettingsViewModel @Inject constructor(
     fun showTagsWriteTypeDialog(show: Boolean) = localUiStateFlow.update {
         it.copy(showTagsWriteTypeDialog = partial(show))
     }
+
+    fun updateRememberViewedWallpapers(enabled: Boolean) = viewModelScope.launch {
+        appPreferencesRepository.updateViewedWallpapersPreferences(
+            uiState.value.appPreferences.viewedWallpapersPreferences.copy(
+                enabled = enabled,
+            ),
+        )
+    }
+
+    fun updateViewedWallpapersLook(look: ViewedWallpapersLook) = viewModelScope.launch {
+        appPreferencesRepository.updateViewedWallpapersPreferences(
+            uiState.value.appPreferences.viewedWallpapersPreferences.copy(
+                look = look,
+            ),
+        )
+    }
+
+    fun showViewedWallpapersLookDialog(show: Boolean) = localUiStateFlow.update {
+        it.copy(showViewedWallpapersLookDialog = partial(show))
+    }
+
+    fun showClearViewedWallpapersConfirmDialog(show: Boolean) = localUiStateFlow.update {
+        it.copy(showClearViewedWallpapersConfirmDialog = partial(show))
+    }
+
+    fun clearViewedWallpapers() = viewModelScope.launch {
+        viewedRepository.deleteAll()
+    }
 }
 
 @Stable
@@ -510,6 +541,8 @@ data class SettingsUiState(
     val showAutoWallpaperSetToDialog: Boolean = false,
     val localDirectories: ImmutableList<LocalDirectory> = persistentListOf(),
     val showTagsWriteTypeDialog: Boolean = false,
+    val showViewedWallpapersLookDialog: Boolean = false,
+    val showClearViewedWallpapersConfirmDialog: Boolean = false,
 )
 
 sealed class NextRun {

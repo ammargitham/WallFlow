@@ -13,12 +13,8 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.FilledIconButton
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
@@ -39,9 +35,10 @@ import androidx.compose.ui.graphics.painter.ColorPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameterProvider
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -51,6 +48,7 @@ import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import coil.request.Parameters
 import com.ammar.wallflow.R
+import com.ammar.wallflow.data.preferences.ViewedWallpapersLook
 import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.extensions.aspectRatio
 import com.ammar.wallflow.model.Wallpaper
@@ -73,6 +71,8 @@ fun WallpaperCard(
     roundedCorners: Boolean = true,
     isSelected: Boolean = false,
     isFavorite: Boolean = false,
+    isViewed: Boolean = false,
+    viewedWallpapersLook: ViewedWallpapersLook = ViewedWallpapersLook.DIM_WITH_LABEL,
     onClick: () -> Unit = {},
     onFavoriteClick: () -> Unit = {},
 ) {
@@ -136,6 +136,14 @@ fun WallpaperCard(
                 .drawWithContent {
                     drawContent()
                     drawRect(selectionColor)
+                    if (!isSelected && isViewed && viewedWallpapersLook in setOf(
+                            ViewedWallpapersLook.DIM,
+                            ViewedWallpapersLook.DIM_WITH_LABEL,
+                            ViewedWallpapersLook.DIM_WITH_ICON,
+                        )
+                    ) {
+                        drawRect(Color.Black.copy(alpha = 0.5f))
+                    }
                     val radius = minOf(size.minDimension / 2f, 20.dp.toPx())
                     drawCircle(
                         color = selectionCircleColor,
@@ -187,31 +195,45 @@ fun WallpaperCard(
             },
             onSuccess = { loaded = true },
         )
-        FilledIconButton(
+        if (isViewed && viewedWallpapersLook in setOf(
+                ViewedWallpapersLook.DIM_WITH_LABEL,
+                ViewedWallpapersLook.LABEL,
+            )
+        ) {
+            CardLabel(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(
+                        start = 8.dp,
+                        bottom = 8.dp,
+                    ),
+                text = stringResource(R.string.viewed),
+            )
+        }
+        if (isViewed && viewedWallpapersLook in setOf(
+                ViewedWallpapersLook.DIM_WITH_ICON,
+                ViewedWallpapersLook.ICON,
+            )
+        ) {
+            CardViewedIcon(
+                modifier = Modifier
+                    .align(Alignment.BottomStart)
+                    .padding(
+                        start = 8.dp,
+                        bottom = 8.dp,
+                    ),
+            )
+        }
+        CardFavoriteButton(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(
                     bottom = 4.dp,
                     end = 4.dp,
                 ),
-            colors = IconButtonDefaults.filledIconButtonColors(
-                containerColor = Color.Black.copy(alpha = 0.5f),
-                contentColor = if (isFavorite) Color.Red else Color.White,
-            ),
+            isFavorite = isFavorite,
             onClick = onFavoriteClick,
-        ) {
-            Icon(
-                modifier = Modifier.size(24.dp),
-                painter = painterResource(
-                    if (isFavorite) {
-                        R.drawable.baseline_favorite_24
-                    } else {
-                        R.drawable.outline_favorite_border_24
-                    },
-                ),
-                contentDescription = stringResource(R.string.favorite),
-            )
-        }
+        )
     }
     ReportDrawnWhen { loaded }
 }
@@ -233,25 +255,52 @@ fun PlaceholderWallpaperCard(
     ) {}
 }
 
-@Preview
-@Composable
-private fun PreviewWallpaperCard() {
-    WallFlowTheme {
-        WallpaperCard(
-            modifier = Modifier.width(200.dp),
-            wallpaper = wallhavenWallpaper1,
-        )
-    }
-}
+private data class Props(
+    val blur: Boolean = false,
+    val fixedHeight: Boolean = false,
+    val roundedCorners: Boolean = true,
+    val isSelected: Boolean = false,
+    val isFavorite: Boolean = false,
+    val isViewed: Boolean = false,
+    val viewedWallpapersLook: ViewedWallpapersLook = ViewedWallpapersLook.DIM_WITH_LABEL,
+)
+
+private class PreviewProps : CollectionPreviewParameterProvider<Props>(
+    listOf(
+        Props(),
+        Props(fixedHeight = true),
+        Props(roundedCorners = false),
+        Props(isSelected = true),
+        Props(isFavorite = true),
+        Props(isViewed = true),
+    ),
+)
 
 @Preview
 @Composable
-private fun PreviewWallpaperCardSelected() {
+private fun PreviewWallpaperCard(
+    @PreviewParameter(PreviewProps::class) props: Props,
+) {
+    val (
+        blur,
+        fixedHeight,
+        roundedCorners,
+        isSelected,
+        isFavorite,
+        isViewed,
+        viewedWallpapersLook,
+    ) = props
     WallFlowTheme {
         WallpaperCard(
             modifier = Modifier.width(200.dp),
             wallpaper = wallhavenWallpaper1,
-            isSelected = true,
+            blur = blur,
+            fixedHeight = fixedHeight,
+            roundedCorners = roundedCorners,
+            isSelected = isSelected,
+            isFavorite = isFavorite,
+            isViewed = isViewed,
+            viewedWallpapersLook = viewedWallpapersLook,
         )
     }
 }

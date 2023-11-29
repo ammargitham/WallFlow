@@ -2,6 +2,7 @@ package com.ammar.wallflow.model.backup
 
 import android.net.Uri
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
+import com.ammar.wallflow.data.db.entity.ViewedEntity
 import com.ammar.wallflow.data.db.entity.search.SavedSearchEntity
 import com.ammar.wallflow.data.db.entity.wallpaper.RedditWallpaperEntity
 import com.ammar.wallflow.data.db.entity.wallpaper.WallhavenWallpaperEntity
@@ -17,6 +18,7 @@ data class BackupV1(
     override val version: Int = 1,
     val preferences: AppPreferences?,
     val favorites: List<FavoriteEntity>?,
+    val viewed: List<ViewedEntity>? = null,
     val wallhaven: WallhavenBackupV1?,
     val reddit: RedditBackupV1? = null,
 ) : Backup {
@@ -24,6 +26,7 @@ data class BackupV1(
         file = file,
         settings = preferences != null,
         favorites = favorites?.size,
+        viewed = viewed?.size,
         savedSearches = (wallhaven?.savedSearches?.size ?: 0) + (reddit?.savedSearches?.size ?: 0),
         backup = this,
     )

@@ -56,6 +56,7 @@ import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.DISABLED_ALPHA
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.preferences.ObjectDetectionDelegate
+import com.ammar.wallflow.data.preferences.ViewedWallpapersLook
 import com.ammar.wallflow.data.preferences.defaultAutoWallpaperFreq
 import com.ammar.wallflow.model.ObjectDetectionModel
 import com.ammar.wallflow.model.WallpaperTarget
@@ -751,6 +752,63 @@ private fun PreviewAutoWallpaperSection(
                 autoWallpaperSection(
                     enabled = props.enabled,
                 )
+            }
+        }
+    }
+}
+
+internal fun LazyListScope.viewedWallpapersSection(
+    enabled: Boolean = false,
+    look: ViewedWallpapersLook = ViewedWallpapersLook.DIM_WITH_LABEL,
+    onEnabledChange: (Boolean) -> Unit = {},
+    onViewedWallpapersLookClick: () -> Unit = {},
+    onClearClick: () -> Unit = {},
+) {
+    item { Header(stringResource(R.string.viewed_wallpapers)) }
+    item {
+        ListItem(
+            modifier = Modifier.clickable {
+                onEnabledChange(!enabled)
+            },
+            headlineContent = { Text(text = stringResource(R.string.remember_viewed_wallpapers)) },
+            trailingContent = {
+                Switch(
+                    modifier = Modifier.height(24.dp),
+                    checked = enabled,
+                    onCheckedChange = onEnabledChange,
+                )
+            },
+        )
+    }
+    item {
+        ListItem(
+            modifier = Modifier.clickable(onClick = onViewedWallpapersLookClick),
+            headlineContent = { Text(text = stringResource(R.string.viewed_wallpapers_look)) },
+            supportingContent = { Text(text = viewedWallpapersLookString(look)) },
+        )
+    }
+    item {
+        Box(
+            modifier = Modifier.padding(
+                horizontal = 16.dp,
+                vertical = 8.dp,
+            ),
+        ) {
+            OutlinedButton(onClick = onClearClick) {
+                Text(text = stringResource(R.string.clear))
+            }
+        }
+    }
+}
+
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun PreviewViewedWallpapersSection() {
+    WallFlowTheme {
+        Surface {
+            LazyColumn {
+                viewedWallpapersSection()
             }
         }
     }

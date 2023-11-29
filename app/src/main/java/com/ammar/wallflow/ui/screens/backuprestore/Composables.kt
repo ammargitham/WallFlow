@@ -219,6 +219,37 @@ private fun BackupDialogContent(
                 )
             },
         )
+        ListItem(
+            modifier = Modifier
+                .clickable(enabled = enabled) {
+                    onOptionsChange(
+                        options.copy(
+                            viewed = !options.viewed,
+                        ),
+                    )
+                }
+                .padding(horizontal = 8.dp),
+            headlineContent = {
+                Text(
+                    text = stringResource(R.string.viewed),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
+                )
+            },
+            leadingContent = {
+                Checkbox(
+                    modifier = Modifier.size(24.dp),
+                    checked = options.viewed,
+                    enabled = enabled,
+                    onCheckedChange = {
+                        onOptionsChange(
+                            options.copy(
+                                viewed = it,
+                            ),
+                        )
+                    },
+                )
+            },
+        )
         OutlinedTextField(
             modifier = Modifier
                 .fillMaxWidth()
@@ -466,6 +497,8 @@ private fun RestoreDialogContent(
             val favoritesEnabled = restoreProgress == null && summaryHasFavs
             val summaryHasSearches = summary.savedSearches != null && summary.savedSearches > 0
             val savedSearchesEnabled = restoreProgress == null && summaryHasSearches
+            val summaryHasViewed = summary.viewed != null && summary.viewed > 0
+            val viewedEnabled = restoreProgress == null && summaryHasViewed
 
             ListItem(
                 modifier = Modifier
@@ -617,6 +650,61 @@ private fun RestoreDialogContent(
                             onOptionsChange(
                                 options.copy(
                                     savedSearches = it,
+                                ),
+                            )
+                        },
+                    )
+                },
+            )
+            ListItem(
+                modifier = Modifier
+                    .clickable(enabled = viewedEnabled) {
+                        onOptionsChange(
+                            options.copy(
+                                viewed = !options.viewed,
+                            ),
+                        )
+                    }
+                    .padding(horizontal = 8.dp),
+                headlineContent = {
+                    Text(
+                        text = stringResource(R.string.viewed),
+                        color = MaterialTheme.colorScheme.onSurface.copy(
+                            alpha = getAlpha(viewedEnabled),
+                        ),
+                    )
+                },
+                supportingContent = {
+                    if (summaryHasViewed) {
+                        Text(
+                            text = stringResource(
+                                R.string.found_n,
+                                summary.viewed ?: 0,
+                            ),
+                            fontStyle = FontStyle.Italic,
+                            color = MaterialTheme.colorScheme.onSurface.copy(
+                                alpha = getAlpha(viewedEnabled),
+                            ),
+                        )
+                    } else {
+                        Text(
+                            text = stringResource(R.string.no_viewed_found),
+                            fontStyle = FontStyle.Italic,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                                alpha = DISABLED_ALPHA,
+                            ),
+                        )
+                    }
+                },
+                leadingContent = {
+                    Checkbox(
+                        modifier = Modifier.size(24.dp),
+                        checked = options.viewed,
+                        enabled = viewedEnabled,
+                        onCheckedChange = {
+                            onOptionsChange(
+                                options.copy(
+                                    viewed = it,
                                 ),
                             )
                         },

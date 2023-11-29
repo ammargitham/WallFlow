@@ -54,6 +54,7 @@ data class AppPreferences(
     val localWallpapersPreferences: LocalWallpapersPreferences = LocalWallpapersPreferences(),
     val mainWallhavenSearch: WallhavenSearch? = null,
     val mainRedditSearch: RedditSearch? = null,
+    val viewedWallpapersPreferences: ViewedWallpapersPreferences = ViewedWallpapersPreferences(),
 ) {
     companion object {
         const val CURRENT_VERSION = 2
@@ -125,6 +126,21 @@ data class LookAndFeelPreferences(
     val layoutPreferences: LayoutPreferences = LayoutPreferences(),
     val showLocalTab: Boolean = true,
 )
+
+@Serializable
+data class ViewedWallpapersPreferences(
+    val enabled: Boolean = false,
+    val look: ViewedWallpapersLook = ViewedWallpapersLook.DIM_WITH_LABEL,
+)
+
+enum class ViewedWallpapersLook {
+    NONE,
+    DIM,
+    DIM_WITH_LABEL,
+    DIM_WITH_ICON,
+    LABEL,
+    ICON,
+}
 
 enum class GridType {
     STAGGERED,

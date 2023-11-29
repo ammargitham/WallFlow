@@ -18,6 +18,8 @@ import com.ammar.wallflow.data.preferences.ObjectDetectionDelegate
 import com.ammar.wallflow.data.preferences.ObjectDetectionPreferences
 import com.ammar.wallflow.data.preferences.PreferencesKeys
 import com.ammar.wallflow.data.preferences.Theme
+import com.ammar.wallflow.data.preferences.ViewedWallpapersLook
+import com.ammar.wallflow.data.preferences.ViewedWallpapersPreferences
 import com.ammar.wallflow.data.preferences.defaultAutoWallpaperConstraints
 import com.ammar.wallflow.data.preferences.defaultAutoWallpaperFreq
 import com.ammar.wallflow.extensions.TAG
@@ -249,6 +251,19 @@ class AppPreferencesRepository @Inject constructor(
         }
     }
 
+    suspend fun updateViewedWallpapersPreferences(
+        viewedWallpapersPreferences: ViewedWallpapersPreferences,
+    ) = withContext(ioDispatcher) {
+        dataStore.edit { it.updateViewedWallpapersPreferences(viewedWallpapersPreferences) }
+    }
+
+    private fun MutablePreferences.updateViewedWallpapersPreferences(
+        viewedWallpapersPreferences: ViewedWallpapersPreferences,
+    ) {
+        set(PreferencesKeys.VIEWED_WALLPAPERS_ENABLED, viewedWallpapersPreferences.enabled)
+        set(PreferencesKeys.VIEWED_WALLPAPERS_LOOK, viewedWallpapersPreferences.look.name)
+    }
+
     private fun mapAppPreferences(preferences: Preferences): AppPreferences {
         val homeRedditSearch = getHomeRedditSearch(preferences)
         return AppPreferences(
@@ -269,8 +284,22 @@ class AppPreferencesRepository @Inject constructor(
             localWallpapersPreferences = getLocalWallpapersPreferences(preferences),
             mainWallhavenSearch = getMainWallhavenSearch(preferences),
             mainRedditSearch = getMainRedditSearch(preferences),
+            viewedWallpapersPreferences = getViewedWallpapersPreferences(preferences),
         )
     }
+
+    private fun getViewedWallpapersPreferences(preferences: Preferences) =
+        ViewedWallpapersPreferences(
+            enabled = preferences[PreferencesKeys.VIEWED_WALLPAPERS_ENABLED] ?: false,
+            look = try {
+                ViewedWallpapersLook.valueOf(
+                    preferences[PreferencesKeys.VIEWED_WALLPAPERS_LOOK]
+                        ?: ViewedWallpapersLook.DIM_WITH_LABEL.name,
+                )
+            } catch (e: Exception) {
+                ViewedWallpapersLook.DIM_WITH_LABEL
+            },
+        )
 
     private fun getTagsWriteType(preferences: Preferences): ExifWriteType {
         val tagsWriteTypeStr = preferences[PreferencesKeys.TAGS_WRITE_TYPE]
@@ -506,6 +535,7 @@ class AppPreferencesRepository @Inject constructor(
                 if (appPreferences.mainRedditSearch != null) {
                     updateMainSearch(appPreferences.mainRedditSearch)
                 }
+                updateViewedWallpapersPreferences(appPreferences.viewedWallpapersPreferences)
             }
         }
     }

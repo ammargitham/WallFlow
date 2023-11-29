@@ -1536,3 +1536,39 @@ private fun PreviewExifWriteTypeOptionsDialog() {
         }
     }
 }
+
+@Composable
+fun ClearViewedWallpapersConfirmDialog(
+    modifier: Modifier = Modifier,
+    onConfirmClick: () -> Unit = {},
+    onDismissRequest: () -> Unit = {},
+) {
+    AlertDialog(
+        modifier = modifier,
+        title = {
+            Text(text = stringResource(R.string.clear_viewed_wallpaper_history))
+        },
+        confirmButton = {
+            TextButton(onClick = onConfirmClick) {
+                Text(text = stringResource(R.string.clear))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismissRequest) {
+                Text(text = stringResource(R.string.cancel))
+            }
+        },
+        onDismissRequest = onDismissRequest,
+    )
+}
+
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun PreviewClearViewedWallpapersConfirmDialog() {
+    WallFlowTheme {
+        Surface {
+            ClearViewedWallpapersConfirmDialog()
+        }
+    }
+}
