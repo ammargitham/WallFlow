@@ -1,0 +1,16 @@
+What's New
+* Allow setting app language from Android system settings (Android 13 and above)
+* Remember prev search filters when searching
+* Get image from cache if available when downloading or sharing
+* Show image url in info sheet and allow long click copying the url
+* Copy tag on long click
+* Add setting to write tags to downloaded wallpaper EXIF 'UserComment'
+* Add setting to remember viewed wallpapers
+* Added translation: Norwegian Bokmål
+* Added translation: Belarusian
+* Added translation: Korean
+
+Bug Fixes
+* Fix wallpapers not ordered according to api response
+* Fix download error on Android 10
+* Fix backup restore error caused by duplicate uploaders
