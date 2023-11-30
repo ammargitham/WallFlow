@@ -93,14 +93,10 @@
     <string name="ratio">"Соотношение сторон"</string>
     <string name="auto_wallpaper">"Смена обоев"</string>
     <string name="enable_auto_wallpaper">"Включить смену обоев"</string>
-    <string name="search">"Поиск"</string>
     <string name="use_object_detection">"Использовать обнаружение объектов"</string>
     <string name="use_object_detection_desc">"Обрезать обои с помощью обнаружения объектов"</string>
-    <string name="search_to_use">"Найдите, чтобы использовать"</string>
     <string name="constraints">"Ограничения"</string>
     <string name="constraints_desc">"Ограничения при запуске смены обоев"</string>
-    <string name="choose_saved_search">"Выберите сохранённый запрос"</string>
-    <string name="no_saved_searches_desc">"Чтобы сохранить поиск, перейдите на главную и выполните поиск обоев. Нажмите на параметры поиска и сохраните поиск."</string>
     <string name="frequency">"Частота"</string>
     <string name="hours">"в часах"</string>
     <string name="on_wifi">"По Wi-Fi"</string>
@@ -200,7 +196,6 @@
     <string name="system">"Системная"</string>
     <string name="light">"Светлая"</string>
     <string name="dark">"Тёмная"</string>
-    <string name="displays">"Экраны"</string>
     <string name="select_display">"Выберите экран"</string>
     <string name="failed_to_change_wallpaper">"Применение обоев провалено!"</string>
     <string name="set_wallpaper">"Установить как обои"</string>
@@ -223,7 +218,6 @@
     <string name="version">"Версия"</string>
     <string name="open_source_licenses">"Лицензии с открытым исходным кодом"</string>
     <string name="local">"Локальные"</string>
-    <string name="manage_dirs">"Управление каталогами"</string>
     <string name="add_dir">"Добавить каталог"</string>
     <string name="location">"Расположение"</string>
     <string name="show_local_tab">"Показать вкладку «Локальные»"</string>
@@ -251,7 +245,6 @@
     <string name="auto_wallpaper_download_desc">"Загрузка обоев при их использовании для смены обоев"</string>
     <string name="change_wallpaper_tile_label">"Изменить обои"</string>
     <string name="no_sources_set">"Нет заданных источников"</string>
-    <string name="set_sources">"Задать источники"</string>
     <string name="tap_to_change_wallpaper">"Нажмите, чтобы изменить обои"</string>
     <string name="changing">"Изменение…"</string>
     <string name="manage_local">"Управление локальными"</string>
@@ -297,7 +290,5 @@
     <string name="subreddits">Сабреддиты</string>
     <string name="success">Успех</string>
     <string name="menu">Меню</string>
-    <string name="remove_from_favorites">Удалить из Избранных</string>
-    <string name="source_home_visibility_toggle">Видимость главной вкладки</string>
     <string name="search_filters">Фильтры поиска</string>
 </resources>

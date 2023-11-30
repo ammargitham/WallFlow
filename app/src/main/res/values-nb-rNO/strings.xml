@@ -5,7 +5,6 @@
     <string name="invalid_url">Ugyldig nettadresse</string>
     <string name="dismiss">Avslå</string>
     <string name="ascending">Stigende</string>
-    <string name="set_sources">Sett kilder</string>
     <string name="categories_supp">kategorier: %1$s</string>
     <string name="hours">timer</string>
     <string name="categories">Kategorier</string>
@@ -100,12 +99,10 @@
     <string name="invalid_uri">Ugyldig URI</string>
     <string name="reddit">Reddit</string>
     <string name="download">Last ned</string>
-    <string name="manage_dirs">Håndter mapper</string>
     <string name="backup">Sikkerhetskopier</string>
     <string name="no_options">Ingen alternativer</string>
     <string name="included_tags_supp">Inkludert: %1$s</string>
     <string name="downloaded">Nedlastet</string>
-    <string name="displays">Skjermer</string>
     <string name="local">Lokal</string>
     <string name="date_added">Dato tillagt</string>
     <string name="show_local_tab">Vis lokal fane</string>
@@ -121,7 +118,6 @@
     <string name="custom_resolution">Egendefinert oppløsning</string>
     <string name="one_day">1 dag</string>
     <string name="favorites">Favoritter</string>
-    <string name="search_to_use">Søk å bruke</string>
     <string name="add_dir">Legg til mappe</string>
     <string name="dark">Mørk</string>
     <string name="ratio">Forhold</string>
@@ -137,10 +133,8 @@
     <string name="confirm">Bekreft</string>
     <string name="cancelled">Avbrutt</string>
     <string name="wallhaven_api_key">Wallhaven-API-nøkkel</string>
-    <string name="choose_saved_search">Velg et lagret søk</string>
     <string name="one_week">1 uke</string>
     <string name="no_saved_searches">Ingen lagrede søk</string>
-    <string name="search">Søk</string>
     <string name="cpu">CPU</string>
     <string name="manage">Håndter</string>
     <string name="invalid_height">Ugyldig høyde</string>
