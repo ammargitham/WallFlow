@@ -174,4 +174,10 @@
     <string name="viewed_wallpapers_look">Выгляд прагледжаных шпалер</string>
     <string name="remember_viewed_wallpapers">Запамінаць прагледжаныя шпалеры</string>
     <string name="viewed">Прагледжана</string>
+    <string name="invalid_width">Няправільная шырыня</string>
+    <string name="height">Вышыня</string>
+    <string name="height_cannot_be_blank">Вышыня не можа быць пусты</string>
+    <string name="custom_resolution">Нестандартнае разрозненне</string>
+    <string name="width">Шырыня</string>
+    <string name="invalid_height">Няправільная вышыня</string>
 </resources>
