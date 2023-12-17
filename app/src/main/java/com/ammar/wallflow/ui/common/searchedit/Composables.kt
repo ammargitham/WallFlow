@@ -38,6 +38,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -46,7 +47,6 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3x.FilterChip
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -133,7 +133,6 @@ internal fun ExcludedTagsFilter(
     )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun CategoriesFilter(
     categories: Set<WallhavenCategory> = setOf(WallhavenCategory.PEOPLE),
@@ -178,7 +177,6 @@ internal fun CategoriesFilter(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun PurityFilter(
     purities: Set<Purity> = setOf(Purity.SFW),
@@ -247,10 +245,7 @@ private fun PreviewPurityFilter() {
     }
 }
 
-@OptIn(
-    ExperimentalMaterial3Api::class,
-    ExperimentalLayoutApi::class,
-)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun WallhavenSortingFilter(
     sorting: WallhavenSorting = WallhavenSorting.DATE_ADDED,
@@ -288,7 +283,6 @@ internal fun WallhavenSortingFilter(
 }
 
 @OptIn(
-    ExperimentalMaterial3Api::class,
     ExperimentalLayoutApi::class,
 )
 @Composable
@@ -329,7 +323,6 @@ internal fun RedditSortFilter(
 
 @OptIn(
     ExperimentalLayoutApi::class,
-    ExperimentalMaterial3Api::class,
 )
 @Composable
 internal fun TopRangeFilter(
@@ -369,7 +362,6 @@ internal fun TopRangeFilter(
 
 @OptIn(
     ExperimentalLayoutApi::class,
-    ExperimentalMaterial3Api::class,
 )
 @Composable
 internal fun RedditTimeRangeFilter(
@@ -407,7 +399,6 @@ internal fun RedditTimeRangeFilter(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun OrderFilter(
     order: Order = Order.DESC,
@@ -467,7 +458,6 @@ internal fun OrderFilter(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun MinResolutionFilter(
     modifier: Modifier = Modifier,
@@ -495,7 +485,7 @@ internal fun MinResolutionFilter(
     }
 }
 
-@OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 internal fun ResolutionsFilter(
     modifier: Modifier = Modifier,
@@ -784,7 +774,6 @@ private fun GridHeader(
 }
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
 private fun RatioOptionGrid(
     modifier: Modifier = Modifier,
     selectedRatios: Set<WallhavenRatio> = emptySet(),
@@ -817,7 +806,6 @@ private fun RatioOptionGrid(
 }
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
 private fun LandscapeChip(
     selected: Boolean = false,
     onClick: () -> Unit = {},
@@ -837,7 +825,6 @@ private fun LandscapeChip(
 }
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
 private fun PortraitChip(
     selected: Boolean = false,
     onClick: () -> Unit = {},
