@@ -60,5 +60,5 @@ val SUPPORTED_MIME_TYPES = setOf(
     MIME_TYPE_WEBP,
 )
 
-val SUBREDDIT_REGEX = "(?>/?r/)?([a-z0-9][_a-z0-9]{2,20})(?>\\Z|\\s)".toRegex()
+val SUBREDDIT_REGEX = "(?>/?r/)?([a-zA-Z0-9][_a-zA-Z0-9]{2,20})(?>\\Z|\\s)".toRegex()
 val WEB_URL_REGEX = PatternsCompat.WEB_URL.toRegex()
