@@ -23,6 +23,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.DockedSearchBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -31,7 +32,6 @@ import androidx.compose.material3.SearchBar as MaterialSearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.minimumInteractiveComponentSize
-import androidx.compose.material3x.FilterChipDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -178,10 +178,7 @@ object SearchBar {
     }
 
     @Composable
-    @OptIn(
-        ExperimentalFoundationApi::class,
-        ExperimentalMaterial3Api::class,
-    )
+    @OptIn(ExperimentalFoundationApi::class)
     private fun <T> SuggestionItem(
         suggestion: Suggestion<T>,
         modifier: Modifier = Modifier,

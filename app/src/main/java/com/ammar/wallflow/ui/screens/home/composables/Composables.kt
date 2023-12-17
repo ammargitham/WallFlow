@@ -26,15 +26,14 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3x.FilterChip
-import androidx.compose.material3x.FilterChipDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -131,7 +130,6 @@ internal fun LazyStaggeredGridScope.wallhavenHeader(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun SourcesRow(
     modifier: Modifier = Modifier,
@@ -206,7 +204,6 @@ fun PreviewSourcesRow() {
 }
 
 @Composable
-@OptIn(ExperimentalMaterial3Api::class)
 private fun SourceChip(
     source: OnlineSource,
     modifier: Modifier = Modifier,
@@ -225,6 +222,8 @@ private fun SourceChip(
             selectedLeadingIconColor = MaterialTheme.colorScheme.onPrimaryContainer,
         ),
         border = FilterChipDefaults.filterChipBorder(
+            enabled = true,
+            selected = selected,
             borderWidth = 0.dp,
             borderColor = Color.Transparent,
         ),
