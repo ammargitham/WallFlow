@@ -27,7 +27,10 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -331,7 +334,23 @@ fun HomeScreen(
             mutableStateOf(false)
         }
 
+        val testTag = "home:${
+            if (uiState.isHome) {
+                "home"
+            } else {
+                "search"
+            }
+        }-${
+            when (localSearch) {
+                is RedditSearch -> "reddit"
+                is WallhavenSearch -> "wallhaven"
+            }
+        }-filters"
+
         EditSearchModalBottomSheet(
+            modifier = Modifier
+                .semantics { contentDescription = testTag }
+                .testTag(testTag),
             state = state,
             search = localSearch,
             header = {

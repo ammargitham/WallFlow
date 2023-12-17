@@ -214,6 +214,8 @@ private fun Feed(
                     derivedStateOf { gridState.firstVisibleItemIndex == 0 }
                 }
 
+                val testTag = "home:${if (isHome) "home" else "search"}-filters"
+
                 ExtendedFloatingActionButton(
                     modifier = Modifier.padding(contentPadding),
                     onClick = onFABClick,
@@ -226,6 +228,7 @@ private fun Feed(
                     },
                     text = {
                         Text(
+                            modifier = Modifier.testTag(testTag),
                             text = stringResource(
                                 if (isHome) {
                                     R.string.home_filters
