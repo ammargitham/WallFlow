@@ -94,6 +94,7 @@ data class AutoWallpaperPreferences(
     val targets: Set<WallpaperTarget> = setOf(WallpaperTarget.HOME, WallpaperTarget.LOCKSCREEN),
     val markFavorite: Boolean = false,
     val download: Boolean = false,
+    val setDifferentWallpapers: Boolean = false,
 ) {
     val anySourceEnabled = (
         savedSearchEnabled &&

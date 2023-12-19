@@ -421,9 +421,14 @@ fun SettingsScreen(
     if (uiState.showAutoWallpaperSetToDialog) {
         AutoWallpaperSetToDialog(
             selectedTargets = uiState.appPreferences.autoWallpaperPreferences.targets,
-            onSaveClick = {
+            setDifferentWallpapers = uiState.appPreferences.autoWallpaperPreferences
+                .setDifferentWallpapers,
+            onSaveClick = { targets, setDifferentWallpapers ->
                 viewModel.updateAutoWallpaperPrefs(
-                    uiState.appPreferences.autoWallpaperPreferences.copy(targets = it),
+                    uiState.appPreferences.autoWallpaperPreferences.copy(
+                        targets = targets,
+                        setDifferentWallpapers = setDifferentWallpapers,
+                    ),
                 )
                 viewModel.showAutoWallpaperSetToDialog(false)
             },

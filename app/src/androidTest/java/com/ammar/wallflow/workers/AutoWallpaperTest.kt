@@ -48,6 +48,7 @@ import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.extensions.getTempFile
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.Source
+import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.model.local.LocalWallpaper
 import com.ammar.wallflow.model.search.SavedSearch
 import com.ammar.wallflow.model.search.WallhavenFilters
@@ -56,7 +57,8 @@ import com.ammar.wallflow.model.search.toEntity
 import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.FAILURE_REASON
 import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.FailureReason
 import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.FailureReason.SAVED_SEARCH_NOT_SET
-import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.SUCCESS_NEXT_WALLPAPER_ID
+import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.SUCCESS_NEXT_HOME_WALLPAPER_ID
+import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.SUCCESS_NEXT_LOCK_WALLPAPER_ID
 import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.SourceChoice
 import io.mockk.every
 import io.mockk.spyk
@@ -81,6 +83,7 @@ import org.junit.runner.RunWith
 class AutoWallpaperTest {
     private lateinit var context: Context
     private val testDispatcher = StandardTestDispatcher()
+    private val allTargets = setOf(WallpaperTarget.HOME, WallpaperTarget.LOCKSCREEN)
 
     @Before
     fun setUp() {
@@ -241,7 +244,12 @@ class AutoWallpaperTest {
                 },
             )
 
-            every { worker["setWallpaper"](wallpapers.first()) } returns (true to tempFile.toUri())
+            every {
+                worker["setWallpaper"](
+                    wallpapers.first(),
+                    allTargets,
+                )
+            } returns (true to tempFile.toUri())
 
             val result = worker.doWork()
             assertThat(
@@ -249,12 +257,18 @@ class AutoWallpaperTest {
                 `is`(
                     Result.success(
                         workDataOf(
-                            SUCCESS_NEXT_WALLPAPER_ID to wallpapers.first().id,
+                            SUCCESS_NEXT_HOME_WALLPAPER_ID to wallpapers.first().id,
+                            SUCCESS_NEXT_LOCK_WALLPAPER_ID to wallpapers.first().id,
                         ),
                     ),
                 ),
             )
-            verify { worker["setWallpaper"](wallpapers.first()) }
+            verify {
+                worker["setWallpaper"](
+                    wallpapers.first(),
+                    allTargets,
+                )
+            }
             val updatedHistory = autoWallpaperHistoryDao.getAll()
             assertEquals(1, updatedHistory.count())
         } finally {
@@ -341,7 +355,12 @@ class AutoWallpaperTest {
                 },
             )
 
-            every { worker["setWallpaper"](wallpapers[4]) } returns (true to tempFile.toUri())
+            every {
+                worker["setWallpaper"](
+                    wallpapers[4],
+                    allTargets,
+                )
+            } returns (true to tempFile.toUri())
 
             val result = worker.doWork()
             assertThat(
@@ -349,12 +368,18 @@ class AutoWallpaperTest {
                 `is`(
                     Result.success(
                         workDataOf(
-                            SUCCESS_NEXT_WALLPAPER_ID to wallpapers[4].id,
+                            SUCCESS_NEXT_HOME_WALLPAPER_ID to wallpapers[4].id,
+                            SUCCESS_NEXT_LOCK_WALLPAPER_ID to wallpapers[4].id,
                         ),
                     ),
                 ),
             )
-            verify { worker["setWallpaper"](wallpapers[4]) }
+            verify {
+                worker["setWallpaper"](
+                    wallpapers[4],
+                    allTargets,
+                )
+            }
             val updatedHistory = autoWallpaperHistoryDao.getAll()
             assertEquals(historyWalls.count() + 1, updatedHistory.count())
         } finally {
@@ -444,7 +469,12 @@ class AutoWallpaperTest {
                 },
             )
 
-            every { worker["setWallpaper"](wallpapers[0]) } returns (true to tempFile.toUri())
+            every {
+                worker["setWallpaper"](
+                    wallpapers[0],
+                    allTargets,
+                )
+            } returns (true to tempFile.toUri())
 
             val result = worker.doWork()
             assertThat(
@@ -452,12 +482,18 @@ class AutoWallpaperTest {
                 `is`(
                     Result.success(
                         workDataOf(
-                            SUCCESS_NEXT_WALLPAPER_ID to wallpapers[0].id,
+                            SUCCESS_NEXT_HOME_WALLPAPER_ID to wallpapers[0].id,
+                            SUCCESS_NEXT_LOCK_WALLPAPER_ID to wallpapers[0].id,
                         ),
                     ),
                 ),
             )
-            verify { worker["setWallpaper"](wallpapers[0]) }
+            verify {
+                worker["setWallpaper"](
+                    wallpapers[0],
+                    allTargets,
+                )
+            }
             val updatedHistory = autoWallpaperHistoryDao.getAll()
             assertEquals(historyWalls.count(), updatedHistory.count())
         } catch (e: Exception) {
@@ -560,6 +596,7 @@ class AutoWallpaperTest {
             every {
                 worker["setWallpaper"](
                     wallpaperEntity.toWallpaper(),
+                    allTargets,
                 )
             } returns (true to tempFile.toUri())
 
@@ -569,12 +606,18 @@ class AutoWallpaperTest {
                 `is`(
                     Result.success(
                         workDataOf(
-                            SUCCESS_NEXT_WALLPAPER_ID to wallpaperEntity.wallhavenId,
+                            SUCCESS_NEXT_HOME_WALLPAPER_ID to wallpaperEntity.wallhavenId,
+                            SUCCESS_NEXT_LOCK_WALLPAPER_ID to wallpaperEntity.wallhavenId,
                         ),
                     ),
                 ),
             )
-            verify { worker["setWallpaper"](wallpaperEntity.toWallpaper()) }
+            verify {
+                worker["setWallpaper"](
+                    wallpaperEntity.toWallpaper(),
+                    allTargets,
+                )
+            }
             val updatedHistory = autoWallpaperHistoryDao.getAll()
             assertEquals(1, updatedHistory.count())
         } finally {
@@ -683,7 +726,10 @@ class AutoWallpaperTest {
             )
 
             every {
-                worker["setWallpaper"](localWallpaper)
+                worker["setWallpaper"](
+                    localWallpaper,
+                    allTargets,
+                )
             } returns (true to uri)
 
             val result = worker.doWork()
@@ -692,16 +738,137 @@ class AutoWallpaperTest {
                 `is`(
                     Result.success(
                         workDataOf(
-                            SUCCESS_NEXT_WALLPAPER_ID to localWallpaper.id,
+                            SUCCESS_NEXT_HOME_WALLPAPER_ID to localWallpaper.id,
+                            SUCCESS_NEXT_LOCK_WALLPAPER_ID to localWallpaper.id,
                         ),
                     ),
                 ),
             )
-            verify { worker["setWallpaper"](localWallpaper) }
+            verify {
+                worker["setWallpaper"](
+                    localWallpaper,
+                    allTargets,
+                )
+            }
             val updatedHistory = autoWallpaperHistoryDao.getAll()
             assertEquals(1, updatedHistory.count())
         } finally {
             testDataStore.clear()
+        }
+    }
+
+    @Test
+    fun testAutoWallpaperWorkerSetsDifferentWallpapers() = runTest(testDispatcher) {
+        val testDataStore = dataStore()
+        val tempFile = createTempFile(context, "tmp")
+        try {
+            val appPreferencesRepository = testDataStore.appPreferencesRepository
+            appPreferencesRepository.updateAutoWallpaperPrefs(
+                AutoWallpaperPreferences(
+                    enabled = true,
+                    savedSearchEnabled = true,
+                    savedSearchIds = setOf(1),
+                    useObjectDetection = false,
+                    setDifferentWallpapers = true,
+                ),
+            )
+            val savedSearch = SavedSearch(
+                id = 1,
+                name = "Test",
+                search = WallhavenSearch(
+                    query = "test",
+                    filters = WallhavenFilters(),
+                ),
+            )
+            val networkWallpapers = List(30) { testNetworkWallhavenWallpaper }
+            val wallpapers = networkWallpapers.map { it.toWallhavenWallpaper() }
+            val autoWallpaperHistoryDao = object : FakeAutoWallpaperHistoryDao() {
+                private var history = emptyList<AutoWallpaperHistoryEntity>()
+
+                override suspend fun getAll() = history
+
+                override suspend fun getAllBySource(source: Source) = history
+
+                override suspend fun getBySourceId(
+                    sourceId: String,
+                    source: Source,
+                ) = history.find { it.sourceId == sourceId }
+
+                override suspend fun upsert(
+                    vararg autoWallpaperHistoryEntity: AutoWallpaperHistoryEntity,
+                ) {
+                    history = history + autoWallpaperHistoryEntity
+                }
+            }
+            val worker = getWorker(
+                dataStore = testDataStore,
+                appPreferencesRepository = appPreferencesRepository,
+                savedSearchDao = object : FakeSavedSearchDao() {
+                    override suspend fun getById(id: Long) = savedSearch.toEntity(1)
+                },
+                autoWallpaperHistoryDao = autoWallpaperHistoryDao,
+                wallHavenNetwork = object : FakeWallhavenNetworkDataSource() {
+                    override suspend fun search(
+                        search: WallhavenSearch,
+                        page: Int?,
+                    ) = NetworkWallhavenWallpapersResponse(
+                        data = networkWallpapers,
+                        meta = NetworkWallhavenMeta(
+                            current_page = 1,
+                            last_page = 1,
+                            per_page = networkWallpapers.size,
+                            total = networkWallpapers.size,
+                            query = StringNetworkWallhavenMetaQuery(
+                                value = "",
+                            ),
+                            seed = null,
+                        ),
+                    )
+                },
+            )
+
+            every {
+                worker["setWallpaper"](
+                    wallpapers[0],
+                    setOf(WallpaperTarget.HOME),
+                )
+            } returns (true to tempFile.toUri())
+            every {
+                worker["setWallpaper"](
+                    wallpapers[1],
+                    setOf(WallpaperTarget.LOCKSCREEN),
+                )
+            } returns (true to tempFile.toUri())
+
+            val result = worker.doWork()
+            assertThat(
+                result,
+                `is`(
+                    Result.success(
+                        workDataOf(
+                            SUCCESS_NEXT_HOME_WALLPAPER_ID to wallpapers[0].id,
+                            SUCCESS_NEXT_LOCK_WALLPAPER_ID to wallpapers[1].id,
+                        ),
+                    ),
+                ),
+            )
+            verify {
+                worker["setWallpaper"](
+                    wallpapers[0],
+                    setOf(WallpaperTarget.HOME),
+                )
+            }
+            verify {
+                worker["setWallpaper"](
+                    wallpapers[1],
+                    setOf(WallpaperTarget.LOCKSCREEN),
+                )
+            }
+            val updatedHistory = autoWallpaperHistoryDao.getAll()
+            assertEquals(2, updatedHistory.count())
+        } finally {
+            testDataStore.clear()
+            tempFile.delete()
         }
     }
 

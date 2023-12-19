@@ -295,6 +295,10 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="viewed">Viewed</string>
     <string name="clear_viewed_wallpaper_history">Clear viewed wallpaper history?</string>
     <string name="no_viewed_found">No viewed found</string>
+    <string name="set_different_wallapers">Set different wallpapers</string>
+    <string name="set_different_wallapers_desc">Different wallpapers will be set to Home and Lock screen</string>
+    <string name="new_home_screen_wallpaper">New Home Screen Wallpaper</string>
+    <string name="new_lock_screen_wallpaper">New Lock Screen Wallpaper</string>
     <plurals name="every_x_hrs">
         <item quantity="one">Every %d hour</item>
         <item quantity="other">Every %d hours</item>

@@ -57,6 +57,9 @@ object PreferencesKeys {
     val AUTO_WALLPAPER_TARGETS = stringSetPreferencesKey("auto_wallpaper_targets")
     val AUTO_WALLPAPER_MARK_FAVORITE = booleanPreferencesKey("auto_wallpaper_mark_favorite")
     val AUTO_WALLPAPER_DOWNLOAD = booleanPreferencesKey("auto_wallpaper_download")
+    val AUTO_WALLPAPER_SET_DIFFERENT_WALLPAPERS = booleanPreferencesKey(
+        "auto_wallpaper_set_different_wallpapers",
+    )
     val THEME = stringPreferencesKey("theme")
     val LAYOUT_GRID_TYPE = stringPreferencesKey("layout_grid_type")
     val LAYOUT_GRID_COL_TYPE = stringPreferencesKey("layout_grid_col_type")
