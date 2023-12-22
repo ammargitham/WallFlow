@@ -75,6 +75,7 @@ import com.ammar.wallflow.utils.NotificationIds.AUTO_WALLPAPER_SUCCESS_NOTIFICAT
 import com.ammar.wallflow.utils.decodeSampledBitmapFromUri
 import com.ammar.wallflow.utils.getPublicDownloadsFile
 import com.ammar.wallflow.utils.objectdetection.detectObjects
+import com.ammar.wallflow.utils.objectdetection.objectsDetector
 import com.ammar.wallflow.utils.writeTagsToFile
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -377,19 +378,21 @@ class AutoWallpaperWorker @AssistedInject constructor(
         return true to uri
     }
 
-    private suspend fun getDetection(uri: Uri) =
-        if (!appPreferences.autoWallpaperPreferences.useObjectDetection) {
-            1 to null
-        } else {
-            val modelFile = getObjectDetectionModel()
-            val (scale, detectionWithBitmaps) = detectObjects(
-                context = context,
-                uri = uri,
-                model = modelFile,
-                objectDetectionPreferences = appPreferences.objectDetectionPreferences,
-            )
-            scale to detectionWithBitmaps.firstOrNull()
-        }
+    private suspend fun getDetection(uri: Uri) = if (
+        !objectsDetector.isEnabled ||
+        !appPreferences.autoWallpaperPreferences.useObjectDetection
+    ) {
+        1 to null
+    } else {
+        val modelFile = getObjectDetectionModel()
+        val (scale, detectionWithBitmaps) = detectObjects(
+            context = context,
+            uri = uri,
+            model = modelFile,
+            objectDetectionPreferences = appPreferences.objectDetectionPreferences,
+        )
+        scale to detectionWithBitmaps.firstOrNull()
+    }
 
     private suspend fun safeDownloadWallpaper(wallpaper: DownloadableWallpaper): File? {
         var downloadTries = 0
