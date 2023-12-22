@@ -95,7 +95,10 @@ fun createFile(
         tempFile = File(dir, fileName1)
     }
     tempFile.parentFile?.mkdirs()
-    tempFile.createNewFile()
+    val created = tempFile.createNewFile()
+    if (!created) {
+        throw IOException("Unable to create file: ${tempFile.absolutePath}")
+    }
     return tempFile
 }
 
@@ -105,10 +108,22 @@ fun copyFiles(
     source: Uri,
     dest: File,
 ) {
-    context.contentResolver.openInputStream(source)?.use {
-        it.source().use { a ->
-            dest.sink().buffer().use { b -> b.writeAll(a) }
+    var deleteOnError = false
+    try {
+        if (!dest.exists()) {
+            deleteOnError = true
+            dest.createNewFile()
         }
+        context.contentResolver.openInputStream(source)?.use {
+            it.source().use { a ->
+                dest.sink().buffer().use { b -> b.writeAll(a) }
+            }
+        }
+    } catch (e: Exception) {
+        if (deleteOnError) {
+            dest.delete()
+        }
+        throw e
     }
 }
 
