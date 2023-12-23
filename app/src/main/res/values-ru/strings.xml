@@ -312,4 +312,8 @@
     <string name="remember_viewed_wallpapers">Запоминать просмотренные обои</string>
     <string name="write_tags_to_exif_desc">Теги обоев будут записаны в EXIF-тег UserComment при загрузке</string>
     <string name="viewed">Просмотрено</string>
+    <string name="new_lock_screen_wallpaper">Новые обои экрана блокировки</string>
+    <string name="new_home_screen_wallpaper">Новые обои главного экрана</string>
+    <string name="set_different_wallapers_desc">Для главного экрана и экрана блокировки будут установлены разные обои</string>
+    <string name="set_different_wallapers">Установить разные обои</string>
 </resources>
