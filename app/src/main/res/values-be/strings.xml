@@ -180,4 +180,15 @@
     <string name="custom_resolution">Нестандартнае разрозненне</string>
     <string name="width">Шырыня</string>
     <string name="invalid_height">Няправільная вышыня</string>
+    <string name="new_lock_screen_wallpaper">Новыя шпалеры экрана блакавання</string>
+    <string name="remove">Выдаліць</string>
+    <string name="next_run_time_info">Гэта самы ранні час, калі сістэма будзе лічыць запуск аўташпалеры.
+\nАўташпалеры амаль ніколі не запускаюцца ў гэты час. Гэта залежыць ад шматлікіх фактараў, такіх як асноўны сістэмны планавальнік, рэжымы дрымоты і энергазберажэння АС, а таксама выкананне любых настроеных абмежаванняў.</string>
+    <string name="link">Спасылка</string>
+    <string name="image">Выява</string>
+    <string name="entity">Суб\'ект</string>
+    <string name="new_home_screen_wallpaper">Новыя шпалеры галоўнага экрана</string>
+    <string name="set_different_wallapers_desc">Для галоўнага экрана і экрана блакіроўкі будуць усталяваны розныя шпалеры</string>
+    <string name="set_different_wallapers">Усталяваць розныя шпалеры</string>
+    <string name="error_detecting_objects">Памылка выяўлення аб\'ектаў</string>
 </resources>
