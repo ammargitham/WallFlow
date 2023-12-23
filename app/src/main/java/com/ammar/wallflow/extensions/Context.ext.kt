@@ -113,7 +113,6 @@ fun Context.setWallpaper(
     targets: Set<WallpaperTarget> = setOf(WallpaperTarget.HOME, WallpaperTarget.LOCKSCREEN),
 ): Boolean {
     if (!checkSetWallpaperPermission()) return false
-    val wallpaperManager = wallpaperManager
     wallpaperManager.setBitmap(
         bitmap,
         null,
@@ -122,6 +121,20 @@ fun Context.setWallpaper(
     )
     return true
 }
+
+// fun Context.setWallpaper(
+//     inputStream: InputStream,
+//     targets: Set<WallpaperTarget> = setOf(WallpaperTarget.HOME, WallpaperTarget.LOCKSCREEN),
+// ): Boolean {
+//     if (!checkSetWallpaperPermission()) return false
+//     wallpaperManager.setStream(
+//         inputStream,
+//         null,
+//         true,
+//         targets.toWhichInt(),
+//     )
+//     return true
+// }
 
 fun Context.share(
     text: String,

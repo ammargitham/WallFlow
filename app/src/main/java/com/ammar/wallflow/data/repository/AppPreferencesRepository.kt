@@ -191,6 +191,7 @@ class AppPreferencesRepository @Inject constructor(
         set(PreferencesKeys.AUTO_WALLPAPER_MARK_FAVORITE, markFavorite)
         set(PreferencesKeys.AUTO_WALLPAPER_DOWNLOAD, download)
         set(PreferencesKeys.AUTO_WALLPAPER_SET_DIFFERENT_WALLPAPERS, setDifferentWallpapers)
+        set(PreferencesKeys.AUTO_WALLPAPER_CROP, crop)
     }
 
     private fun MutablePreferences.updateLookAndFeelPreferences(
@@ -419,6 +420,7 @@ class AppPreferencesRepository @Inject constructor(
             download = get(PreferencesKeys.AUTO_WALLPAPER_DOWNLOAD) ?: false,
             setDifferentWallpapers = get(PreferencesKeys.AUTO_WALLPAPER_SET_DIFFERENT_WALLPAPERS)
                 ?: false,
+            crop = get(PreferencesKeys.AUTO_WALLPAPER_CROP) ?: true,
         )
     }
 

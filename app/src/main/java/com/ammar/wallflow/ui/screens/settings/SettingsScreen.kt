@@ -570,6 +570,9 @@ fun SettingsScreenContent(
                             .autoWallpaperPreferences
                             .localEnabled,
                     ),
+                    crop = appPreferences
+                        .autoWallpaperPreferences
+                        .crop,
                     useObjectDetection = appPreferences.autoWallpaperPreferences.useObjectDetection,
                     nextRun = autoWallpaperNextRun,
                     frequency = appPreferences.autoWallpaperPreferences.frequency,
@@ -616,6 +619,13 @@ fun SettingsScreenContent(
                         onAutoWallpaperPrefsChange(
                             appPreferences.autoWallpaperPreferences.copy(
                                 download = it,
+                            ),
+                        )
+                    },
+                    onCropChange = {
+                        onAutoWallpaperPrefsChange(
+                            appPreferences.autoWallpaperPreferences.copy(
+                                crop = it,
                             ),
                         )
                     },

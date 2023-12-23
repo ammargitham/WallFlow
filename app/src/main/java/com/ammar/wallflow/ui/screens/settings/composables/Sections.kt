@@ -442,6 +442,7 @@ private fun PreviewSubjectDetectionSection() {
 internal fun LazyListScope.autoWallpaperSection(
     enabled: Boolean = false,
     sourcesSummary: String? = null,
+    crop: Boolean = true,
     useObjectDetection: Boolean = true,
     frequency: DateTimePeriod = defaultAutoWallpaperFreq,
     nextRun: NextRun = NextRun.NotScheduled,
@@ -461,8 +462,10 @@ internal fun LazyListScope.autoWallpaperSection(
     onDownloadChange: (Boolean) -> Unit = {},
     onShowNotificationChange: (Boolean) -> Unit = {},
     onSetToClick: () -> Unit = {},
+    onCropChange: (Boolean) -> Unit = {},
 ) {
     val alpha = if (enabled) 1f else DISABLED_ALPHA
+    val objectDetectionAlpha = if (enabled && crop) 1f else DISABLED_ALPHA
 
     item { Header(stringResource(R.string.auto_wallpaper)) }
     item {
@@ -582,23 +585,53 @@ internal fun LazyListScope.autoWallpaperSection(
             },
         )
     }
+    item {
+        ListItem(
+            modifier = Modifier.clickable(
+                enabled = enabled,
+                onClick = { onCropChange(!crop) },
+            ),
+            headlineContent = {
+                Text(
+                    text = stringResource(R.string.crop),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
+                )
+            },
+            supportingContent = {
+                Text(
+                    text = stringResource(R.string.auto_wallpaper_crop_desc),
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = alpha),
+                )
+            },
+            trailingContent = {
+                Switch(
+                    modifier = Modifier.height(24.dp),
+                    enabled = enabled,
+                    checked = crop,
+                    onCheckedChange = onCropChange,
+                )
+            },
+        )
+    }
     if (objectsDetector.isEnabled) {
         item {
             ListItem(
                 modifier = Modifier.clickable(
-                    enabled = enabled,
+                    enabled = enabled && crop,
                     onClick = { onUseObjectDetectionChange(!useObjectDetection) },
                 ),
                 headlineContent = {
                     Text(
                         text = stringResource(R.string.use_object_detection),
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
+                        color = MaterialTheme.colorScheme.onSurface.copy(
+                            alpha = objectDetectionAlpha,
+                        ),
                     )
                 },
                 trailingContent = {
                     Switch(
                         modifier = Modifier.height(24.dp),
-                        enabled = enabled,
+                        enabled = enabled && crop,
                         checked = useObjectDetection,
                         onCheckedChange = onUseObjectDetectionChange,
                     )
@@ -606,7 +639,9 @@ internal fun LazyListScope.autoWallpaperSection(
                 supportingContent = {
                     Text(
                         text = stringResource(R.string.use_object_detection_desc),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = alpha),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                            alpha = objectDetectionAlpha,
+                        ),
                     )
                 },
             )

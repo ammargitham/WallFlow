@@ -7,6 +7,8 @@ import android.os.Handler
 import android.util.Log
 import android.view.Display
 import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
@@ -233,21 +235,30 @@ class CropViewModel(
             ),
             cacheBeforeUse = false,
         )
-        val cropRect = uiState.value.lastCropRegion
+        val state = uiState.value
+        val cropRect = if (!state.crop) {
+            if (state.imageSize == Size.Unspecified) {
+                return
+            } else {
+                state.imageSize.toRect()
+            }
+        } else {
+            state.lastCropRegion
+        }
         if (result is CropResult.Cancelled || cropRect == null) {
             localUiStateFlow.update { it.copy(result = partial(Result.Cancelled)) }
             return
         }
         val success = result as CropResult.Success
         localUiStateFlow.update { it.copy(result = partial(Result.Pending(success.bitmap))) }
-        val display = uiState.value.displays.find {
-            it.displayId == uiState.value.selectedDisplay?.displayId
+        val display = state.displays.find {
+            it.displayId == state.selectedDisplay?.displayId
         } ?: application.displayManager.getDisplay(Display.DEFAULT_DISPLAY)
         val applied = application.setWallpaper(
             display = display,
             uri = uri,
             cropRect = cropRect,
-            targets = uiState.value.wallpaperTargets,
+            targets = state.wallpaperTargets,
         )
         application.toast(
             application.getString(
@@ -324,6 +335,24 @@ class CropViewModel(
         it.copy(selectedDisplay = partial(display))
     }
 
+    fun onCropChange(crop: Boolean) {
+        localUiStateFlow.update {
+            it.copy(
+                crop = partial(crop),
+                lastCropRegion = if (!crop) {
+                    partial(null)
+                } else {
+                    it.lastCropRegion
+                },
+            )
+        }
+        imageCropper.cropState?.enabled = crop
+    }
+
+    fun setImageSize(imageSize: Size) = localUiStateFlow.update {
+        it.copy(imageSize = partial(imageSize))
+    }
+
     companion object {
         fun getFactory(
             uri: Uri,
@@ -366,6 +395,8 @@ data class CropUiState(
     val theme: Theme = Theme.SYSTEM,
     val displays: List<Display> = emptyList(),
     val selectedDisplay: Display? = null,
+    val crop: Boolean = true,
+    val imageSize: Size = Size.Unspecified,
 )
 
 data class DetectionState(
@@ -376,8 +407,8 @@ data class DetectionState(
 )
 
 sealed class Result {
-    object NotStarted : Result()
-    object Cancelled : Result()
+    data object NotStarted : Result()
+    data object Cancelled : Result()
     data class Pending(val bitmap: ImageBitmap) : Result()
     data class Success(val result: CropResult) : Result()
 }

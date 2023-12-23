@@ -95,6 +95,7 @@ data class AutoWallpaperPreferences(
     val markFavorite: Boolean = false,
     val download: Boolean = false,
     val setDifferentWallpapers: Boolean = false,
+    val crop: Boolean = true,
 ) {
     val anySourceEnabled = (
         savedSearchEnabled &&

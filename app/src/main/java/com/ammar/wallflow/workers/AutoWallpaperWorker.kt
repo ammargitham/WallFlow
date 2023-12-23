@@ -7,6 +7,8 @@ import android.net.Uri
 import android.os.Build
 import android.util.Log
 import android.view.Display
+import androidx.compose.ui.geometry.Rect
+import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.unit.toSize
 import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
@@ -352,10 +354,27 @@ class AutoWallpaperWorker @AssistedInject constructor(
             is LocalWallpaper -> nextWallpaper.data
             else -> return false to null
         }
+        val rect = getCropRect(nextWallpaper, uri)
+        val display = context.displayManager.getDisplay(Display.DEFAULT_DISPLAY)
+        val applied = context.setWallpaper(display, uri, rect, targets)
+        if (!applied) {
+            return false to null
+        }
+        return true to uri
+    }
+
+    private suspend fun getCropRect(
+        nextWallpaper: Wallpaper,
+        uri: Uri,
+    ): Rect {
+        val imageSize = nextWallpaper.resolution.toSize()
+        if (!autoWallpaperPreferences.crop) {
+            return imageSize.toRect()
+        }
         val screenResolution = context.getScreenResolution(true)
         val maxCropSize = getMaxCropSize(
             screenResolution = screenResolution,
-            imageSize = nextWallpaper.resolution.toSize(),
+            imageSize = imageSize,
         )
         val (detectionScale, detection) = try {
             getDetection(uri = uri)
@@ -363,19 +382,13 @@ class AutoWallpaperWorker @AssistedInject constructor(
             Log.e(TAG, "setWallpaper: Error in object detection", e)
             1 to null
         }
-        val rect = getCropRect(
+        return getCropRect(
             maxCropSize = maxCropSize,
             detectionRect = detection?.detection?.boundingBox,
             detectedRectScale = detectionScale,
-            imageSize = nextWallpaper.resolution.toSize(),
+            imageSize = imageSize,
             cropScale = 1f,
         )
-        val display = context.displayManager.getDisplay(Display.DEFAULT_DISPLAY)
-        val applied = context.setWallpaper(display, uri, rect, targets)
-        if (!applied) {
-            return false to null
-        }
-        return true to uri
     }
 
     private suspend fun getDetection(uri: Uri) = if (
