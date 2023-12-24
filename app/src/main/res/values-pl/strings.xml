@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="dismiss">Odrzuć</string>
+    <string name="apply_wallpaper">Zastosuj tapetę</string>
+    <string name="wallhaven_api_key_desc">Wymagane do oglądania treści NSFW.</string>
+    <string name="info">Szczegóły</string>
+    <string name="back">Powrót</string>
+    <string name="download">Pobierz</string>
+    <string name="date_added">Daty dodania</string>
+    <string name="more">Więcej</string>
+    <string name="home">Strona główna</string>
+    <string name="popular_tags">Popularne tagi</string>
+    <string name="confirm">Potwierdź</string>
+    <string name="wallhaven_api_key">Wallhaven Klucz API</string>
+    <string name="settings">Ustawienia</string>
+    <string name="three_days">3 dni</string>
+    <string name="top">Popularnych</string>
+    <string name="one_month">1 miesiąca</string>
+    <string name="six_months">6 miesięcy</string>
+    <string name="people">Ludzie</string>
+    <string name="sorting">Sortuj według</string>
+    <plurals name="every_x_mins">
+        <item quantity="one">Co %d minute</item>
+        <item quantity="few">Co %d minuty</item>
+        <item quantity="many">Co %d minut</item>
+        <item quantity="other">Co %d minut</item>
+    </plurals>
+    <string name="three_months">3 miesięcy</string>
+    <string name="downloads_channel_name">Pobieranie</string>
+    <string name="relevance">Trafności</string>
+    <string name="views">Odsłon</string>
+    <string name="one_day">1 dnia</string>
+    <string name="favorites">Ulubionych</string>
+    <string name="random">Losowo</string>
+    <string name="general">Ogólne</string>
+    <string name="one_week">1 tygodnia</string>
+    <string name="nsfw">NSFW</string>
+    <string name="anime">Anime</string>
+    <string name="sfw">SFW (Bezpieczny do pracy)</string>
+    <string name="share">Udostępnij</string>
+    <string name="add">Dodaj</string>
+    <string name="one_year">1 roku</string>
+    <string name="comments">Komentarze</string>
+</resources>
