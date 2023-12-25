@@ -1,0 +1,7 @@
+What's New
+* Option to set different wallpapers to home and lock screen via auto wallpaper
+* Option to disable cropping when setting wallpaper (for scrolling wallpapers)
+* Updated translations
+
+Bug Fixes
+* Fix auto wallpaper download not working on Android 12
