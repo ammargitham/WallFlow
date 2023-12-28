@@ -115,9 +115,6 @@ fun WallpaperScreen(
                 query = "id:${it.id}",
                 meta = WallhavenTagSearchMeta(it),
             )
-            if (searchBarController.state.value.search == search) {
-                return@fn
-            }
             navController.search(search)
         }
     }
