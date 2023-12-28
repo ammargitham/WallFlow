@@ -1,0 +1,8 @@
+What's New
+* Updated Russian translations
+
+Bug Fixes
+* Fix auto wallpaper download not working if download directory missing
+* Fix auto wallpaper not correctly setting some local wallpapers
+* Fix feed scroll position lost when performing search
+* Fix clicking same tag in info screen again does not open search view
