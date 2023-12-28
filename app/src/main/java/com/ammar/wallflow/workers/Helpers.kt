@@ -112,6 +112,7 @@ fun copyFiles(
     try {
         if (!dest.exists()) {
             deleteOnError = true
+            dest.parentFile?.mkdirs()
             dest.createNewFile()
         }
         context.contentResolver.openInputStream(source)?.use {
