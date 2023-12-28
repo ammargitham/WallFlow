@@ -166,7 +166,6 @@ class AutoWallpaperWorker @AssistedInject constructor(
 
     private suspend fun doWorkActual(): Result {
         val forced = inputData.getBoolean(INPUT_FORCE, false)
-        Log.d(TAG, "doWorkActual: ${autoWallpaperPreferences.enabled}")
         if (!autoWallpaperPreferences.enabled && !forced) {
             return Result.failure(
                 workDataOf(
