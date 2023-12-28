@@ -316,4 +316,7 @@
     <string name="new_home_screen_wallpaper">Новые обои главного экрана</string>
     <string name="set_different_wallapers_desc">Для главного экрана и экрана блокировки будут установлены разные обои</string>
     <string name="set_different_wallapers">Установить разные обои</string>
+    <string name="crop">Обрезать</string>
+    <string name="auto_wallpaper_crop_desc">Обрезать обои перед установкой.
+\nОтключите обрезку, если хотите, чтобы обои на главном экране прокручивались.</string>
 </resources>
