@@ -2,8 +2,6 @@ package com.ammar.wallflow.data.repository.local
 
 import android.content.Context
 import android.net.Uri
-import androidx.compose.ui.unit.IntSize
-import androidx.exifinterface.media.ExifInterface
 import androidx.paging.LoadState
 import androidx.paging.LoadStates
 import androidx.paging.PagingData
@@ -11,6 +9,7 @@ import com.ammar.wallflow.IoDispatcher
 import com.ammar.wallflow.SUPPORTED_MIME_TYPES
 import com.ammar.wallflow.data.repository.utils.Resource
 import com.ammar.wallflow.extensions.deepListFiles
+import com.ammar.wallflow.extensions.toLocalWallpaper
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.local.LocalWallpaper
 import com.ammar.wallflow.ui.screens.local.LocalSort
@@ -65,7 +64,7 @@ class DefaultLocalWallpapersRepository @Inject constructor(
             )
         }
         val files = tempFiles
-            ?.map { dfcToLocalWallpaper(context, it) }
+            ?.map { it.toLocalWallpaper(context) }
             ?: emptyList()
         acc.addAll(files)
         acc
@@ -83,7 +82,7 @@ class DefaultLocalWallpapersRepository @Inject constructor(
                         IllegalArgumentException("Invalid or non-existing uri"),
                     ),
                 )
-            return flowOf(Resource.Success(dfcToLocalWallpaper(context, doc)))
+            return flowOf(Resource.Success(doc.toLocalWallpaper(context)))
         } catch (e: Exception) {
             return flowOf(Resource.Error(e))
         }
@@ -94,41 +93,5 @@ class DefaultLocalWallpapersRepository @Inject constructor(
         uris: Collection<Uri>,
     ) = withContext(ioDispatcher) {
         getAllLocalWallpapers(context, uris).randomOrNull()
-    }
-
-    private fun dfcToLocalWallpaper(
-        context: Context,
-        it: DocumentFileCompat,
-    ): LocalWallpaper {
-        val resolution = try {
-            context.contentResolver.openInputStream(it.uri)?.use { openInputStream ->
-                val exifInterface = ExifInterface(openInputStream)
-                var height = exifInterface.getAttributeInt(
-                    ExifInterface.TAG_IMAGE_LENGTH,
-                    -1,
-                )
-                if (height <= 0) {
-                    height = 500
-                }
-                var width = exifInterface.getAttributeInt(
-                    ExifInterface.TAG_IMAGE_WIDTH,
-                    -1,
-                )
-                if (width <= 0) {
-                    width = 500
-                }
-                IntSize(width, height)
-            } ?: IntSize(500, 500)
-        } catch (e: Exception) {
-            IntSize(500, 500)
-        }
-        return LocalWallpaper(
-            id = it.uri.toString(),
-            data = it.uri,
-            fileSize = it.length,
-            resolution = resolution,
-            mimeType = it.getType(),
-            name = it.name,
-        )
     }
 }
