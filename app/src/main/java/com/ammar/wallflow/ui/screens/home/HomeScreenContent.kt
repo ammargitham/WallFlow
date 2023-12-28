@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridScope
-import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
@@ -34,6 +33,7 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.preferences.LayoutPreferences
 import com.ammar.wallflow.data.preferences.ViewedWallpapersLook
+import com.ammar.wallflow.extensions.rememberLazyStaggeredGridState
 import com.ammar.wallflow.model.Favorite
 import com.ammar.wallflow.model.OnlineSource
 import com.ammar.wallflow.model.Purity
@@ -204,7 +204,7 @@ private fun Feed(
     onWallpaperFavoriteClick: (wallpaper: Wallpaper) -> Unit = {},
     onFABClick: () -> Unit = {},
 ) {
-    val gridState = rememberLazyStaggeredGridState()
+    val gridState = wallpapers.rememberLazyStaggeredGridState()
     Scaffold(
         modifier = modifier,
         contentWindowInsets = WindowInsets(0.dp),

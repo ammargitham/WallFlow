@@ -20,6 +20,7 @@ import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.ammar.wallflow.data.preferences.LayoutPreferences
 import com.ammar.wallflow.data.preferences.ViewedWallpapersLook
+import com.ammar.wallflow.extensions.rememberLazyStaggeredGridState
 import com.ammar.wallflow.extensions.search
 import com.ammar.wallflow.model.Favorite
 import com.ammar.wallflow.model.Viewed
@@ -57,7 +58,7 @@ fun FavoritesScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val viewerUiState by viewerViewModel.uiState.collectAsStateWithLifecycle()
     val wallpapers = viewModel.favoriteWallpapers.collectAsLazyPagingItems()
-    val gridState = rememberLazyStaggeredGridState()
+    val gridState = wallpapers.rememberLazyStaggeredGridState()
     val context = LocalContext.current
     val systemController = LocalSystemController.current
     val bottomBarController = LocalBottomBarController.current

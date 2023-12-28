@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.lazy.staggeredgrid.rememberLazyStaggeredGridState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,6 +22,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.ammar.wallflow.extensions.rememberLazyStaggeredGridState
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.bottomWindowInsets
@@ -52,7 +52,7 @@ fun LocalScreen(
     val bottomBarController = LocalBottomBarController.current
     val searchBarController = LocalMainSearchBarController.current
     val bottomWindowInsets = bottomWindowInsets
-    val gridState = rememberLazyStaggeredGridState()
+    val gridState = wallpapers.rememberLazyStaggeredGridState()
     val navigationBarsInsets = WindowInsets.navigationBars
     val density = LocalDensity.current
     val bottomPadding = remember(
