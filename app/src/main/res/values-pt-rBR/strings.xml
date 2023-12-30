@@ -1,2 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="info">Informações</string>
+    <string name="download">Baixar</string>
+    <string name="home">Início</string>
+    <string name="popular_tags">Tags populares</string>
+    <string name="app_name">WallFlow</string>
+</resources>
