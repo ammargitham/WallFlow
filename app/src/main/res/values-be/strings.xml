@@ -199,7 +199,7 @@
     <string name="tflite_delegate">Дэлегат TFLite</string>
     <string name="url_cannot_be_empty">URL не можа быць пустым</string>
     <string name="error_occurred">Адбылася памылка!</string>
-    <string name="favorite">Выбраныя</string>
+    <string name="favorite">Выбранае</string>
     <string name="grid_type">Тып сеткі</string>
     <string name="tflite_model">Мадэль TFLite</string>
     <string name="exif_write_type">Тып запісу EXIF</string>
@@ -260,4 +260,7 @@
     <string name="auto_wallpaper_crop_desc">Абрэзаць шпалеры перад усталёўкай.
 \nАдключыце абразанне, калі жадаеце, каб шпалеры на галоўным экране пракручваліся.</string>
     <string name="colors">Колеры</string>
+    <string name="no_favorites_found">У файле выбраная не знойдзены</string>
+    <string name="mark_as_favorite">Пазначыць як выбранае</string>
+    <string name="auto_wallpaper_mark_as_favorite_desc">Адзначыць шпалеры як выбранае пры выкарыстанні пры змене шпалер</string>
 </resources>
