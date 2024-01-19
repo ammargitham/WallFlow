@@ -30,7 +30,7 @@
     <string name="anime">"Аниме"</string>
     <string name="people">"Люди"</string>
     <string name="sfw">SFW</string>
-    <string name="sketchy">"Скетчи"</string>
+    <string name="sketchy">Сомнительные</string>
     <string name="nsfw">NSFW</string>
     <string name="descending">"По убыванию"</string>
     <string name="ascending">"По возрастанию"</string>
@@ -170,7 +170,7 @@
     <string name="delete_suggestion_dialog_text">"Удалить из истории?"</string>
     <string name="url_cannot_be_empty">"URL не может быть пустым"</string>
     <string name="invalid_url">"Неверный URL"</string>
-    <string name="blur_sketchy_wallpapers">"Размывать скетчи"</string>
+    <string name="blur_sketchy_wallpapers">Размывать сомнительные обои</string>
     <string name="blur_nsfw_wallpapers">"Размывать NSFW обои"</string>
     <string name="enable_object_detection">"Включить обнаружение объектов"</string>
     <string name="tflite_delegate">"Делегат TFLite"</string>
