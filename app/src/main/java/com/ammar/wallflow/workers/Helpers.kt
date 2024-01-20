@@ -70,11 +70,13 @@ private fun createFile(
         else -> {
             val contentDispositionStr = response.header("Content-Disposition")
             val parseExceptionMsg = "Could not parse file name from response"
-            if (contentDispositionStr.isNullOrEmpty()) {
-                throw IllegalArgumentException(parseExceptionMsg)
+            val pathFileName = response.request.url.pathSegments.joinToString("_");
+            if (!contentDispositionStr.isNullOrEmpty()) {
+                ContentDisposition.parse(contentDispositionStr).filename
+                    ?: throw IllegalArgumentException(parseExceptionMsg)
+            } else {
+                pathFileName
             }
-            ContentDisposition.parse(contentDispositionStr).filename
-                ?: throw IllegalArgumentException(parseExceptionMsg)
         }
     }
     return createFile(dir, fName)
