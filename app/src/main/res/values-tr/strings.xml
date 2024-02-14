@@ -306,4 +306,11 @@
     <string name="subreddits">Subredditler</string>
     <string name="colors">Renkler</string>
     <string name="failed">Başarısız</string>
+    <string name="set_different_wallapers">Farklı duvar kağıtları ayarla</string>
+    <string name="set_different_wallapers_desc">Ana ekran ve kilit ekranı için farklı duvar kağıtları ayarlanacaktır</string>
+    <string name="new_home_screen_wallpaper">Yeni Ana Ekran Duvar Kağıdı</string>
+    <string name="new_lock_screen_wallpaper">Yeni Kilit Ekranı Duvar Kağıdı</string>
+    <string name="crop">Kırp</string>
+    <string name="auto_wallpaper_crop_desc">Uygulamadan önce duvar kağıdını kırpın.
+\nAna ekranda duvar kağıdının kaymasını istiyorsanız devre dışı bırakın.</string>
 </resources>
