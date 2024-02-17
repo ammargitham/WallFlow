@@ -1,8 +1,10 @@
 package com.ammar.wallflow.activities.main
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
@@ -97,6 +99,20 @@ class MainActivity : ComponentActivity() {
             consumedIntent = savedInstanceState.getBoolean(
                 SAVED_INSTANCE_STATE_CONSUMED_INTENT,
                 false,
+            )
+        }
+
+        // Fix leak for Android Q
+        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
+            onBackPressedDispatcher.addCallback(
+                this,
+                object : OnBackPressedCallback(true) {
+                    override fun handleOnBackPressed() {
+                        if (isTaskRoot) {
+                            finishAfterTransition()
+                        }
+                    }
+                },
             )
         }
 
