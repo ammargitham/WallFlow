@@ -22,6 +22,7 @@ data class SystemState(
     val isExpanded: Boolean = false,
     val size: IntSize = IntSize.Zero,
     val applyScaffoldPadding: Boolean = true,
+    val isStatusBarLight: Boolean? = null,
 )
 
 class DefaultSystemController(initialState: SystemState) : SystemController() {

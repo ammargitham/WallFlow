@@ -75,6 +75,7 @@ fun WallpaperScreen(
                 it.copy(
                     statusBarColor = Color.Transparent,
                     navigationBarColor = Color.Transparent,
+                    isStatusBarLight = false,
                 )
             }
         }
@@ -86,7 +87,12 @@ fun WallpaperScreen(
         systemController.update { it.copy(applyScaffoldPadding = false) }
 
         onDispose {
-            systemController.update { it.copy(applyScaffoldPadding = true) }
+            systemController.update {
+                it.copy(
+                    applyScaffoldPadding = true,
+                    isStatusBarLight = null,
+                )
+            }
         }
     }
 

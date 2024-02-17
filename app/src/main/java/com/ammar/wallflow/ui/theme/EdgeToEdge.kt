@@ -1,6 +1,5 @@
 package com.ammar.wallflow.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
@@ -25,12 +24,14 @@ fun EdgeToEdge(
     statusBarColor: Color = Color.Unspecified,
     navigationBarVisible: Boolean = false,
     navigationBarColor: Color = Color.Unspecified,
+    isStatusBarLight: Boolean? = null,
 ) {
     val view = LocalView.current
     if (view.isInEditMode) {
         return
     }
     val activity = view.context as? ComponentActivity ?: return
+    val currentWindow = activity.window
     val colorScheme = rememberColorScheme(
         darkTheme = darkTheme,
         dynamicColor = dynamicColor,
@@ -79,8 +80,8 @@ fun EdgeToEdge(
         statusBarVisible,
         navigationBarVisible,
     ) {
-        val currentWindow = (view.context as? Activity)?.window ?: return@LaunchedEffect
-        val insetsController = WindowCompat.getInsetsController(currentWindow, view)
+        val window = currentWindow ?: return@LaunchedEffect
+        val insetsController = WindowCompat.getInsetsController(window, view)
         insetsController.run {
             if (statusBarVisible) {
                 show(WindowInsetsCompat.Type.statusBars())
@@ -92,6 +93,16 @@ fun EdgeToEdge(
             } else {
                 hide(WindowInsetsCompat.Type.navigationBars())
             }
+        }
+    }
+
+    LaunchedEffect(
+        isStatusBarLight,
+    ) {
+        val window = currentWindow ?: return@LaunchedEffect
+        val insetsController = WindowCompat.getInsetsController(window, view)
+        insetsController.run {
+            isAppearanceLightStatusBars = isStatusBarLight ?: !darkTheme
         }
     }
 }

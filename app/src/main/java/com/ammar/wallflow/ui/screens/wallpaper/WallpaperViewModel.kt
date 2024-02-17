@@ -41,7 +41,7 @@ class WallpaperViewModel @Inject constructor(
 
     fun onWallpaperTap() = localUiState.update {
         it.copy(
-            systemBarsVisible = partial(!it.systemBarsVisible.getOrElse { false }),
+            systemBarsVisible = partial(!it.systemBarsVisible.getOrElse { true }),
         )
     }
 

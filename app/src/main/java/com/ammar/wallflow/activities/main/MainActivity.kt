@@ -209,6 +209,7 @@ class MainActivity : ComponentActivity() {
             navigationBarColor = systemState.navigationBarColor,
             statusBarVisible = systemState.statusBarVisible,
             navigationBarVisible = systemState.navigationBarVisible,
+            isStatusBarLight = systemState.isStatusBarLight,
         )
 
         WallFlowTheme(darkTheme = darkTheme) {
