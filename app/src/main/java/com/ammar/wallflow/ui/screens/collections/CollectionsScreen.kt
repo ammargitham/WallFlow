@@ -50,9 +50,9 @@ import kotlinx.collections.immutable.persistentListOf
 
 @Destination
 @Composable
-fun FavoritesScreen(
+fun CollectionsScreen(
     navController: NavController,
-    viewModel: FavoritesViewModel = hiltViewModel(),
+    viewModel: CollectionsViewModel = hiltViewModel(),
     viewerViewModel: WallpaperViewerViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()

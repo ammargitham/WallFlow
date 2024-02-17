@@ -33,7 +33,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 @HiltViewModel
-class FavoritesViewModel @Inject constructor(
+class CollectionsViewModel @Inject constructor(
     application: Application,
     private val favoritesRepository: FavoritesRepository,
     appPreferencesRepository: AppPreferencesRepository,

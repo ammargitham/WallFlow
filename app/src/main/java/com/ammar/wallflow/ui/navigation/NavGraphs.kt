@@ -2,7 +2,7 @@ package com.ammar.wallflow.ui.navigation
 
 import com.ammar.wallflow.ui.screens.NavGraph
 import com.ammar.wallflow.ui.screens.destinations.BackupRestoreScreenDestination
-import com.ammar.wallflow.ui.screens.destinations.FavoritesScreenDestination
+import com.ammar.wallflow.ui.screens.destinations.CollectionsScreenDestination
 import com.ammar.wallflow.ui.screens.destinations.HomeScreenDestination
 import com.ammar.wallflow.ui.screens.destinations.LayoutSettingsScreenDestination
 import com.ammar.wallflow.ui.screens.destinations.LocalScreenDestination
@@ -22,11 +22,11 @@ object NavGraphs {
         ),
     )
 
-    val favorites: NavGraph = NavGraph(
-        route = "favorites",
-        startRoute = FavoritesScreenDestination,
+    val collections: NavGraph = NavGraph(
+        route = "collections",
+        startRoute = CollectionsScreenDestination,
         destinations = listOf(
-            FavoritesScreenDestination,
+            CollectionsScreenDestination,
         ),
     )
 
@@ -96,7 +96,7 @@ object NavGraphs {
         ),
         nestedNavGraphs = listOf(
             home,
-            favorites,
+            collections,
             local,
             more,
         ),
