@@ -1,4 +1,4 @@
-package com.ammar.wallflow.ui.screens.favorites
+package com.ammar.wallflow.ui.screens.collections
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues

@@ -1,4 +1,4 @@
-package com.ammar.wallflow.ui.screens.favorites
+package com.ammar.wallflow.ui.screens.collections
 
 import android.app.Application
 import androidx.compose.runtime.Stable
