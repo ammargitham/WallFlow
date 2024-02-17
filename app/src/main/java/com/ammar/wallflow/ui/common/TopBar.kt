@@ -111,7 +111,7 @@ fun TopBar(
                     MaterialTheme.colorScheme.onSurface
                 } else {
                     MaterialTheme.colorScheme.onSurfaceVariant
-                }
+                },
             ),
             actions = actions,
         )
