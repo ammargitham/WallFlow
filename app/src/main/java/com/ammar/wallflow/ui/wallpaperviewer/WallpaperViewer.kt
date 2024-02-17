@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -53,15 +54,19 @@ import com.ammar.wallflow.extensions.toDp
 import com.ammar.wallflow.extensions.toast
 import com.ammar.wallflow.extensions.wallpaperManager
 import com.ammar.wallflow.model.DownloadableWallpaper
+import com.ammar.wallflow.model.LightDarkType
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.reddit.RedditWallpaper
 import com.ammar.wallflow.model.reddit.withRedditDomainPrefix
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.model.wallhaven.WallhavenUploader
 import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
+import com.ammar.wallflow.ui.common.TopBar
 import com.ammar.wallflow.ui.common.bottomWindowInsets
 import com.ammar.wallflow.ui.common.permissions.DownloadPermissionsRationalDialog
 import com.ammar.wallflow.ui.common.permissions.rememberDownloadPermissionsState
+import com.ammar.wallflow.ui.screens.wallpaper.InfoButton
+import com.ammar.wallflow.ui.screens.wallpaper.ShareButton
 import com.ammar.wallflow.ui.screens.wallpaper.WallpaperActions
 import com.ammar.wallflow.ui.screens.wallpaper.WallpaperInfoBottomSheet
 import com.ammar.wallflow.utils.DownloadStatus
@@ -71,6 +76,7 @@ import me.saket.telephoto.zoomable.ZoomSpec
 import me.saket.telephoto.zoomable.rememberZoomableState
 import me.saket.telephoto.zoomable.zoomable
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WallpaperViewer(
     modifier: Modifier = Modifier,
@@ -82,6 +88,8 @@ fun WallpaperViewer(
     showInfo: Boolean = false,
     showFullScreenAction: Boolean = false,
     isFavorite: Boolean = false,
+    showBackButton: Boolean = false,
+    lightDarkTypeFlags: Int = LightDarkType.UNSPECIFIED,
     onWallpaperTransform: () -> Unit = {},
     onWallpaperTap: () -> Unit = {},
     onInfoClick: () -> Unit = {},
@@ -94,6 +102,8 @@ fun WallpaperViewer(
     onTagClick: (WallhavenTag) -> Unit = {},
     onUploaderClick: (WallhavenUploader) -> Unit = {},
     onFavoriteToggle: (Boolean) -> Unit = {},
+    onBackClick: () -> Unit = {},
+    onLightDarkTypeFlagsChange: (Int) -> Unit = {},
 ) {
     val clipboardManager = LocalClipboardManager.current
     var showRationale by rememberSaveable { mutableStateOf(false) }
@@ -249,19 +259,21 @@ fun WallpaperViewer(
         ) {
             WallpaperActions(
                 downloadStatus = downloadStatus,
-                applyWallpaperEnabled = applyWallpaperEnabled,
+                showApplyWallpaperAction = applyWallpaperEnabled,
                 showFullScreenAction = showFullScreenAction,
                 showDownloadAction = wallpaper is DownloadableWallpaper,
-                showShareLinkAction = wallpaper is WallhavenWallpaper ||
-                    wallpaper is RedditWallpaper,
+                // showShareLinkAction = wallpaper is WallhavenWallpaper ||
+                //     wallpaper is RedditWallpaper,
                 isFavorite = isFavorite,
-                onInfoClick = onInfoClick,
+                // onInfoClick = onInfoClick,
+                lightDarkTypeFlags = lightDarkTypeFlags,
                 onDownloadClick = { downloadPermissionsState.launchMultiplePermissionRequest() },
-                onShareLinkClick = onShareLinkClick,
-                onShareImageClick = onShareImageClick,
+                // onShareLinkClick = onShareLinkClick,
+                // onShareImageClick = onShareImageClick,
                 onApplyWallpaperClick = onApplyWallpaperClick,
                 onFullScreenClick = onFullScreenClick,
                 onFavoriteToggle = onFavoriteToggle,
+                onLightDarkTypeFlagsChange = onLightDarkTypeFlagsChange,
             )
         }
 
@@ -277,6 +289,22 @@ fun WallpaperViewer(
                 modifier = Modifier.fillMaxSize(),
             )
         }
+
+        TopBar(
+            visible = actionsVisible,
+            gradientBg = true,
+            showBackButton = showBackButton,
+            onBackClick = onBackClick,
+            actions = {
+                InfoButton(onClick = onInfoClick)
+                ShareButton(
+                    showShareLinkAction = wallpaper is WallhavenWallpaper ||
+                        wallpaper is RedditWallpaper,
+                    onLinkClick = onShareLinkClick,
+                    onImageClick = onShareImageClick,
+                )
+            },
+        )
     }
 
     if (showInfo) {

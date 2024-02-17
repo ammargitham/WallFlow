@@ -38,6 +38,32 @@ fun TopBar(
     gradientBg: Boolean = false,
     actions: @Composable RowScope.() -> Unit = {},
 ) {
+    TopBar(
+        modifier = modifier,
+        windowInsets = windowInsets,
+        scrollBehavior = scrollBehavior,
+        showBackButton = showBackButton,
+        title = title,
+        visible = visible,
+        gradientBg = gradientBg,
+        actions = actions,
+        onBackClick = { navController.popBackStack() },
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopBar(
+    modifier: Modifier = Modifier,
+    windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
+    scrollBehavior: TopAppBarScrollBehavior? = null,
+    showBackButton: Boolean = false,
+    title: @Composable () -> Unit = {},
+    visible: Boolean = true,
+    gradientBg: Boolean = false,
+    actions: @Composable RowScope.() -> Unit = {},
+    onBackClick: () -> Unit = {},
+) {
     AnimatedVisibility(
         visible = visible,
         enter = slideInVertically(),
@@ -65,7 +91,7 @@ fun TopBar(
                     enter = slideInHorizontally(),
                     exit = slideOutHorizontally(),
                 ) {
-                    IconButton(onClick = { navController.popBackStack() }) {
+                    IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.back),
@@ -81,6 +107,11 @@ fun TopBar(
                 } else {
                     MaterialTheme.colorScheme.surface
                 },
+                actionIconContentColor = if (gradientBg) {
+                    MaterialTheme.colorScheme.onSurface
+                } else {
+                    MaterialTheme.colorScheme.onSurfaceVariant
+                }
             ),
             actions = actions,
         )

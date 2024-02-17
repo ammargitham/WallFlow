@@ -88,6 +88,9 @@ class DatabaseModule {
     @Provides
     fun providesViewedDao(appDatabase: AppDatabase) = appDatabase.viewedDao()
 
+    @Provides
+    fun providesLightDarkDao(appDatabase: AppDatabase) = appDatabase.lightDarkDao()
+
     lateinit var appDatabase: AppDatabase
 
     @Provides

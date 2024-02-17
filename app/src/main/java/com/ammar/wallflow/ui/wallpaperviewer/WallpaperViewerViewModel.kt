@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.FavoritesRepository
+import com.ammar.wallflow.data.repository.LightDarkRepository
 import com.ammar.wallflow.data.repository.ViewedRepository
 import com.ammar.wallflow.data.repository.local.LocalWallpapersRepository
 import com.ammar.wallflow.data.repository.reddit.RedditRepository
@@ -12,12 +13,14 @@ import com.ammar.wallflow.data.repository.utils.Resource
 import com.ammar.wallflow.data.repository.utils.successOr
 import com.ammar.wallflow.data.repository.wallhaven.WallhavenRepository
 import com.ammar.wallflow.model.DownloadableWallpaper
+import com.ammar.wallflow.model.LightDarkType
 import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import com.ammar.wallflow.utils.DownloadManager
 import com.ammar.wallflow.utils.DownloadStatus
 import com.ammar.wallflow.utils.ExifWriteType
+import com.ammar.wallflow.utils.combine
 import com.github.materiiapps.partial.Partialize
 import com.github.materiiapps.partial.getOrElse
 import com.github.materiiapps.partial.partial
@@ -46,6 +49,7 @@ class WallpaperViewerViewModel @Inject constructor(
     private val favoritesRepository: FavoritesRepository,
     appPreferencesRepository: AppPreferencesRepository,
     private val viewedRepository: ViewedRepository,
+    private val lightDarkRepository: LightDarkRepository,
 ) : AndroidViewModel(
     application = application,
 ) {
@@ -74,13 +78,30 @@ class WallpaperViewerViewModel @Inject constructor(
         )
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val lightDarkTypeFlags = wallpaperFlow.flatMapLatest {
+        val wallpaper = it.successOr(null) ?: return@flatMapLatest flowOf(LightDarkType.UNSPECIFIED)
+        lightDarkRepository.observeIsFavorite(
+            source = wallpaper.source,
+            sourceId = wallpaper.id,
+        )
+    }
+
     val uiState = combine(
         localUiState,
         wallpaperFlow,
         argsFlow,
         isFavoriteFlow,
         appPreferencesRepository.appPreferencesFlow,
-    ) { local, wallpaper, args, isFavorite, appPreferences ->
+        lightDarkTypeFlags,
+    ) {
+            local,
+            wallpaper,
+            args,
+            isFavorite,
+            appPreferences,
+            lightDarkTypeFlags,
+        ->
         local.merge(
             WallpaperViewerUiState(
                 wallpaper = wallpaper.successOr(null),
@@ -90,6 +111,7 @@ class WallpaperViewerViewModel @Inject constructor(
                 writeTagsToExif = appPreferences.writeTagsToExif,
                 tagsExifWriteType = appPreferences.tagsExifWriteType,
                 rememberViewedWallpapers = appPreferences.viewedWallpapersPreferences.enabled,
+                lightDarkTypeFlags = lightDarkTypeFlags ?: LightDarkType.UNSPECIFIED,
             ),
         )
     }.stateIn(
@@ -209,6 +231,15 @@ class WallpaperViewerViewModel @Inject constructor(
             source = wallpaper.source,
         )
     }
+
+    fun updateLightDarkTypeFlags(flags: Int) = viewModelScope.launch {
+        val wallpaper = uiState.value.wallpaper ?: return@launch
+        lightDarkRepository.upsert(
+            sourceId = wallpaper.id,
+            source = wallpaper.source,
+            typeFlags = flags,
+        )
+    }
 }
 
 @Partialize
@@ -223,6 +254,7 @@ data class WallpaperViewerUiState(
     val writeTagsToExif: Boolean = false,
     val tagsExifWriteType: ExifWriteType = ExifWriteType.APPEND,
     val rememberViewedWallpapers: Boolean = false,
+    val lightDarkTypeFlags: Int = LightDarkType.UNSPECIFIED,
 )
 
 data class WallpaperViewerArgs(

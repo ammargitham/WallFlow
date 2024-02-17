@@ -301,6 +301,10 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="new_lock_screen_wallpaper">New Lock Screen Wallpaper</string>
     <string name="crop">Crop</string>
     <string name="auto_wallpaper_crop_desc">Crop wallpaper before applying.\nDisable it if you want wallpaper scrolling on home screen.</string>
+    <string name="mark_light_dark">Mark as Light or Dark</string>
+    <string name="light_dark">Light / Dark</string>
+    <string name="extra_dim">Extra Dim</string>
+    <string name="help">Help</string>
     <plurals name="every_x_hrs">
         <item quantity="one">Every %d hour</item>
         <item quantity="other">Every %d hours</item>

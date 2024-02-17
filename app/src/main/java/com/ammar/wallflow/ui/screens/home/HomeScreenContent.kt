@@ -35,6 +35,7 @@ import com.ammar.wallflow.data.preferences.LayoutPreferences
 import com.ammar.wallflow.data.preferences.ViewedWallpapersLook
 import com.ammar.wallflow.extensions.rememberLazyStaggeredGridState
 import com.ammar.wallflow.model.Favorite
+import com.ammar.wallflow.model.LightDarkType
 import com.ammar.wallflow.model.OnlineSource
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.Viewed
@@ -78,6 +79,7 @@ internal fun HomeScreenContent(
     fullWallpaperLoading: Boolean = false,
     showFullWallpaperInfo: Boolean = false,
     isFullWallpaperFavorite: Boolean = false,
+    fullWallpaperLightDarkTypeFlags: Int = LightDarkType.UNSPECIFIED,
     header: (LazyStaggeredGridScope.() -> Unit)? = null,
     onWallpaperClick: (wallpaper: Wallpaper) -> Unit = {},
     onWallpaperFavoriteClick: (wallpaper: Wallpaper) -> Unit = {},
@@ -130,6 +132,7 @@ internal fun HomeScreenContent(
                 showFullScreenAction = isExpanded,
                 showInfo = showFullWallpaperInfo,
                 isFavorite = isFullWallpaperFavorite,
+                lightDarkTypeFlags = fullWallpaperLightDarkTypeFlags,
                 onWallpaperTransform = onFullWallpaperTransform,
                 onWallpaperTap = onFullWallpaperTap,
                 onInfoClick = onFullWallpaperInfoClick,

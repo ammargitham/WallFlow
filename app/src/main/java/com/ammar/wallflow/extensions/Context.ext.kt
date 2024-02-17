@@ -13,6 +13,7 @@ import android.graphics.BitmapRegionDecoder
 import android.hardware.display.DisplayManager
 import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import android.util.DisplayMetrics
 import android.util.Log
 import android.view.Display
@@ -122,19 +123,20 @@ fun Context.setWallpaper(
     return true
 }
 
-// fun Context.setWallpaper(
-//     inputStream: InputStream,
-//     targets: Set<WallpaperTarget> = setOf(WallpaperTarget.HOME, WallpaperTarget.LOCKSCREEN),
-// ): Boolean {
-//     if (!checkSetWallpaperPermission()) return false
-//     wallpaperManager.setStream(
-//         inputStream,
-//         null,
-//         true,
-//         targets.toWhichInt(),
-//     )
-//     return true
-// }
+fun Context.setWallpaper(
+    inputStream: InputStream,
+    rect: Rect,
+    targets: Set<WallpaperTarget> = setOf(WallpaperTarget.HOME, WallpaperTarget.LOCKSCREEN),
+): Boolean {
+    if (!checkSetWallpaperPermission()) return false
+    wallpaperManager.setStream(
+        inputStream,
+        rect.toAndroidRectF().toRect(),
+        true,
+        targets.toWhichInt(),
+    )
+    return true
+}
 
 fun Context.share(
     text: String,
@@ -279,4 +281,15 @@ fun Context.readFromUri(
 ) = contentResolver.openInputStream(uri)?.use { inputStream ->
     val buffer = inputStream.source().buffer()
     buffer.readUtf8()
+}
+
+fun Context.isExtraDimActive() = try {
+    Settings.Secure.getInt(
+        contentResolver,
+        "reduce_bright_colors_activated",
+        0,
+    ) == 1
+} catch (e: Exception) {
+    Log.e(TAG, "isExtraDimActive: ", e)
+    false
 }

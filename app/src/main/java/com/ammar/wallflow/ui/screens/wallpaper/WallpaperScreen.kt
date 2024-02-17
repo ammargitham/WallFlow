@@ -27,7 +27,6 @@ import com.ammar.wallflow.model.search.WallhavenUploaderSearchMeta
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.model.wallhaven.WallhavenUploader
 import com.ammar.wallflow.ui.common.LocalSystemController
-import com.ammar.wallflow.ui.common.TopBar
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
 import com.ammar.wallflow.ui.common.mainsearch.LocalMainSearchBarController
 import com.ammar.wallflow.ui.common.mainsearch.MainSearchBar
@@ -154,6 +153,8 @@ fun WallpaperScreen(
             thumbData = viewerUiState.thumbData,
             showInfo = viewerUiState.showInfo,
             isFavorite = viewerUiState.isFavorite,
+            showBackButton = true,
+            lightDarkTypeFlags = viewerUiState.lightDarkTypeFlags,
             onWallpaperTransform = {
                 viewModel.onWallpaperTransform()
                 viewerViewModel.onWallpaperTransform()
@@ -180,13 +181,8 @@ fun WallpaperScreen(
             onUploaderClick = onUploaderClick,
             onDownloadPermissionsGranted = viewerViewModel::download,
             onFavoriteToggle = { viewerViewModel.toggleFavorite() },
-        )
-
-        TopBar(
-            navController = navController,
-            visible = uiState.systemBarsVisible,
-            gradientBg = true,
-            showBackButton = true,
+            onBackClick = { navController.popBackStack() },
+            onLightDarkTypeFlagsChange = viewerViewModel::updateLightDarkTypeFlags,
         )
     }
 }

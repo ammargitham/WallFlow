@@ -1,0 +1,31 @@
+package com.ammar.wallflow.data.db.dao
+
+import androidx.room.Dao
+import androidx.room.Query
+import androidx.room.Upsert
+import com.ammar.wallflow.data.db.entity.LightDarkEntity
+import com.ammar.wallflow.model.Source
+import kotlinx.coroutines.flow.Flow
+
+@Dao
+interface LightDarkDao {
+    @Query("SELECT * FROM light_dark ORDER BY updated_on DESC")
+    fun observeAll(): Flow<List<LightDarkEntity>>
+
+    @Query("SELECT * FROM light_dark ORDER BY updated_on DESC")
+    suspend fun getAll(): List<LightDarkEntity>
+
+    @Query("SELECT * FROM light_dark WHERE source_id = :sourceId AND source = :source")
+    suspend fun getBySourceIdAndSource(sourceId: String, source: Source): LightDarkEntity?
+
+    @Query(
+        "SELECT typeFlags FROM light_dark WHERE source_id = :sourceId AND source = :source",
+    )
+    fun observeTypeFlags(
+        sourceId: String,
+        source: Source,
+    ): Flow<Int?>
+
+    @Upsert
+    suspend fun upsert(lightDarkEntity: LightDarkEntity)
+}
