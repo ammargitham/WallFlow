@@ -13,7 +13,7 @@ enum class BottomBarDestination(
     @StringRes val label: Int,
 ) {
     Home(NavGraphs.home, R.drawable.baseline_home_24, R.string.home),
-    Collections(NavGraphs.collections, R.drawable.baseline_favorite_24, R.string.collections),
+    Collections(NavGraphs.collections, R.drawable.baseline_collections_24, R.string.collections),
     Local(NavGraphs.local, R.drawable.baseline_folder_24, R.string.local),
     More(NavGraphs.more, R.drawable.baseline_more_horiz_24, R.string.more),
 }

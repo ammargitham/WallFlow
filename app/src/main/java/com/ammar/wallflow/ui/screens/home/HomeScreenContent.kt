@@ -35,6 +35,7 @@ import com.ammar.wallflow.data.preferences.LayoutPreferences
 import com.ammar.wallflow.data.preferences.ViewedWallpapersLook
 import com.ammar.wallflow.extensions.rememberLazyStaggeredGridState
 import com.ammar.wallflow.model.Favorite
+import com.ammar.wallflow.model.LightDark
 import com.ammar.wallflow.model.LightDarkType
 import com.ammar.wallflow.model.OnlineSource
 import com.ammar.wallflow.model.Purity
@@ -67,6 +68,7 @@ internal fun HomeScreenContent(
     favorites: ImmutableList<Favorite> = persistentListOf(),
     viewedList: ImmutableList<Viewed> = persistentListOf(),
     viewedWallpapersLook: ViewedWallpapersLook = ViewedWallpapersLook.DIM_WITH_LABEL,
+    lightDarkList: ImmutableList<LightDark> = persistentListOf(),
     blurSketchy: Boolean = false,
     blurNsfw: Boolean = false,
     selectedWallpaper: Wallpaper? = null,
@@ -109,6 +111,7 @@ internal fun HomeScreenContent(
                 favorites = favorites,
                 viewedList = viewedList,
                 viewedWallpapersLook = viewedWallpapersLook,
+                lightDarkList = lightDarkList,
                 blurSketchy = blurSketchy,
                 blurNsfw = blurNsfw,
                 header = header,
@@ -196,6 +199,7 @@ private fun Feed(
     favorites: ImmutableList<Favorite> = persistentListOf(),
     viewedList: ImmutableList<Viewed> = persistentListOf(),
     viewedWallpapersLook: ViewedWallpapersLook = ViewedWallpapersLook.DIM_WITH_LABEL,
+    lightDarkList: ImmutableList<LightDark> = persistentListOf(),
     blurSketchy: Boolean = false,
     blurNsfw: Boolean = false,
     showSelection: Boolean = false,
@@ -253,6 +257,7 @@ private fun Feed(
             favorites = favorites,
             viewedList = viewedList,
             viewedWallpapersLook = viewedWallpapersLook,
+            lightDarkList = lightDarkList,
             blurSketchy = blurSketchy,
             blurNsfw = blurNsfw,
             header = header,

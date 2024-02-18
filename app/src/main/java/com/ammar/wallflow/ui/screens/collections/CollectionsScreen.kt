@@ -2,19 +2,27 @@ package com.ammar.wallflow.ui.screens.collections
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.ammar.wallflow.extensions.rememberLazyStaggeredGridState
+import com.ammar.wallflow.R
 import com.ammar.wallflow.extensions.search
+import com.ammar.wallflow.model.CollectionCategory
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.search.WallhavenTagSearchMeta
 import com.ammar.wallflow.model.search.WallhavenUploaderSearchMeta
@@ -42,8 +50,7 @@ fun CollectionsScreen(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val viewerUiState by viewerViewModel.uiState.collectAsStateWithLifecycle()
-    val wallpapers = viewModel.favoriteWallpapers.collectAsLazyPagingItems()
-    val gridState = wallpapers.rememberLazyStaggeredGridState()
+    val wallpapers = viewModel.wallpapers.collectAsLazyPagingItems()
     val context = LocalContext.current
     val systemController = LocalSystemController.current
     val bottomBarController = LocalBottomBarController.current
@@ -122,16 +129,38 @@ fun CollectionsScreen(
         CollectionsScreenContent(
             modifier = Modifier.fillMaxSize(),
             isExpanded = systemState.isExpanded,
-            gridState = gridState,
             wallpapers = wallpapers,
             favorites = uiState.favorites,
             viewedList = uiState.viewedList,
             viewedWallpapersLook = uiState.viewedWallpapersLook,
+            lightDarkList = uiState.lightDarkList,
             blurSketchy = uiState.blurSketchy,
             blurNsfw = uiState.blurNsfw,
             selectedWallpaper = uiState.selectedWallpaper,
             showSelection = systemState.isExpanded,
             layoutPreferences = uiState.layoutPreferences,
+            header = {
+                header(
+                    selectedCategory = uiState.selectedCategory,
+                    onCategoryClick = viewModel::changeCategory,
+                )
+            },
+            emptyContent = {
+                item(span = StaggeredGridItemSpan.FullLine) {
+                    Text(
+                        modifier = Modifier.padding(vertical = 100.dp),
+                        text = stringResource(
+                            when (uiState.selectedCategory) {
+                                CollectionCategory.FAVORITES -> R.string.no_favorites
+                                CollectionCategory.LIGHT_DARK -> R.string.no_light_dark
+                            },
+                        ),
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
+                        textAlign = TextAlign.Center,
+                    )
+                }
+            },
             fullWallpaper = viewerUiState.wallpaper,
             fullWallpaperActionsVisible = viewerUiState.actionsVisible,
             fullWallpaperDownloadStatus = viewerUiState.downloadStatus,

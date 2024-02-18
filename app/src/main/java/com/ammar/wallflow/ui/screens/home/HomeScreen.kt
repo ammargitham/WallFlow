@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.ExperimentalMaterialApi
@@ -36,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.ammar.wallflow.R
 import com.ammar.wallflow.extensions.search
@@ -93,8 +95,10 @@ fun HomeScreen(
     val viewerUiState by viewerViewModel.uiState.collectAsStateWithLifecycle()
     val wallpapers = viewModel.wallpapers.collectAsLazyPagingItems()
     // TODO: Replace with M3 PullToRefresh
+    val showRefreshingIndicator = wallpapers.loadState.refresh == LoadState.Loading &&
+        wallpapers.itemCount > 0
     val refreshState = rememberPullRefreshState(
-        refreshing = false,
+        refreshing = showRefreshingIndicator,
         onRefresh = {
             wallpapers.refresh()
             viewModel.refresh()
@@ -259,6 +263,7 @@ fun HomeScreen(
             favorites = uiState.favorites,
             viewedList = uiState.viewedList,
             viewedWallpapersLook = uiState.viewedWallpapersLook,
+            lightDarkList = uiState.lightDarkList,
             blurSketchy = uiState.blurSketchy,
             blurNsfw = uiState.blurNsfw,
             selectedWallpaper = uiState.selectedWallpaper,
@@ -307,8 +312,11 @@ fun HomeScreen(
         )
 
         PullRefreshIndicator(
-            modifier = Modifier.align(Alignment.TopCenter),
-            refreshing = false,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .offset(y = SearchBar.Defaults.height - 8.dp),
+            refreshing = showRefreshingIndicator,
+            // refreshing = true,
             state = refreshState,
         )
     }

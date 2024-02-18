@@ -51,7 +51,9 @@ import com.ammar.wallflow.R
 import com.ammar.wallflow.data.preferences.ViewedWallpapersLook
 import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.extensions.aspectRatio
+import com.ammar.wallflow.model.LightDarkType
 import com.ammar.wallflow.model.Wallpaper
+import com.ammar.wallflow.model.isUnspecified
 import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import com.ammar.wallflow.model.wallhaven.wallhavenWallpaper1
 import com.ammar.wallflow.ui.theme.WallFlowTheme
@@ -73,6 +75,7 @@ fun WallpaperCard(
     isFavorite: Boolean = false,
     isViewed: Boolean = false,
     viewedWallpapersLook: ViewedWallpapersLook = ViewedWallpapersLook.DIM_WITH_LABEL,
+    lightDarkTypeFlags: Int = LightDarkType.UNSPECIFIED,
     onClick: () -> Unit = {},
     onFavoriteClick: () -> Unit = {},
 ) {
@@ -195,6 +198,17 @@ fun WallpaperCard(
             },
             onSuccess = { loaded = true },
         )
+        if (!lightDarkTypeFlags.isUnspecified()) {
+            CardLightDarkIcon(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(
+                        top = 8.dp,
+                        end = 8.dp,
+                    ),
+                typeFlags = lightDarkTypeFlags,
+            )
+        }
         if (isViewed && viewedWallpapersLook in setOf(
                 ViewedWallpapersLook.DIM_WITH_LABEL,
                 ViewedWallpapersLook.LABEL,
@@ -263,6 +277,7 @@ private data class Props(
     val isFavorite: Boolean = false,
     val isViewed: Boolean = false,
     val viewedWallpapersLook: ViewedWallpapersLook = ViewedWallpapersLook.DIM_WITH_LABEL,
+    val lightDarkTypeFlags: Int = LightDarkType.UNSPECIFIED,
 )
 
 private class PreviewProps : CollectionPreviewParameterProvider<Props>(
@@ -273,6 +288,7 @@ private class PreviewProps : CollectionPreviewParameterProvider<Props>(
         Props(isSelected = true),
         Props(isFavorite = true),
         Props(isViewed = true),
+        Props(lightDarkTypeFlags = LightDarkType.DARK),
     ),
 )
 
@@ -289,6 +305,7 @@ private fun PreviewWallpaperCard(
         isFavorite,
         isViewed,
         viewedWallpapersLook,
+        lightDarkTypeFlags,
     ) = props
     WallFlowTheme {
         WallpaperCard(
@@ -301,6 +318,7 @@ private fun PreviewWallpaperCard(
             isFavorite = isFavorite,
             isViewed = isViewed,
             viewedWallpapersLook = viewedWallpapersLook,
+            lightDarkTypeFlags = lightDarkTypeFlags,
         )
     }
 }

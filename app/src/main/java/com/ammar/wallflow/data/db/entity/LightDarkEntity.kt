@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.ammar.wallflow.model.LightDark
 import com.ammar.wallflow.model.Source
 import kotlinx.datetime.Instant
 import kotlinx.serialization.Serializable
@@ -24,4 +25,10 @@ data class LightDarkEntity(
     val source: Source,
     val typeFlags: Int,
     @ColumnInfo(name = "updated_on") val updatedOn: Instant,
+)
+
+fun LightDarkEntity.toLightDark() = LightDark(
+    sourceId = sourceId,
+    source = source,
+    typeFlags = typeFlags,
 )

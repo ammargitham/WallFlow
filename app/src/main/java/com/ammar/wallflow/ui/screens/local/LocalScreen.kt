@@ -134,6 +134,7 @@ fun LocalScreen(
         favorites = uiState.favorites,
         viewedList = uiState.viewedList,
         viewedWallpapersLook = uiState.viewedWallpapersLook,
+        lightDarkList = uiState.lightDarkList,
         selectedWallpaper = uiState.selectedWallpaper,
         layoutPreferences = uiState.layoutPreferences,
         fullWallpaper = viewerUiState.wallpaper,

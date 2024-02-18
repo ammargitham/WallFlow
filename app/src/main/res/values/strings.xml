@@ -306,6 +306,8 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="extra_dim">Extra Dim</string>
     <string name="help">Help</string>
     <string name="collections">Collections</string>
+    <string name="no_favorites">No wallpapers marked as favorite</string>
+    <string name="no_light_dark">No wallpapers marked as light or dark</string>
     <plurals name="every_x_hrs">
         <item quantity="one">Every %d hour</item>
         <item quantity="other">Every %d hours</item>

@@ -39,7 +39,7 @@ class FavoritesRepository @Inject constructor(
     fun observeAll() = favoriteDao.observeAll()
 
     @OptIn(ExperimentalPagingApi::class)
-    fun favoriteWallpapersPager(
+    fun wallpapersPager(
         context: Context,
         pageSize: Int = 24,
         prefetchDistance: Int = pageSize,
