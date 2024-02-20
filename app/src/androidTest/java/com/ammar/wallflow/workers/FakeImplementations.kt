@@ -6,6 +6,7 @@ import androidx.paging.PagingData
 import androidx.paging.PagingSource
 import com.ammar.wallflow.data.db.dao.AutoWallpaperHistoryDao
 import com.ammar.wallflow.data.db.dao.FavoriteDao
+import com.ammar.wallflow.data.db.dao.LightDarkDao
 import com.ammar.wallflow.data.db.dao.ObjectDetectionModelDao
 import com.ammar.wallflow.data.db.dao.ViewedDao
 import com.ammar.wallflow.data.db.dao.search.SavedSearchDao
@@ -13,6 +14,7 @@ import com.ammar.wallflow.data.db.dao.wallpaper.RedditWallpapersDao
 import com.ammar.wallflow.data.db.dao.wallpaper.WallhavenWallpapersDao
 import com.ammar.wallflow.data.db.entity.AutoWallpaperHistoryEntity
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
+import com.ammar.wallflow.data.db.entity.LightDarkEntity
 import com.ammar.wallflow.data.db.entity.ObjectDetectionModelEntity
 import com.ammar.wallflow.data.db.entity.ViewedEntity
 import com.ammar.wallflow.data.db.entity.search.SavedSearchEntity
@@ -389,4 +391,30 @@ internal open class FakeViewedDao : ViewedDao {
     override suspend fun upsert(viewedEntity: ViewedEntity) = throw RuntimeException()
 
     override suspend fun deleteAll() = throw RuntimeException()
+}
+
+internal open class FakeLightDarkDao : LightDarkDao {
+    override fun observeAll(): Flow<List<LightDarkEntity>> {
+        throw RuntimeException()
+    }
+
+    override suspend fun getAll(): List<LightDarkEntity> {
+        throw RuntimeException()
+    }
+
+    override suspend fun getBySourceIdAndSource(
+        sourceId: String,
+        source: Source,
+    ) = throw RuntimeException()
+
+    override fun pagingSource() = throw RuntimeException()
+
+    override fun observeTypeFlags(sourceId: String, source: Source) = throw RuntimeException()
+
+    override suspend fun upsert(lightDarkEntity: LightDarkEntity) = throw RuntimeException()
+
+    override suspend fun deleteBySourceIdAndSource(
+        sourceId: String,
+        source: Source,
+    ) = throw RuntimeException()
 }

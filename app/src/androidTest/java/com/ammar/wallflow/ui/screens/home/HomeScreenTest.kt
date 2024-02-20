@@ -19,6 +19,7 @@ import com.ammar.wallflow.data.db.entity.wallpaper.RedditWallpaperEntity
 import com.ammar.wallflow.data.db.entity.wallpaper.WallhavenWallpaperEntity
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.FavoritesRepository
+import com.ammar.wallflow.data.repository.LightDarkRepository
 import com.ammar.wallflow.data.repository.SavedSearchRepository
 import com.ammar.wallflow.data.repository.ViewedRepository
 import com.ammar.wallflow.data.repository.reddit.RedditRepository
@@ -32,6 +33,7 @@ import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import com.ammar.wallflow.workers.FakeFavoriteDao
+import com.ammar.wallflow.workers.FakeLightDarkDao
 import com.ammar.wallflow.workers.FakeLocalWallpapersRepository
 import com.ammar.wallflow.workers.FakeRedditWallpapersDao
 import com.ammar.wallflow.workers.FakeSavedSearchDao
@@ -91,90 +93,102 @@ class HomeScreenTest {
     private fun getViewModel(
         dataStore: DataStore<Preferences>,
         coroutineDispatcher: CoroutineDispatcher,
-    ) = HomeViewModel(
-        wallhavenRepository = object : WallhavenRepository {
-            override fun wallpapersPager(
-                search: WallhavenSearch,
-                pageSize: Int,
-                prefetchDistance: Int,
-                initialLoadSize: Int,
-            ): Flow<PagingData<Wallpaper>> {
-                TODO("Not yet implemented")
-            }
+    ): HomeViewModel {
+        val wallhavenWallpapersDao = FakeWallhavenWallpapersDao()
+        val redditWallpapersDao = FakeRedditWallpapersDao()
+        val localWallpapersRepository = FakeLocalWallpapersRepository()
+        return HomeViewModel(
+            wallhavenRepository = object : WallhavenRepository {
+                override fun wallpapersPager(
+                    search: WallhavenSearch,
+                    pageSize: Int,
+                    prefetchDistance: Int,
+                    initialLoadSize: Int,
+                ): Flow<PagingData<Wallpaper>> {
+                    TODO("Not yet implemented")
+                }
 
-            override fun popularTags(): Flow<Resource<List<WallhavenTag>>> {
-                TODO("Not yet implemented")
-            }
+                override fun popularTags(): Flow<Resource<List<WallhavenTag>>> {
+                    TODO("Not yet implemented")
+                }
 
-            override suspend fun refreshPopularTags() {
-                TODO("Not yet implemented")
-            }
+                override suspend fun refreshPopularTags() {
+                    TODO("Not yet implemented")
+                }
 
-            override fun wallpaper(
-                wallpaperWallhavenId: String,
-            ): Flow<Resource<WallhavenWallpaper?>> {
-                TODO("Not yet implemented")
-            }
+                override fun wallpaper(
+                    wallpaperWallhavenId: String,
+                ): Flow<Resource<WallhavenWallpaper?>> {
+                    TODO("Not yet implemented")
+                }
 
-            override suspend fun insertTagEntities(
-                tags: Collection<WallhavenTagEntity>,
-            ) {
-                TODO("Not yet implemented")
-            }
+                override suspend fun insertTagEntities(
+                    tags: Collection<WallhavenTagEntity>,
+                ) {
+                    TODO("Not yet implemented")
+                }
 
-            override suspend fun insertUploaderEntities(
-                uploaders: Collection<WallhavenUploaderEntity>,
-            ) {
-                TODO("Not yet implemented")
-            }
+                override suspend fun insertUploaderEntities(
+                    uploaders: Collection<WallhavenUploaderEntity>,
+                ) {
+                    TODO("Not yet implemented")
+                }
 
-            override suspend fun insertWallpaperEntities(
-                entities: Collection<WallhavenWallpaperEntity>,
-            ) {
-                TODO("Not yet implemented")
-            }
-        },
-        redditRepository = object : RedditRepository {
-            override fun wallpapersPager(
-                search: RedditSearch,
-                pageSize: Int,
-                prefetchDistance: Int,
-                initialLoadSize: Int,
-            ): Flow<PagingData<Wallpaper>> {
-                TODO("Not yet implemented")
-            }
+                override suspend fun insertWallpaperEntities(
+                    entities: Collection<WallhavenWallpaperEntity>,
+                ) {
+                    TODO("Not yet implemented")
+                }
+            },
+            redditRepository = object : RedditRepository {
+                override fun wallpapersPager(
+                    search: RedditSearch,
+                    pageSize: Int,
+                    prefetchDistance: Int,
+                    initialLoadSize: Int,
+                ): Flow<PagingData<Wallpaper>> {
+                    TODO("Not yet implemented")
+                }
 
-            override fun wallpaper(wallpaperId: String): Flow<Resource<RedditWallpaper?>> {
-                TODO("Not yet implemented")
-            }
+                override fun wallpaper(wallpaperId: String): Flow<Resource<RedditWallpaper?>> {
+                    TODO("Not yet implemented")
+                }
 
-            override suspend fun insertWallpaperEntities(
-                entities: Collection<RedditWallpaperEntity>,
-            ) {
-                TODO("Not yet implemented")
-            }
-        },
-        appPreferencesRepository = AppPreferencesRepository(
-            dataStore = dataStore,
-            ioDispatcher = coroutineDispatcher,
-        ),
-        savedSearchRepository = SavedSearchRepository(
-            savedSearchDao = FakeSavedSearchDao(),
-            ioDispatcher = coroutineDispatcher,
-        ),
-        favoritesRepository = FavoritesRepository(
-            favoriteDao = FakeFavoriteDao(),
-            wallhavenWallpapersDao = FakeWallhavenWallpapersDao(),
-            redditWallpapersDao = FakeRedditWallpapersDao(),
-            localWallpapersRepository = FakeLocalWallpapersRepository(),
-            ioDispatcher = coroutineDispatcher,
-        ),
-        savedStateHandle = SavedStateHandle(),
-        viewedRepository = ViewedRepository(
-            viewedDao = FakeViewedDao(),
-            ioDispatcher = coroutineDispatcher,
-        ),
-    )
+                override suspend fun insertWallpaperEntities(
+                    entities: Collection<RedditWallpaperEntity>,
+                ) {
+                    TODO("Not yet implemented")
+                }
+            },
+            appPreferencesRepository = AppPreferencesRepository(
+                dataStore = dataStore,
+                ioDispatcher = coroutineDispatcher,
+            ),
+            savedSearchRepository = SavedSearchRepository(
+                savedSearchDao = FakeSavedSearchDao(),
+                ioDispatcher = coroutineDispatcher,
+            ),
+            favoritesRepository = FavoritesRepository(
+                favoriteDao = FakeFavoriteDao(),
+                wallhavenWallpapersDao = wallhavenWallpapersDao,
+                redditWallpapersDao = redditWallpapersDao,
+                localWallpapersRepository = localWallpapersRepository,
+                ioDispatcher = coroutineDispatcher,
+            ),
+            savedStateHandle = SavedStateHandle(),
+            viewedRepository = ViewedRepository(
+                viewedDao = FakeViewedDao(),
+                ioDispatcher = coroutineDispatcher,
+            ),
+            lightDarkRepository = LightDarkRepository(
+                lightDarkDao = FakeLightDarkDao(),
+                wallhavenWallpapersDao = wallhavenWallpapersDao,
+                redditWallpapersDao = redditWallpapersDao,
+                localWallpapersRepository = localWallpapersRepository,
+                ioDispatcher = coroutineDispatcher,
+            ),
+        )
+    }
 
     companion object {
         private const val TEST_DATASTORE_NAME: String = "test_datastore"
