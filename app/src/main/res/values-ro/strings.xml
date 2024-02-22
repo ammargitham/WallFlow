@@ -312,4 +312,8 @@
     <string name="subreddits">Subreddits</string>
     <string name="colors">Culori</string>
     <string name="failed">Eșuat</string>
+    <string name="app_name">WallFlow</string>
+    <string name="auto_wallpaper_crop_desc">Decupare imagine de fundal înainte de aplicare.
+\nDezactivează dacă dorești derularea imaginii de fundal pe ecranul de pornire.</string>
+    <string name="crop">Decupare</string>
 </resources>
