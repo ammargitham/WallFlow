@@ -99,6 +99,12 @@ interface WallhavenWallpapersDao : WallpapersDao {
                 FROM favorites
                 WHERE source_id = wallhaven_wallpapers.wallhaven_id
                 AND source = 'WALLHAVEN'
+            )
+            AND NOT EXISTS (
+                SELECT 1
+                FROM light_dark
+                WHERE source_id = wallhaven_wallpapers.wallhaven_id
+                AND source = 'WALLHAVEN'
             );
         """,
     )
@@ -131,6 +137,12 @@ interface WallhavenWallpapersDao : WallpapersDao {
             AND NOT EXISTS (
                 SELECT 1
                 FROM favorites
+                WHERE source_id = wallhaven_wallpapers.wallhaven_id
+                AND source = 'WALLHAVEN'
+            )
+            AND NOT EXISTS (
+                SELECT 1
+                FROM light_dark
                 WHERE source_id = wallhaven_wallpapers.wallhaven_id
                 AND source = 'WALLHAVEN'
             );

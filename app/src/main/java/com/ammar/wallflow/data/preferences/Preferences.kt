@@ -38,14 +38,32 @@ object PreferencesKeys {
     val AUTO_WALLPAPER_SAVED_SEARCH_ENABLED = booleanPreferencesKey(
         "auto_wallpaper_saved_search_enabled",
     )
+    val AUTO_WALLPAPER_LS_SAVED_SEARCH_ENABLED = booleanPreferencesKey(
+        "auto_wallpaper_ls_saved_search_enabled",
+    )
     val AUTO_WALLPAPER_FAVORITES_ENABLED = booleanPreferencesKey(
         "auto_wallpaper_favorites_enabled",
+    )
+    val AUTO_WALLPAPER_LS_FAVORITES_ENABLED = booleanPreferencesKey(
+        "auto_wallpaper_ls_favorites_enabled",
     )
     val AUTO_WALLPAPER_LOCAL_ENABLED = booleanPreferencesKey(
         "auto_wallpaper_local_enabled",
     )
+    val AUTO_WALLPAPER_LS_LOCAL_ENABLED = booleanPreferencesKey(
+        "auto_wallpaper_ls_local_enabled",
+    )
     val AUTO_WALLPAPER_SAVED_SEARCH_ID = stringSetPreferencesKey(
         "auto_wallpaper_saved_search_id",
+    )
+    val AUTO_WALLPAPER_LS_SAVED_SEARCH_ID = stringSetPreferencesKey(
+        "auto_wallpaper_ls_saved_search_id",
+    )
+    val AUTO_WALLPAPER_LOCAL_DIRS = stringSetPreferencesKey(
+        "auto_wallpaper_local_dirs",
+    )
+    val AUTO_WALLPAPER_LS_LOCAL_DIRS = stringSetPreferencesKey(
+        "auto_wallpaper_ls_local_dirs",
     )
     val AUTO_WALLPAPER_USE_OBJECT_DETECTION = booleanPreferencesKey(
         "auto_wallpaper_use_object_detection",
@@ -61,6 +79,18 @@ object PreferencesKeys {
         "auto_wallpaper_set_different_wallpapers",
     )
     val AUTO_WALLPAPER_CROP = booleanPreferencesKey("auto_wallpaper_crop")
+    val AUTO_WALLPAPER_LIGHT_DARK_ENABLED = booleanPreferencesKey(
+        "auto_wallpaper_light_dark_enabled",
+    )
+    val AUTO_WALLPAPER_LS_LIGHT_DARK_ENABLED = booleanPreferencesKey(
+        "auto_wallpaper_ls_light_dark_enabled",
+    )
+    val AUTO_WALLPAPER_USE_DARK_WITH_EXTRA_DIM = booleanPreferencesKey(
+        "auto_wallpaper_use_dark_with_extra_dim",
+    )
+    val AUTO_WALLPAPER_LS_USE_DARK_WITH_EXTRA_DIM = booleanPreferencesKey(
+        "auto_wallpaper_ls_use_dark_with_extra_dim",
+    )
     val THEME = stringPreferencesKey("theme")
     val LAYOUT_GRID_TYPE = stringPreferencesKey("layout_grid_type")
     val LAYOUT_GRID_COL_TYPE = stringPreferencesKey("layout_grid_col_type")

@@ -6,6 +6,7 @@ import com.ammar.wallflow.ui.screens.destinations.CollectionsScreenDestination
 import com.ammar.wallflow.ui.screens.destinations.HomeScreenDestination
 import com.ammar.wallflow.ui.screens.destinations.LayoutSettingsScreenDestination
 import com.ammar.wallflow.ui.screens.destinations.LocalScreenDestination
+import com.ammar.wallflow.ui.screens.destinations.ManageAutoWallpaperSourcesScreenDestination
 import com.ammar.wallflow.ui.screens.destinations.MoreScreenDestination
 import com.ammar.wallflow.ui.screens.destinations.OSLibrariesScreenDestination
 import com.ammar.wallflow.ui.screens.destinations.SettingsScreenDestination
@@ -45,6 +46,7 @@ object NavGraphs {
             SettingsScreenDestination,
             WallhavenApiKeyDialogDestination,
             LayoutSettingsScreenDestination,
+            ManageAutoWallpaperSourcesScreenDestination,
         ),
     )
 

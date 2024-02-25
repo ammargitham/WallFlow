@@ -59,9 +59,9 @@ import com.ammar.wallflow.ui.common.permissions.shouldShowRationale
 import com.ammar.wallflow.ui.common.searchedit.EditSearchModalBottomSheet
 import com.ammar.wallflow.ui.common.searchedit.SavedSearchesDialog
 import com.ammar.wallflow.ui.screens.destinations.LayoutSettingsScreenDestination
+import com.ammar.wallflow.ui.screens.destinations.ManageAutoWallpaperSourcesScreenDestination
 import com.ammar.wallflow.ui.screens.destinations.WallhavenApiKeyDialogDestination
 import com.ammar.wallflow.ui.screens.settings.composables.AutoWallpaperSetToDialog
-import com.ammar.wallflow.ui.screens.settings.composables.AutoWallpaperSourceOptionsDialog
 import com.ammar.wallflow.ui.screens.settings.composables.ClearViewedWallpapersConfirmDialog
 import com.ammar.wallflow.ui.screens.settings.composables.ConstraintOptionsDialog
 import com.ammar.wallflow.ui.screens.settings.composables.DeleteSavedSearchConfirmDialog
@@ -139,6 +139,10 @@ fun SettingsScreen(
             uiState.tempAutoWallpaperPreferences
         } ?: AutoWallpaperPreferences()
         viewModel.setTempAutoWallpaperPrefs(null)
+        if (!updatedAutoWallpaperPreferences.anySourceEnabled) {
+            navController.navigate(ManageAutoWallpaperSourcesScreenDestination)
+            return@rememberMultiplePermissionsState
+        }
         viewModel.updateAutoWallpaperPrefs(updatedAutoWallpaperPreferences)
     }
 
@@ -195,7 +199,10 @@ fun SettingsScreen(
                 }
                 viewModel.updateAutoWallpaperPrefs(it)
             },
-            onAutoWallpaperSourcesClick = { viewModel.showAutoWallpaperSourcesDialog(true) },
+            onAutoWallpaperSourcesClick = {
+                // viewModel.showAutoWallpaperSourcesDialog(true)
+                navController.navigate(ManageAutoWallpaperSourcesScreenDestination)
+            },
             onAutoWallpaperFrequencyClick = { viewModel.showAutoWallpaperFrequencyDialog(true) },
             onAutoWallpaperConstraintsClick = {
                 viewModel.showAutoWallpaperConstraintsDialog(true)
@@ -343,21 +350,6 @@ fun SettingsScreen(
         )
     }
 
-    if (uiState.showAutoWallpaperSourcesDialog) {
-        AutoWallpaperSourceOptionsDialog(
-            savedSearches = uiState.savedSearches,
-            localDirectories = uiState.localDirectories,
-            autoWallpaperPreferences = uiState.tempAutoWallpaperPreferences
-                ?: uiState.appPreferences.autoWallpaperPreferences,
-            onSaveClick = {
-                viewModel.updateAutoWallpaperPrefs(it)
-                viewModel.setTempAutoWallpaperPrefs(null)
-                viewModel.showAutoWallpaperSourcesDialog(false)
-            },
-            onDismissRequest = { viewModel.showAutoWallpaperSourcesDialog(false) },
-        )
-    }
-
     if (uiState.showAutoWallpaperFrequencyDialog) {
         FrequencyDialog(
             frequency = uiState.appPreferences.autoWallpaperPreferences.frequency,
@@ -421,13 +413,10 @@ fun SettingsScreen(
     if (uiState.showAutoWallpaperSetToDialog) {
         AutoWallpaperSetToDialog(
             selectedTargets = uiState.appPreferences.autoWallpaperPreferences.targets,
-            setDifferentWallpapers = uiState.appPreferences.autoWallpaperPreferences
-                .setDifferentWallpapers,
-            onSaveClick = { targets, setDifferentWallpapers ->
+            onSaveClick = { targets ->
                 viewModel.updateAutoWallpaperPrefs(
                     uiState.appPreferences.autoWallpaperPreferences.copy(
                         targets = targets,
-                        setDifferentWallpapers = setDifferentWallpapers,
                     ),
                 )
                 viewModel.showAutoWallpaperSetToDialog(false)

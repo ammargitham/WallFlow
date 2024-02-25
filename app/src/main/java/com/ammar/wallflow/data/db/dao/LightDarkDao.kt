@@ -30,6 +30,9 @@ interface LightDarkDao {
         source: Source,
     ): Flow<Int?>
 
+    @Query("SELECT COUNT(*) FROM light_dark")
+    fun observeCount(): Flow<Int>
+
     @Upsert
     suspend fun upsert(lightDarkEntity: LightDarkEntity)
 

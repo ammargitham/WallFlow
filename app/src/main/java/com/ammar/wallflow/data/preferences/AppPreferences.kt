@@ -2,17 +2,15 @@
     DateTimePeriodSerializer::class,
     ConstraintsSerializer::class,
     UUIDSerializer::class,
+    UriSerializer::class,
 )
 
 package com.ammar.wallflow.data.preferences
 
+import android.net.Uri
 import androidx.annotation.IntRange
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.Saver
 import androidx.work.Constraints
 import androidx.work.NetworkType
-import com.ammar.wallflow.json
 import com.ammar.wallflow.model.OnlineSource
 import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.model.search.RedditSearch
@@ -23,13 +21,13 @@ import com.ammar.wallflow.model.search.WallhavenTopRange
 import com.ammar.wallflow.model.serializers.ConstraintsSerializer
 import com.ammar.wallflow.model.serializers.DateTimePeriodSerializer
 import com.ammar.wallflow.model.serializers.UUIDSerializer
+import com.ammar.wallflow.model.serializers.UriSerializer
 import com.ammar.wallflow.ui.screens.local.LocalSort
 import com.ammar.wallflow.utils.ExifWriteType
 import java.util.UUID
 import kotlinx.datetime.DateTimePeriod
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.UseSerializers
-import kotlinx.serialization.encodeToString
 
 @Serializable
 data class AppPreferences(
@@ -83,9 +81,15 @@ internal val defaultAutoWallpaperConstraints = Constraints.Builder().apply {
 data class AutoWallpaperPreferences(
     val enabled: Boolean = false,
     val savedSearchEnabled: Boolean = false,
+    val lsSavedSearchEnabled: Boolean = false,
     val favoritesEnabled: Boolean = false,
+    val lsFavoritesEnabled: Boolean = false,
     val localEnabled: Boolean = false,
+    val lsLocalEnabled: Boolean = false,
     val savedSearchIds: Set<Long> = emptySet(),
+    val lsSavedSearchIds: Set<Long> = emptySet(),
+    val localDirs: Set<Uri> = emptySet(),
+    val lsLocalDirs: Set<Uri> = emptySet(),
     val useObjectDetection: Boolean = true,
     val frequency: DateTimePeriod = defaultAutoWallpaperFreq,
     val constraints: Constraints = defaultAutoWallpaperConstraints,
@@ -96,25 +100,27 @@ data class AutoWallpaperPreferences(
     val download: Boolean = false,
     val setDifferentWallpapers: Boolean = false,
     val crop: Boolean = true,
+    val lightDarkEnabled: Boolean = false,
+    val lsLightDarkEnabled: Boolean = false,
+    val useDarkWithExtraDim: Boolean = false,
+    val lsUseDarkWithExtraDim: Boolean = false,
 ) {
-    val anySourceEnabled = (
+    private val anyHomeScreenSourceEnabled = lightDarkEnabled || (
         savedSearchEnabled &&
             savedSearchIds.isNotEmpty() &&
             savedSearchIds.all { it > 0 }
         ) ||
         favoritesEnabled ||
         localEnabled
+    private val anyLockScreenSourceEnabled = lsLightDarkEnabled || (
+        lsSavedSearchEnabled &&
+            lsSavedSearchIds.isNotEmpty() &&
+            lsSavedSearchIds.all { it > 0 }
+        ) ||
+        lsFavoritesEnabled ||
+        lsLocalEnabled
+    val anySourceEnabled = anyHomeScreenSourceEnabled || anyLockScreenSourceEnabled
 }
-
-val MutableStateAutoWallpaperPreferencesSaver =
-    Saver<MutableState<AutoWallpaperPreferences>, String>(
-        save = {
-            json.encodeToString<AutoWallpaperPreferences>(it.value)
-        },
-        restore = {
-            mutableStateOf(json.decodeFromString<AutoWallpaperPreferences>(it))
-        },
-    )
 
 enum class Theme {
     SYSTEM,

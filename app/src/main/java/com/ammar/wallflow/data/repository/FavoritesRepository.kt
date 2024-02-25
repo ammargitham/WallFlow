@@ -155,4 +155,6 @@ class FavoritesRepository @Inject constructor(
         source: Source,
         sourceId: String,
     ) = favoriteDao.observeExists(source = source, sourceId = sourceId)
+
+    fun observeCount() = favoriteDao.observeCount()
 }

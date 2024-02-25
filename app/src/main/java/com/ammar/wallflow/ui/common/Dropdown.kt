@@ -128,6 +128,7 @@ fun <T> DropdownMultiple(
     options: Set<DropdownOption<T>> = emptySet(),
     initialSelectedOptions: Set<T>? = null,
     emptyOptionsMessage: String? = null,
+    showOptionClearAction: Boolean = true,
     placeholder: @Composable (() -> Unit)? = null,
     onChange: (value: Set<T>) -> Unit = {},
 ) {
@@ -156,6 +157,7 @@ fun <T> DropdownMultiple(
             readOnly = true,
             tags = selectedOptions,
             label = label,
+            showTagClearAction = showOptionClearAction,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             colors = ExposedDropdownMenuDefaults.textFieldColors(),
             placeholder = placeholder,

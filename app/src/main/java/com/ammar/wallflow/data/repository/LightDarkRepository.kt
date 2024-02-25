@@ -110,10 +110,12 @@ class LightDarkRepository @Inject constructor(
         )
     }
 
-    fun observeIsFavorite(
+    fun observeTypeFlags(
         source: Source,
         sourceId: String,
     ) = lightDarkDao.observeTypeFlags(source = source, sourceId = sourceId)
+
+    fun observeCount() = lightDarkDao.observeCount()
 
     // suspend fun insertEntities(entities: Collection<ViewedEntity>) = withContext(ioDispatcher) {
     //     val existing = lightDarkDao.getAll()

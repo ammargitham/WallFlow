@@ -36,6 +36,9 @@ interface FavoriteDao {
         source: Source,
     ): Flow<Boolean>
 
+    @Query("SELECT COUNT(*) FROM favorites")
+    fun observeCount(): Flow<Int>
+
     @Query("SELECT * FROM favorites WHERE source_id = :sourceId AND source = :source")
     suspend fun getBySourceIdAndType(
         sourceId: String,

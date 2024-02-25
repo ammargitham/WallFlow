@@ -1,7 +1,6 @@
 package com.ammar.wallflow.ui.screens.settings.layout
 
-import android.app.Application
-import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ammar.wallflow.data.preferences.AppPreferences
 import com.ammar.wallflow.data.preferences.LayoutPreferences
@@ -17,9 +16,8 @@ import kotlinx.coroutines.launch
 
 @HiltViewModel
 class LayoutSettingsViewModel @Inject constructor(
-    application: Application,
     private val appPreferencesRepository: AppPreferencesRepository,
-) : AndroidViewModel(application) {
+) : ViewModel() {
     private val localUiStateFlow = MutableStateFlow(LayoutSettingsUiStatePartial())
 
     val uiState = combine(

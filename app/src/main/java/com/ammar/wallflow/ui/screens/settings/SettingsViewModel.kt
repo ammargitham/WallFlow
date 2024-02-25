@@ -27,7 +27,6 @@ import com.ammar.wallflow.extensions.workManager
 import com.ammar.wallflow.model.ObjectDetectionModel
 import com.ammar.wallflow.model.local.LocalDirectory
 import com.ammar.wallflow.model.search.SavedSearch
-import com.ammar.wallflow.services.ChangeWallpaperTileService
 import com.ammar.wallflow.utils.DownloadManager
 import com.ammar.wallflow.utils.DownloadStatus
 import com.ammar.wallflow.utils.ExifWriteType
@@ -331,7 +330,7 @@ class SettingsViewModel @Inject constructor(
                             savedSearchIds = updatedSavedSearchIds,
                             savedSearchEnabled = updatedSavedSearchIds.isNotEmpty(),
                         ),
-                        showSourcesDialog = false,
+                        // showSourcesDialog = false,
                     )
                 }
                 // close the dialog
@@ -343,70 +342,15 @@ class SettingsViewModel @Inject constructor(
         localUiStateFlow.update { it.copy(deleteSavedSearch = partial(savedSearch)) }
     }
 
-    fun updateAutoWallpaperPrefs(
-        autoWallpaperPreferences: AutoWallpaperPreferences,
-        showSourcesDialog: Boolean = true,
-    ) {
-        var prefs = autoWallpaperPreferences
-        if (prefs.enabled &&
-            (!prefs.savedSearchEnabled || prefs.savedSearchIds.isEmpty()) &&
-            !prefs.favoritesEnabled &&
-            !prefs.localEnabled
-        ) {
-            if (showSourcesDialog) {
-                localUiStateFlow.update {
-                    it.copy(
-                        tempAutoWallpaperPreferences = partial(prefs),
-                        showAutoWallpaperSourcesDialog = partial(true),
-                    )
-                }
-                return
-            } else {
-                // disable auto wallpaper
-                prefs = prefs.copy(enabled = false)
-            }
-        }
-        if (!prefs.enabled) {
-            // reset work request id
-            prefs = prefs.copy(
-                workRequestId = null,
+    fun updateAutoWallpaperPrefs(autoWallpaperPreferences: AutoWallpaperPreferences) {
+        viewModelScope.launch {
+            updateAutoWallpaperPrefs(
+                context = application,
+                appPreferencesRepository = appPreferencesRepository,
+                prevAppPreferences = uiState.value.appPreferences,
+                newAutoWallpaperPreferences = autoWallpaperPreferences,
             )
         }
-        viewModelScope.launch {
-            appPreferencesRepository.updateAutoWallpaperPrefs(prefs)
-            val tileAdded = uiState.value.appPreferences.changeWallpaperTileAdded
-            if (tileAdded) {
-                ChangeWallpaperTileService.requestListeningState(application)
-            }
-            if (prefs.enabled) {
-                // only reschedule if enabled or frequency or constraints change
-                val currentPrefs = uiState.value.appPreferences.autoWallpaperPreferences
-                if (
-                    currentPrefs.enabled &&
-                    currentPrefs.frequency == prefs.frequency &&
-                    currentPrefs.constraints == prefs.constraints
-                ) {
-                    return@launch
-                }
-                // schedule worker with updated preferences
-                AutoWallpaperWorker.schedule(
-                    context = application,
-                    constraints = prefs.constraints,
-                    interval = prefs.frequency,
-                    appPreferencesRepository = appPreferencesRepository,
-                )
-            } else {
-                // stop the worker
-                AutoWallpaperWorker.stop(
-                    context = application,
-                    appPreferencesRepository = appPreferencesRepository,
-                )
-            }
-        }
-    }
-
-    fun showAutoWallpaperSourcesDialog(show: Boolean) = localUiStateFlow.update {
-        it.copy(showAutoWallpaperSourcesDialog = partial(show))
     }
 
     fun showAutoWallpaperFrequencyDialog(show: Boolean) = localUiStateFlow.update {
@@ -529,7 +473,6 @@ data class SettingsUiState(
     val editSavedSearch: SavedSearch? = null,
     val deleteSavedSearch: SavedSearch? = null,
     val autoWallpaperSavedSearches: ImmutableList<SavedSearch> = persistentListOf(),
-    val showAutoWallpaperSourcesDialog: Boolean = false,
     val showAutoWallpaperFrequencyDialog: Boolean = false,
     val showAutoWallpaperConstraintsDialog: Boolean = false,
     val showPermissionRationaleDialog: Boolean = false,

@@ -1,5 +1,7 @@
 package com.ammar.wallflow.data.repository
 
+import android.content.Context
+import android.net.Uri
 import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.MutablePreferences
@@ -23,6 +25,7 @@ import com.ammar.wallflow.data.preferences.ViewedWallpapersPreferences
 import com.ammar.wallflow.data.preferences.defaultAutoWallpaperConstraints
 import com.ammar.wallflow.data.preferences.defaultAutoWallpaperFreq
 import com.ammar.wallflow.extensions.TAG
+import com.ammar.wallflow.extensions.accessibleFolders
 import com.ammar.wallflow.extensions.toConstraintTypeMap
 import com.ammar.wallflow.extensions.toConstraints
 import com.ammar.wallflow.json
@@ -38,6 +41,7 @@ import com.ammar.wallflow.model.serializers.constraintTypeMapSerializer
 import com.ammar.wallflow.ui.screens.local.LocalSort
 import com.ammar.wallflow.utils.ExifWriteType
 import com.ammar.wallflow.utils.objectdetection.objectsDetector
+import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.IOException
 import java.util.UUID
 import javax.inject.Inject
@@ -54,6 +58,7 @@ import kotlinx.serialization.encodeToString
 
 @Singleton
 class AppPreferencesRepository @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val dataStore: DataStore<Preferences>,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
@@ -168,11 +173,26 @@ class AppPreferencesRepository @Inject constructor(
     ) = with(autoWallpaperPreferences) {
         set(PreferencesKeys.ENABLE_AUTO_WALLPAPER, enabled)
         set(PreferencesKeys.AUTO_WALLPAPER_SAVED_SEARCH_ENABLED, savedSearchEnabled)
+        set(PreferencesKeys.AUTO_WALLPAPER_LS_SAVED_SEARCH_ENABLED, lsSavedSearchEnabled)
         set(PreferencesKeys.AUTO_WALLPAPER_FAVORITES_ENABLED, favoritesEnabled)
+        set(PreferencesKeys.AUTO_WALLPAPER_LS_FAVORITES_ENABLED, lsFavoritesEnabled)
         set(PreferencesKeys.AUTO_WALLPAPER_LOCAL_ENABLED, localEnabled)
+        set(PreferencesKeys.AUTO_WALLPAPER_LS_LOCAL_ENABLED, lsLocalEnabled)
         set(
             PreferencesKeys.AUTO_WALLPAPER_SAVED_SEARCH_ID,
             savedSearchIds.mapTo(HashSet()) { it.toString() },
+        )
+        set(
+            PreferencesKeys.AUTO_WALLPAPER_LS_SAVED_SEARCH_ID,
+            lsSavedSearchIds.mapTo(HashSet()) { it.toString() },
+        )
+        set(
+            PreferencesKeys.AUTO_WALLPAPER_LOCAL_DIRS,
+            localDirs.mapTo(HashSet()) { it.toString() },
+        )
+        set(
+            PreferencesKeys.AUTO_WALLPAPER_LS_LOCAL_DIRS,
+            lsLocalDirs.mapTo(HashSet()) { it.toString() },
         )
         set(PreferencesKeys.AUTO_WALLPAPER_USE_OBJECT_DETECTION, useObjectDetection)
         set(PreferencesKeys.AUTO_WALLPAPER_FREQUENCY, frequency.toString())
@@ -192,6 +212,10 @@ class AppPreferencesRepository @Inject constructor(
         set(PreferencesKeys.AUTO_WALLPAPER_DOWNLOAD, download)
         set(PreferencesKeys.AUTO_WALLPAPER_SET_DIFFERENT_WALLPAPERS, setDifferentWallpapers)
         set(PreferencesKeys.AUTO_WALLPAPER_CROP, crop)
+        set(PreferencesKeys.AUTO_WALLPAPER_LIGHT_DARK_ENABLED, lightDarkEnabled)
+        set(PreferencesKeys.AUTO_WALLPAPER_LS_LIGHT_DARK_ENABLED, lsLightDarkEnabled)
+        set(PreferencesKeys.AUTO_WALLPAPER_USE_DARK_WITH_EXTRA_DIM, useDarkWithExtraDim)
+        set(PreferencesKeys.AUTO_WALLPAPER_LS_USE_DARK_WITH_EXTRA_DIM, lsUseDarkWithExtraDim)
     }
 
     private fun MutablePreferences.updateLookAndFeelPreferences(
@@ -387,17 +411,86 @@ class AppPreferencesRepository @Inject constructor(
         val savedSearchEnabled =
             (get(PreferencesKeys.AUTO_WALLPAPER_SAVED_SEARCH_ENABLED) ?: false) &&
                 savedSearchIds.isNotEmpty()
+
+        val lsSavedSearchIdStrings = get(PreferencesKeys.AUTO_WALLPAPER_LS_SAVED_SEARCH_ID)
+            ?: savedSearchIdStrings
+        val lsSavedSearchIds = lsSavedSearchIdStrings
+            .mapNotNull { it.toLongOrNull() }
+            .filterTo(HashSet()) { it > 0 }
+        val lsSavedSearchEnabled = (
+            get(PreferencesKeys.AUTO_WALLPAPER_LS_SAVED_SEARCH_ENABLED)
+                ?: savedSearchEnabled
+            ) && lsSavedSearchIds.isNotEmpty()
+
         val favoritesEnabled = get(PreferencesKeys.AUTO_WALLPAPER_FAVORITES_ENABLED) ?: false
-        val localEnabled = get(PreferencesKeys.AUTO_WALLPAPER_LOCAL_ENABLED) ?: false
+        val lsFavoritesEnabled = get(PreferencesKeys.AUTO_WALLPAPER_LS_FAVORITES_ENABLED)
+            ?: favoritesEnabled
+
+        val localDirStrings = get(PreferencesKeys.AUTO_WALLPAPER_LOCAL_DIRS)
+        val localDirs = localDirStrings
+            ?.mapNotNullTo(HashSet()) {
+                try {
+                    Uri.parse(it)
+                } catch (exception: Exception) {
+                    null
+                }
+            } ?: context.accessibleFolders.mapTo(HashSet()) { it.uri }
+        val localEnabled = (get(PreferencesKeys.AUTO_WALLPAPER_LOCAL_ENABLED) ?: false) &&
+            localDirs.isNotEmpty()
+
+        val lsLocalDirStrings = get(PreferencesKeys.AUTO_WALLPAPER_LS_LOCAL_DIRS)
+            ?: localDirs.map { it.toString() }
+        val lsLocalDirs = lsLocalDirStrings.mapNotNullTo(HashSet()) {
+            try {
+                Uri.parse(it)
+            } catch (exception: Exception) {
+                null
+            }
+        }
+        val lsLocalEnabled = (
+            get(PreferencesKeys.AUTO_WALLPAPER_LS_LOCAL_ENABLED)
+                ?: localEnabled
+            ) && lsLocalDirs.isNotEmpty()
+
+        val lightDarkEnabled = get(PreferencesKeys.AUTO_WALLPAPER_LIGHT_DARK_ENABLED) ?: false
+        val lsLightDarkEnabled = get(PreferencesKeys.AUTO_WALLPAPER_LS_LIGHT_DARK_ENABLED)
+            ?: lightDarkEnabled
+
+        val useDarkWithExtraDim = get(PreferencesKeys.AUTO_WALLPAPER_USE_DARK_WITH_EXTRA_DIM)
+            ?: false
+        val lsUseDarkWithExtraDim = get(PreferencesKeys.AUTO_WALLPAPER_LS_USE_DARK_WITH_EXTRA_DIM)
+            ?: useDarkWithExtraDim
+
+        val anyHomeScreenSourceEnabled = lightDarkEnabled || (
+            savedSearchEnabled &&
+                savedSearchIds.isNotEmpty() &&
+                savedSearchIds.all { it > 0 }
+            ) ||
+            favoritesEnabled ||
+            localEnabled
+        val anyLockScreenSourceEnabled = lsLightDarkEnabled || (
+            lsSavedSearchEnabled &&
+                lsSavedSearchIds.isNotEmpty() &&
+                lsSavedSearchIds.all { it > 0 }
+            ) ||
+            lsFavoritesEnabled ||
+            lsLocalEnabled
+        val anySourceEnabled = anyHomeScreenSourceEnabled || anyLockScreenSourceEnabled
         AutoWallpaperPreferences(
             enabled = when {
-                !savedSearchEnabled && !favoritesEnabled && !localEnabled -> false
+                !anySourceEnabled -> false
                 else -> get(PreferencesKeys.ENABLE_AUTO_WALLPAPER) ?: false
             },
             savedSearchEnabled = savedSearchEnabled,
+            lsSavedSearchEnabled = lsSavedSearchEnabled,
             favoritesEnabled = favoritesEnabled,
+            lsFavoritesEnabled = lsFavoritesEnabled,
             localEnabled = localEnabled,
+            lsLocalEnabled = lsLocalEnabled,
             savedSearchIds = savedSearchIds,
+            lsSavedSearchIds = lsSavedSearchIds,
+            localDirs = localDirs,
+            lsLocalDirs = lsLocalDirs,
             useObjectDetection = get(PreferencesKeys.AUTO_WALLPAPER_USE_OBJECT_DETECTION)
                 ?: true,
             frequency = parseFrequency(get(PreferencesKeys.AUTO_WALLPAPER_FREQUENCY)),
@@ -421,6 +514,10 @@ class AppPreferencesRepository @Inject constructor(
             setDifferentWallpapers = get(PreferencesKeys.AUTO_WALLPAPER_SET_DIFFERENT_WALLPAPERS)
                 ?: false,
             crop = get(PreferencesKeys.AUTO_WALLPAPER_CROP) ?: true,
+            lightDarkEnabled = lightDarkEnabled,
+            lsLightDarkEnabled = lsLightDarkEnabled,
+            useDarkWithExtraDim = useDarkWithExtraDim,
+            lsUseDarkWithExtraDim = lsUseDarkWithExtraDim,
         )
     }
 

@@ -51,6 +51,12 @@ interface RedditWallpapersDao : WallpapersDao {
                 FROM favorites
                 WHERE source_id = reddit_wallpapers.reddit_id
                 AND source = 'REDDIT'
+            )
+            AND NOT EXISTS (
+                SELECT 1
+                FROM light_dark
+                WHERE source_id = reddit_wallpapers.reddit_id
+                AND source = 'REDDIT'
             );
         """,
     )
@@ -97,6 +103,12 @@ interface RedditWallpapersDao : WallpapersDao {
             AND NOT EXISTS (
                 SELECT 1
                 FROM favorites
+                WHERE source_id = reddit_wallpapers.reddit_id
+                AND source = 'REDDIT'
+            )
+            AND NOT EXISTS (
+                SELECT 1
+                FROM light_dark
                 WHERE source_id = reddit_wallpapers.reddit_id
                 AND source = 'REDDIT'
             );

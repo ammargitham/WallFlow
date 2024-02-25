@@ -81,7 +81,7 @@ class WallpaperViewerViewModel @Inject constructor(
     @OptIn(ExperimentalCoroutinesApi::class)
     private val lightDarkTypeFlags = wallpaperFlow.flatMapLatest {
         val wallpaper = it.successOr(null) ?: return@flatMapLatest flowOf(LightDarkType.UNSPECIFIED)
-        lightDarkRepository.observeIsFavorite(
+        lightDarkRepository.observeTypeFlags(
             source = wallpaper.source,
             sourceId = wallpaper.id,
         )

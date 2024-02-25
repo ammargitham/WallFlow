@@ -1,7 +1,6 @@
 package com.ammar.wallflow.ui.screens.settings.composables
 
 import android.content.res.Configuration
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -35,19 +33,15 @@ import com.ammar.wallflow.ui.theme.WallFlowTheme
 fun AutoWallpaperSetToDialog(
     modifier: Modifier = Modifier,
     selectedTargets: Set<WallpaperTarget> = setOf(WallpaperTarget.HOME, WallpaperTarget.LOCKSCREEN),
-    setDifferentWallpapers: Boolean = false,
-    onSaveClick: (
-        targets: Set<WallpaperTarget>,
-        setDifferentWallpapers: Boolean,
-    ) -> Unit = { _, _ -> },
+    onSaveClick: (targets: Set<WallpaperTarget>) -> Unit = {},
     onDismissRequest: () -> Unit = {},
 ) {
     var localSelectedTargets by remember(selectedTargets) {
         mutableStateOf(selectedTargets)
     }
-    var localSetDifferentWallpapers by remember(setDifferentWallpapers) {
-        mutableStateOf(setDifferentWallpapers)
-    }
+    // var localSetDifferentWallpapers by remember(setDifferentWallpapers) {
+    //     mutableStateOf(setDifferentWallpapers)
+    // }
 
     fun toggleTarget(target: WallpaperTarget) {
         localSelectedTargets = if (target in localSelectedTargets) {
@@ -101,37 +95,37 @@ fun AutoWallpaperSetToDialog(
                             )
                         },
                     )
-                    AnimatedVisibility(localSelectedTargets.size == 2) {
-                        Column {
-                            HorizontalDivider()
-                            ListItem(
-                                modifier = Modifier
-                                    .clickable {
-                                        localSetDifferentWallpapers = !localSetDifferentWallpapers
-                                    }
-                                    .padding(horizontal = 8.dp),
-                                headlineContent = {
-                                    Text(text = stringResource(R.string.set_different_wallapers))
-                                },
-                                supportingContent = {
-                                    Text(
-                                        text = stringResource(
-                                            R.string.set_different_wallapers_desc,
-                                        ),
-                                    )
-                                },
-                                leadingContent = {
-                                    Checkbox(
-                                        modifier = Modifier.size(24.dp),
-                                        checked = localSetDifferentWallpapers,
-                                        onCheckedChange = {
-                                            localSetDifferentWallpapers = it
-                                        },
-                                    )
-                                },
-                            )
-                        }
-                    }
+                    // AnimatedVisibility(localSelectedTargets.size == 2) {
+                    //     Column {
+                    //         HorizontalDivider()
+                    //         ListItem(
+                    //             modifier = Modifier
+                    //                 .clickable {
+                    //                     localSetDifferentWallpapers = !localSetDifferentWallpapers
+                    //                 }
+                    //                 .padding(horizontal = 8.dp),
+                    //             headlineContent = {
+                    //                 Text(text = stringResource(R.string.set_different_wallapers))
+                    //             },
+                    //             supportingContent = {
+                    //                 Text(
+                    //                     text = stringResource(
+                    //                         R.string.set_different_wallapers_desc,
+                    //                     ),
+                    //                 )
+                    //             },
+                    //             leadingContent = {
+                    //                 Checkbox(
+                    //                     modifier = Modifier.size(24.dp),
+                    //                     checked = localSetDifferentWallpapers,
+                    //                     onCheckedChange = {
+                    //                         localSetDifferentWallpapers = it
+                    //                     },
+                    //                 )
+                    //             },
+                    //         )
+                    //     }
+                    // }
                 }
             },
             buttons = {
@@ -141,11 +135,7 @@ fun AutoWallpaperSetToDialog(
                     TextButton(onClick = onDismissRequest) {
                         Text(text = stringResource(R.string.cancel))
                     }
-                    TextButton(
-                        onClick = {
-                            onSaveClick(localSelectedTargets, localSetDifferentWallpapers)
-                        },
-                    ) {
+                    TextButton(onClick = { onSaveClick(localSelectedTargets) }) {
                         Text(text = stringResource(R.string.save))
                     }
                 }

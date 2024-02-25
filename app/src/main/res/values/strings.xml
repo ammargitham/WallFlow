@@ -308,6 +308,15 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="collections">Collections</string>
     <string name="no_favorites">No wallpapers marked as favorite</string>
     <string name="no_light_dark">No wallpapers marked as light or dark</string>
+    <string name="use_same_sources_homescreen_lockscreen">Use same sources for home screen and lock screen</string>
+    <string name="use_light_dark_wallpapers">Use Light / Dark wallpapers</string>
+    <string name="use_dark_with_extra_dim_desc">Allow regular dark wallpapers when \"Extra Dim\" is activated</string>
+    <string name="use_dark_with_extra_dim">Use Dark wallpapers with Extra Dim</string>
+    <string name="use_saved_searches">Use saved searches</string>
+    <string name="choose_saved_searches">Choose saved searches</string>
+    <string name="use_favorites">Use favorites</string>
+    <string name="use_local_dirs">Use local directories</string>
+    <string name="choose_local_dirs">Choose local directories</string>
     <plurals name="every_x_hrs">
         <item quantity="one">Every %d hour</item>
         <item quantity="other">Every %d hours</item>

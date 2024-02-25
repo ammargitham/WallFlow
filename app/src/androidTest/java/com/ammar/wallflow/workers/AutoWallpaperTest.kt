@@ -939,6 +939,7 @@ class AutoWallpaperTest {
 
     private val DataStore<Preferences>.appPreferencesRepository
         get() = AppPreferencesRepository(
+            context = context,
             dataStore = this,
             ioDispatcher = testDispatcher,
         )

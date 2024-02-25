@@ -185,6 +185,8 @@ internal open class FakeFavoriteDao : FavoriteDao {
 
     override fun observeExists(sourceId: String, source: Source) = throw RuntimeException()
 
+    override fun observeCount() = throw RuntimeException()
+
     override suspend fun getBySourceIdAndType(
         sourceId: String,
         source: Source,
@@ -410,6 +412,8 @@ internal open class FakeLightDarkDao : LightDarkDao {
     override fun pagingSource() = throw RuntimeException()
 
     override fun observeTypeFlags(sourceId: String, source: Source) = throw RuntimeException()
+
+    override fun observeCount() = throw RuntimeException()
 
     override suspend fun upsert(lightDarkEntity: LightDarkEntity) = throw RuntimeException()
 

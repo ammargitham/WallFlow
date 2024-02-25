@@ -92,6 +92,9 @@ fun <T> TagInputField(
         BasicTextField(
             modifier = Modifier
                 .onPreviewKeyEvent {
+                    if (!showTagClearAction) {
+                        return@onPreviewKeyEvent true
+                    }
                     if (it.key != Key.Backspace ||
                         fieldValue.isNotEmpty() ||
                         tags.isEmpty() ||
