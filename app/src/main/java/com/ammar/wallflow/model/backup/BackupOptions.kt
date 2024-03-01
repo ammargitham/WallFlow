@@ -11,11 +11,16 @@ import com.ammar.wallflow.extensions.getParcelableCompat
 data class BackupOptions(
     val settings: Boolean = false,
     val favorites: Boolean = false,
+    val lightDark: Boolean = false,
     val savedSearches: Boolean = false,
     val viewed: Boolean = false,
     val file: Uri? = null,
 ) {
-    val atleastOneChosen = settings || favorites || savedSearches || viewed
+    val atleastOneChosen = settings ||
+        favorites ||
+        lightDark ||
+        savedSearches ||
+        viewed
 }
 
 val MutableBackupOptionsSaver = Saver<MutableState<BackupOptions>, Bundle>(
@@ -24,6 +29,7 @@ val MutableBackupOptionsSaver = Saver<MutableState<BackupOptions>, Bundle>(
         bundleOf(
             "settings" to value.settings,
             "favorites" to value.favorites,
+            "light_dark" to value.lightDark,
             "saved_searches" to value.savedSearches,
             "viewed" to value.viewed,
             "file" to value.file,
@@ -34,6 +40,7 @@ val MutableBackupOptionsSaver = Saver<MutableState<BackupOptions>, Bundle>(
             BackupOptions(
                 settings = it.getBoolean("settings", false),
                 favorites = it.getBoolean("favorites", false),
+                lightDark = it.getBoolean("light_dark", false),
                 savedSearches = it.getBoolean("saved_searches", false),
                 viewed = it.getBoolean("viewed", false),
                 file = it.getParcelableCompat("file", Uri::class.java),

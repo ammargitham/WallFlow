@@ -27,11 +27,11 @@ fun CardViewedIcon(
         modifier = modifier
             .clip(CircleShape)
             .background(Color.Black.copy(alpha = 0.5f))
-            .size(40.dp),
+            .size(24.dp),
     ) {
         Icon(
             modifier = Modifier
-                .size(24.dp)
+                .size(16.dp)
                 .align(Alignment.Center),
             painter = painterResource(R.drawable.baseline_visibility_24),
             contentDescription = stringResource(R.string.viewed),

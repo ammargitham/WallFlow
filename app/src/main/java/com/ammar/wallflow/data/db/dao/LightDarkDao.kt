@@ -2,6 +2,7 @@ package com.ammar.wallflow.data.db.dao
 
 import androidx.paging.PagingSource
 import androidx.room.Dao
+import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Upsert
 import com.ammar.wallflow.data.db.entity.LightDarkEntity
@@ -18,6 +19,9 @@ interface LightDarkDao {
 
     @Query("SELECT * FROM light_dark WHERE source_id = :sourceId AND source = :source")
     suspend fun getBySourceIdAndSource(sourceId: String, source: Source): LightDarkEntity?
+
+    @Query("SELECT * FROM light_dark WHERE typeFlags in (:typeFlags) ORDER BY RANDOM() LIMIT 1")
+    suspend fun getRandomByTypeFlag(typeFlags: Set<Int>): LightDarkEntity?
 
     @Query("SELECT * FROM light_dark ORDER BY updated_on DESC")
     fun pagingSource(): PagingSource<Int, LightDarkEntity>
@@ -38,4 +42,7 @@ interface LightDarkDao {
 
     @Query("DELETE FROM light_dark WHERE source_id = :sourceId AND source = :source")
     suspend fun deleteBySourceIdAndSource(sourceId: String, source: Source)
+
+    @Insert
+    suspend fun insertAll(lightDarkEntities: Collection<LightDarkEntity>)
 }

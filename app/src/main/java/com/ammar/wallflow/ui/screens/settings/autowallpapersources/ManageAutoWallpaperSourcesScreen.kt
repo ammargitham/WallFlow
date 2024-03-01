@@ -190,18 +190,21 @@ private fun ManageAutoWallpaperSourcesScreenContent(
             savedSearches = savedSearches,
             savedSearchEnabled = activeSources.savedSearchEnabled,
             savedSearchIds = activeSources.savedSearchIds,
+            lightDarkEnabled = activeSources.lightDarkEnabled,
             onChangeSavedSearchEnabled = { onChangeSavedSearchEnabled(it, activeTarget) },
             onChangeSavedSearchIds = { onChangeSavedSearchIds(it, activeTarget) },
         )
         FavoritesSection(
             favoritesEnabled = activeSources.favoritesEnabled,
             hasFavorites = hasFavorites,
+            lightDarkEnabled = activeSources.lightDarkEnabled,
             onChangeFavoritesEnabled = { onChangeFavoritesEnabled(it, activeTarget) },
         )
         LocalSection(
             localDirectories = localDirectories,
             localEnabled = activeSources.localEnabled,
             selectedUris = activeSources.localDirs,
+            lightDarkEnabled = activeSources.lightDarkEnabled,
             onChangeLocalEnabled = { onChangeLocalEnabled(it, activeTarget) },
             onChangeSelectedUris = { onChangeSelectedLocalDirs(it, activeTarget) },
         )

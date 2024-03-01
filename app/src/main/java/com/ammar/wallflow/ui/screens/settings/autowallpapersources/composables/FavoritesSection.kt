@@ -22,25 +22,34 @@ import com.ammar.wallflow.ui.theme.WallFlowTheme
 internal fun FavoritesSection(
     favoritesEnabled: Boolean = false,
     hasFavorites: Boolean = false,
+    lightDarkEnabled: Boolean = false,
     onChangeFavoritesEnabled: (Boolean) -> Unit = {},
 ) {
-    val alpha = if (hasFavorites) 1f else DISABLED_ALPHA
+    val disabled = !hasFavorites || lightDarkEnabled
+    val alpha = if (disabled) DISABLED_ALPHA else 1f
+    val supportingTextRes: Int? = if (!hasFavorites) {
+        R.string.no_favorites
+    } else if (lightDarkEnabled) {
+        R.string.light_dark_enabled
+    } else {
+        null
+    }
 
     SectionHeader(text = stringResource(R.string.favorites))
     ListItem(
-        modifier = Modifier.clickable(
-            enabled = hasFavorites,
-        ) { onChangeFavoritesEnabled(!favoritesEnabled) },
+        modifier = Modifier.clickable(enabled = !disabled) {
+            onChangeFavoritesEnabled(!favoritesEnabled)
+        },
         headlineContent = {
             Text(
                 text = stringResource(R.string.use_favorites),
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
             )
         },
-        supportingContent = if (!hasFavorites) {
+        supportingContent = if (supportingTextRes != null) {
             {
                 Text(
-                    text = stringResource(R.string.no_favorites),
+                    text = stringResource(supportingTextRes),
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
                         alpha = alpha,
                     ),
@@ -51,8 +60,8 @@ internal fun FavoritesSection(
         },
         trailingContent = {
             Switch(
-                enabled = hasFavorites,
-                checked = favoritesEnabled && hasFavorites,
+                enabled = !disabled,
+                checked = favoritesEnabled && !disabled,
                 onCheckedChange = onChangeFavoritesEnabled,
             )
         },
@@ -62,6 +71,7 @@ internal fun FavoritesSection(
 private data class FavoritesSectionParameters(
     val favoritesEnabled: Boolean = false,
     val hasFavorites: Boolean = false,
+    val lightDarkEnabled: Boolean = false,
 )
 
 private class FavoritesSectionPPP : CollectionPreviewParameterProvider<FavoritesSectionParameters>(
@@ -73,6 +83,11 @@ private class FavoritesSectionPPP : CollectionPreviewParameterProvider<Favorites
         FavoritesSectionParameters(
             favoritesEnabled = true,
             hasFavorites = true,
+        ),
+        FavoritesSectionParameters(
+            favoritesEnabled = true,
+            hasFavorites = true,
+            lightDarkEnabled = true,
         ),
     ),
 )
@@ -88,6 +103,7 @@ private fun PreviewFavoritesSection(
             FavoritesSection(
                 favoritesEnabled = parameters.favoritesEnabled,
                 hasFavorites = parameters.hasFavorites,
+                lightDarkEnabled = parameters.lightDarkEnabled,
             )
         }
     }

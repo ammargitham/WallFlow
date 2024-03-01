@@ -6,8 +6,10 @@ import androidx.compose.animation.animateColor
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
@@ -198,17 +200,6 @@ fun WallpaperCard(
             },
             onSuccess = { loaded = true },
         )
-        if (!lightDarkTypeFlags.isUnspecified()) {
-            CardLightDarkIcon(
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(
-                        top = 8.dp,
-                        end = 8.dp,
-                    ),
-                typeFlags = lightDarkTypeFlags,
-            )
-        }
         if (isViewed && viewedWallpapersLook in setOf(
                 ViewedWallpapersLook.DIM_WITH_LABEL,
                 ViewedWallpapersLook.LABEL,
@@ -224,19 +215,27 @@ fun WallpaperCard(
                 text = stringResource(R.string.viewed),
             )
         }
-        if (isViewed && viewedWallpapersLook in setOf(
-                ViewedWallpapersLook.DIM_WITH_ICON,
-                ViewedWallpapersLook.ICON,
-            )
+        Row(
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(
+                    top = 8.dp,
+                    start = 8.dp,
+                ),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            CardViewedIcon(
-                modifier = Modifier
-                    .align(Alignment.BottomStart)
-                    .padding(
-                        start = 8.dp,
-                        bottom = 8.dp,
-                    ),
-            )
+            if (isViewed && viewedWallpapersLook in setOf(
+                    ViewedWallpapersLook.DIM_WITH_ICON,
+                    ViewedWallpapersLook.ICON,
+                )
+            ) {
+                CardViewedIcon(modifier = Modifier)
+            }
+            if (!lightDarkTypeFlags.isUnspecified()) {
+                CardLightDarkIcon(
+                    typeFlags = lightDarkTypeFlags,
+                )
+            }
         }
         CardFavoriteButton(
             modifier = Modifier
@@ -289,6 +288,11 @@ private class PreviewProps : CollectionPreviewParameterProvider<Props>(
         Props(isFavorite = true),
         Props(isViewed = true),
         Props(lightDarkTypeFlags = LightDarkType.DARK),
+        Props(
+            isViewed = true,
+            viewedWallpapersLook = ViewedWallpapersLook.ICON,
+            lightDarkTypeFlags = LightDarkType.DARK,
+        ),
     ),
 )
 

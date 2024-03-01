@@ -396,18 +396,16 @@ internal open class FakeViewedDao : ViewedDao {
 }
 
 internal open class FakeLightDarkDao : LightDarkDao {
-    override fun observeAll(): Flow<List<LightDarkEntity>> {
-        throw RuntimeException()
-    }
+    override fun observeAll() = throw RuntimeException()
 
-    override suspend fun getAll(): List<LightDarkEntity> {
-        throw RuntimeException()
-    }
+    override suspend fun getAll() = throw RuntimeException()
 
     override suspend fun getBySourceIdAndSource(
         sourceId: String,
         source: Source,
     ) = throw RuntimeException()
+
+    override suspend fun getRandomByTypeFlag(typeFlags: Set<Int>) = throw RuntimeException()
 
     override fun pagingSource() = throw RuntimeException()
 
@@ -420,5 +418,9 @@ internal open class FakeLightDarkDao : LightDarkDao {
     override suspend fun deleteBySourceIdAndSource(
         sourceId: String,
         source: Source,
+    ) = throw RuntimeException()
+
+    override suspend fun insertAll(
+        lightDarkEntities: Collection<LightDarkEntity>,
     ) = throw RuntimeException()
 }

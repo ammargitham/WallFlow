@@ -41,26 +41,35 @@ internal fun ColumnScope.SavedSearchesSection(
     savedSearches: ImmutableList<SavedSearch> = persistentListOf(),
     savedSearchEnabled: Boolean = false,
     savedSearchIds: Set<Long> = emptySet(),
+    lightDarkEnabled: Boolean = false,
     onChangeSavedSearchEnabled: (Boolean) -> Unit = {},
     onChangeSavedSearchIds: (Set<Long>) -> Unit = {},
 ) {
-    val alpha = if (savedSearches.isNotEmpty()) 1f else DISABLED_ALPHA
+    val disabled = savedSearches.isEmpty() || lightDarkEnabled
+    val alpha = if (disabled) DISABLED_ALPHA else 1f
+    val supportingTextRes: Int? = if (savedSearches.isEmpty()) {
+        R.string.no_saved_searches
+    } else if (lightDarkEnabled) {
+        R.string.light_dark_enabled
+    } else {
+        null
+    }
 
     SectionHeader(text = stringResource(R.string.saved_searches))
     ListItem(
-        modifier = Modifier.clickable(
-            enabled = savedSearches.isNotEmpty(),
-        ) { onChangeSavedSearchEnabled(!savedSearchEnabled) },
+        modifier = Modifier.clickable(enabled = !disabled) {
+            onChangeSavedSearchEnabled(!savedSearchEnabled)
+        },
         headlineContent = {
             Text(
                 text = stringResource(R.string.use_saved_searches),
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
             )
         },
-        supportingContent = if (savedSearches.isEmpty()) {
+        supportingContent = if (supportingTextRes != null) {
             {
                 Text(
-                    text = stringResource(R.string.no_saved_searches),
+                    text = stringResource(supportingTextRes),
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
                         alpha = alpha,
                     ),
@@ -71,13 +80,13 @@ internal fun ColumnScope.SavedSearchesSection(
         },
         trailingContent = {
             Switch(
-                enabled = savedSearches.isNotEmpty(),
-                checked = savedSearchEnabled && savedSearches.isNotEmpty(),
+                enabled = !disabled,
+                checked = savedSearchEnabled && !disabled,
                 onCheckedChange = onChangeSavedSearchEnabled,
             )
         },
     )
-    AnimatedVisibility(visible = savedSearchEnabled && savedSearches.isNotEmpty()) {
+    AnimatedVisibility(visible = savedSearchEnabled && !disabled) {
         DropdownMultiple(
             modifier = Modifier
                 .padding(
@@ -116,6 +125,7 @@ private data class SavedSearchesSectionParameters(
     val savedSearches: List<SavedSearch> = emptyList(),
     val savedSearchEnabled: Boolean = false,
     val savedSearchIds: Set<Long> = emptySet(),
+    val lightDarkEnabled: Boolean = false,
 )
 
 private class SavedSearchesSectionPPP :
@@ -135,6 +145,17 @@ private class SavedSearchesSectionPPP :
                     )
                 },
             ),
+            SavedSearchesSectionParameters(
+                savedSearchEnabled = true,
+                savedSearches = List(3) {
+                    SavedSearch(
+                        id = it.toLong(),
+                        name = "Saved search $it",
+                        search = WallhavenSearch(),
+                    )
+                },
+                lightDarkEnabled = true,
+            ),
         ),
     )
 
@@ -153,6 +174,7 @@ private fun PreviewSavedSearchesSection(
                     savedSearches = parameters.savedSearches.toImmutableList(),
                     savedSearchEnabled = parameters.savedSearchEnabled,
                     savedSearchIds = parameters.savedSearchIds,
+                    lightDarkEnabled = parameters.lightDarkEnabled,
                 )
             }
         }

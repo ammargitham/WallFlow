@@ -4,6 +4,8 @@ import android.content.res.Configuration
 import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ListItem
@@ -30,30 +32,39 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 
 @Composable
-internal fun LocalSection(
+internal fun ColumnScope.LocalSection(
     localDirectories: ImmutableList<LocalDirectory> = persistentListOf(),
     localEnabled: Boolean = false,
     selectedUris: Set<Uri> = emptySet(),
+    lightDarkEnabled: Boolean = false,
     onChangeLocalEnabled: (Boolean) -> Unit = {},
     onChangeSelectedUris: (Set<Uri>) -> Unit = {},
 ) {
-    val alpha = if (localDirectories.isNotEmpty()) 1f else DISABLED_ALPHA
+    val disabled = localDirectories.isEmpty() || lightDarkEnabled
+    val alpha = if (disabled) DISABLED_ALPHA else 1f
+    val supportingTextRes: Int? = if (localDirectories.isEmpty()) {
+        R.string.no_local_dirs
+    } else if (lightDarkEnabled) {
+        R.string.light_dark_enabled
+    } else {
+        null
+    }
 
     SectionHeader(text = stringResource(R.string.local))
     ListItem(
-        modifier = Modifier.clickable(
-            enabled = localDirectories.isNotEmpty(),
-        ) { onChangeLocalEnabled(!localEnabled) },
+        modifier = Modifier.clickable(enabled = !disabled) {
+            onChangeLocalEnabled(!localEnabled)
+        },
         headlineContent = {
             Text(
                 text = stringResource(R.string.use_local_dirs),
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
             )
         },
-        supportingContent = if (localDirectories.isEmpty()) {
+        supportingContent = if (supportingTextRes != null) {
             {
                 Text(
-                    text = stringResource(R.string.no_local_dirs),
+                    text = stringResource(supportingTextRes),
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
                         alpha = alpha,
                     ),
@@ -64,13 +75,13 @@ internal fun LocalSection(
         },
         trailingContent = {
             Switch(
-                enabled = localDirectories.isNotEmpty(),
-                checked = localEnabled && localDirectories.isNotEmpty(),
+                enabled = !disabled,
+                checked = localEnabled && !disabled,
                 onCheckedChange = onChangeLocalEnabled,
             )
         },
     )
-    AnimatedVisibility(visible = localEnabled && localDirectories.isNotEmpty()) {
+    AnimatedVisibility(visible = localEnabled && !disabled) {
         DropdownMultiple(
             modifier = Modifier
                 .padding(
@@ -96,6 +107,7 @@ internal fun LocalSection(
 private data class LocalSectionParameters(
     val localDirectories: List<LocalDirectory> = emptyList(),
     val localEnabled: Boolean = false,
+    val lightDarkEnabled: Boolean = false,
 )
 
 private class LocalSectionPPP : CollectionPreviewParameterProvider<LocalSectionParameters>(
@@ -113,6 +125,16 @@ private class LocalSectionPPP : CollectionPreviewParameterProvider<LocalSectionP
                 ),
             ),
         ),
+        LocalSectionParameters(
+            localEnabled = true,
+            localDirectories = listOf(
+                LocalDirectory(
+                    uri = Uri.EMPTY,
+                    path = "test",
+                ),
+            ),
+            lightDarkEnabled = true,
+        ),
     ),
 )
 
@@ -124,10 +146,13 @@ private fun PreviewLocalSection(
 ) {
     WallFlowTheme {
         Surface {
-            LocalSection(
-                localDirectories = parameters.localDirectories.toImmutableList(),
-                localEnabled = parameters.localEnabled,
-            )
+            Column {
+                LocalSection(
+                    localDirectories = parameters.localDirectories.toImmutableList(),
+                    localEnabled = parameters.localEnabled,
+                    lightDarkEnabled = parameters.lightDarkEnabled,
+                )
+            }
         }
     }
 }

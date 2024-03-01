@@ -85,7 +85,8 @@ import com.ammar.wallflow.ui.screens.settings.composables.viewedWallpapersSectio
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import com.ammar.wallflow.utils.StoragePermissions
 import com.ammar.wallflow.utils.objectdetection.objectsDetector
-import com.ammar.wallflow.workers.AutoWallpaperWorker
+import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.AutoWallpaperException
+import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.Status
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.navigate
 import kotlinx.collections.immutable.ImmutableList
@@ -468,7 +469,7 @@ fun SettingsScreenContent(
     autoWallpaperSavedSearches: ImmutableList<SavedSearch> = persistentListOf(),
     hasSetWallpaperPermission: Boolean = true,
     autoWallpaperNextRun: NextRun = NextRun.NotScheduled,
-    autoWallpaperStatus: AutoWallpaperWorker.Companion.Status? = null,
+    autoWallpaperStatus: Status? = null,
     showLocalTab: Boolean = true,
     onBlurSketchyCheckChange: (checked: Boolean) -> Unit = {},
     onBlurNsfwCheckChange: (checked: Boolean) -> Unit = {},
@@ -548,6 +549,12 @@ fun SettingsScreenContent(
                     enabled = appPreferences.autoWallpaperPreferences.enabled,
                     sourcesSummary = getSourcesSummary(
                         context = context,
+                        useSameSources = !appPreferences
+                            .autoWallpaperPreferences
+                            .setDifferentWallpapers,
+                        lightDarkEnabled = appPreferences
+                            .autoWallpaperPreferences
+                            .lightDarkEnabled,
                         savedSearches = autoWallpaperSavedSearches,
                         savedSearchEnabled = appPreferences
                             .autoWallpaperPreferences
@@ -558,6 +565,18 @@ fun SettingsScreenContent(
                         localEnabled = appPreferences
                             .autoWallpaperPreferences
                             .localEnabled,
+                        lsLightDarkEnabled = appPreferences
+                            .autoWallpaperPreferences
+                            .lsLightDarkEnabled,
+                        lsSavedSearchEnabled = appPreferences
+                            .autoWallpaperPreferences
+                            .lsSavedSearchEnabled,
+                        lsFavoritesEnabled = appPreferences
+                            .autoWallpaperPreferences
+                            .lsFavoritesEnabled,
+                        lsLocalEnabled = appPreferences
+                            .autoWallpaperPreferences
+                            .lsLocalEnabled,
                     ),
                     crop = appPreferences
                         .autoWallpaperPreferences
@@ -632,10 +651,22 @@ fun SettingsScreenContent(
                 targetOffsetY = { x -> x },
             ),
         ) {
-            Snackbar(
-                modifier = Modifier.padding(16.dp),
-            ) {
-                Text(text = stringResource(R.string.wallpaper_changed))
+            Snackbar(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = when (autoWallpaperStatus) {
+                        is Status.Success -> {
+                            stringResource(R.string.wallpaper_changed)
+                        }
+                        is Status.Failed -> {
+                            if (autoWallpaperStatus.e is AutoWallpaperException) {
+                                getFailureReasonString(autoWallpaperStatus.e.code)
+                            } else {
+                                stringResource(R.string.wallpaper_not_changed)
+                            }
+                        }
+                        else -> ""
+                    },
+                )
             }
         }
     }
@@ -643,25 +674,95 @@ fun SettingsScreenContent(
 
 private fun getSourcesSummary(
     context: Context,
+    useSameSources: Boolean,
+    lightDarkEnabled: Boolean,
     savedSearches: ImmutableList<SavedSearch>,
     savedSearchEnabled: Boolean,
     favoritesEnabled: Boolean,
     localEnabled: Boolean,
+    lsLightDarkEnabled: Boolean,
+    lsSavedSearchEnabled: Boolean,
+    lsFavoritesEnabled: Boolean,
+    lsLocalEnabled: Boolean,
 ) = mutableListOf<String>().apply {
-    if (savedSearchEnabled) {
-        add(
-            "${context.getString(R.string.saved_search)} (${
+    if (useSameSources) {
+        if (lightDarkEnabled) {
+            add(context.getString(R.string.light_dark))
+            return@apply
+        }
+        if (savedSearchEnabled && savedSearches.size > 0) {
+            val searchNames = if (savedSearches.size > 2) {
+                context.resources.getQuantityString(
+                    R.plurals.n_searches,
+                    savedSearches.size,
+                    savedSearches.size,
+                )
+            } else {
                 savedSearches.joinToString(", ") { it.name }
-            })",
+            }
+            add("${context.getString(R.string.saved_search)} ($searchNames)")
+        }
+        if (favoritesEnabled) {
+            add(context.getString(R.string.favorites))
+        }
+        if (localEnabled) {
+            add(context.getString(R.string.local))
+        }
+    } else {
+        val homeCount = getSourcesCount(
+            lightDarkEnabled,
+            savedSearchEnabled,
+            favoritesEnabled,
+            localEnabled,
         )
-    }
-    if (favoritesEnabled) {
-        add(context.getString(R.string.favorites))
-    }
-    if (localEnabled) {
-        add(context.getString(R.string.local))
+        if (homeCount > 0) {
+            add(
+                context.resources.getQuantityString(
+                    R.plurals.home_screen_sources,
+                    homeCount,
+                    homeCount,
+                ),
+            )
+        }
+        val lsCount = getSourcesCount(
+            lsLightDarkEnabled,
+            lsSavedSearchEnabled,
+            lsFavoritesEnabled,
+            lsLocalEnabled,
+        )
+        if (lsCount > 0) {
+            add(
+                context.resources.getQuantityString(
+                    R.plurals.lock_screen_sources,
+                    lsCount,
+                    lsCount,
+                ),
+            )
+        }
     }
 }.joinToString(", ")
+
+private fun getSourcesCount(
+    lightDarkEnabled: Boolean,
+    savedSearchEnabled: Boolean,
+    favoritesEnabled: Boolean,
+    localEnabled: Boolean,
+): Int {
+    if (lightDarkEnabled) {
+        return 1
+    }
+    var count = 0
+    if (savedSearchEnabled) {
+        count += 1
+    }
+    if (favoritesEnabled) {
+        count += 1
+    }
+    if (localEnabled) {
+        count += 1
+    }
+    return count
+}
 
 @Preview
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
@@ -670,7 +771,7 @@ private fun PreviewSettingsScreenContent() {
     WallFlowTheme {
         Surface {
             val coroutineScope = rememberCoroutineScope()
-            var autoWallpaperStatus: AutoWallpaperWorker.Companion.Status? by remember {
+            var autoWallpaperStatus: Status? by remember {
                 mutableStateOf(null)
             }
             SettingsScreenContent(
@@ -681,7 +782,7 @@ private fun PreviewSettingsScreenContent() {
                 ),
                 autoWallpaperStatus = autoWallpaperStatus,
                 onAutoWallpaperChangeNowClick = {
-                    autoWallpaperStatus = AutoWallpaperWorker.Companion.Status.Success
+                    autoWallpaperStatus = Status.Success
                     coroutineScope.launch {
                         delay(5000)
                         autoWallpaperStatus = null

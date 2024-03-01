@@ -161,6 +161,7 @@ class HomeScreenTest {
                 }
             },
             appPreferencesRepository = AppPreferencesRepository(
+                context = context,
                 dataStore = dataStore,
                 ioDispatcher = coroutineDispatcher,
             ),

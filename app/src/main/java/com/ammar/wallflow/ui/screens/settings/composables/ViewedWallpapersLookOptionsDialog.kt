@@ -163,10 +163,10 @@ private fun ViewedWallpapersLookOptionsContent(
                 ) {
                     CardViewedIcon(
                         modifier = Modifier
-                            .align(Alignment.BottomStart)
+                            .align(Alignment.TopStart)
                             .padding(
                                 start = 8.dp,
-                                bottom = 8.dp,
+                                top = 8.dp,
                             ),
                     )
                 }

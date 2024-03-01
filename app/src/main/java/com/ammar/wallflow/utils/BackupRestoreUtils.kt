@@ -4,16 +4,19 @@ import android.content.Context
 import android.util.Log
 import androidx.core.net.toUri
 import com.ammar.wallflow.data.db.dao.FavoriteDao
+import com.ammar.wallflow.data.db.dao.LightDarkDao
 import com.ammar.wallflow.data.db.dao.ViewedDao
 import com.ammar.wallflow.data.db.dao.search.SavedSearchDao
 import com.ammar.wallflow.data.db.dao.wallpaper.RedditWallpapersDao
 import com.ammar.wallflow.data.db.dao.wallpaper.WallhavenWallpapersDao
 import com.ammar.wallflow.data.db.entity.FavoriteEntity
+import com.ammar.wallflow.data.db.entity.LightDarkEntity
 import com.ammar.wallflow.data.db.entity.ViewedEntity
 import com.ammar.wallflow.data.db.entity.search.toSavedSearch
 import com.ammar.wallflow.data.preferences.AppPreferences
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.FavoritesRepository
+import com.ammar.wallflow.data.repository.LightDarkRepository
 import com.ammar.wallflow.data.repository.SavedSearchRepository
 import com.ammar.wallflow.data.repository.ViewedRepository
 import com.ammar.wallflow.data.repository.reddit.RedditRepository
@@ -58,12 +61,14 @@ suspend fun getBackupV1Json(
     redditWallpapersDao: RedditWallpapersDao,
     savedSearchDao: SavedSearchDao,
     viewedDao: ViewedDao,
+    lightDarkDao: LightDarkDao,
 ): String? {
     if (!options.atleastOneChosen) {
         return null
     }
     var appPreferences: AppPreferences? = null
     var favorites: List<FavoriteEntity>? = null
+    var lightDarkEntities: List<LightDarkEntity>? = null
     var viewed: List<ViewedEntity>? = null
     var wallhavenBackupV1 = WallhavenBackupV1(
         wallpapers = null,
@@ -103,6 +108,45 @@ suspend fun getBackupV1Json(
         }
     }
 
+    if (options.lightDark) {
+        lightDarkEntities = lightDarkDao.getAll()
+        // get all light dark wallhaven wallpapers
+        val wallhavenWallpaperIds = lightDarkEntities
+            .filter { it.source == Source.WALLHAVEN }
+            .mapTo(HashSet()) { it.sourceId }
+        if (wallhavenWallpaperIds.isNotEmpty()) {
+            var existingIds = emptySet<String>()
+            val existingWallpapers = wallhavenBackupV1.wallpapers ?: emptyList()
+            if (existingWallpapers.isNotEmpty()) {
+                existingIds = existingWallpapers.mapTo(HashSet()) { it.wallhavenId }
+            }
+            val wallpapers = wallhavenWallpapersDao.getAllByWallhavenIds(
+                wallhavenWallpaperIds - existingIds,
+            )
+            wallhavenBackupV1 = wallhavenBackupV1.copy(
+                wallpapers = existingWallpapers + wallpapers,
+            )
+        }
+
+        // get all light dark reddit wallpapers
+        val redditWallpaperIds = lightDarkEntities
+            .filter { it.source == Source.REDDIT }
+            .map { it.sourceId }
+        if (redditWallpaperIds.isNotEmpty()) {
+            var existingIds = emptySet<String>()
+            val existingWallpapers = redditBackupV1.wallpapers ?: emptyList()
+            if (existingWallpapers.isNotEmpty()) {
+                existingIds = existingWallpapers.mapTo(HashSet()) { it.redditId }
+            }
+            val wallpapers = redditWallpapersDao.getByRedditIds(
+                redditWallpaperIds - existingIds,
+            )
+            redditBackupV1 = redditBackupV1.copy(
+                wallpapers = existingWallpapers + wallpapers,
+            )
+        }
+    }
+
     if (options.viewed) {
         viewed = viewedDao.getAll()
     }
@@ -126,6 +170,7 @@ suspend fun getBackupV1Json(
     val backupV1 = BackupV1(
         preferences = appPreferences,
         favorites = favorites,
+        lightDark = lightDarkEntities,
         viewed = viewed,
         wallhaven = wallhavenBackupV1,
         reddit = redditBackupV1,
@@ -172,6 +217,7 @@ suspend fun restoreBackup(
     wallhavenWallpapersDao: WallhavenWallpapersDao,
     redditWallpapersDao: RedditWallpapersDao,
     viewedRepository: ViewedRepository,
+    lightDarkRepository: LightDarkRepository,
 ) {
     when (backup.version) {
         1 -> restoreBackupV1(
@@ -186,6 +232,7 @@ suspend fun restoreBackup(
             wallhavenWallpapersDao = wallhavenWallpapersDao,
             redditWallpapersDao = redditWallpapersDao,
             viewedRepository = viewedRepository,
+            lightDarkRepository = lightDarkRepository,
         )
         else -> throw InvalidJsonException("Invalid version!")
     }
@@ -203,6 +250,7 @@ suspend fun restoreBackupV1(
     wallhavenWallpapersDao: WallhavenWallpapersDao,
     redditWallpapersDao: RedditWallpapersDao,
     viewedRepository: ViewedRepository,
+    lightDarkRepository: LightDarkRepository,
 ) {
     if (!options.atleastOneChosen) {
         return
@@ -222,7 +270,9 @@ suspend fun restoreBackupV1(
             )
         }
     }
-    if (options.favorites && backup.favorites?.isNotEmpty() == true) {
+    val hasFavorites = options.favorites && backup.favorites?.isNotEmpty() == true
+    val hasLightDark = options.lightDark && backup.lightDark?.isNotEmpty() == true
+    if (hasFavorites || hasLightDark) {
         // restore sources first
         // 1. Wallhaven
         //    - Wallpapers
@@ -237,9 +287,13 @@ suspend fun restoreBackupV1(
             // restore wallpapers
             redditRepository.insertWallpaperEntities(redditWallpapers)
         }
-        val existingWallhavenWallpaperIds = wallhavenWallpapersDao.getAllWallhavenIds()
-        val existingRedditWallpaperIds = redditWallpapersDao.getAllRedditIds()
-        val favoritesToInsert = backup.favorites.filter {
+    }
+
+    val existingWallhavenWallpaperIds = wallhavenWallpapersDao.getAllWallhavenIds()
+    val existingRedditWallpaperIds = redditWallpapersDao.getAllRedditIds()
+
+    if (hasFavorites) {
+        val favoritesToInsert = backup.favorites?.filter {
             when (it.source) {
                 Source.WALLHAVEN -> it.sourceId in existingWallhavenWallpaperIds
                 Source.REDDIT -> it.sourceId in existingRedditWallpaperIds
@@ -250,8 +304,28 @@ suspend fun restoreBackupV1(
                 }
             }
         }
-        favoritesRepository.insertEntities(favoritesToInsert)
+        if (favoritesToInsert != null) {
+            favoritesRepository.insertEntities(favoritesToInsert)
+        }
     }
+
+    if (hasLightDark) {
+        val lightDarkToInsert = backup.lightDark?.filter {
+            when (it.source) {
+                Source.WALLHAVEN -> it.sourceId in existingWallhavenWallpaperIds
+                Source.REDDIT -> it.sourceId in existingRedditWallpaperIds
+                Source.LOCAL -> try {
+                    DocumentFileCompat.fromSingleUri(context, it.sourceId.toUri()) != null
+                } catch (e: Exception) {
+                    false
+                }
+            }
+        }
+        if (lightDarkToInsert != null) {
+            lightDarkRepository.insertEntities(lightDarkToInsert)
+        }
+    }
+
     if (options.viewed && backup.viewed?.isNotEmpty() == true) {
         viewedRepository.insertEntities(backup.viewed)
     }

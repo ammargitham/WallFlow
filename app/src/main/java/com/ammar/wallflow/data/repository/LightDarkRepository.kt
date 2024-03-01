@@ -117,16 +117,37 @@ class LightDarkRepository @Inject constructor(
 
     fun observeCount() = lightDarkDao.observeCount()
 
-    // suspend fun insertEntities(entities: Collection<ViewedEntity>) = withContext(ioDispatcher) {
-    //     val existing = lightDarkDao.getAll()
-    //     val existingMap = existing.associateBy { (it.source to it.sourceId) }
-    //     val insert = entities.filter {
-    //         // only take non-existing
-    //         existingMap[(it.source to it.sourceId)] == null
-    //     }.map {
-    //         // reset id
-    //         it.copy(id = 0)
-    //     }
-    //     lightDarkDao.insertAll(insert)
-    // }
+    suspend fun getRandomByTypeFlags(
+        context: Context,
+        typeFlags: Set<Int>,
+    ) = withContext(ioDispatcher) {
+        val entity = lightDarkDao.getRandomByTypeFlag(typeFlags) ?: return@withContext null
+        when (entity.source) {
+            Source.WALLHAVEN -> {
+                val wallpaperEntity = wallhavenWallpapersDao.getByWallhavenId(entity.sourceId)
+                wallpaperEntity?.toWallpaper()
+            }
+            Source.REDDIT -> {
+                val wallpaperEntity = redditWallpapersDao.getByRedditId(entity.sourceId)
+                wallpaperEntity?.toWallpaper()
+            }
+            Source.LOCAL -> localWallpapersRepository.wallpaper(
+                context = context,
+                wallpaperUriStr = entity.sourceId,
+            ).firstOrNull()?.successOr(null)
+        }
+    }
+
+    suspend fun insertEntities(entities: Collection<LightDarkEntity>) = withContext(ioDispatcher) {
+        val existing = lightDarkDao.getAll()
+        val existingMap = existing.associateBy { it.source to it.sourceId }
+        val insert = entities.filter {
+            // only take non-existing
+            existingMap[it.source to it.sourceId] == null
+        }.map {
+            // reset id
+            it.copy(id = 0)
+        }
+        lightDarkDao.insertAll(insert)
+    }
 }

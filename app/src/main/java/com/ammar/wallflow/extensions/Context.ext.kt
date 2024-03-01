@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.ContextWrapper
 import android.content.Intent
 import android.content.UriPermission
+import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.BitmapRegionDecoder
 import android.hardware.display.DisplayManager
@@ -281,6 +282,11 @@ fun Context.readFromUri(
 ) = contentResolver.openInputStream(uri)?.use { inputStream ->
     val buffer = inputStream.source().buffer()
     buffer.readUtf8()
+}
+
+fun Context.isSystemInDarkTheme(): Boolean {
+    val uiMode = resources.configuration.uiMode
+    return (uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
 }
 
 fun Context.isExtraDimActive() = try {

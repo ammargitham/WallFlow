@@ -20,6 +20,7 @@ import androidx.work.workDataOf
 import com.ammar.wallflow.MIME_TYPE_JPEG
 import com.ammar.wallflow.data.db.dao.AutoWallpaperHistoryDao
 import com.ammar.wallflow.data.db.dao.FavoriteDao
+import com.ammar.wallflow.data.db.dao.LightDarkDao
 import com.ammar.wallflow.data.db.dao.ObjectDetectionModelDao
 import com.ammar.wallflow.data.db.dao.search.SavedSearchDao
 import com.ammar.wallflow.data.db.dao.wallpaper.RedditWallpapersDao
@@ -41,6 +42,7 @@ import com.ammar.wallflow.data.preferences.AutoWallpaperPreferences
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.AutoWallpaperHistoryRepository
 import com.ammar.wallflow.data.repository.FavoritesRepository
+import com.ammar.wallflow.data.repository.LightDarkRepository
 import com.ammar.wallflow.data.repository.ObjectDetectionModelRepository
 import com.ammar.wallflow.data.repository.SavedSearchRepository
 import com.ammar.wallflow.data.repository.local.LocalWallpapersRepository
@@ -661,7 +663,7 @@ class AutoWallpaperTest {
                 `is`(
                     Result.failure(
                         workDataOf(
-                            FAILURE_REASON to FailureReason.NO_WALLPAPER_FOUND.name,
+                            FAILURE_REASON to FailureReason.DISABLED.name,
                         ),
                     ),
                 ),
@@ -683,6 +685,7 @@ class AutoWallpaperTest {
                     favoritesEnabled = false,
                     localEnabled = true,
                     savedSearchIds = setOf(1),
+                    localDirs = setOf(Uri.EMPTY),
                     useObjectDetection = false,
                 ),
             )
@@ -767,7 +770,9 @@ class AutoWallpaperTest {
                 AutoWallpaperPreferences(
                     enabled = true,
                     savedSearchEnabled = true,
+                    lsSavedSearchEnabled = true,
                     savedSearchIds = setOf(1),
+                    lsSavedSearchIds = setOf(1),
                     useObjectDetection = false,
                     setDifferentWallpapers = true,
                 ),
@@ -884,6 +889,7 @@ class AutoWallpaperTest {
         wallhavenWallpapersDao: WallhavenWallpapersDao = FakeWallhavenWallpapersDao(),
         redditWallpapersDao: RedditWallpapersDao = FakeRedditWallpapersDao(),
         localWallpapersRepository: LocalWallpapersRepository = FakeLocalWallpapersRepository(),
+        lightDarkDao: LightDarkDao = FakeLightDarkDao(),
     ): AutoWallpaperWorker {
         val workTaskExecutor = InstantWorkTaskExecutor()
         return AutoWallpaperWorker(
@@ -925,6 +931,13 @@ class AutoWallpaperTest {
                 ioDispatcher = testDispatcher,
             ),
             localWallpapersRepository = localWallpapersRepository,
+            lightDarkRepository = LightDarkRepository(
+                lightDarkDao = lightDarkDao,
+                wallhavenWallpapersDao = wallhavenWallpapersDao,
+                redditWallpapersDao = redditWallpapersDao,
+                localWallpapersRepository = localWallpapersRepository,
+                ioDispatcher = testDispatcher,
+            ),
         ).run {
             spyk(this, recordPrivateCalls = true)
         }

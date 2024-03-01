@@ -317,6 +317,13 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="use_favorites">Use favorites</string>
     <string name="use_local_dirs">Use local directories</string>
     <string name="choose_local_dirs">Choose local directories</string>
+    <string name="light_dark_enabled">Light / Dark wallpapers enabled</string>
+    <string name="wallpaper_not_changed">Wallpaper not changed</string>
+    <string name="wallpaper_not_changed_with_reason">Wallpaper not changed: %s</string>
+    <string name="app_prefs_null">No application preferences found</string>
+    <string name="auto_wallpaper_disabled">Auto wallpaper disabled</string>
+    <string name="no_wallpaper_found">No wallpaper found</string>
+    <string name="auto_wallpaper_cancelled">Auto wallpaper cancelled</string>
     <plurals name="every_x_hrs">
         <item quantity="one">Every %d hour</item>
         <item quantity="other">Every %d hours</item>
@@ -328,5 +335,17 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <plurals name="num_detected_objects">
         <item quantity="one">%d object</item>
         <item quantity="other">%d objects</item>
+    </plurals>
+    <plurals name="n_searches">
+        <item quantity="one">%d search</item>
+        <item quantity="other">%d searches</item>
+    </plurals>
+    <plurals name="home_screen_sources">
+        <item quantity="one">Home screen: %d source</item>
+        <item quantity="other">Home screen: %d sources</item>
+    </plurals>
+    <plurals name="lock_screen_sources">
+        <item quantity="one">Lock screen: %d source</item>
+        <item quantity="other">Lock screen: %d sources</item>
     </plurals>
 </resources>
