@@ -6,6 +6,7 @@ import androidx.hilt.work.HiltWorkerFactory
 import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.lifecycle.lifecycleScope
 import androidx.work.Configuration
+import androidx.work.ExistingPeriodicWorkPolicy
 import coil.ImageLoader
 import coil.ImageLoaderFactory
 import com.ammar.wallflow.data.network.coil.WallhavenFallbackInterceptor
@@ -64,18 +65,30 @@ class WallFlowApplication : Application(), Configuration.Provider, ImageLoaderFa
     private fun scheduleAutoWallpaperWorker() {
         with(ProcessLifecycleOwner.get()) {
             lifecycleScope.launch {
+                val workerNeedsUpdate = AutoWallpaperWorker.checkIfNeedsUpdate(
+                    appPreferencesRepository = appPreferencesRepository,
+                )
                 val scheduled = AutoWallpaperWorker.checkIfScheduled(
                     context = this@WallFlowApplication,
                     appPreferencesRepository = appPreferencesRepository,
                 )
-                if (scheduled) return@launch
-                val prefs = appPreferencesRepository.appPreferencesFlow.first()
+                if (scheduled && !workerNeedsUpdate) {
+                    return@launch
+                }
+                val prefs = appPreferencesRepository
+                    .appPreferencesFlow
+                    .first()
                     .autoWallpaperPreferences
                 AutoWallpaperWorker.schedule(
                     context = this@WallFlowApplication,
                     constraints = prefs.constraints,
                     interval = prefs.frequency,
                     appPreferencesRepository = appPreferencesRepository,
+                    enqueuePolicy = if (scheduled) {
+                        ExistingPeriodicWorkPolicy.UPDATE
+                    } else {
+                        ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE
+                    },
                 )
             }
         }

@@ -12,6 +12,7 @@ import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.unit.toSize
 import androidx.core.app.NotificationCompat
 import androidx.hilt.work.HiltWorker
+import androidx.work.BackoffPolicy
 import androidx.work.Constraints
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingPeriodicWorkPolicy
@@ -50,6 +51,7 @@ import com.ammar.wallflow.extensions.getTempDir
 import com.ammar.wallflow.extensions.getTempFileIfExists
 import com.ammar.wallflow.extensions.getUriForFile
 import com.ammar.wallflow.extensions.isExtraDimActive
+import com.ammar.wallflow.extensions.isInDefaultOrientation
 import com.ammar.wallflow.extensions.isSystemInDarkTheme
 import com.ammar.wallflow.extensions.notificationManager
 import com.ammar.wallflow.extensions.setWallpaper
@@ -87,6 +89,7 @@ import dagger.assisted.AssistedInject
 import java.io.File
 import java.util.UUID
 import java.util.concurrent.TimeUnit
+import kotlin.math.max
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.datetime.Clock
@@ -205,6 +208,11 @@ class AutoWallpaperWorker @AssistedInject constructor(
                     FAILURE_REASON to FailureReason.NO_SOURCES_ENABLED.name,
                 ),
             )
+        }
+        // check if device is not in its default orientation
+        if (!forced && !context.isInDefaultOrientation()) {
+            Log.i(TAG, "Device is rotated. Auto wallpaper will retry in 15 minutes")
+            return Result.retry()
         }
         try {
             val targets = autoWallpaperPreferences.targets
@@ -759,6 +767,8 @@ class AutoWallpaperWorker @AssistedInject constructor(
             constraints: Constraints,
             interval: DateTimePeriod,
             appPreferencesRepository: AppPreferencesRepository,
+            enqueuePolicy: ExistingPeriodicWorkPolicy =
+                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
         ) {
             Log.i(TAG, "Scheduling auto wallpaper worker...")
             val minutes = interval.hours * 60L + interval.minutes
@@ -766,15 +776,23 @@ class AutoWallpaperWorker @AssistedInject constructor(
                 minutes,
                 TimeUnit.MINUTES,
             ).apply {
-                setInitialDelay(minutes.coerceAtLeast(16), TimeUnit.MINUTES)
+                // avoid immediate execution
+                setInitialDelay(max(minutes, 15), TimeUnit.MINUTES)
                 setConstraints(constraints)
+                // try to re-execute the worker when 'Retry' is returned
+                setBackoffCriteria(
+                    backoffPolicy = BackoffPolicy.LINEAR,
+                    backoffDelay = 15,
+                    timeUnit = TimeUnit.MINUTES,
+                )
             }.build()
             context.workManager.enqueueUniquePeriodicWork(
                 PERIODIC_WORK_NAME,
-                ExistingPeriodicWorkPolicy.CANCEL_AND_REENQUEUE,
+                enqueuePolicy,
                 request,
             )
             appPreferencesRepository.updateAutoWallpaperWorkRequestId(request.id)
+            appPreferencesRepository.updateAutoWallpaperBackoffUpdated(true)
             Log.i(TAG, "Auto wallpaper worker scheduled!")
         }
 
@@ -863,6 +881,10 @@ class AutoWallpaperWorker @AssistedInject constructor(
                 )
             }
         }
+
+        suspend fun checkIfNeedsUpdate(
+            appPreferencesRepository: AppPreferencesRepository,
+        ) = !appPreferencesRepository.getAutoWallBackoffUpdated()
 
         enum class SourceChoice {
             LIGHT_DARK,

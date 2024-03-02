@@ -239,6 +239,12 @@ class AppPreferencesRepository @Inject constructor(
         }
     }
 
+    suspend fun updateAutoWallpaperBackoffUpdated(updated: Boolean) = withContext(ioDispatcher) {
+        dataStore.edit {
+            it[PreferencesKeys.AUTO_WALLPAPER_BACKOFF_UPDATED] = updated
+        }
+    }
+
     suspend fun updateTileAdded(added: Boolean) = withContext(ioDispatcher) {
         dataStore.edit {
             it[PreferencesKeys.CHANGE_WALLPAPER_TILE_ADDED] = added
@@ -518,6 +524,7 @@ class AppPreferencesRepository @Inject constructor(
             lsLightDarkEnabled = lsLightDarkEnabled,
             useDarkWithExtraDim = useDarkWithExtraDim,
             lsUseDarkWithExtraDim = lsUseDarkWithExtraDim,
+            backoffUpdated = get(PreferencesKeys.AUTO_WALLPAPER_BACKOFF_UPDATED) ?: false,
         )
     }
 
@@ -609,6 +616,10 @@ class AppPreferencesRepository @Inject constructor(
     suspend fun getAutoWallHavenWorkRequestId() = getAutoWallpaperPreferences(
         dataStore.data.first(),
     ).workRequestId
+
+    suspend fun getAutoWallBackoffUpdated() = getAutoWallpaperPreferences(
+        dataStore.data.first(),
+    ).backoffUpdated
 
     suspend fun setPreferences(appPreferences: AppPreferences) {
         dataStore.edit {

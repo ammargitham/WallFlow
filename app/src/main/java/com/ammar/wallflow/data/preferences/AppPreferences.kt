@@ -104,6 +104,7 @@ data class AutoWallpaperPreferences(
     val lsLightDarkEnabled: Boolean = false,
     val useDarkWithExtraDim: Boolean = false,
     val lsUseDarkWithExtraDim: Boolean = false,
+    val backoffUpdated: Boolean = false,
 ) {
     private val anyHomeScreenSourceEnabled = lightDarkEnabled || (
         savedSearchEnabled &&

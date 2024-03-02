@@ -236,6 +236,12 @@ fun Context.getScreenResolution(
     )
 }
 
+fun Context.isInDefaultOrientation(): Boolean {
+    val display = displayManager.getDisplay(Display.DEFAULT_DISPLAY) ?: return true
+    val rotation = display.rotation
+    return rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180
+}
+
 fun Context.getUriForFile(file: File): Uri = FileProvider.getUriForFile(
     this,
     FILE_PROVIDER_AUTHORITY,
