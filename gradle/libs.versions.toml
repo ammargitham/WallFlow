@@ -40,7 +40,7 @@ jsoup = "1.17.2"
 junit = "4.13.2"
 kotlin = "1.9.22"
 kotlinxCollectionsImmutable = "0.3.7"
-kotlinxDatetime = "0.5.0"
+kotlinxDatetime = "0.6.0-RC.2"
 kotlinxSerializationJson = "1.6.3"
 ksp = "1.9.22-1.0.17"
 # @keep
