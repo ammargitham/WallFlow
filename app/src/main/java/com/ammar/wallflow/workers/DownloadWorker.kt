@@ -93,18 +93,11 @@ class DownloadWorker @AssistedInject constructor(
                 workDataOf(OUTPUT_KEY_ERROR to "Invalid destination dir"),
             )
         }
-        val inferFileNameFromResponse = inputData.getBoolean(
-            INPUT_KEY_FILE_NAME_FROM_RESPONSE,
-            false,
-        )
-        var fileName: String? = null
-        if (!inferFileNameFromResponse) {
-            fileName = inputData.getString(INPUT_KEY_DESTINATION_FILE_NAME)
-            if (fileName.isNullOrBlank()) {
-                return@withContext Result.failure(
-                    workDataOf(OUTPUT_KEY_ERROR to "Invalid destination file name"),
-                )
-            }
+        val fileName: String? = inputData.getString(INPUT_KEY_DESTINATION_FILE_NAME)
+        if (fileName.isNullOrBlank()) {
+            return@withContext Result.failure(
+                workDataOf(OUTPUT_KEY_ERROR to "Invalid destination file name"),
+            )
         }
         progressNotificationBuilder.setContentTitle(
             inputData.getString(INPUT_KEY_NOTIFICATION_TITLE) ?: url.getFileNameFromUrl(),
@@ -175,7 +168,7 @@ class DownloadWorker @AssistedInject constructor(
     private suspend fun downloadWallpaper(
         url: String,
         dir: String,
-        fileName: String? = null,
+        fileName: String,
         wallpaperId: String,
         source: Source,
     ): File {
@@ -316,7 +309,6 @@ class DownloadWorker @AssistedInject constructor(
         const val INPUT_KEY_URL = "url"
         const val INPUT_KEY_DESTINATION_DIR = "destination_dir"
         const val INPUT_KEY_DESTINATION_FILE_NAME = "file_name"
-        const val INPUT_KEY_FILE_NAME_FROM_RESPONSE = "file_name_from_response"
         const val INPUT_KEY_NOTIFICATION_TYPE = "notification_type"
         const val INPUT_KEY_NOTIFICATION_TITLE = "notification_title"
         const val INPUT_KEY_WALLPAPER_ID = "wallpaper_id"

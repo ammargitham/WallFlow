@@ -250,6 +250,7 @@ fun SettingsScreen(
             model = uiState.editModel,
             downloadStatus = uiState.modelDownloadStatus,
             checkNameExists = viewModel::checkModelNameExists,
+            checkFileNameExists = viewModel::checkModelFileNameExists,
             onSaveClick = viewModel::saveModel,
             onDeleteClick = {
                 uiState.editModel?.run { viewModel.deleteModel(this) }

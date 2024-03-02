@@ -5,6 +5,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.core.util.PatternsCompat
 import com.ammar.wallflow.R
+import com.ammar.wallflow.extensions.isValidFileName
 
 class NameState(
     val context: Context,
@@ -67,3 +68,28 @@ class IntState(
 }
 
 fun intStateSaver(errorFor: (String) -> String) = textFieldStateSaver(IntState(errorFor = errorFor))
+
+class FileNameState(
+    val context: Context,
+    val fileName: String? = null,
+    private val fileNameExists: State<Boolean> = mutableStateOf(false),
+) :
+    TextFieldState(
+        validator = { it.isNotBlank() && !fileNameExists.value && it.isValidFileName() },
+        errorFor = {
+            context.getString(
+                when {
+                    it.isBlank() -> R.string.file_name_cannot_be_empty
+                    fileNameExists.value -> R.string.file_name_already_used
+                    !it.isValidFileName() -> R.string.file_name_invalid
+                    else -> R.string.file_name_invalid
+                },
+            )
+        },
+    ) {
+    init {
+        fileName?.let { text = it }
+    }
+}
+
+fun fileNameStateSaver(context: Context) = textFieldStateSaver(FileNameState(context))

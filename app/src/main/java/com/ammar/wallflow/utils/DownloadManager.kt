@@ -13,6 +13,7 @@ import com.ammar.wallflow.extensions.getFileNameFromUrl
 import com.ammar.wallflow.extensions.getMLModelsDir
 import com.ammar.wallflow.extensions.getTempDir
 import com.ammar.wallflow.extensions.getTempFileIfExists
+import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.extensions.workManager
 import com.ammar.wallflow.model.DownloadableWallpaper
 import com.ammar.wallflow.workers.DownloadWorker
@@ -52,12 +53,12 @@ class DownloadManager @Inject constructor() {
         downloadLocation: DownloadLocation = DownloadLocation.DOWNLOADS,
         notificationType: NotificationType = NotificationType.VISIBLE_SUCCESS,
         notificationTitle: String? = null,
-        inferFileNameFromResponse: Boolean = false,
+        fileName: String? = null,
         extraWorkerData: Array<out Pair<String, Any?>> = emptyArray(),
     ): String {
-        val fileName = when {
-            inferFileNameFromResponse -> null
-            else -> url.getFileNameFromUrl()
+        val fName = when {
+            fileName.isNullOrBlank() -> url.getFileNameFromUrl()
+            else -> fileName.trimAll()
         }
         val dir = when (downloadLocation) {
             DownloadLocation.APP_TEMP -> context.getTempDir()
@@ -75,8 +76,7 @@ class DownloadManager @Inject constructor() {
                 workDataOf(
                     DownloadWorker.INPUT_KEY_URL to url,
                     DownloadWorker.INPUT_KEY_DESTINATION_DIR to dir.absolutePath,
-                    DownloadWorker.INPUT_KEY_DESTINATION_FILE_NAME to fileName,
-                    DownloadWorker.INPUT_KEY_FILE_NAME_FROM_RESPONSE to inferFileNameFromResponse,
+                    DownloadWorker.INPUT_KEY_DESTINATION_FILE_NAME to fName,
                     DownloadWorker.INPUT_KEY_NOTIFICATION_TYPE to notificationType.type,
                     DownloadWorker.INPUT_KEY_NOTIFICATION_TITLE to notificationTitle,
                     DownloadWorker.INPUT_KEY_SCAN_FILE to scanFile,

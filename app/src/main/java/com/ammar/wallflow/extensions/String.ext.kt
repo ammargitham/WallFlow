@@ -1,5 +1,6 @@
 package com.ammar.wallflow.extensions
 
+import com.ammar.wallflow.VALID_FILE_NAME_REGEX
 import java.net.MalformedURLException
 import java.net.URL
 import java.net.URLDecoder
@@ -81,3 +82,5 @@ fun String.fromQueryString() = this
     }
 
 fun String.htmlUnescaped(): String = Parser.unescapeEntities(this, false)
+
+fun String.isValidFileName() = VALID_FILE_NAME_REGEX.matches(this)

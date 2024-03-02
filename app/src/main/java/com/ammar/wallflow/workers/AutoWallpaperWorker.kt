@@ -498,7 +498,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
             okHttpClient = okHttpClient,
             url = objectDetectionModel.url,
             dir = context.getMLModelsDir().absolutePath,
-            fileName = null,
+            fileName = objectDetectionModel.fileName,
             progressCallback = { _, _ -> },
         )
     }
