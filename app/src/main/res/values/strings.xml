@@ -76,6 +76,8 @@
     <string name="name">Name</string>
     <string name="name_cannot_be_empty">Name cannot be empty</string>
     <string name="name_already_used">Name already used</string>
+    <string name="file_name_cannot_be_empty">File name cannot be empty</string>
+    <string name="file_name_already_used">File name already used</string>
     <string name="saved_searches">Saved searches</string>
     <string name="load_search">Load search</string>
     <string name="manager_saved_searches">Manage saved searches</string>
@@ -324,6 +326,9 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="auto_wallpaper_disabled">Auto wallpaper disabled</string>
     <string name="no_wallpaper_found">No wallpaper found</string>
     <string name="auto_wallpaper_cancelled">Auto wallpaper cancelled</string>
+    <string name="url">URL</string>
+    <string name="file_name">File name</string>
+    <string name="file_name_invalid">File name invalid</string>
     <plurals name="every_x_hrs">
         <item quantity="one">Every %d hour</item>
         <item quantity="other">Every %d hours</item>

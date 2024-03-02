@@ -62,3 +62,6 @@ val SUPPORTED_MIME_TYPES = setOf(
 
 val SUBREDDIT_REGEX = "(?>/?r/)?([a-zA-Z0-9][_a-zA-Z0-9]{2,20})(?>\\Z|\\s)".toRegex()
 val WEB_URL_REGEX = PatternsCompat.WEB_URL.toRegex()
+
+// https://cs.android.com/android/platform/superproject/main/+/main:frameworks/base/core/java/android/os/FileUtils.java;l=129
+val VALID_FILE_NAME_REGEX = "[\\w%+,./=_-]+".toRegex()

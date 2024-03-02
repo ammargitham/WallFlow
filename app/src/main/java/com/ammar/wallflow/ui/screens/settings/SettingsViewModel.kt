@@ -23,6 +23,7 @@ import com.ammar.wallflow.data.repository.ViewedRepository
 import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.extensions.accessibleFolders
 import com.ammar.wallflow.extensions.getMLModelsFileIfExists
+import com.ammar.wallflow.extensions.rootCause
 import com.ammar.wallflow.extensions.workManager
 import com.ammar.wallflow.model.ObjectDetectionModel
 import com.ammar.wallflow.model.local.LocalDirectory
@@ -53,6 +54,9 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
+import org.tensorflow.lite.task.core.BaseOptions
+import org.tensorflow.lite.task.vision.detector.ObjectDetector
+import org.tensorflow.lite.task.vision.detector.ObjectDetector.ObjectDetectorOptions
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
@@ -166,6 +170,9 @@ class SettingsViewModel @Inject constructor(
         objectDetectionModelRepository.nameExistsExcludingId(it, name)
     } ?: objectDetectionModelRepository.nameExists(name)
 
+    fun checkModelFileNameExists(fileName: String) =
+        application.getMLModelsFileIfExists(fileName) != null
+
     fun saveModel(
         model: ObjectDetectionModelEntity,
         onDone: (error: Throwable?) -> Unit,
@@ -195,6 +202,26 @@ class SettingsViewModel @Inject constructor(
                         onDone(RuntimeException(msg))
                         return@downloadModel
                     }
+                    // check if file is a valid tf-lite model
+                    val objectDetectorOptions = ObjectDetectorOptions.builder().apply {
+                        setBaseOptions(BaseOptions.builder().build())
+                        setMaxResults(5)
+                    }.build()
+                    val modelFile = File(modelPath)
+                    var objectDetector: ObjectDetector? = null
+                    try {
+                        objectDetector = ObjectDetector.createFromFileAndOptions(
+                            modelFile,
+                            objectDetectorOptions,
+                        )
+                    } catch (e: Exception) {
+                        Log.e(TAG, "saveModel: ", e)
+                        modelFile.delete()
+                        onDone(e.rootCause)
+                        return@downloadModel
+                    } finally {
+                        objectDetector?.close()
+                    }
                     existing?.fileName?.run {
                         // if this model has an existing file, delete it
                         application.getMLModelsFileIfExists(this)?.delete()
@@ -202,7 +229,7 @@ class SettingsViewModel @Inject constructor(
                     viewModelScope.launch {
                         try {
                             // save the new file
-                            val fileName = File(modelPath).name
+                            val fileName = modelFile.name
                             objectDetectionModelRepository.addOrUpdate(
                                 existing?.copy(
                                     name = model.name,
@@ -220,6 +247,7 @@ class SettingsViewModel @Inject constructor(
                             }
                         } catch (e: Exception) {
                             Log.e(TAG, "saveModel: ", e)
+                            modelFile.delete()
                             onDone(e)
                         }
                     }

@@ -9,10 +9,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -38,12 +41,15 @@ import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.db.entity.ObjectDetectionModelEntity
 import com.ammar.wallflow.extensions.DELETE
+import com.ammar.wallflow.extensions.getFileNameFromUrl
 import com.ammar.wallflow.extensions.trimAll
+import com.ammar.wallflow.ui.common.FileNameState
 import com.ammar.wallflow.ui.common.NameState
 import com.ammar.wallflow.ui.common.ProgressIndicator
 import com.ammar.wallflow.ui.common.TextFieldState
 import com.ammar.wallflow.ui.common.UnpaddedAlertDialogContent
 import com.ammar.wallflow.ui.common.UrlState
+import com.ammar.wallflow.ui.common.fileNameStateSaver
 import com.ammar.wallflow.ui.common.nameStateSaver
 import com.ammar.wallflow.ui.common.urlStateSaver
 import com.ammar.wallflow.ui.theme.WallFlowTheme
@@ -59,6 +65,7 @@ fun ObjectDetectionModelEditDialog(
     model: ObjectDetectionModelEntity? = null,
     downloadStatus: DownloadStatus? = null,
     checkNameExists: suspend (name: String, id: Long?) -> Boolean = { _, _ -> true },
+    checkFileNameExists: suspend (fileName: String) -> Boolean = { _ -> true },
     onSaveClick: (
         entity: ObjectDetectionModelEntity,
         onDone: (error: Throwable?) -> Unit,
@@ -67,7 +74,9 @@ fun ObjectDetectionModelEditDialog(
     onDismissRequest: () -> Unit = {},
 ) {
     val nameExists = remember { mutableStateOf(false) } // do not change to `by`
+    val fileNameExists = remember { mutableStateOf(false) } // do not change to `by`
     var saving by rememberSaveable { mutableStateOf(false) }
+    var errorMsg: String? by rememberSaveable { mutableStateOf(null) }
     val context = LocalContext.current
     val nameState by rememberSaveable(stateSaver = nameStateSaver(context)) {
         mutableStateOf(NameState(context, model?.name ?: "", nameExists))
@@ -75,9 +84,26 @@ fun ObjectDetectionModelEditDialog(
     val urlState by rememberSaveable(stateSaver = urlStateSaver(context)) {
         mutableStateOf(UrlState(context, model?.url ?: ""))
     }
+    val fileNameState by rememberSaveable(stateSaver = fileNameStateSaver(context)) {
+        mutableStateOf(FileNameState(context, model?.fileName ?: "", fileNameExists))
+    }
 
     LaunchedEffect(nameState.text) {
+        if (nameState.text.isBlank()) {
+            return@LaunchedEffect
+        }
         nameExists.value = checkNameExists(nameState.text.trimAll(), model?.id)
+    }
+
+    LaunchedEffect(fileNameState.text) {
+        if (fileNameState.text.isBlank()) {
+            return@LaunchedEffect
+        }
+        if (fileNameState.text.trimAll() == model?.fileName?.trimAll()) {
+            fileNameExists.value = false
+            return@LaunchedEffect
+        }
+        fileNameExists.value = checkFileNameExists(fileNameState.text.trimAll())
     }
 
     BasicAlertDialog(
@@ -95,10 +121,13 @@ fun ObjectDetectionModelEditDialog(
             text = {
                 ObjectDetectionModelEditContent(
                     modifier = modifier.padding(24.dp),
+                    isEdit = model != null,
                     nameState = nameState,
                     urlState = urlState,
+                    fileNameState = fileNameState,
                     saving = saving,
                     downloadStatus = downloadStatus,
+                    errorMsg = errorMsg,
                 )
             },
             buttons = {
@@ -125,8 +154,12 @@ fun ObjectDetectionModelEditDialog(
                         Text(text = stringResource(R.string.cancel))
                     }
                     TextButton(
-                        enabled = !saving && nameState.isValid && urlState.isValid,
+                        enabled = !saving &&
+                            nameState.isValid &&
+                            urlState.isValid &&
+                            fileNameState.isValid,
                         onClick = {
+                            errorMsg = null
                             saving = true
                             onSaveClick(
                                 model?.copy(
@@ -138,7 +171,10 @@ fun ObjectDetectionModelEditDialog(
                                     url = urlState.text.trimAll(),
                                     fileName = "",
                                 ),
-                            ) { saving = false }
+                            ) {
+                                errorMsg = it?.localizedMessage
+                                saving = false
+                            }
                         },
                     ) {
                         Text(
@@ -199,13 +235,29 @@ private fun PreviewObjectDetectionModelEditDialog(
 @Composable
 fun ObjectDetectionModelEditContent(
     modifier: Modifier = Modifier,
+    isEdit: Boolean = false,
     nameState: TextFieldState = TextFieldState(),
     urlState: TextFieldState = TextFieldState(),
+    fileNameState: TextFieldState = TextFieldState(),
     saving: Boolean = false,
     downloadStatus: DownloadStatus? = null,
+    errorMsg: String? = null,
 ) {
+    var isFileNameDirty by remember { mutableStateOf(false) }
+
+    LaunchedEffect(isEdit, urlState.text) {
+        if (isEdit || isFileNameDirty || urlState.text.isBlank()) {
+            return@LaunchedEffect
+        }
+        fileNameState.text = urlState.text.trimAll().getFileNameFromUrl()
+        fileNameState.enableShowErrors(true)
+    }
+
     Column(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .verticalScroll(state = rememberScrollState()),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         OutlinedTextField(
             modifier = Modifier
@@ -240,11 +292,37 @@ fun ObjectDetectionModelEditContent(
             value = urlState.text,
             onValueChange = { urlState.text = it },
             singleLine = true,
-            label = { Text(text = "URL") },
+            label = { Text(text = stringResource(R.string.url)) },
             isError = urlState.showErrors(),
             supportingText = { Text(text = urlState.getError() ?: "") },
         )
-        if (downloadStatus != null) {
+        OutlinedTextField(
+            modifier = Modifier
+                .fillMaxWidth()
+                .onFocusChanged { focusState ->
+                    fileNameState.onFocusChange(focusState.isFocused)
+                    if (!focusState.isFocused) {
+                        fileNameState.enableShowErrors()
+                    }
+                },
+            enabled = !saving,
+            value = fileNameState.text,
+            onValueChange = {
+                fileNameState.text = it
+                isFileNameDirty = true
+            },
+            singleLine = true,
+            label = { Text(text = stringResource(R.string.file_name)) },
+            isError = fileNameState.showErrors(),
+            supportingText = if (fileNameState.showErrors()) {
+                {
+                    Text(text = fileNameState.getError() ?: "")
+                }
+            } else {
+                null
+            },
+        )
+        if (errorMsg == null && downloadStatus != null) {
             val showProgress = remember(downloadStatus) {
                 (
                     downloadStatus is DownloadStatus.Running ||
@@ -279,10 +357,16 @@ fun ObjectDetectionModelEditContent(
                     is DownloadStatus.Success -> R.string.downloaded
                 }
                 Text(text = stringResource(text))
-                if (showProgress) {
+                if (showProgress && progress >= 0) {
                     Text(text = "(${(progress * 100).roundToInt()}%)")
                 }
             }
+        }
+        if (errorMsg != null) {
+            Text(
+                text = errorMsg,
+                color = MaterialTheme.colorScheme.error,
+            )
         }
     }
 }

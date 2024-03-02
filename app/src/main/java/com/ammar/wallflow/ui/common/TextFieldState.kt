@@ -40,9 +40,9 @@ open class TextFieldState(
         if (focused) isFocusedDirty = true
     }
 
-    fun enableShowErrors() {
-        // only show errors if the text was at least once focused
-        if (isFocusedDirty) {
+    fun enableShowErrors(forceShow: Boolean = false) {
+        // only show errors if the text was at least once focused or forced
+        if (forceShow || isFocusedDirty) {
             displayErrors = true
         }
     }
