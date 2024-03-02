@@ -30,7 +30,7 @@
     <string name="anime">"Аниме"</string>
     <string name="people">"Люди"</string>
     <string name="sfw">SFW</string>
-    <string name="sketchy">"Скетчи"</string>
+    <string name="sketchy">Сомнительные</string>
     <string name="nsfw">NSFW</string>
     <string name="descending">"По убыванию"</string>
     <string name="ascending">"По возрастанию"</string>
@@ -170,7 +170,7 @@
     <string name="delete_suggestion_dialog_text">"Удалить из истории?"</string>
     <string name="url_cannot_be_empty">"URL не может быть пустым"</string>
     <string name="invalid_url">"Неверный URL"</string>
-    <string name="blur_sketchy_wallpapers">"Размывать скетчи"</string>
+    <string name="blur_sketchy_wallpapers">Размывать сомнительные обои</string>
     <string name="blur_nsfw_wallpapers">"Размывать NSFW обои"</string>
     <string name="enable_object_detection">"Включить обнаружение объектов"</string>
     <string name="tflite_delegate">"Делегат TFLite"</string>
@@ -240,7 +240,7 @@
     <string name="backup_failed">"Резервное копирование не удалось!"</string>
     <string name="restore_done">"Восстановление выполнено!"</string>
     <string name="restore_failed">"Восстановление не удалось!"</string>
-    <string name="mark_as_favorite">"Отменить как избранное"</string>
+    <string name="mark_as_favorite">Отметить как избранное</string>
     <string name="auto_wallpaper_mark_as_favorite_desc">"Отметить обои как избранные при использовании для смены обоев"</string>
     <string name="auto_wallpaper_download_desc">"Загрузка обоев при их использовании для смены обоев"</string>
     <string name="change_wallpaper_tile_label">"Изменить обои"</string>
@@ -316,7 +316,7 @@
     <string name="new_home_screen_wallpaper">Новые обои главного экрана</string>
     <string name="set_different_wallapers_desc">Для главного экрана и экрана блокировки будут установлены разные обои</string>
     <string name="set_different_wallapers">Установить разные обои</string>
-    <string name="crop">Обрезать</string>
+    <string name="crop">Обрезка</string>
     <string name="auto_wallpaper_crop_desc">Обрезать обои перед установкой.
 \nОтключите обрезку, если хотите, чтобы обои на главном экране прокручивались.</string>
 </resources>

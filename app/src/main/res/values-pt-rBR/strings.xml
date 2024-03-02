@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="info">Informações</string>
+    <string name="download">Baixar</string>
+    <string name="home">Início</string>
+    <string name="popular_tags">Tags populares</string>
+    <string name="app_name">WallFlow</string>
+    <string name="apply_wallpaper">Aplicar papel de parede</string>
+    <string name="wallhaven_api_key_desc">Necessário para visualizar conteúdo NSFW.</string>
+    <string name="back">Voltar</string>
+    <string name="more">Mais</string>
+    <string name="confirm">Confirmar</string>
+    <string name="wallhaven_api_key">Chave API da Wallhaven</string>
+    <string name="settings">Configurações</string>
+</resources>

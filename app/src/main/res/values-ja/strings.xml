@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="apply_wallpaper">壁紙を適用</string>
+    <string name="info">情報</string>
+    <string name="download">ダウンロード</string>
+    <string name="more">もっと</string>
+    <string name="home">ホーム</string>
+    <string name="popular_tags">人気のタグ</string>
+    <string name="app_name">WallFlow</string>
+    <string name="wallhaven_api_key_desc">NSFWコンテンツを表示するには必須です。</string>
+    <string name="back">戻る</string>
+    <string name="cleanup_channel_description">古いキャッシュとファイルのクリーンアップの進行状況通知を表示するチャネル</string>
+    <string name="set_different_wallapers_desc">ホーム画面とロック画面に異なる壁紙を設定します</string>
+    <string name="confirm">確認</string>
+    <string name="wallhaven_api_key">WallhavenAPIキー</string>
+    <string name="settings">設定</string>
+</resources>

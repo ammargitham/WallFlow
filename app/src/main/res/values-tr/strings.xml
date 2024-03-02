@@ -306,4 +306,46 @@
     <string name="subreddits">Subredditler</string>
     <string name="colors">Renkler</string>
     <string name="failed">Başarısız</string>
+    <string name="set_different_wallapers">Farklı duvar kağıtları ayarla</string>
+    <string name="set_different_wallapers_desc">Ana ekran ve kilit ekranı için farklı duvar kağıtları ayarlanacaktır</string>
+    <string name="new_home_screen_wallpaper">Yeni Ana Ekran Duvar Kağıdı</string>
+    <string name="new_lock_screen_wallpaper">Yeni Kilit Ekranı Duvar Kağıdı</string>
+    <string name="crop">Kırp</string>
+    <string name="auto_wallpaper_crop_desc">Uygulamadan önce duvar kağıdını kırpın.
+\nAna ekranda duvar kağıdının kaymasını istiyorsanız devre dışı bırakın.</string>
+    <string name="extra_dim">Fazladan Karart</string>
+    <string name="help">Yardım</string>
+    <string name="collections">Koleksiyonlar</string>
+    <string name="no_favorites">Favori olarak işaretlenen duvar kağıdı yok</string>
+    <string name="no_light_dark">Açık veya koyu olarak işaretlenen duvar kağıdı yok</string>
+    <string name="use_same_sources_homescreen_lockscreen">Ana ekran ve kilit ekranı için aynı kaynakları kullan</string>
+    <string name="use_light_dark_wallpapers">Açık / Koyu duvar kağıtları kullan</string>
+    <string name="use_dark_with_extra_dim_desc">\" Fazladan Karart\" etkinleştirildiğinde normal koyu duvar kağıtlarına izin ver</string>
+    <string name="use_dark_with_extra_dim">Fazladan Karart ile koyu duvar kağıtları kullan</string>
+    <string name="use_saved_searches">Kayıtlı aramaları kullan</string>
+    <string name="choose_saved_searches">Kayıtlı aramaları seç</string>
+    <string name="use_favorites">Favorileri kullan</string>
+    <string name="use_local_dirs">Yerel dizinleri kullan</string>
+    <string name="choose_local_dirs">Yerel dizinleri seç</string>
+    <string name="light_dark_enabled">Açık / Koyu duvar kağıtları etkinleştirildi</string>
+    <string name="auto_wallpaper_disabled">Otomatik duvar kağıdı devre dışı</string>
+    <string name="no_wallpaper_found">Duvar kağıdı bulunamadı</string>
+    <string name="auto_wallpaper_cancelled">Otomatik duvar kağıdı iptal edildi</string>
+    <plurals name="n_searches">
+        <item quantity="one">%d arama</item>
+        <item quantity="other">%d arama</item>
+    </plurals>
+    <string name="mark_light_dark">Açık veya koyu olarak işaretle</string>
+    <string name="light_dark">Açık / Koyu</string>
+    <plurals name="home_screen_sources">
+        <item quantity="one">Ana ekran: %d kaynak</item>
+        <item quantity="other">Ana ekran: %d kaynak</item>
+    </plurals>
+    <plurals name="lock_screen_sources">
+        <item quantity="one">Kilit ekranı: %d kaynak</item>
+        <item quantity="other">Kilit ekranı: %d kaynak</item>
+    </plurals>
+    <string name="wallpaper_not_changed">Duvar kağıdı değiştirilmedi</string>
+    <string name="wallpaper_not_changed_with_reason">Duvar kağıdı değiştirilmedi: %s</string>
+    <string name="app_prefs_null">Uygulama tercihi bulunamadı</string>
 </resources>
