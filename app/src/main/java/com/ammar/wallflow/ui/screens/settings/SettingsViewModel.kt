@@ -24,6 +24,7 @@ import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.extensions.accessibleFolders
 import com.ammar.wallflow.extensions.getMLModelsFileIfExists
 import com.ammar.wallflow.extensions.rootCause
+import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.extensions.workManager
 import com.ammar.wallflow.model.ObjectDetectionModel
 import com.ammar.wallflow.model.local.LocalDirectory
@@ -35,6 +36,7 @@ import com.ammar.wallflow.utils.combine
 import com.ammar.wallflow.utils.getRealPath
 import com.ammar.wallflow.workers.AutoWallpaperWorker
 import com.ammar.wallflow.workers.DownloadWorker
+import com.ammar.wallflow.workers.renameFile
 import com.github.materiiapps.partial.Partialize
 import com.github.materiiapps.partial.partial
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -255,8 +257,30 @@ class SettingsViewModel @Inject constructor(
             }
             return@launch
         }
-        objectDetectionModelRepository.addOrUpdate(existing.copy(name = model.name))
+
+        val newFileName = model.fileName.trimAll()
+        val existingFileName = existing.fileName.trimAll()
+        if (newFileName != existingFileName) {
+            // just rename file
+            application.getMLModelsFileIfExists(existingFileName)?.let {
+                renameFile(it, newFileName)
+            }
+        }
+
+        objectDetectionModelRepository.addOrUpdate(
+            existing.copy(
+                name = model.name,
+                fileName = newFileName,
+            ),
+        )
         onDone(null)
+        localUiStateFlow.update {
+            it.copy(
+                editModel = partial(null),
+                showEditModelDialog = partial(false),
+                modelDownloadStatus = partial(null),
+            )
+        }
     }
 
     private suspend fun downloadModel(

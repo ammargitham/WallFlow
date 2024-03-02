@@ -56,7 +56,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.work.Constraints
 import com.ammar.wallflow.DISABLED_ALPHA
-import com.ammar.wallflow.INTERNAL_MODELS
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.db.entity.ObjectDetectionModelEntity
 import com.ammar.wallflow.data.preferences.ObjectDetectionDelegate
@@ -270,17 +269,13 @@ private fun ObjectDetectionModelOptionsContent(
                         onClick = { onOptionClick(it) },
                     )
                 },
-                trailingContent = if (it.name in INTERNAL_MODELS) {
-                    null
-                } else {
-                    {
-                        IconButton(onClick = { onOptionEditClick(it) }) {
-                            Icon(
-                                modifier = Modifier.size(24.dp),
-                                imageVector = Icons.Default.Edit,
-                                contentDescription = stringResource(R.string.edit),
-                            )
-                        }
+                trailingContent = {
+                    IconButton(onClick = { onOptionEditClick(it) }) {
+                        Icon(
+                            modifier = Modifier.size(24.dp),
+                            imageVector = Icons.Default.Edit,
+                            contentDescription = stringResource(R.string.edit),
+                        )
                     }
                 },
             )

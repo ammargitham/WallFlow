@@ -66,6 +66,7 @@ fun ObjectDetectionModelEditDialog(
     downloadStatus: DownloadStatus? = null,
     checkNameExists: suspend (name: String, id: Long?) -> Boolean = { _, _ -> true },
     checkFileNameExists: suspend (fileName: String) -> Boolean = { _ -> true },
+    showDeleteAction: Boolean = model != null,
     onSaveClick: (
         entity: ObjectDetectionModelEntity,
         onDone: (error: Throwable?) -> Unit,
@@ -134,7 +135,7 @@ fun ObjectDetectionModelEditDialog(
                 Row(
                     horizontalArrangement = Arrangement.spacedBy(8.dp),
                 ) {
-                    if (model != null) {
+                    if (showDeleteAction) {
                         FilledTonalButton(
                             enabled = !saving,
                             colors = ButtonDefaults.filledTonalButtonColors(
@@ -165,11 +166,12 @@ fun ObjectDetectionModelEditDialog(
                                 model?.copy(
                                     name = nameState.text.trimAll(),
                                     url = urlState.text.trimAll(),
+                                    fileName = fileNameState.text.trimAll(),
                                 ) ?: ObjectDetectionModelEntity(
                                     id = 0L,
                                     name = nameState.text.trimAll(),
                                     url = urlState.text.trimAll(),
-                                    fileName = "",
+                                    fileName = fileNameState.text.trimAll(),
                                 ),
                             ) {
                                 errorMsg = it?.localizedMessage

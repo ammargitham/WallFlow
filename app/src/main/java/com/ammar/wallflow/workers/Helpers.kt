@@ -60,18 +60,6 @@ suspend fun download(
     return file ?: throw IOException("File null!")
 }
 
-// private fun createFile(
-//     response: Response,
-//     dir: String,
-//     fileName: String?,
-// ): File {
-//     val fName = when {
-//         fileName != null -> fileName
-//         else -> getFileNameFromResponse(response)
-//     }
-//     return createFile(dir, fName)
-// }
-
 private fun getFileNameFromResponse(response: Response): String {
     val contentDispositionStr = response.header("Content-Disposition")
     val parseExceptionMsg = "Could not parse file name from response"
@@ -104,6 +92,17 @@ fun createFile(
         throw IOException("Unable to create file: ${tempFile.absolutePath}")
     }
     return tempFile
+}
+
+fun renameFile(
+    file: File,
+    newFileName: String,
+): Boolean {
+    val newFile = File(file.parent, newFileName)
+    if (newFile.exists()) {
+        throw IOException("A file with name \"${newFile}\" already exists")
+    }
+    return file.renameTo(newFile)
 }
 
 @Throws(IOException::class)
