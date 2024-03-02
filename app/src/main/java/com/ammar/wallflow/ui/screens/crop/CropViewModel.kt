@@ -203,7 +203,7 @@ class CropViewModel(
                 R.string.model_download_title,
                 objectDetectionModel.name,
             ),
-            inferFileNameFromResponse = true,
+            fileName = objectDetectionModel.fileName,
         )
         viewModelScope.launch {
             downloadManager.getProgress(application, workName).collectLatest { state ->

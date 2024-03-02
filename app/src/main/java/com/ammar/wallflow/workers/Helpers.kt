@@ -18,7 +18,7 @@ suspend fun download(
     okHttpClient: OkHttpClient,
     url: String,
     dir: String,
-    fileName: String?,
+    fileName: String,
     progressCallback: suspend (total: Long, downloaded: Long) -> Unit,
 ): File {
     progressCallback(100, -1)
@@ -29,7 +29,7 @@ suspend fun download(
             if (!response.isSuccessful) {
                 throw IOException("Unexpected code: $response")
             }
-            file = createFile(response, dir, fileName).also {
+            file = createFile(dir, fileName).also {
                 (response.body ?: throw IOException("Response body is null")).use { body ->
                     val contentLength = body.contentLength()
                     val source = body.source()
@@ -60,26 +60,28 @@ suspend fun download(
     return file ?: throw IOException("File null!")
 }
 
-private fun createFile(
-    response: Response,
-    dir: String,
-    fileName: String?,
-): File {
-    val fName = when {
-        fileName != null -> fileName
-        else -> {
-            val contentDispositionStr = response.header("Content-Disposition")
-            val parseExceptionMsg = "Could not parse file name from response"
-            val pathFileName = response.request.url.pathSegments.joinToString("_");
-            if (!contentDispositionStr.isNullOrEmpty()) {
-                ContentDisposition.parse(contentDispositionStr).filename
-                    ?: throw IllegalArgumentException(parseExceptionMsg)
-            } else {
-                pathFileName
-            }
-        }
+// private fun createFile(
+//     response: Response,
+//     dir: String,
+//     fileName: String?,
+// ): File {
+//     val fName = when {
+//         fileName != null -> fileName
+//         else -> getFileNameFromResponse(response)
+//     }
+//     return createFile(dir, fName)
+// }
+
+private fun getFileNameFromResponse(response: Response): String {
+    val contentDispositionStr = response.header("Content-Disposition")
+    val parseExceptionMsg = "Could not parse file name from response"
+    val pathFileName = response.request.url.pathSegments.joinToString("_")
+    return if (!contentDispositionStr.isNullOrEmpty()) {
+        ContentDisposition.parse(contentDispositionStr).filename
+            ?: throw IllegalArgumentException(parseExceptionMsg)
+    } else {
+        pathFileName
     }
-    return createFile(dir, fName)
 }
 
 fun createFile(

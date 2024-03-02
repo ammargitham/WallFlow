@@ -179,6 +179,7 @@ class SettingsViewModel @Inject constructor(
             downloadModel(
                 model.name,
                 model.url,
+                model.fileName,
             ) { state ->
                 if (!state.isSuccessOrFail()) return@downloadModel
                 if (state is DownloadStatus.Failed) {
@@ -233,6 +234,7 @@ class SettingsViewModel @Inject constructor(
     private suspend fun downloadModel(
         name: String,
         url: String,
+        fileName: String,
         onDone: (status: DownloadStatus) -> Unit,
     ) {
         val workName = downloadManager.requestDownload(
@@ -241,7 +243,7 @@ class SettingsViewModel @Inject constructor(
             downloadLocation = DownloadManager.Companion.DownloadLocation.APP_ML_MODELS,
             notificationType = DownloadWorker.Companion.NotificationType.VISIBLE,
             notificationTitle = application.getString(R.string.model_download_title, name),
-            inferFileNameFromResponse = true,
+            fileName = fileName,
         )
         downloadManager.getProgress(application, workName).collectLatest { state ->
             localUiStateFlow.update { it.copy(modelDownloadStatus = partial(state)) }

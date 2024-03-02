@@ -39,7 +39,7 @@ const val EFFICIENT_DET_LITE_0_MODEL_NAME = "EfficientDet-Lite0"
 const val EFFICIENT_DET_LITE_0_MODEL_URL = "https://tfhub.dev/tensorflow/lite-model/" +
     "efficientdet/lite0/detection/metadata/1?lite-format=tflite"
 const val EFFICIENT_DET_LITE_0_MODEL_FILE_NAME =
-    "kagglesdsdata_models_992_1146_1.tflite"
+    "lite-model_efficientdet_lite0_detection_metadata_1.tflite"
 
 val INTERNAL_MODELS = listOf(
     EFFICIENT_DET_LITE_0_MODEL_NAME,
