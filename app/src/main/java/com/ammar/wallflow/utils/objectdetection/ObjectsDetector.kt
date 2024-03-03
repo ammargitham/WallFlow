@@ -13,4 +13,8 @@ interface ObjectsDetector {
         model: File,
         bitmap: Bitmap,
     ): List<DetectionWithBitmap>
+
+    fun validateModelFile(
+        model: File,
+    ): Boolean
 }

@@ -34,6 +34,7 @@ import com.ammar.wallflow.utils.DownloadStatus
 import com.ammar.wallflow.utils.ExifWriteType
 import com.ammar.wallflow.utils.combine
 import com.ammar.wallflow.utils.getRealPath
+import com.ammar.wallflow.utils.objectdetection.validateModelFile
 import com.ammar.wallflow.workers.AutoWallpaperWorker
 import com.ammar.wallflow.workers.DownloadWorker
 import com.ammar.wallflow.workers.renameFile
@@ -56,9 +57,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Instant
-import org.tensorflow.lite.task.core.BaseOptions
-import org.tensorflow.lite.task.vision.detector.ObjectDetector
-import org.tensorflow.lite.task.vision.detector.ObjectDetector.ObjectDetectorOptions
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
@@ -204,25 +202,16 @@ class SettingsViewModel @Inject constructor(
                         onDone(RuntimeException(msg))
                         return@downloadModel
                     }
-                    // check if file is a valid tf-lite model
-                    val objectDetectorOptions = ObjectDetectorOptions.builder().apply {
-                        setBaseOptions(BaseOptions.builder().build())
-                        setMaxResults(5)
-                    }.build()
                     val modelFile = File(modelPath)
-                    var objectDetector: ObjectDetector? = null
+
+                    // check if file is a valid tf-lite model
                     try {
-                        objectDetector = ObjectDetector.createFromFileAndOptions(
-                            modelFile,
-                            objectDetectorOptions,
-                        )
+                        validateModelFile(modelFile)
                     } catch (e: Exception) {
                         Log.e(TAG, "saveModel: ", e)
                         modelFile.delete()
                         onDone(e.rootCause)
                         return@downloadModel
-                    } finally {
-                        objectDetector?.close()
                     }
                     existing?.fileName?.run {
                         // if this model has an existing file, delete it

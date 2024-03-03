@@ -13,7 +13,9 @@ class ObjectsDetectorImpl : ObjectsDetector {
         objectDetectionPreferences: ObjectDetectionPreferences,
         model: File,
         bitmap: Bitmap,
-    ): List<DetectionWithBitmap> {
-        return emptyList()
+    ): List<DetectionWithBitmap> = emptyList()
+
+    override fun validateModelFile(model: File): Boolean {
+        throw IllegalStateException("Objection detection not available")
     }
 }

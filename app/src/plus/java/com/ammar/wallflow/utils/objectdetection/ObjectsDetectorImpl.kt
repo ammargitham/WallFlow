@@ -49,6 +49,23 @@ class ObjectsDetectorImpl : ObjectsDetector {
         }
         return detectionWithBitmaps
     }
+
+    override fun validateModelFile(model: File): Boolean {
+        val objectDetectorOptions = ObjectDetector.ObjectDetectorOptions.builder().apply {
+            setBaseOptions(BaseOptions.builder().build())
+            setMaxResults(5)
+        }.build()
+        var objectDetector: ObjectDetector? = null
+        try {
+            objectDetector = ObjectDetector.createFromFileAndOptions(
+                model,
+                objectDetectorOptions,
+            )
+        } finally {
+            objectDetector?.close()
+        }
+        return true
+    }
 }
 
 fun Detection.toDetection() = com.ammar.wallflow.model.Detection(

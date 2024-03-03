@@ -19,3 +19,5 @@ fun detectObjects(
     val detections = objectsDetector.detectObjects(objectDetectionPreferences, model, bitmap)
     return scale to detections
 }
+
+fun validateModelFile(model: File) = objectsDetector.validateModelFile(model)
