@@ -319,4 +319,6 @@
     <string name="crop">Обрезка</string>
     <string name="auto_wallpaper_crop_desc">Обрезать обои перед установкой.
 \nОтключите обрезку, если хотите, чтобы обои на главном экране прокручивались.</string>
+    <string name="file_name_cannot_be_empty">Название файла не может быть пустым</string>
+    <string name="file_name_already_used">Данное название файла уже используется</string>
 </resources>
