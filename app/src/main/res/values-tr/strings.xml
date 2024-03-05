@@ -353,4 +353,6 @@
     <string name="url">URL</string>
     <string name="file_name">Dosya adı</string>
     <string name="file_name_invalid">Dosya adı geçersiz</string>
+    <string name="light_dark_info">Bir duvar kağıdını açık veya koyu olarak işaretlemek, otomatik duvar kağıdı hizmetinin sistem temasına bağlı olarak açık veya koyu duvar kağıtları ayarlamasına izin verecektir.
+\nİşaretledikten sonra, ayarlardaki otomatik duvar kağıdı kaynaklarında \'Açık / Koyu duvar kağıtları kullan\' seçeneğini etkinleştirin.</string>
 </resources>
