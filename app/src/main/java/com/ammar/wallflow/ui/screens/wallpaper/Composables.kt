@@ -89,6 +89,7 @@ fun WallpaperActions(
     onFullScreenClick: () -> Unit = {},
     onFavoriteToggle: (Boolean) -> Unit = {},
     onLightDarkTypeFlagsChange: (Int) -> Unit = {},
+    onShowLightDarkInfoClick: () -> Unit = {},
 ) {
     BottomAppBar(
         modifier = modifier,
@@ -110,6 +111,7 @@ fun WallpaperActions(
             LightDarkButton(
                 typeFlags = lightDarkTypeFlags,
                 onFlagsChange = onLightDarkTypeFlagsChange,
+                onShowLightDarkInfoClick = onShowLightDarkInfoClick,
             )
         },
         floatingActionButton = if (showApplyWallpaperAction) {

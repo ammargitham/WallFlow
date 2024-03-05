@@ -66,6 +66,7 @@ import com.ammar.wallflow.ui.common.bottomWindowInsets
 import com.ammar.wallflow.ui.common.permissions.DownloadPermissionsRationalDialog
 import com.ammar.wallflow.ui.common.permissions.rememberDownloadPermissionsState
 import com.ammar.wallflow.ui.screens.wallpaper.InfoButton
+import com.ammar.wallflow.ui.screens.wallpaper.LightDarkInfoDialog
 import com.ammar.wallflow.ui.screens.wallpaper.ShareButton
 import com.ammar.wallflow.ui.screens.wallpaper.WallpaperActions
 import com.ammar.wallflow.ui.screens.wallpaper.WallpaperInfoBottomSheet
@@ -108,6 +109,7 @@ fun WallpaperViewer(
     val clipboardManager = LocalClipboardManager.current
     var showRationale by rememberSaveable { mutableStateOf(false) }
     var containerIntSize by remember { mutableStateOf(IntSize.Zero) }
+    var showLightDarkInfo by rememberSaveable { mutableStateOf(false) }
 
     val downloadPermissionsState = rememberDownloadPermissionsState(
         onShowRationale = { showRationale = true },
@@ -262,18 +264,14 @@ fun WallpaperViewer(
                 showApplyWallpaperAction = applyWallpaperEnabled,
                 showFullScreenAction = showFullScreenAction,
                 showDownloadAction = wallpaper is DownloadableWallpaper,
-                // showShareLinkAction = wallpaper is WallhavenWallpaper ||
-                //     wallpaper is RedditWallpaper,
                 isFavorite = isFavorite,
-                // onInfoClick = onInfoClick,
                 lightDarkTypeFlags = lightDarkTypeFlags,
                 onDownloadClick = { downloadPermissionsState.launchMultiplePermissionRequest() },
-                // onShareLinkClick = onShareLinkClick,
-                // onShareImageClick = onShareImageClick,
                 onApplyWallpaperClick = onApplyWallpaperClick,
                 onFullScreenClick = onFullScreenClick,
                 onFavoriteToggle = onFavoriteToggle,
                 onLightDarkTypeFlagsChange = onLightDarkTypeFlagsChange,
+                onShowLightDarkInfoClick = { showLightDarkInfo = true },
             )
         }
 
@@ -336,6 +334,12 @@ fun WallpaperViewer(
         DownloadPermissionsRationalDialog(
             permissions = downloadPermissionsState.shouldShowRationale.keys.map { it.permission },
             onConfirmOrDismiss = { showRationale = false },
+        )
+    }
+
+    if (showLightDarkInfo) {
+        LightDarkInfoDialog(
+            onDismissRequest = { showLightDarkInfo = false },
         )
     }
 }

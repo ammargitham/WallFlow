@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -24,6 +25,7 @@ import androidx.compose.material3.PlainTooltip
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults.rememberPlainTooltipPositionProvider
 import androidx.compose.material3.rememberTooltipState
@@ -32,6 +34,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,9 +62,10 @@ fun LightDarkButton(
     modifier: Modifier = Modifier,
     typeFlags: Int = LightDarkType.UNSPECIFIED,
     onFlagsChange: (Int) -> Unit = {},
+    onShowLightDarkInfoClick: () -> Unit = {},
 ) {
     val context = LocalContext.current
-    var expanded by remember { mutableStateOf(false) }
+    var expanded by rememberSaveable { mutableStateOf(false) }
 
     TooltipBox(
         modifier = modifier.wrapContentSize(Alignment.TopStart),
@@ -121,12 +125,11 @@ fun LightDarkButton(
                         .weight(1f)
                         .widthIn(min = 16.dp),
                 )
-                // TODO
                 Icon(
                     modifier = Modifier.clickable(
                         interactionSource = remember { MutableInteractionSource() },
                         indication = ripple(bounded = false),
-                        onClick = {},
+                        onClick = onShowLightDarkInfoClick,
                     ),
                     painter = painterResource(R.drawable.outline_help_outline_24),
                     contentDescription = stringResource(R.string.help),
@@ -220,6 +223,35 @@ private fun PreviewLightDarkButton(
             LightDarkButton(
                 typeFlags = typeFlags,
             )
+        }
+    }
+}
+
+@Composable
+fun LightDarkInfoDialog(
+    modifier: Modifier = Modifier,
+    onDismissRequest: () -> Unit = {},
+) {
+    AlertDialog(
+        modifier = modifier,
+        text = { Text(text = stringResource(R.string.light_dark_info)) },
+        confirmButton = {},
+        dismissButton = {
+            TextButton(onClick = onDismissRequest) {
+                Text(text = stringResource(R.string.ok))
+            }
+        },
+        onDismissRequest = onDismissRequest,
+    )
+}
+
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun PreviewLightDarkInfoDialog() {
+    WallFlowTheme {
+        Surface {
+            LightDarkInfoDialog()
         }
     }
 }
