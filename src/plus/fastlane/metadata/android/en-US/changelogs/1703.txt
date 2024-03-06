@@ -1,0 +1,13 @@
+What's New
+* Light/Dark wallpapers
+  * Mark wallpapers as light or dark
+  * Auto wallpaper will use them according to the system theme.
+* Add 'Collections' tab which includes both Favorites and Light/Dark wallpapers
+* Separate auto wallpaper sources for home and lock screen
+* Updated translations
+
+Bug Fixes
+* Fix status bar icon color incorrect in some cases
+* Delay auto wallpaper execution if device is rotated
+* Make 'More' screen scrollable
+* Fix default tflite model not downloaded
