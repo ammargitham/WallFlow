@@ -244,10 +244,8 @@ class MainActivity : ComponentActivity() {
             ) {
                 MainActivityContent(
                     currentDestination = currentDestination,
-                    useNavRail = useNavRail,
                     globalErrors = uiState.globalErrors,
                     bottomBarVisible = bottomBarController.state.value.visible,
-                    bottomBarSize = bottomBarController.state.value.size,
                     showLocalTab = uiState.showLocalTab,
                     searchBar = {
                         MainSearchBar(
@@ -357,9 +355,6 @@ class MainActivity : ComponentActivity() {
                         navController.navigate(WallhavenApiKeyDialogDestination)
                     },
                     onDismissGlobalError = viewModel::dismissGlobalError,
-                    onBottomBarSizeChanged = { size ->
-                        bottomBarController.update { it.copy(size = size) }
-                    },
                     onBottomBarItemClick = {
                         navController.navigate(it) {
                             popUpTo(navController.graph.findStartDestination().id) {
