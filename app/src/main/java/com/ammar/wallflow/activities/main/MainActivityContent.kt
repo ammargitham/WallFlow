@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.Scaffold
@@ -19,8 +18,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
@@ -33,16 +30,12 @@ import com.ammar.wallflow.extensions.toPx
 import com.ammar.wallflow.model.OnlineSource
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.Wallpaper
-import com.ammar.wallflow.model.search.Search
-import com.ammar.wallflow.model.search.WallhavenSearch
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.model.wallhaven.wallhavenWallpaper1
 import com.ammar.wallflow.model.wallhaven.wallhavenWallpaper2
-import com.ammar.wallflow.ui.common.Suggestion
 import com.ammar.wallflow.ui.common.bottombar.BottomBar
 import com.ammar.wallflow.ui.common.bottombar.NavRail
 import com.ammar.wallflow.ui.common.globalerrors.GlobalErrorsColumn
-import com.ammar.wallflow.ui.common.mainsearch.MainSearchBar
 import com.ammar.wallflow.ui.common.topWindowInsets
 import com.ammar.wallflow.ui.screens.NavGraph
 import com.ammar.wallflow.ui.screens.home.HomeScreenContent
@@ -58,41 +51,16 @@ import kotlinx.datetime.Clock
 fun MainActivityContent(
     modifier: Modifier = Modifier,
     currentDestination: NavDestination? = null,
-    showBackButton: Boolean = false,
     useNavRail: Boolean = false,
-    useDockedSearchBar: Boolean = false,
     globalErrors: List<GlobalError> = emptyList(),
     bottomBarVisible: Boolean = true,
     bottomBarSize: IntSize = IntSize.Zero,
-    searchBarOffset: Density.() -> IntOffset = { IntOffset.Zero },
-    searchBarVisible: Boolean = true,
-    searchBarActive: Boolean = false,
-    searchBarSearch: Search = WallhavenSearch(),
-    searchBarQuery: String = "",
-    searchBarSuggestions: List<Suggestion<Search>> = emptyList(),
-    // showSearchBarFilters: Boolean = false,
-    searchBarDeleteSuggestion: Search? = null,
-    searchBarOverflowIcon: @Composable (() -> Unit)? = null,
-    // searchBarShowNSFW: Boolean = false,
-    searchBarShowQuery: Boolean = true,
     showLocalTab: Boolean = true,
-    onBackClick: () -> Unit = {},
+    searchBar: @Composable () -> Unit = {},
     onFixWallHavenApiKeyClick: () -> Unit = {},
     onDismissGlobalError: (error: GlobalError) -> Unit = {},
     onBottomBarSizeChanged: (size: IntSize) -> Unit = {},
     onBottomBarItemClick: (destination: NavGraph) -> Unit = {},
-    onSearchBarActiveChange: (active: Boolean) -> Unit = {},
-    onSearchBarQueryChange: (String) -> Unit = {},
-    onSearchBarSearch: (query: String) -> Unit = {},
-    onSearchBarSuggestionClick: (suggestion: Suggestion<Search>) -> Unit = {},
-    onSearchBarSuggestionInsert: (suggestion: Suggestion<Search>) -> Unit = {},
-    onSearchBarSuggestionDeleteRequest: (suggestion: Suggestion<Search>) -> Unit = {},
-    // onSearchBarShowFiltersChange: (show: Boolean) -> Unit = {},
-    // onSearchBarFiltersChange: (searchQuery: Filters) -> Unit = {},
-    onDeleteSearchBarSuggestionConfirmClick: () -> Unit = {},
-    onDeleteSearchBarSuggestionDismissRequest: () -> Unit = {},
-    onSearchBarSaveAsClick: () -> Unit = {},
-    onSearchBarLoadClick: () -> Unit = {},
     content: @Composable (contentPadding: PaddingValues) -> Unit,
 ) {
     Scaffold(
@@ -114,33 +82,7 @@ fun MainActivityContent(
             ) {
                 content(it)
             }
-            MainSearchBar(
-                modifier = Modifier.offset(searchBarOffset),
-                useDocked = useDockedSearchBar,
-                visible = searchBarVisible,
-                active = searchBarActive,
-                search = searchBarSearch,
-                query = searchBarQuery,
-                suggestions = searchBarSuggestions,
-                // showFilters = showSearchBarFilters,
-                deleteSuggestion = searchBarDeleteSuggestion,
-                overflowIcon = searchBarOverflowIcon,
-                // showNSFW = searchBarShowNSFW,
-                showQuery = searchBarShowQuery,
-                onQueryChange = onSearchBarQueryChange,
-                onBackClick = if (showBackButton) onBackClick else null,
-                onSearch = onSearchBarSearch,
-                onSuggestionClick = onSearchBarSuggestionClick,
-                onSuggestionInsert = onSearchBarSuggestionInsert,
-                onSuggestionDeleteRequest = onSearchBarSuggestionDeleteRequest,
-                onActiveChange = onSearchBarActiveChange,
-                // onShowFiltersChange = onSearchBarShowFiltersChange,
-                // onFiltersChange = onSearchBarFiltersChange,
-                onDeleteSuggestionConfirmClick = onDeleteSearchBarSuggestionConfirmClick,
-                onDeleteSuggestionDismissRequest = onDeleteSearchBarSuggestionDismissRequest,
-                onSaveAsClick = onSearchBarSaveAsClick,
-                onLoadClick = onSearchBarLoadClick,
-            )
+            searchBar()
             if (globalErrors.isNotEmpty()) {
                 GlobalErrorsColumn(
                     modifier = Modifier
