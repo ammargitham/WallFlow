@@ -2,7 +2,9 @@ package com.ammar.wallflow.ui.screens.home
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -25,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -50,6 +53,7 @@ import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.model.wallhaven.WallhavenUploader
 import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.SearchBar
+import com.ammar.wallflow.ui.common.bottomWindowInsets
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
 import com.ammar.wallflow.ui.common.mainsearch.LocalMainSearchBarController
 import com.ammar.wallflow.ui.common.mainsearch.MainSearchBar
@@ -65,6 +69,7 @@ import com.ammar.wallflow.ui.screens.home.composables.header
 import com.ammar.wallflow.ui.screens.home.composables.wallhavenHeader
 import com.ammar.wallflow.ui.wallpaperviewer.WallpaperViewerViewModel
 import com.ammar.wallflow.utils.applyWallpaper
+import com.ammar.wallflow.utils.getStartBottomPadding
 import com.ammar.wallflow.utils.shareWallpaper
 import com.ammar.wallflow.utils.shareWallpaperUrl
 import com.ramcosta.composedestinations.annotation.Destination
@@ -102,7 +107,16 @@ fun HomeScreen(
     val searchBarController = LocalMainSearchBarController.current
     val bottomBarController = LocalBottomBarController.current
     val systemController = LocalSystemController.current
+    val density = LocalDensity.current
     val context = LocalContext.current
+    val bottomWindowInsets = bottomWindowInsets
+    val navigationBarsInsets = WindowInsets.navigationBars
+    val bottomPadding = getStartBottomPadding(
+        density,
+        bottomBarController,
+        bottomWindowInsets,
+        navigationBarsInsets,
+    )
     val systemState by systemController.state
     val clipboardManager = LocalClipboardManager.current
 
@@ -208,7 +222,7 @@ fun HomeScreen(
                 start = 8.dp,
                 end = 8.dp,
                 top = SearchBar.Defaults.height,
-                bottom = 8.dp,
+                bottom = bottomPadding + 8.dp,
             ),
             wallpapers = wallpapers,
             header = if (uiState.isHome) {

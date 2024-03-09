@@ -1,35 +1,32 @@
 package com.ammar.wallflow.activities.main
 
 import android.content.res.Configuration
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
-import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
-import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
-import androidx.compose.material3.adaptive.navigationsuite.ExperimentalMaterial3AdaptiveNavigationSuiteApi
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldLayout
-import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination
 import androidx.paging.PagingData
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.ammar.wallflow.data.repository.GlobalErrorsRepository
 import com.ammar.wallflow.data.repository.GlobalErrorsRepository.GlobalError
+import com.ammar.wallflow.extensions.toDp
+import com.ammar.wallflow.extensions.toPx
 import com.ammar.wallflow.model.OnlineSource
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.Wallpaper
@@ -50,85 +47,73 @@ import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.datetime.Clock
 
-@OptIn(
-    ExperimentalMaterial3AdaptiveNavigationSuiteApi::class,
-    ExperimentalMaterial3AdaptiveApi::class,
-)
 @Composable
 fun MainActivityContent(
+    modifier: Modifier = Modifier,
     currentDestination: NavDestination? = null,
+    useNavRail: Boolean = false,
     globalErrors: List<GlobalError> = emptyList(),
     bottomBarVisible: Boolean = true,
+    bottomBarSize: IntSize = IntSize.Zero,
     showLocalTab: Boolean = true,
     searchBar: @Composable () -> Unit = {},
     onFixWallHavenApiKeyClick: () -> Unit = {},
     onDismissGlobalError: (error: GlobalError) -> Unit = {},
+    onBottomBarSizeChanged: (size: IntSize) -> Unit = {},
     onBottomBarItemClick: (destination: NavGraph) -> Unit = {},
     content: @Composable (contentPadding: PaddingValues) -> Unit,
 ) {
-    val navigationSuiteType = NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(
-        currentWindowAdaptiveInfo(),
-    )
-    NavigationSuiteScaffoldLayout(
-        navigationSuite = {
-            AnimatedVisibility(
-                visible = bottomBarVisible,
-                enter = if (navigationSuiteType == NavigationSuiteType.NavigationBar) {
-                    slideInVertically(initialOffsetY = { it })
-                } else {
-                    slideInHorizontally(initialOffsetX = { -it })
-                },
-                exit = if (navigationSuiteType == NavigationSuiteType.NavigationBar) {
-                    slideOutVertically(targetOffsetY = { it })
-                } else {
-                    slideOutHorizontally(targetOffsetX = { -it })
-                },
-            ) {
-                if (navigationSuiteType == NavigationSuiteType.NavigationBar) {
-                    BottomBar(
-                        modifier = Modifier.fillMaxWidth(),
-                        currentDestination = currentDestination,
-                        showLocalTab = showLocalTab,
-                        onItemClick = onBottomBarItemClick,
-                    )
-                } else {
-                    NavRail(
-                        modifier = Modifier.fillMaxHeight(),
-                        currentDestination = currentDestination,
-                        showLocalTab = showLocalTab,
-                        onItemClick = onBottomBarItemClick,
-                    )
-                }
-                // NavigationSuite(
-                //     // layoutType = if (bottomBarVisible) {
-                //     //     navigationSuiteType
-                //     // } else {
-                //     //     NavigationSuiteType.None
-                //     // },
-                //     layoutType = navigationSuiteType,
-                //     colors = NavigationSuiteDefaults.colors(),
-                //     content = {
-                //         navSuiteItems(
-                //             currentDestination = currentDestination,
-                //             showLocalTab = showLocalTab,
-                //             onItemClick = onBottomBarItemClick,
-                //         )
-                //     },
-                // )
-            }
-        },
+    Scaffold(
+        modifier = modifier,
+        contentWindowInsets = WindowInsets(left = 0),
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),
         ) {
-            content(PaddingValues(0.dp))
+            Box(
+                modifier = Modifier
+                    .padding(
+                        start = if (useNavRail && bottomBarVisible) {
+                            bottomBarSize.width.toDp()
+                        } else {
+                            0.dp
+                        },
+                    ),
+            ) {
+                content(it)
+            }
             searchBar()
             if (globalErrors.isNotEmpty()) {
                 GlobalErrorsColumn(
-                    modifier = Modifier.windowInsetsPadding(topWindowInsets),
+                    modifier = Modifier
+                        .windowInsetsPadding(topWindowInsets)
+                        .padding(
+                            start = if (useNavRail) bottomBarSize.width.toDp() else 0.dp,
+                        ),
                     globalErrors = globalErrors,
                     onFixWallHavenApiKeyClick = onFixWallHavenApiKeyClick,
                     onDismiss = onDismissGlobalError,
+                )
+            }
+            if (useNavRail) {
+                NavRail(
+                    modifier = Modifier
+                        .fillMaxHeight()
+                        .align(Alignment.TopStart)
+                        .onSizeChanged(onBottomBarSizeChanged),
+                    currentDestination = currentDestination,
+                    showLocalTab = showLocalTab,
+                    onItemClick = onBottomBarItemClick,
+                )
+            } else {
+                BottomBar(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.BottomCenter)
+                        .onSizeChanged(onBottomBarSizeChanged),
+                    currentDestination = currentDestination,
+                    showLocalTab = showLocalTab,
+                    onItemClick = onBottomBarItemClick,
                 )
             }
         }
@@ -160,7 +145,9 @@ private fun PreviewMainActivityContentPixel6Pro() {
 )
 @Composable
 private fun PreviewMainActivityContentCustomDpi() {
-    PreviewContent()
+    PreviewContent(
+        useNavRail = true,
+    )
 }
 
 @Preview(
@@ -174,7 +161,9 @@ private fun PreviewMainActivityContentCustomDpi() {
 )
 @Composable
 private fun PreviewMainActivityContentDesktop() {
-    PreviewContent()
+    PreviewContent(
+        useNavRail = true,
+    )
 }
 
 @Preview(
@@ -188,7 +177,9 @@ private fun PreviewMainActivityContentDesktop() {
 )
 @Composable
 private fun PreviewMainActivityContentFoldable() {
-    PreviewContent()
+    PreviewContent(
+        useNavRail = true,
+    )
 }
 
 @Preview(
@@ -202,11 +193,15 @@ private fun PreviewMainActivityContentFoldable() {
 )
 @Composable
 private fun PreviewMainActivityContentTable() {
-    PreviewContent()
+    PreviewContent(
+        useNavRail = true,
+    )
 }
 
 @Composable
-private fun PreviewContent() {
+private fun PreviewContent(
+    useNavRail: Boolean = false,
+) {
     val previewWallpaperFlow = flowOf(
         PagingData.from(
             listOf<Wallpaper>(
@@ -230,9 +225,15 @@ private fun PreviewContent() {
     WallFlowTheme {
         Surface {
             MainActivityContent(
+                useNavRail = useNavRail,
                 globalErrors = listOf(
                     GlobalErrorsRepository.WallHavenUnauthorisedError(),
                 ),
+                bottomBarSize = if (useNavRail) {
+                    IntSize(80.dp.toPx(), 120)
+                } else {
+                    IntSize.Zero
+                },
             ) {
                 val pagingItems = previewWallpaperFlow.collectAsLazyPagingItems()
                 val nestedScrollConnection = remember {

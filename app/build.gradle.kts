@@ -250,8 +250,6 @@ dependencies {
     implementation(libs.androidx.compose.material) // only for pull to refresh component
     implementation(libs.androidx.compose.material3)
     implementation(libs.androidx.compose.material3.window.size.cls)
-    implementation(libs.androidx.compose.material3.adaptive)
-    implementation(libs.androidx.compose.material3.adaptive.navigation.suite)
     // Tooling
     debugImplementation(libs.androidx.compose.ui.tooling)
     // Compose Runtime tracing
