@@ -1,7 +1,10 @@
 package com.ammar.wallflow.ui.screens.collections
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.staggeredgrid.StaggeredGridItemSpan
@@ -13,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -29,6 +33,7 @@ import com.ammar.wallflow.model.search.WallhavenUploaderSearchMeta
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.model.wallhaven.WallhavenUploader
 import com.ammar.wallflow.ui.common.LocalSystemController
+import com.ammar.wallflow.ui.common.bottomWindowInsets
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
 import com.ammar.wallflow.ui.common.mainsearch.LocalMainSearchBarController
 import com.ammar.wallflow.ui.common.mainsearch.MainSearchBar
@@ -36,6 +41,7 @@ import com.ammar.wallflow.ui.common.topWindowInsets
 import com.ammar.wallflow.ui.screens.destinations.WallpaperScreenDestination
 import com.ammar.wallflow.ui.wallpaperviewer.WallpaperViewerViewModel
 import com.ammar.wallflow.utils.applyWallpaper
+import com.ammar.wallflow.utils.getStartBottomPadding
 import com.ammar.wallflow.utils.shareWallpaper
 import com.ammar.wallflow.utils.shareWallpaperUrl
 import com.ramcosta.composedestinations.annotation.Destination
@@ -56,6 +62,22 @@ fun CollectionsScreen(
     val bottomBarController = LocalBottomBarController.current
     val searchBarController = LocalMainSearchBarController.current
     val systemState by systemController.state
+    val bottomWindowInsets = bottomWindowInsets
+    val navigationBarsInsets = WindowInsets.navigationBars
+    val density = LocalDensity.current
+    val bottomPadding = remember(
+        bottomBarController.state.value,
+        density,
+        bottomWindowInsets.getBottom(density),
+        navigationBarsInsets.getBottom(density),
+    ) {
+        getStartBottomPadding(
+            density,
+            bottomBarController,
+            bottomWindowInsets,
+            navigationBarsInsets,
+        )
+    }
 
     LaunchedEffect(Unit) {
         systemController.resetBarsState()
@@ -129,6 +151,12 @@ fun CollectionsScreen(
         CollectionsScreenContent(
             modifier = Modifier.fillMaxSize(),
             isExpanded = systemState.isExpanded,
+            contentPadding = PaddingValues(
+                start = 8.dp,
+                end = 8.dp,
+                top = 8.dp,
+                bottom = bottomPadding + 8.dp,
+            ),
             wallpapers = wallpapers,
             favorites = uiState.favorites,
             viewedList = uiState.viewedList,
