@@ -349,4 +349,22 @@
     <string name="use_saved_searches">Использовать сохранённые поисковые запросы</string>
     <string name="light_dark_info">Назначение обоев как светлых или тёмных позволит службе смены обоев устанавливать светлые или тёмные обои в зависимости от темы системы.
 \nПосле назначения включите «Использовать светлые / тёмные обои» в настройках источников для смены обоев.</string>
+    <plurals name="n_searches">
+        <item quantity="one">%d поисковый запрос</item>
+        <item quantity="few">%d поисковых запроса</item>
+        <item quantity="many">%d поисковых запросов</item>
+        <item quantity="other">%d поисковых запросов</item>
+    </plurals>
+    <plurals name="home_screen_sources">
+        <item quantity="one">Главный экран: %d источник</item>
+        <item quantity="few">Главный экран: %d источника</item>
+        <item quantity="many">Главный экран: %d источников</item>
+        <item quantity="other">Главный экран: %d источников</item>
+    </plurals>
+    <plurals name="lock_screen_sources">
+        <item quantity="one">Экран блокировки: %d источник</item>
+        <item quantity="few">Экран блокировки: %d источника</item>
+        <item quantity="many">Экран блокировки: %d источников</item>
+        <item quantity="other">Экран блокировки: %d источников</item>
+    </plurals>
 </resources>
