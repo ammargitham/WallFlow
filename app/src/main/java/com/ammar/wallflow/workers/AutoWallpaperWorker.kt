@@ -779,12 +779,14 @@ class AutoWallpaperWorker @AssistedInject constructor(
                 // avoid immediate execution
                 setInitialDelay(max(minutes, 15), TimeUnit.MINUTES)
                 setConstraints(constraints)
-                // try to re-execute the worker when 'Retry' is returned
-                setBackoffCriteria(
-                    backoffPolicy = BackoffPolicy.LINEAR,
-                    backoffDelay = 15,
-                    timeUnit = TimeUnit.MINUTES,
-                )
+                if (!constraints.requiresDeviceIdle()) {
+                    // try to re-execute the worker when 'Retry' is returned
+                    setBackoffCriteria(
+                        backoffPolicy = BackoffPolicy.LINEAR,
+                        backoffDelay = 15,
+                        timeUnit = TimeUnit.MINUTES,
+                    )
+                }
             }.build()
             context.workManager.enqueueUniquePeriodicWork(
                 PERIODIC_WORK_NAME,
