@@ -27,10 +27,12 @@ import androidx.compose.ui.unit.IntSize
 import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.FileProvider
 import androidx.core.graphics.toRect
+import androidx.core.net.toFile
 import androidx.core.net.toUri
 import androidx.core.provider.DocumentsContractCompat
 import androidx.work.WorkManager
 import com.ammar.wallflow.FILE_PROVIDER_AUTHORITY
+import com.ammar.wallflow.MIME_TYPE_JPEG
 import com.ammar.wallflow.R
 import com.ammar.wallflow.WEB_URL_REGEX
 import com.ammar.wallflow.model.WallpaperTarget
@@ -40,6 +42,7 @@ import com.ammar.wallflow.utils.getDecodeSampledBitmapOptions
 import com.ammar.wallflow.utils.isExternalStorageWritable
 import com.ammar.wallflow.utils.withMLModelsDir
 import com.ammar.wallflow.utils.withTempDir
+import com.lazygeniouz.dfc.file.DocumentFileCompat
 import java.io.File
 import java.io.InputStream
 import okio.buffer
@@ -157,19 +160,33 @@ fun Context.share(
     type: String,
     title: String? = null,
     grantTempPermission: Boolean = false,
-) = startActivity(getShareChooserIntent(uri, type, title, grantTempPermission))
+) = startActivity(
+    getShareChooserIntent(
+        this,
+        uri,
+        type,
+        title,
+        grantTempPermission,
+    ),
+)
 
 fun Context.getShareChooserIntent(
-    file: File,
+    file: DocumentFileCompat,
     grantTempPermission: Boolean,
 ): Intent = getShareChooserIntent(
-    uri = getUriForFile(file),
-    type = parseMimeType(file),
+    context = this,
+    uri = if (file.uri.scheme == "file") {
+        getUriForFile(file.uri.toFile())
+    } else {
+        file.uri
+    },
+    type = file.getType() ?: MIME_TYPE_JPEG,
     title = file.name,
     grantTempPermission = grantTempPermission,
 )
 
 fun getShareChooserIntent(
+    context: Context,
     uri: Uri,
     type: String,
     title: String?,
@@ -180,7 +197,7 @@ fun getShareChooserIntent(
         if (grantTempPermission) {
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
-        clipData = ClipData.newRawUri(title, uri)
+        clipData = ClipData.newUri(context.contentResolver, title, uri)
         putExtra(Intent.EXTRA_STREAM, uri)
         setTypeAndNormalize(type)
     },

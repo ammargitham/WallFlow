@@ -10,6 +10,8 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.core.net.toFile
+import androidx.core.net.toUri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory.Companion.APPLICATION_KEY
 import androidx.lifecycle.viewModelScope
@@ -193,7 +195,7 @@ class CropViewModel(
         detectObjects(uri, file, preferences)
     }
 
-    private fun downloadModel(objectDetectionModel: ObjectDetectionModel) {
+    private fun downloadModel(objectDetectionModel: ObjectDetectionModel) = viewModelScope.launch {
         val workName = downloadManager.requestDownload(
             context = application,
             url = objectDetectionModel.url,
@@ -205,22 +207,20 @@ class CropViewModel(
             ),
             fileName = objectDetectionModel.fileName,
         )
-        viewModelScope.launch {
-            downloadManager.getProgress(application, workName).collectLatest { state ->
-                modelDownloadStatusFlow.update { state }
-                localUiStateFlow.update { it.copy(modelDownloadStatus = partial(state)) }
-                if (!state.isSuccessOrFail()) return@collectLatest
-                if (state is DownloadStatus.Failed) {
+        downloadManager.getProgress(application, workName).collectLatest { state ->
+            modelDownloadStatusFlow.update { state }
+            localUiStateFlow.update { it.copy(modelDownloadStatus = partial(state)) }
+            if (!state.isSuccessOrFail()) return@collectLatest
+            if (state is DownloadStatus.Failed) {
+                return@collectLatest
+            }
+            if (state is DownloadStatus.Success) {
+                val modelPath = state.filePath
+                if (modelPath == null) {
+                    Log.e(TAG, "model file path null")
                     return@collectLatest
                 }
-                if (state is DownloadStatus.Success) {
-                    val modelPath = state.filePath
-                    if (modelPath == null) {
-                        Log.e(TAG, "model file path null")
-                        return@collectLatest
-                    }
-                    downloadedModelFlow.update { File(modelPath) }
-                }
+                downloadedModelFlow.update { modelPath.toUri().toFile() }
             }
         }
     }

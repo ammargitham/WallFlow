@@ -2,12 +2,15 @@ package com.ammar.wallflow.utils
 
 import android.app.Application
 import android.content.Context
+import android.net.Uri
 import android.util.Log
+import androidx.core.net.toUri
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkInfo
 import androidx.work.workDataOf
+import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.extensions.getFileNameFromUrl
 import com.ammar.wallflow.extensions.getMLModelsDir
@@ -23,11 +26,14 @@ import java.io.File
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 
 @Singleton
-class DownloadManager @Inject constructor() {
-    fun requestDownload(
+class DownloadManager @Inject constructor(
+    val appPreferencesRepository: AppPreferencesRepository,
+) {
+    suspend fun requestDownload(
         context: Context,
         wallpaper: DownloadableWallpaper,
         notificationType: NotificationType = NotificationType.VISIBLE_SUCCESS,
@@ -47,7 +53,7 @@ class DownloadManager @Inject constructor() {
         ),
     )
 
-    fun requestDownload(
+    suspend fun requestDownload(
         context: Context,
         url: String,
         downloadLocation: DownloadLocation = DownloadLocation.DOWNLOADS,
@@ -60,10 +66,10 @@ class DownloadManager @Inject constructor() {
             fileName.isNullOrBlank() -> url.getFileNameFromUrl()
             else -> fileName.trimAll()
         }
-        val dir = when (downloadLocation) {
-            DownloadLocation.APP_TEMP -> context.getTempDir()
-            DownloadLocation.DOWNLOADS -> getPublicDownloadsDir()
-            DownloadLocation.APP_ML_MODELS -> context.getMLModelsDir()
+        val dirUri = when (downloadLocation) {
+            DownloadLocation.APP_TEMP -> context.getTempDir().toUri()
+            DownloadLocation.DOWNLOADS -> getDownloadLocation()
+            DownloadLocation.APP_ML_MODELS -> context.getMLModelsDir().toUri()
         }
         val scanFile = when (downloadLocation) {
             DownloadLocation.APP_TEMP -> false
@@ -75,7 +81,7 @@ class DownloadManager @Inject constructor() {
             setInputData(
                 workDataOf(
                     DownloadWorker.INPUT_KEY_URL to url,
-                    DownloadWorker.INPUT_KEY_DESTINATION_DIR to dir.absolutePath,
+                    DownloadWorker.INPUT_KEY_DESTINATION_DIR to dirUri.toString(),
                     DownloadWorker.INPUT_KEY_DESTINATION_FILE_NAME to fName,
                     DownloadWorker.INPUT_KEY_NOTIFICATION_TYPE to notificationType.type,
                     DownloadWorker.INPUT_KEY_NOTIFICATION_TITLE to notificationTitle,
@@ -90,6 +96,15 @@ class DownloadManager @Inject constructor() {
             request,
         )
         return url
+    }
+
+    private suspend fun getDownloadLocation(): Uri {
+        val appPreferences = appPreferencesRepository
+            .appPreferencesFlow
+            .firstOrNull()
+            ?: return getPublicDownloadsDir().toUri()
+        return appPreferences.downloadLocation
+            ?: getPublicDownloadsDir().toUri()
     }
 
     fun getProgress(

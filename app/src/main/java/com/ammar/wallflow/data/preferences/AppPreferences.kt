@@ -53,6 +53,7 @@ data class AppPreferences(
     val mainWallhavenSearch: WallhavenSearch? = null,
     val mainRedditSearch: RedditSearch? = null,
     val viewedWallpapersPreferences: ViewedWallpapersPreferences = ViewedWallpapersPreferences(),
+    val downloadLocation: Uri? = null,
 ) {
     companion object {
         const val CURRENT_VERSION = 2
@@ -178,4 +179,5 @@ data class LayoutPreferences(
 @Serializable
 data class LocalWallpapersPreferences(
     val sort: LocalSort = LocalSort.NO_SORT,
+    val directories: Set<Uri>? = null,
 )

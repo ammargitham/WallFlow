@@ -1,5 +1,6 @@
 package com.ammar.wallflow.utils
 
+import android.app.Application
 import android.content.ContentUris
 import android.content.Context
 import android.database.Cursor
@@ -9,6 +10,9 @@ import android.provider.DocumentsContract
 import android.provider.MediaStore
 import android.util.Log
 import androidx.core.provider.DocumentsContractCompat
+import com.ammar.wallflow.data.preferences.AppPreferences
+import com.ammar.wallflow.extensions.accessibleFolders
+import com.ammar.wallflow.model.local.LocalDirectory
 
 fun getRealPath(context: Context, uri: Uri) = try {
     val docUri = if (DocumentsContractCompat.isTreeUri(uri)) {
@@ -109,4 +113,24 @@ fun isDownloadsDocument(uri: Uri): Boolean {
  */
 fun isMediaDocument(uri: Uri): Boolean {
     return "com.android.providers.media.documents" == uri.authority
+}
+
+fun getLocalDirs(
+    context: Application,
+    appPreferences: AppPreferences,
+): List<LocalDirectory> {
+    val accessibleUris = context.accessibleFolders.map { it.uri }
+    val dirs = appPreferences.localWallpapersPreferences.directories
+        ?.filter { accessibleUris.contains(it) }
+        ?.map {
+            LocalDirectory(
+                uri = it,
+                path = getRealPath(
+                    context = context,
+                    uri = it,
+                ) ?: it.toString(),
+            )
+        }
+        ?: emptyList()
+    return dirs
 }

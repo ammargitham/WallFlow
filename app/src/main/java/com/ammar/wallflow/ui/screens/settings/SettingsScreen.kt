@@ -5,6 +5,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.Configuration
 import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -34,6 +36,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -62,6 +65,7 @@ import com.ammar.wallflow.ui.screens.destinations.LayoutSettingsScreenDestinatio
 import com.ammar.wallflow.ui.screens.destinations.ManageAutoWallpaperSourcesScreenDestination
 import com.ammar.wallflow.ui.screens.destinations.WallhavenApiKeyDialogDestination
 import com.ammar.wallflow.ui.screens.settings.composables.AutoWallpaperSetToDialog
+import com.ammar.wallflow.ui.screens.settings.composables.ChangeDownloadLocationDialog
 import com.ammar.wallflow.ui.screens.settings.composables.ClearViewedWallpapersConfirmDialog
 import com.ammar.wallflow.ui.screens.settings.composables.ConstraintOptionsDialog
 import com.ammar.wallflow.ui.screens.settings.composables.DeleteSavedSearchConfirmDialog
@@ -84,6 +88,8 @@ import com.ammar.wallflow.ui.screens.settings.composables.objectDetectionSection
 import com.ammar.wallflow.ui.screens.settings.composables.viewedWallpapersSection
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import com.ammar.wallflow.utils.StoragePermissions
+import com.ammar.wallflow.utils.getPublicDownloadsDir
+import com.ammar.wallflow.utils.getRealPath
 import com.ammar.wallflow.utils.objectdetection.objectsDetector
 import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.AutoWallpaperException
 import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.Status
@@ -147,6 +153,22 @@ fun SettingsScreen(
         viewModel.updateAutoWallpaperPrefs(updatedAutoWallpaperPreferences)
     }
 
+    val chooseDownloadLocationLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.OpenDocumentTree(),
+    ) {
+        if (it == null) {
+            return@rememberLauncherForActivityResult
+        }
+        viewModel.updateDownloadLocation(it)
+    }
+
+    val prefsDownloadLocationUri = uiState.appPreferences.downloadLocation
+    val downloadLocationString = if (prefsDownloadLocationUri == null) {
+        getPublicDownloadsDir().absolutePath
+    } else {
+        getRealPath(context, prefsDownloadLocationUri) ?: prefsDownloadLocationUri.toString()
+    }
+
     LaunchedEffect(Unit) {
         searchBarController.update { it.copy(visible = false) }
     }
@@ -172,6 +194,7 @@ fun SettingsScreen(
                 showBackButton = true,
             )
         }
+
         SettingsScreenContent(
             appPreferences = uiState.appPreferences,
             model = uiState.selectedModel,
@@ -180,10 +203,12 @@ fun SettingsScreen(
             autoWallpaperSavedSearches = uiState.autoWallpaperSavedSearches,
             autoWallpaperStatus = uiState.autoWallpaperStatus,
             showLocalTab = uiState.appPreferences.lookAndFeelPreferences.showLocalTab,
+            downloadLocation = downloadLocationString,
             onBlurSketchyCheckChange = viewModel::setBlurSketchy,
             onBlurNsfwCheckChange = viewModel::setBlurNsfw,
             onWriteTagsToExifCheckChange = viewModel::updateWriteTagsToExif,
             onTagsWriteTypeClick = { viewModel.showTagsWriteTypeDialog(true) },
+            onDownloadLocationClick = { viewModel.showChangeDownloadLocationDialog(true) },
             onWallhavenApiKeyItemClick = {
                 navController.navigate(WallhavenApiKeyDialogDestination)
             },
@@ -461,6 +486,25 @@ fun SettingsScreen(
             },
         )
     }
+
+    if (uiState.showChangeDownloadLocationDialog) {
+        ChangeDownloadLocationDialog(
+            defaultLocation = getPublicDownloadsDir().toUri(),
+            customLocation = uiState.appPreferences.downloadLocation,
+            onDefaultClick = {
+                viewModel.removeDownloadLocation()
+            },
+            onCustomClick = {
+                chooseDownloadLocationLauncher.launch(null)
+            },
+            onCustomEditClick = {
+                chooseDownloadLocationLauncher.launch(uiState.appPreferences.downloadLocation)
+            },
+            onDismissRequest = {
+                viewModel.showChangeDownloadLocationDialog(false)
+            },
+        )
+    }
 }
 
 @Composable
@@ -473,10 +517,12 @@ fun SettingsScreenContent(
     autoWallpaperNextRun: NextRun = NextRun.NotScheduled,
     autoWallpaperStatus: Status? = null,
     showLocalTab: Boolean = true,
+    downloadLocation: String = "",
     onBlurSketchyCheckChange: (checked: Boolean) -> Unit = {},
     onBlurNsfwCheckChange: (checked: Boolean) -> Unit = {},
     onWriteTagsToExifCheckChange: (checked: Boolean) -> Unit = {},
     onTagsWriteTypeClick: () -> Unit = {},
+    onDownloadLocationClick: () -> Unit = {},
     onWallhavenApiKeyItemClick: () -> Unit = {},
     onObjectDetectionPrefsChange: (objectDetectionPrefs: ObjectDetectionPreferences) -> Unit = {},
     onObjectDetectionDelegateClick: () -> Unit = {},
@@ -509,11 +555,13 @@ fun SettingsScreenContent(
                 blurNsfw = appPreferences.blurNsfw,
                 writeTagsToExif = appPreferences.writeTagsToExif,
                 tagsExifWriteType = appPreferences.tagsExifWriteType,
+                downloadLocation = downloadLocation,
                 onBlurSketchyCheckChange = onBlurSketchyCheckChange,
                 onBlurNsfwCheckChange = onBlurNsfwCheckChange,
                 onWriteTagsToExifCheckChange = onWriteTagsToExifCheckChange,
                 onTagsWriteTypeClick = onTagsWriteTypeClick,
                 onManageSavedSearchesClick = onManageSavedSearchesClick,
+                onDownloadLocationClick = onDownloadLocationClick,
             )
             dividerItem()
             viewedWallpapersSection(

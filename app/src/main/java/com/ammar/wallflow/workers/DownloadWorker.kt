@@ -5,9 +5,12 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.pm.ServiceInfo
 import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
+import androidx.core.net.toFile
+import androidx.core.net.toUri
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
@@ -21,6 +24,8 @@ import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.extensions.getFileNameFromUrl
 import com.ammar.wallflow.extensions.getShareChooserIntent
 import com.ammar.wallflow.extensions.notificationManager
+import com.ammar.wallflow.extensions.parseMimeType
+import com.ammar.wallflow.extensions.toUriOrNull
 import com.ammar.wallflow.extensions.workManager
 import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.services.DownloadSuccessActionsService
@@ -28,11 +33,11 @@ import com.ammar.wallflow.ui.common.permissions.checkNotificationPermission
 import com.ammar.wallflow.ui.screens.wallpaper.getWallpaperScreenPendingIntent
 import com.ammar.wallflow.utils.ExifWriteType
 import com.ammar.wallflow.utils.NotificationChannels.DOWNLOADS_CHANNEL_ID
-import com.ammar.wallflow.utils.decodeSampledBitmapFromFile
+import com.ammar.wallflow.utils.decodeSampledBitmapFromUri
 import com.ammar.wallflow.utils.writeTagsToFile
+import com.lazygeniouz.dfc.file.DocumentFileCompat
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import java.io.File
 import kotlin.math.absoluteValue
 import kotlin.random.Random
 import kotlinx.coroutines.CoroutineDispatcher
@@ -93,6 +98,10 @@ class DownloadWorker @AssistedInject constructor(
                 workDataOf(OUTPUT_KEY_ERROR to "Invalid destination dir"),
             )
         }
+        val destinationDirUri = destinationDir.toUriOrNull()
+            ?: return@withContext Result.failure(
+                workDataOf(OUTPUT_KEY_ERROR to "Invalid destination directory"),
+            )
         val fileName: String? = inputData.getString(INPUT_KEY_DESTINATION_FILE_NAME)
         if (fileName.isNullOrBlank()) {
             return@withContext Result.failure(
@@ -104,21 +113,23 @@ class DownloadWorker @AssistedInject constructor(
         )
         val wallpaperId = inputData.getString(INPUT_KEY_WALLPAPER_ID)
         try {
-            val file = if (wallpaperId != null) {
+            val file: DocumentFileCompat = if (wallpaperId != null) {
                 val source = Source.valueOf(inputData.getString(INPUT_KEY_WALLPAPER_SOURCE) ?: "")
                 downloadWallpaper(
                     url = url,
-                    dir = destinationDir,
+                    dirUri = destinationDirUri,
                     fileName = fileName,
                     wallpaperId = wallpaperId,
                     source = source,
                 )
             } else {
                 download(
+                    context = context,
                     okHttpClient = okHttpClient,
                     url = url,
-                    dir = destinationDir,
+                    dirUri = destinationDirUri,
                     fileName = fileName,
+                    mimeType = parseMimeType(url),
                     progressCallback = this@DownloadWorker::notifyProgress,
                 )
             }
@@ -137,6 +148,7 @@ class DownloadWorker @AssistedInject constructor(
                         ExifWriteType.APPEND
                     }
                     writeTagsToFile(
+                        context = context,
                         file = file,
                         tags = tags.asList(),
                         exifWriteType = exifWriteType,
@@ -144,7 +156,7 @@ class DownloadWorker @AssistedInject constructor(
                 }
             }
             Result.success(
-                workDataOf(OUTPUT_KEY_FILE_PATH to file.absolutePath),
+                workDataOf(OUTPUT_KEY_FILE_PATH to file.uri.toString()),
             )
         } catch (e: Exception) {
             Log.e(TAG, "doWork: Error downloading $url", e)
@@ -167,27 +179,32 @@ class DownloadWorker @AssistedInject constructor(
 
     private suspend fun downloadWallpaper(
         url: String,
-        dir: String,
+        dirUri: Uri,
         fileName: String,
         wallpaperId: String,
         source: Source,
-    ): File {
+    ): DocumentFileCompat {
         var file = copyFromCache(
             url = url,
-            dir = dir,
+            dirUri = dirUri,
             fileName = fileName,
         )
         if (file == null) {
             file = download(
+                context = context,
                 okHttpClient = okHttpClient,
                 url = url,
-                dir = dir,
+                dirUri = dirUri,
                 fileName = fileName,
+                mimeType = parseMimeType(url),
                 progressCallback = this::notifyProgress,
             )
         }
         if (inputData.getBoolean(INPUT_KEY_SCAN_FILE, false)) {
-            scanFile(context, file)
+            val uri = file.uri
+            if (uri.scheme == "file") {
+                scanFile(context, uri.toFile())
+            }
         }
         try {
             notifyWallpaperDownloadSuccess(wallpaperId, file, source)
@@ -200,15 +217,20 @@ class DownloadWorker @AssistedInject constructor(
     @OptIn(ExperimentalCoilApi::class)
     private fun copyFromCache(
         url: String,
-        dir: String,
+        dirUri: Uri,
         fileName: String?,
-    ): File? {
+    ): DocumentFileCompat? {
         val cacheFile = context.imageLoader.diskCache?.openSnapshot(url)?.use {
-            it.data.toFile()
+            it.data.toFile().toUri()
         } ?: return null
         val fileNameActual = fileName ?: url.getFileNameFromUrl()
-        val file = createFile(dir, fileNameActual)
-        copyFiles(cacheFile, file)
+        val file = createFile(
+            context = context,
+            dirUri = dirUri,
+            fileName = fileNameActual,
+            mimeType = parseMimeType(url),
+        )
+        copyFiles(context, cacheFile, file.uri)
         return file
     }
 
@@ -251,11 +273,11 @@ class DownloadWorker @AssistedInject constructor(
     @SuppressLint("MissingPermission") // permission check added in shouldShowNotification()
     private fun notifyWallpaperDownloadSuccess(
         wallpaperId: String,
-        file: File,
+        file: DocumentFileCompat,
         source: Source,
     ) {
         if (!shouldShowSuccessNotification()) return
-        val bitmap = decodeSampledBitmapFromFile(context, file.absolutePath)
+        val (bitmap, _) = decodeSampledBitmapFromUri(context, file.uri) ?: return
         val notification = successNotificationBuilder.apply {
             setContentTitle(file.name)
             setLargeIcon(bitmap)

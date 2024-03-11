@@ -3,14 +3,17 @@ package com.ammar.wallflow.services
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.net.toFile
+import androidx.core.net.toUri
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import com.ammar.wallflow.IoDispatcher
 import com.ammar.wallflow.extensions.TAG
+import com.lazygeniouz.dfc.file.DocumentFileCompat
 import dagger.hilt.android.AndroidEntryPoint
-import java.io.File
 import javax.inject.Inject
 import kotlin.random.Random
 import kotlinx.coroutines.CoroutineDispatcher
@@ -36,25 +39,30 @@ class DownloadSuccessActionsService : LifecycleService() {
         val filePath = intent.getStringExtra(EXTRA_FILE_PATH)
         if (filePath.isNullOrBlank()) return START_NOT_STICKY
         when (intent.action) {
-            Intent.ACTION_DELETE -> delete(filePath)
+            Intent.ACTION_DELETE -> delete(filePath.toUri())
             else -> return START_NOT_STICKY
         }
         dismissNotification(intent.getIntExtra(EXTRA_NOTIFICATION_ID, -1))
         return START_REDELIVER_INTENT
     }
 
-    private fun delete(filePath: String) {
-        lifecycleScope.launch {
-            withContext(ioDispatcher) {
-                try {
-                    val deleted = File(filePath).delete()
-                    if (!deleted) {
-                        Log.w(TAG, "File not deleted: $filePath")
-                        return@withContext
-                    }
-                } catch (e: Exception) {
-                    Log.e(TAG, "Error deleting file: $filePath", e)
+    private fun delete(uri: Uri) = lifecycleScope.launch {
+        withContext(ioDispatcher) {
+            try {
+                val deleted = if (uri.scheme == "file") {
+                    uri.toFile().delete()
+                } else {
+                    DocumentFileCompat.fromSingleUri(
+                        this@DownloadSuccessActionsService,
+                        uri,
+                    )?.delete() ?: false
                 }
+                if (!deleted) {
+                    Log.w(TAG, "File not deleted: $uri")
+                    return@withContext
+                }
+            } catch (e: Exception) {
+                Log.e(TAG, "Error deleting file: $uri", e)
             }
         }
     }
@@ -70,7 +78,7 @@ class DownloadSuccessActionsService : LifecycleService() {
 
         fun getDeletePendingIntent(
             context: Context,
-            file: File,
+            file: DocumentFileCompat,
             notificationId: Int,
         ): PendingIntent = getPendingIntent(
             context,
@@ -82,7 +90,7 @@ class DownloadSuccessActionsService : LifecycleService() {
         private fun getPendingIntent(
             context: Context,
             @Suppress("SameParameterValue") action: String,
-            file: File,
+            file: DocumentFileCompat,
             notificationId: Int? = null,
         ): PendingIntent = PendingIntent.getService(
             context,
@@ -92,7 +100,7 @@ class DownloadSuccessActionsService : LifecycleService() {
                 DownloadSuccessActionsService::class.java,
             ).apply {
                 this.action = action
-                putExtra(EXTRA_FILE_PATH, file.absolutePath)
+                putExtra(EXTRA_FILE_PATH, file.uri.toString())
                 if (notificationId != null) {
                     putExtra(EXTRA_NOTIFICATION_ID, notificationId)
                 }

@@ -1,6 +1,5 @@
 package com.ammar.wallflow.ui.screens.local
 
-import android.content.Intent
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.PaddingValues
@@ -76,11 +75,7 @@ fun LocalScreen(
         if (it == null) {
             return@rememberLauncherForActivityResult
         }
-        context.contentResolver.takePersistableUriPermission(
-            it,
-            Intent.FLAG_GRANT_READ_URI_PERMISSION,
-        )
-        viewModel.refreshFolders()
+        viewModel.addLocalDir(it)
     }
 
     LaunchedEffect(Unit) {
@@ -178,11 +173,7 @@ fun LocalScreen(
             onDismissRequest = { viewModel.showManageFoldersSheet(false) },
             onAddFolderClick = onAddFolderClick,
             onRemoveClick = {
-                context.contentResolver.releasePersistableUriPermission(
-                    it.uri,
-                    Intent.FLAG_GRANT_READ_URI_PERMISSION,
-                )
-                viewModel.refreshFolders()
+                viewModel.removeLocalDir(it.uri)
             },
             onSortChange = viewModel::updateSort,
         )

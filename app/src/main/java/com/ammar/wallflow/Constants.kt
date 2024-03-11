@@ -51,6 +51,8 @@ const val MIME_TYPE_JPEG = "image/jpeg"
 const val MIME_TYPE_PNG = "image/png"
 const val MIME_TYPE_WEBP = "image/webp"
 const val MIME_TYPE_JSON = "application/json"
+const val MIME_TYPE_ANY = "*/*"
+const val MIME_TYPE_TFLITE_MODEL = "application/tflite-model"
 
 val SUPPORTED_MIME_TYPES = setOf(
     MIME_TYPE_BMP,

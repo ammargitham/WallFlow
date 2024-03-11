@@ -330,6 +330,7 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="file_name">File name</string>
     <string name="file_name_invalid">File name invalid</string>
     <string name="light_dark_info">Marking a wallpaper as light or dark will allow the auto wallpaper service to set light or dark wallpapers depending on the system theme.\nAfter marking, enable \'Use Light / Dark wallpapers\' in auto wallpaper sources in settings.</string>
+    <string name="download_location">Download location</string>
     <plurals name="every_x_hrs">
         <item quantity="one">Every %d hour</item>
         <item quantity="other">Every %d hours</item>

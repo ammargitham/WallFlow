@@ -28,6 +28,7 @@ import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.extensions.accessibleFolders
 import com.ammar.wallflow.extensions.toConstraintTypeMap
 import com.ammar.wallflow.extensions.toConstraints
+import com.ammar.wallflow.extensions.toUriOrNull
 import com.ammar.wallflow.json
 import com.ammar.wallflow.model.OnlineSource
 import com.ammar.wallflow.model.WallpaperTarget
@@ -261,6 +262,16 @@ class AppPreferencesRepository @Inject constructor(
         set(PreferencesKeys.LOCAL_WALLPAPERS_SORT, sort.name)
     }
 
+    suspend fun updateLocalDirs(dirs: Set<Uri>) = withContext(ioDispatcher) {
+        dataStore.edit {
+            it.updateLocalDirs(dirs)
+        }
+    }
+
+    private fun MutablePreferences.updateLocalDirs(dirs: Set<Uri>) {
+        set(PreferencesKeys.LOCAL_DIRS, dirs.mapTo(HashSet()) { it.toString() })
+    }
+
     suspend fun updateHomeSources(
         sources: Map<OnlineSource, Boolean>,
     ) = withContext(ioDispatcher) {
@@ -296,6 +307,16 @@ class AppPreferencesRepository @Inject constructor(
         set(PreferencesKeys.VIEWED_WALLPAPERS_LOOK, viewedWallpapersPreferences.look.name)
     }
 
+    suspend fun updateDownloadLocation(uri: Uri?) = withContext(ioDispatcher) {
+        dataStore.edit {
+            if (uri == null) {
+                it.remove(PreferencesKeys.DOWNLOAD_LOCATION)
+            } else {
+                it[PreferencesKeys.DOWNLOAD_LOCATION] = uri.toString()
+            }
+        }
+    }
+
     private fun mapAppPreferences(preferences: Preferences): AppPreferences {
         val homeRedditSearch = getHomeRedditSearch(preferences)
         return AppPreferences(
@@ -308,6 +329,7 @@ class AppPreferencesRepository @Inject constructor(
             blurNsfw = preferences[PreferencesKeys.BLUR_NSFW] ?: false,
             writeTagsToExif = preferences[PreferencesKeys.WRITE_TAGS_TO_EXIF] ?: false,
             tagsExifWriteType = getTagsWriteType(preferences),
+            downloadLocation = preferences[PreferencesKeys.DOWNLOAD_LOCATION]?.toUriOrNull(),
             objectDetectionPreferences = getObjectDetectionPreferences(preferences),
             autoWallpaperPreferences = getAutoWallpaperPreferences(preferences),
             lookAndFeelPreferences = getLookAndFeelPreferences(preferences),
@@ -371,13 +393,20 @@ class AppPreferencesRepository @Inject constructor(
 
     private fun getLocalWallpapersPreferences(
         preferences: Preferences,
-    ) = LocalWallpapersPreferences(
-        sort = try {
-            LocalSort.valueOf(preferences[PreferencesKeys.LOCAL_WALLPAPERS_SORT] ?: "")
-        } catch (e: Exception) {
-            LocalSort.NO_SORT
-        },
-    )
+    ): LocalWallpapersPreferences {
+        val localDirStrings = preferences[PreferencesKeys.LOCAL_DIRS]
+        val localDirs = localDirStrings
+            ?.mapNotNullTo(HashSet(), String::toUriOrNull)
+            ?: context.accessibleFolders.mapTo(HashSet()) { it.uri }
+        return LocalWallpapersPreferences(
+            sort = try {
+                LocalSort.valueOf(preferences[PreferencesKeys.LOCAL_WALLPAPERS_SORT] ?: "")
+            } catch (e: Exception) {
+                LocalSort.NO_SORT
+            },
+            directories = localDirs,
+        )
+    }
 
     private fun getLookAndFeelPreferences(preferences: Preferences) = LookAndFeelPreferences(
         theme = try {

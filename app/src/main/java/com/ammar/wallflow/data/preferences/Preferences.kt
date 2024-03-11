@@ -31,6 +31,7 @@ object PreferencesKeys {
     val BLUR_NSFW = booleanPreferencesKey("blur_nsfw")
     val WRITE_TAGS_TO_EXIF = booleanPreferencesKey("write_tags_to_exif")
     val TAGS_WRITE_TYPE = stringPreferencesKey("tags_write_type")
+    val DOWNLOAD_LOCATION = stringPreferencesKey("download_location")
     val ENABLE_OBJECT_DETECTION = booleanPreferencesKey("enable_object_detection")
     val OBJECT_DETECTION_DELEGATE = stringPreferencesKey("object_detection_delegate")
     val OBJECT_DETECTION_MODEL_ID = longPreferencesKey("object_detection_model_id")
@@ -101,6 +102,7 @@ object PreferencesKeys {
     val SHOW_LOCAL_TAB = booleanPreferencesKey("show_local_tab")
     val CHANGE_WALLPAPER_TILE_ADDED = booleanPreferencesKey("change_wallpaper_tile_added")
     val LOCAL_WALLPAPERS_SORT = stringPreferencesKey("local_wallpapers_sort")
+    val LOCAL_DIRS = stringSetPreferencesKey("local_dirs")
     val VIEWED_WALLPAPERS_ENABLED = booleanPreferencesKey("viewed_wallpapers_enabled")
     val VIEWED_WALLPAPERS_LOOK = stringPreferencesKey("viewed_wallpapers_look")
 }

@@ -1,8 +1,12 @@
 package com.ammar.wallflow.ui.screens.settings
 
 import android.app.Application
+import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import androidx.compose.runtime.Stable
+import androidx.core.net.toFile
+import androidx.core.net.toUri
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.work.WorkInfo
@@ -21,7 +25,6 @@ import com.ammar.wallflow.data.repository.ObjectDetectionModelRepository
 import com.ammar.wallflow.data.repository.SavedSearchRepository
 import com.ammar.wallflow.data.repository.ViewedRepository
 import com.ammar.wallflow.extensions.TAG
-import com.ammar.wallflow.extensions.accessibleFolders
 import com.ammar.wallflow.extensions.getMLModelsFileIfExists
 import com.ammar.wallflow.extensions.rootCause
 import com.ammar.wallflow.extensions.trimAll
@@ -32,8 +35,7 @@ import com.ammar.wallflow.model.search.SavedSearch
 import com.ammar.wallflow.utils.DownloadManager
 import com.ammar.wallflow.utils.DownloadStatus
 import com.ammar.wallflow.utils.ExifWriteType
-import com.ammar.wallflow.utils.combine
-import com.ammar.wallflow.utils.getRealPath
+import com.ammar.wallflow.utils.getLocalDirs
 import com.ammar.wallflow.utils.objectdetection.validateModelFile
 import com.ammar.wallflow.workers.AutoWallpaperWorker
 import com.ammar.wallflow.workers.DownloadWorker
@@ -41,7 +43,6 @@ import com.ammar.wallflow.workers.renameFile
 import com.github.materiiapps.partial.Partialize
 import com.github.materiiapps.partial.partial
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.io.File
 import javax.inject.Inject
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -51,7 +52,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -69,18 +70,6 @@ class SettingsViewModel @Inject constructor(
 ) : AndroidViewModel(application) {
     private val localUiStateFlow = MutableStateFlow(SettingsUiStatePartial())
     private val autoWallpaperNextRunFlow = getAutoWallpaperNextRun()
-    private val localDirectories = flowOf(
-        application.accessibleFolders
-            .map { p ->
-                LocalDirectory(
-                    uri = p.uri,
-                    path = getRealPath(
-                        context = application,
-                        uri = p.uri,
-                    ) ?: p.uri.toString(),
-                )
-            },
-    )
     private var changeNowJob: Job? = null
 
     val uiState = combine(
@@ -89,14 +78,12 @@ class SettingsViewModel @Inject constructor(
         localUiStateFlow,
         savedSearchRepository.observeAll(),
         autoWallpaperNextRunFlow,
-        localDirectories,
     ) {
             appPreferences,
             objectDetectionModels,
             localUiState,
             savedSearches,
             autoWallpaperNextRun,
-            dirs,
         ->
         val selectedModelId = appPreferences.objectDetectionPreferences.modelId
         val selectedModel = if (selectedModelId == 0L) {
@@ -118,7 +105,7 @@ class SettingsViewModel @Inject constructor(
                     appPreferences.autoWallpaperPreferences.savedSearchIds.contains(it.id)
                 }.toPersistentList(),
                 autoWallpaperNextRun = autoWallpaperNextRun,
-                localDirectories = dirs.toPersistentList(),
+                localDirectories = getLocalDirs(application, appPreferences).toPersistentList(),
             ),
         )
     }.stateIn(
@@ -202,7 +189,7 @@ class SettingsViewModel @Inject constructor(
                         onDone(RuntimeException(msg))
                         return@downloadModel
                     }
-                    val modelFile = File(modelPath)
+                    val modelFile = modelPath.toUri().toFile()
 
                     // check if file is a valid tf-lite model
                     try {
@@ -470,6 +457,10 @@ class SettingsViewModel @Inject constructor(
         it.copy(showTagsWriteTypeDialog = partial(show))
     }
 
+    fun showChangeDownloadLocationDialog(show: Boolean) = localUiStateFlow.update {
+        it.copy(showChangeDownloadLocationDialog = partial(show))
+    }
+
     fun updateRememberViewedWallpapers(enabled: Boolean) = viewModelScope.launch {
         appPreferencesRepository.updateViewedWallpapersPreferences(
             uiState.value.appPreferences.viewedWallpapersPreferences.copy(
@@ -496,6 +487,43 @@ class SettingsViewModel @Inject constructor(
 
     fun clearViewedWallpapers() = viewModelScope.launch {
         viewedRepository.deleteAll()
+    }
+
+    fun updateDownloadLocation(uri: Uri) = viewModelScope.launch {
+        application.contentResolver.takePersistableUriPermission(
+            uri,
+            Intent.FLAG_GRANT_WRITE_URI_PERMISSION or
+                Intent.FLAG_GRANT_WRITE_URI_PERMISSION,
+        )
+        appPreferencesRepository.updateDownloadLocation(uri)
+        localUiStateFlow.update {
+            it.copy(
+                showChangeDownloadLocationDialog = partial(false),
+            )
+        }
+    }
+
+    fun removeDownloadLocation() = viewModelScope.launch {
+        val appPreferences = uiState.value.appPreferences
+        val localUris = getLocalDirs(application, appPreferences).map { it.uri }
+        val currentDownloadLocation = appPreferences.downloadLocation ?: return@launch
+        application.contentResolver.releasePersistableUriPermission(
+            currentDownloadLocation,
+            if (localUris.contains(currentDownloadLocation)) {
+                // just release write permission
+                Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            } else {
+                // release both read and write
+                Intent.FLAG_GRANT_READ_URI_PERMISSION or
+                    Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+            },
+        )
+        appPreferencesRepository.updateDownloadLocation(null)
+        localUiStateFlow.update {
+            it.copy(
+                showChangeDownloadLocationDialog = partial(false),
+            )
+        }
     }
 }
 
@@ -529,6 +557,7 @@ data class SettingsUiState(
     val showTagsWriteTypeDialog: Boolean = false,
     val showViewedWallpapersLookDialog: Boolean = false,
     val showClearViewedWallpapersConfirmDialog: Boolean = false,
+    val showChangeDownloadLocationDialog: Boolean = false,
 )
 
 sealed class NextRun {

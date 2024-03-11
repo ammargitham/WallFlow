@@ -15,14 +15,12 @@ import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.data.repository.FavoritesRepository
 import com.ammar.wallflow.data.repository.LightDarkRepository
 import com.ammar.wallflow.data.repository.SavedSearchRepository
-import com.ammar.wallflow.extensions.accessibleFolders
 import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.model.local.LocalDirectory
 import com.ammar.wallflow.model.search.SavedSearch
 import com.ammar.wallflow.model.serializers.UriSerializer
 import com.ammar.wallflow.ui.screens.settings.updateAutoWallpaperPrefs
-import com.ammar.wallflow.utils.combine
-import com.ammar.wallflow.utils.getRealPath
+import com.ammar.wallflow.utils.getLocalDirs
 import com.github.materiiapps.partial.Partialize
 import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
@@ -31,7 +29,7 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.serialization.UseSerializers
@@ -45,18 +43,6 @@ class ManageAutoWallpaperSourcesViewModel @Inject constructor(
     favoritesRepository: FavoritesRepository,
 ) : AndroidViewModel(application) {
     private val localUiStateFlow = MutableStateFlow(ManageAutoWallpaperSourcesUiStatePartial())
-    private val localDirectories = flowOf(
-        application.accessibleFolders
-            .map { p ->
-                LocalDirectory(
-                    uri = p.uri,
-                    path = getRealPath(
-                        context = application,
-                        uri = p.uri,
-                    ) ?: p.uri.toString(),
-                )
-            },
-    )
 
     val uiState = combine(
         appPreferencesRepository.appPreferencesFlow,
@@ -64,14 +50,12 @@ class ManageAutoWallpaperSourcesViewModel @Inject constructor(
         lightDarkRepository.observeCount(),
         savedSearchRepository.observeAll(),
         favoritesRepository.observeCount(),
-        localDirectories,
     ) {
             appPreferences,
             localUiState,
             lightDarkCount,
             savedSearches,
             favoritesCount,
-            dirs,
         ->
         val autoWallpaperPreferences = appPreferences.autoWallpaperPreferences
         val allSavedSearches = savedSearches.map { entity -> entity.toSavedSearch() }
@@ -83,7 +67,7 @@ class ManageAutoWallpaperSourcesViewModel @Inject constructor(
                 savedSearches = allSavedSearches.toPersistentList(),
                 hasLightDarkWallpapers = lightDarkCount > 0,
                 hasFavorites = favoritesCount > 0,
-                localDirectories = dirs.toPersistentList(),
+                localDirectories = getLocalDirs(application, appPreferences).toPersistentList(),
                 homeScreenSources = AutoWallpaperSources(
                     lightDarkEnabled = autoWallpaperPreferences.lightDarkEnabled,
                     useDarkWithExtraDim = autoWallpaperPreferences.useDarkWithExtraDim,

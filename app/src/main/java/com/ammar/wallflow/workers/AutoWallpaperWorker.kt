@@ -11,6 +11,8 @@ import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.toRect
 import androidx.compose.ui.unit.toSize
 import androidx.core.app.NotificationCompat
+import androidx.core.net.toFile
+import androidx.core.net.toUri
 import androidx.hilt.work.HiltWorker
 import androidx.work.BackoffPolicy
 import androidx.work.Constraints
@@ -24,6 +26,7 @@ import androidx.work.PeriodicWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.ammar.wallflow.MIME_TYPE_TFLITE_MODEL
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.db.entity.search.toSavedSearch
 import com.ammar.wallflow.data.db.entity.toModel
@@ -49,11 +52,11 @@ import com.ammar.wallflow.extensions.getMLModelsFileIfExists
 import com.ammar.wallflow.extensions.getScreenResolution
 import com.ammar.wallflow.extensions.getTempDir
 import com.ammar.wallflow.extensions.getTempFileIfExists
-import com.ammar.wallflow.extensions.getUriForFile
 import com.ammar.wallflow.extensions.isExtraDimActive
 import com.ammar.wallflow.extensions.isInDefaultOrientation
 import com.ammar.wallflow.extensions.isSystemInDarkTheme
 import com.ammar.wallflow.extensions.notificationManager
+import com.ammar.wallflow.extensions.parseMimeType
 import com.ammar.wallflow.extensions.setWallpaper
 import com.ammar.wallflow.extensions.workManager
 import com.ammar.wallflow.model.AutoWallpaperHistory
@@ -80,13 +83,13 @@ import com.ammar.wallflow.utils.NotificationIds.AUTO_WALLPAPER_LOCK_SUCCESS_NOTI
 import com.ammar.wallflow.utils.NotificationIds.AUTO_WALLPAPER_NOTIFICATION_ID
 import com.ammar.wallflow.utils.NotificationIds.AUTO_WALLPAPER_SUCCESS_NOTIFICATION_ID
 import com.ammar.wallflow.utils.decodeSampledBitmapFromUri
-import com.ammar.wallflow.utils.getPublicDownloadsFile
+import com.ammar.wallflow.utils.getPublicDownloadsDir
 import com.ammar.wallflow.utils.objectdetection.detectObjects
 import com.ammar.wallflow.utils.objectdetection.objectsDetector
 import com.ammar.wallflow.utils.writeTagsToFile
+import com.lazygeniouz.dfc.file.DocumentFileCompat
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
-import java.io.File
 import java.util.UUID
 import java.util.concurrent.TimeUnit
 import kotlin.math.max
@@ -378,7 +381,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
                 } catch (e: Exception) {
                     Log.e(TAG, "setWallpaper: ", e)
                 }
-                context.getUriForFile(wallpaperFile)
+                wallpaperFile.uri
             }
             is LocalWallpaper -> nextWallpaper.data
             else -> return false to null
@@ -426,7 +429,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
     ) {
         1 to null
     } else {
-        val modelFile = getObjectDetectionModel()
+        val modelFile = getObjectDetectionModel().uri.toFile()
         val (scale, detectionWithBitmaps) = detectObjects(
             context = context,
             uri = uri,
@@ -436,7 +439,9 @@ class AutoWallpaperWorker @AssistedInject constructor(
         scale to detectionWithBitmaps.firstOrNull()
     }
 
-    private suspend fun safeDownloadWallpaper(wallpaper: DownloadableWallpaper): File? {
+    private suspend fun safeDownloadWallpaper(
+        wallpaper: DownloadableWallpaper,
+    ): DocumentFileCompat? {
         var downloadTries = 0
         while (true) {
             val wallpaperFile = downloadWallpaper(wallpaper)
@@ -444,10 +449,11 @@ class AutoWallpaperWorker @AssistedInject constructor(
                 return wallpaperFile
             }
             // check if file size matches (only for wallhaven, as reddit does not return fileSize)
-            if (wallpaperFile.length() == wallpaper.fileSize) {
+            if (wallpaperFile.length == wallpaper.fileSize) {
                 // file was correctly downloaded
                 return wallpaperFile
             }
+            Log.w(TAG, "DownloadWallpaper: File length mismatch! Trying again...")
             // increment try count
             downloadTries++
             // max 3 tries
@@ -462,13 +468,19 @@ class AutoWallpaperWorker @AssistedInject constructor(
         }
     }
 
-    private suspend fun downloadWallpaper(wallpaper: DownloadableWallpaper): File {
+    private suspend fun downloadWallpaper(wallpaper: DownloadableWallpaper): DocumentFileCompat {
         val fileName = wallpaper.data.getFileNameFromUrl()
-        return context.getTempFileIfExists(fileName) ?: download(
+        val tempFile = context.getTempFileIfExists(fileName)
+        if (tempFile != null) {
+            return DocumentFileCompat.fromFile(context, tempFile)
+        }
+        return download(
+            context = context,
             okHttpClient = okHttpClient,
             url = wallpaper.data,
-            dir = context.getTempDir().absolutePath,
+            dirUri = context.getTempDir().toUri(),
             fileName = fileName,
+            mimeType = wallpaper.mimeType ?: parseMimeType(wallpaper.data),
             progressCallback = { total, downloaded ->
                 try {
                     val notification = notificationBuilder.apply {
@@ -496,17 +508,23 @@ class AutoWallpaperWorker @AssistedInject constructor(
         )
     }
 
-    private suspend fun getObjectDetectionModel(): File {
+    private suspend fun getObjectDetectionModel(): DocumentFileCompat {
         val objectDetectionPreferences = appPreferences.objectDetectionPreferences
         val modelId = objectDetectionPreferences.modelId
         val objectDetectionModel = objectDetectionModelRepository.getById(modelId)?.toModel()
             ?: ObjectDetectionModel.DEFAULT
         val fileName = objectDetectionModel.fileName
-        return context.getMLModelsFileIfExists(fileName) ?: download(
+        val file = context.getMLModelsFileIfExists(fileName)
+        if (file != null) {
+            return DocumentFileCompat.fromFile(context, file)
+        }
+        return download(
+            context = context,
             okHttpClient = okHttpClient,
             url = objectDetectionModel.url,
-            dir = context.getMLModelsDir().absolutePath,
+            dirUri = context.getMLModelsDir().toUri(),
             fileName = objectDetectionModel.fileName,
+            mimeType = MIME_TYPE_TFLITE_MODEL,
             progressCallback = { _, _ -> },
         )
     }
@@ -727,19 +745,29 @@ class AutoWallpaperWorker @AssistedInject constructor(
         try {
             val url = wallpaper.data
             val fileName = url.getFileNameFromUrl()
-            val dest = getPublicDownloadsFile(fileName)
-            copyFiles(context, uri, dest)
+            val dirUri = appPreferences.downloadLocation
+                ?: getPublicDownloadsDir().toUri()
+            val destFile = createFile(
+                context = context,
+                dirUri = dirUri,
+                fileName = fileName,
+                mimeType = wallpaper.mimeType ?: parseMimeType(url),
+            )
+            copyFiles(context, uri, destFile.uri)
             if (writeTagsToExif &&
                 wallpaper is WallhavenWallpaper &&
                 wallpaper.tags != null
             ) {
                 writeTagsToFile(
-                    file = dest,
+                    context = context,
+                    file = destFile,
                     tags = wallpaper.tags.map { it.name },
                     exifWriteType = tagsExifWriteType,
                 )
             }
-            scanFile(context, dest)
+            if (destFile.uri.scheme == "file") {
+                scanFile(context, destFile.uri.toFile())
+            }
         } catch (e: Exception) {
             Log.e(TAG, "saveWallpaperToDownloads: ", e)
         }

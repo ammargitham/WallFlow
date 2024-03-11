@@ -198,13 +198,22 @@ internal fun LazyListScope.generalSection(
     blurNsfw: Boolean = false,
     writeTagsToExif: Boolean = false,
     tagsExifWriteType: ExifWriteType = ExifWriteType.APPEND,
+    downloadLocation: String = "",
     onBlurSketchyCheckChange: (checked: Boolean) -> Unit = {},
     onBlurNsfwCheckChange: (checked: Boolean) -> Unit = {},
     onWriteTagsToExifCheckChange: (checked: Boolean) -> Unit = {},
     onTagsWriteTypeClick: () -> Unit = {},
     onManageSavedSearchesClick: () -> Unit = {},
+    onDownloadLocationClick: () -> Unit = {},
 ) {
     item { Header(stringResource(R.string.general)) }
+    item {
+        ListItem(
+            modifier = Modifier.clickable(onClick = onDownloadLocationClick),
+            headlineContent = { Text(text = stringResource(R.string.download_location)) },
+            supportingContent = { Text(text = downloadLocation) },
+        )
+    }
     item {
         ListItem(
             modifier = Modifier.clickable { onBlurSketchyCheckChange(!blurSketchy) },
@@ -292,6 +301,7 @@ private fun PreviewGeneralSection() {
             LazyColumn {
                 generalSection(
                     writeTagsToExif = true,
+                    downloadLocation = "test location",
                 )
             }
         }

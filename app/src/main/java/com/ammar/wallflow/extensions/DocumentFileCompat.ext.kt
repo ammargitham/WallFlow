@@ -2,8 +2,10 @@ package com.ammar.wallflow.extensions
 
 import android.content.Context
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.util.Log
 import androidx.compose.ui.unit.IntSize
+import androidx.core.net.toFile
 import com.ammar.wallflow.model.local.LocalWallpaper
 import com.lazygeniouz.dfc.file.DocumentFileCompat
 
@@ -44,4 +46,22 @@ fun DocumentFileCompat.toLocalWallpaper(
         mimeType = getType(),
         name = name,
     )
+}
+
+fun DocumentFileCompat.Companion.fromUri(
+    context: Context,
+    uri: Uri,
+): DocumentFileCompat? {
+    if (uri.scheme == "file") {
+        return fromFile(context, uri.toFile())
+    }
+    if (isTreeUri(uri)) {
+        return fromTreeUri(context, uri)
+    }
+    return fromSingleUri(context, uri)
+}
+
+private fun isTreeUri(uri: Uri): Boolean {
+    val paths = uri.pathSegments
+    return paths.size >= 2 && "tree" == paths[0]
 }
