@@ -80,6 +80,7 @@ fun SubredditsInputField(
             tags = localSubreddits,
             separatorRegex = regex,
             isError = hasError,
+            maxLines = 3,
             label = { Text(text = stringResource(R.string.subreddits)) },
             tagFromInputString = {
                 val name = SUBREDDIT_REGEX.matchEntire(it)
