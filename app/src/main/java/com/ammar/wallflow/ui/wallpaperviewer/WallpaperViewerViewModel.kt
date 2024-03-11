@@ -67,7 +67,11 @@ class WallpaperViewerViewModel @Inject constructor(
                 Source.LOCAL -> localWallpapersRepository.wallpaper(application, it.wallpaperId)
             }
         }
-    }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = Resource.Loading(null),
+    )
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val isFavoriteFlow = wallpaperFlow.flatMapLatest {
@@ -76,7 +80,11 @@ class WallpaperViewerViewModel @Inject constructor(
             source = wallpaper.source,
             sourceId = wallpaper.id,
         )
-    }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = false,
+    )
 
     @OptIn(ExperimentalCoroutinesApi::class)
     private val lightDarkTypeFlags = wallpaperFlow.flatMapLatest {
@@ -85,7 +93,11 @@ class WallpaperViewerViewModel @Inject constructor(
             source = wallpaper.source,
             sourceId = wallpaper.id,
         )
-    }
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = LightDarkType.UNSPECIFIED,
+    )
 
     val uiState = combine(
         localUiState,
