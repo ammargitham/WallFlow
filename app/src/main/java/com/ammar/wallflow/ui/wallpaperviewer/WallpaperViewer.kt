@@ -65,7 +65,6 @@ import com.ammar.wallflow.ui.common.TopBar
 import com.ammar.wallflow.ui.common.bottomWindowInsets
 import com.ammar.wallflow.ui.common.permissions.DownloadPermissionsRationalDialog
 import com.ammar.wallflow.ui.common.permissions.rememberDownloadPermissionsState
-import com.ammar.wallflow.ui.screens.wallpaper.InfoButton
 import com.ammar.wallflow.ui.screens.wallpaper.LightDarkInfoDialog
 import com.ammar.wallflow.ui.screens.wallpaper.ShareButton
 import com.ammar.wallflow.ui.screens.wallpaper.WallpaperActions
@@ -272,6 +271,7 @@ fun WallpaperViewer(
                 onFavoriteToggle = onFavoriteToggle,
                 onLightDarkTypeFlagsChange = onLightDarkTypeFlagsChange,
                 onShowLightDarkInfoClick = { showLightDarkInfo = true },
+                onInfoClick = onInfoClick,
             )
         }
 
@@ -294,7 +294,6 @@ fun WallpaperViewer(
             showBackButton = showBackButton,
             onBackClick = onBackClick,
             actions = {
-                InfoButton(onClick = onInfoClick)
                 ShareButton(
                     showShareLinkAction = wallpaper is WallhavenWallpaper ||
                         wallpaper is RedditWallpaper,

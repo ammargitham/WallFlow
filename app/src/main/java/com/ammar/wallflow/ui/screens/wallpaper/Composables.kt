@@ -90,6 +90,7 @@ fun WallpaperActions(
     onFavoriteToggle: (Boolean) -> Unit = {},
     onLightDarkTypeFlagsChange: (Int) -> Unit = {},
     onShowLightDarkInfoClick: () -> Unit = {},
+    onInfoClick: () -> Unit = {},
 ) {
     BottomAppBar(
         modifier = modifier,
@@ -98,6 +99,7 @@ fun WallpaperActions(
             if (showFullScreenAction) {
                 FullScreenButton(onClick = onFullScreenClick)
             }
+            InfoButton(onClick = onInfoClick)
             FavoriteButton(
                 isFavorite = isFavorite,
                 onToggle = onFavoriteToggle,
