@@ -321,4 +321,50 @@
 \nОтключите обрезку, если хотите, чтобы обои на главном экране прокручивались.</string>
     <string name="file_name_cannot_be_empty">Название файла не может быть пустым</string>
     <string name="file_name_already_used">Данное название файла уже используется</string>
+    <string name="mark_light_dark">Отметить как светлую или тёмную</string>
+    <string name="light_dark">Светлая / Тёмная</string>
+    <string name="help">Справка</string>
+    <string name="collections">Коллекции</string>
+    <string name="use_light_dark_wallpapers">Использовать светлые/тёмные обои</string>
+    <string name="use_dark_with_extra_dim">Использовать тёмные обои с функцией «Дополнительного затемнения»</string>
+    <string name="choose_saved_searches">Выберите сохранённые поисковые запросы</string>
+    <string name="use_favorites">Использовать избранные</string>
+    <string name="use_local_dirs">Использовать локальные каталоги</string>
+    <string name="choose_local_dirs">Выберите локальные каталоги</string>
+    <string name="light_dark_enabled">Светлые / Тёмные обои включены</string>
+    <string name="wallpaper_not_changed">Обои не сменились</string>
+    <string name="wallpaper_not_changed_with_reason">Обои не сменились: %s</string>
+    <string name="app_prefs_null">Настройки приложения не найдены</string>
+    <string name="auto_wallpaper_disabled">Смена обоев отключена</string>
+    <string name="auto_wallpaper_cancelled">Смена обоев отменена</string>
+    <string name="url">URL</string>
+    <string name="file_name_invalid">Имя файла неверно</string>
+    <string name="extra_dim">«Дополнительное затемнение»</string>
+    <string name="no_favorites">Нет обоев, отмеченных как избранные</string>
+    <string name="no_light_dark">Нет обоев, помеченных как светлые или тёмные</string>
+    <string name="use_same_sources_homescreen_lockscreen">Использовать одинаковые источники для главного экрана и экрана блокировки</string>
+    <string name="file_name">Имя файла</string>
+    <string name="use_dark_with_extra_dim_desc">Разрешить обычные тёмные обои при активации «Дополнительного затемнения»</string>
+    <string name="no_wallpaper_found">Обои не найдены</string>
+    <string name="use_saved_searches">Использовать сохранённые поисковые запросы</string>
+    <string name="light_dark_info">Назначение обоев как светлых или тёмных позволит службе смены обоев устанавливать светлые или тёмные обои в зависимости от темы системы.
+\nПосле назначения включите «Использовать светлые / тёмные обои» в настройках источников для смены обоев.</string>
+    <plurals name="n_searches">
+        <item quantity="one">%d поисковый запрос</item>
+        <item quantity="few">%d поисковых запроса</item>
+        <item quantity="many">%d поисковых запросов</item>
+        <item quantity="other">%d поисковых запросов</item>
+    </plurals>
+    <plurals name="home_screen_sources">
+        <item quantity="one">Главный экран: %d источник</item>
+        <item quantity="few">Главный экран: %d источника</item>
+        <item quantity="many">Главный экран: %d источников</item>
+        <item quantity="other">Главный экран: %d источников</item>
+    </plurals>
+    <plurals name="lock_screen_sources">
+        <item quantity="one">Экран блокировки: %d источник</item>
+        <item quantity="few">Экран блокировки: %d источника</item>
+        <item quantity="many">Экран блокировки: %d источников</item>
+        <item quantity="other">Экран блокировки: %d источников</item>
+    </plurals>
 </resources>

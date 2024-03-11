@@ -316,4 +316,49 @@
     <string name="auto_wallpaper_crop_desc">Decupare imagine de fundal înainte de aplicare.
 \nDezactivează dacă dorești derularea imaginii de fundal pe ecranul de pornire.</string>
     <string name="crop">Decupare</string>
+    <string name="file_name_cannot_be_empty">Numele fișierului nu poate fi gol</string>
+    <string name="file_name_already_used">Numele fișierului este deja folosit</string>
+    <string name="mark_light_dark">Marchează ca luminoasă sau întunecată</string>
+    <string name="extra_dim">Întunecare suplimentară</string>
+    <string name="no_light_dark">Nu există imagini de fundal marcate ca luminoase sau întunecate</string>
+    <string name="collections">Colecții</string>
+    <string name="no_favorites">Nicio imagine de fundal marcată ca favorită</string>
+    <string name="use_same_sources_homescreen_lockscreen">Se utilizează aceleași surse pentru ecranul de pornire și ecranul de blocare</string>
+    <string name="use_light_dark_wallpapers">Utilizare imagini de fundal luminoase/întunecate</string>
+    <string name="use_dark_with_extra_dim_desc">Permite imagini de fundal întunecate obișnuite când „Întunecarea suplimentară” este activată</string>
+    <string name="use_dark_with_extra_dim">Utilizează imagini de fundal întunecate cu funcția Întunecare suplimentară</string>
+    <string name="use_saved_searches">Utilizează căutările salvate</string>
+    <string name="use_favorites">Folosește favoritele</string>
+    <string name="use_local_dirs">Utilizează directoare locale</string>
+    <string name="choose_local_dirs">Alege directoarele locale</string>
+    <string name="light_dark_enabled">Imaginile de fundal luminoase/întunecate sunt activate</string>
+    <string name="wallpaper_not_changed">Tapetul nu a fost schimbat</string>
+    <string name="wallpaper_not_changed_with_reason">Tapetul nu a fost schimbat: %s</string>
+    <string name="app_prefs_null">Setările aplicației nu au fost găsite</string>
+    <string name="auto_wallpaper_disabled">Imagini de fundal automate dezactivate</string>
+    <string name="no_wallpaper_found">Nu a fost găsită nicio imagine de fundal</string>
+    <string name="auto_wallpaper_cancelled">Schimbarea imaginii de fundal a fost anulată</string>
+    <string name="url">URL</string>
+    <string name="file_name">Nume de fișier</string>
+    <string name="file_name_invalid">Numele fișierului este incorect</string>
+    <plurals name="n_searches">
+        <item quantity="one">%d căutare</item>
+        <item quantity="few">%d căutări</item>
+        <item quantity="other">%d căutări</item>
+    </plurals>
+    <plurals name="lock_screen_sources">
+        <item quantity="one">Ecranul de blocare: %d sursă</item>
+        <item quantity="few">Ecranul de blocare: %d surse</item>
+        <item quantity="other">Ecranul de blocare: %d surse</item>
+    </plurals>
+    <plurals name="home_screen_sources">
+        <item quantity="one">Ecranul de pornire: %d sursă</item>
+        <item quantity="few">Ecranul de pornire: %d surse</item>
+        <item quantity="other">Ecranul de pornire: %d surse</item>
+    </plurals>
+    <string name="choose_saved_searches">Alege căutările salvate</string>
+    <string name="light_dark">Luminoasă / Întunecată</string>
+    <string name="help">Ajutor</string>
+    <string name="light_dark_info">Setarea imaginii de fundal la culoare deschisă sau întunecată va permite schimbătorului de imagini de fundal să seteze un tapet deschis sau întunecat, în funcție de tema sistemului.
+\nDupă marcare, activează „Utilizează imagine de fundal luminoasă/întunecată” în setările sursei pentru a schimba imaginea de fundal.</string>
 </resources>
