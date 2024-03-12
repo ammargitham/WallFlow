@@ -8,7 +8,8 @@ Features
 * Save searches
 * Mark wallpapers as favorite
 * Local Wallpapers
-* Use saved searches, favorites, and local wallpapers in auto wallpaper
+* Light/Dark wallpapers
+* Use light/dark wallpapers, saved searches, favorites, and local wallpapers in auto wallpaper
 * Search history
 * Search results caching to reduce api calls
 * Options to tweak the wallpaper grid layout

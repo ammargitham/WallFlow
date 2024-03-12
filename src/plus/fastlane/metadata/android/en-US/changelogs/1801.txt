@@ -1,0 +1,9 @@
+What's New
+* Custom download location
+* Move info button back down
+
+Bug Fixes
+* Fix bottom padding for collections tab
+* Fix crash caused when setting auto wallpaper with idle constraint
+* Fix duplicate API requests fired when viewing wallpaper
+* Make subreddit input scrollable in the reddit setup dialog
