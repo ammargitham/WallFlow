@@ -367,4 +367,5 @@
         <item quantity="many">Экран блокировки: %d источников</item>
         <item quantity="other">Экран блокировки: %d источников</item>
     </plurals>
+    <string name="download_location">Место загрузки</string>
 </resources>
