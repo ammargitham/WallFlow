@@ -349,7 +349,11 @@ suspend fun restoreBackupV1(
 fun migrateBackupJson(currentJson: JsonObject) = try {
     val prefs = currentJson["preferences"]?.let {
         // migrate preferences
-        migratePrefs(it.jsonObject)
+        if (it is JsonObject) {
+            migratePrefs(it.jsonObject)
+        } else {
+            null
+        }
     }
     JsonObject(
         currentJson.toMutableMap().apply {

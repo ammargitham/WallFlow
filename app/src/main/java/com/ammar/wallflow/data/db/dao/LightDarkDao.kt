@@ -20,7 +20,7 @@ interface LightDarkDao {
     @Query("SELECT * FROM light_dark WHERE source_id = :sourceId AND source = :source")
     suspend fun getBySourceIdAndSource(sourceId: String, source: Source): LightDarkEntity?
 
-    @Query("SELECT * FROM light_dark WHERE typeFlags in (:typeFlags) ORDER BY RANDOM() LIMIT 1")
+    @Query("SELECT * FROM light_dark WHERE typeFlags IN (:typeFlags) ORDER BY RANDOM() LIMIT 1")
     suspend fun getRandomByTypeFlag(typeFlags: Set<Int>): LightDarkEntity?
 
     @Query("SELECT * FROM light_dark ORDER BY updated_on DESC")

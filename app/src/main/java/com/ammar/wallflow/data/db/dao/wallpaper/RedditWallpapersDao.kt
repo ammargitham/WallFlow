@@ -5,7 +5,9 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import com.ammar.wallflow.data.db.entity.wallpaper.RedditWallpaperEntity
+import com.ammar.wallflow.utils.safeGetAll
 
 @Dao
 interface RedditWallpapersDao : WallpapersDao {
@@ -25,7 +27,15 @@ interface RedditWallpapersDao : WallpapersDao {
     suspend fun getByRedditId(redditId: String): RedditWallpaperEntity?
 
     @Query("SELECT * FROM reddit_wallpapers WHERE reddit_id IN (:redditIds)")
-    suspend fun getByRedditIds(redditIds: List<String>): List<RedditWallpaperEntity>
+    suspend fun getByRedditIdsUpTo999Items(
+        redditIds: Collection<String>,
+    ): List<RedditWallpaperEntity>
+
+    @Transaction
+    suspend fun getByRedditIds(redditIds: Collection<String>) = safeGetAll(
+        redditIds,
+        ::getByRedditIdsUpTo999Items,
+    )
 
     @Query("SELECT reddit_id FROM reddit_wallpapers")
     suspend fun getAllRedditIds(): List<String>

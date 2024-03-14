@@ -33,6 +33,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import java.io.FileNotFoundException
 import java.io.IOException
 import javax.inject.Inject
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
@@ -88,6 +89,8 @@ class BackupRestoreViewModel @Inject constructor(
                     restoreException = null,
                 )
             }
+            // delay to show reading progress
+            delay(200)
             try {
                 val json = application.readFromUri(uri)
                 if (json == null) {
@@ -99,6 +102,8 @@ class BackupRestoreViewModel @Inject constructor(
                     }
                     return@launch
                 }
+                // delay to show reading progress
+                delay(200)
                 val backup = readBackupJson(json)
                 val restoreSummary = backup.getRestoreSummary(uri)
                 val restoreOptions = restoreSummary.getInitialRestoreOptions()

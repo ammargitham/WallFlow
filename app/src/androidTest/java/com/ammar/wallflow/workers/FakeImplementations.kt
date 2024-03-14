@@ -42,19 +42,17 @@ import okhttp3.Request
 import org.jsoup.nodes.Document
 
 internal open class FakeSavedSearchDao : SavedSearchDao {
-    override fun observeAll(): Flow<List<SavedSearchEntity>> {
-        throw RuntimeException()
-    }
+    override fun observeAll() = throw RuntimeException()
 
-    override suspend fun getAll(): List<SavedSearchEntity> {
-        throw RuntimeException()
-    }
+    override suspend fun getAll() = throw RuntimeException()
+
+    override suspend fun getAllByNamesUpTo999Items(
+        names: Collection<String>,
+    ) = throw RuntimeException()
 
     override suspend fun getAllByNames(
         names: Collection<String>,
-    ): List<SavedSearchEntity> {
-        throw RuntimeException()
-    }
+    ) = throw RuntimeException()
 
     override suspend fun exists(id: Long) = throw RuntimeException()
 
@@ -65,25 +63,17 @@ internal open class FakeSavedSearchDao : SavedSearchDao {
         name: String,
     ): Boolean = throw RuntimeException()
 
-    override suspend fun getById(id: Long): SavedSearchEntity? {
-        throw RuntimeException()
-    }
+    override suspend fun getById(id: Long): SavedSearchEntity? = throw RuntimeException()
 
-    override suspend fun getByName(name: String): SavedSearchEntity? {
-        throw RuntimeException()
-    }
+    override suspend fun getByName(name: String) = throw RuntimeException()
 
-    override suspend fun upsert(savedSearch: SavedSearchEntity) {
-        throw RuntimeException()
-    }
+    override suspend fun upsert(savedSearch: SavedSearchEntity) = throw RuntimeException()
 
-    override suspend fun upsert(savedSearchDaos: Collection<SavedSearchEntity>) {
-        throw RuntimeException()
-    }
+    override suspend fun upsert(
+        savedSearchDaos: Collection<SavedSearchEntity>,
+    ) = throw RuntimeException()
 
-    override suspend fun deleteByName(name: String) {
-        throw RuntimeException()
-    }
+    override suspend fun deleteByName(name: String) = throw RuntimeException()
 }
 
 internal open class FakeAutoWallpaperHistoryDao : AutoWallpaperHistoryDao {
@@ -236,6 +226,12 @@ internal open class FakeWallhavenWallpapersDao : WallhavenWallpapersDao {
         throw RuntimeException()
     }
 
+    override suspend fun getAllByWallhavenIdsUpTo999Items(
+        wallhavenIds: Collection<String>,
+    ): List<WallhavenWallpaperEntity> {
+        throw RuntimeException()
+    }
+
     override suspend fun getByWallhavenIds(
         wallhavenIds: List<String>,
     ): List<WallhavenWallpaperEntity> {
@@ -328,7 +324,11 @@ internal open class FakeRedditWallpapersDao : RedditWallpapersDao {
 
     override suspend fun getByRedditId(redditId: String) = throw RuntimeException()
 
-    override suspend fun getByRedditIds(redditIds: List<String>) = throw RuntimeException()
+    override suspend fun getByRedditIdsUpTo999Items(
+        redditIds: Collection<String>,
+    ) = throw RuntimeException()
+
+    override suspend fun getByRedditIds(redditIds: Collection<String>) = throw RuntimeException()
 
     override suspend fun getAllRedditIds() = throw RuntimeException()
 
