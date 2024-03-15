@@ -28,6 +28,7 @@ data class BackupV1(
         file = file,
         settings = preferences != null,
         favorites = favorites?.size,
+        lightDark = lightDark?.size,
         viewed = viewed?.size,
         savedSearches = (wallhaven?.savedSearches?.size ?: 0) + (reddit?.savedSearches?.size ?: 0),
         backup = this,

@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -124,7 +126,8 @@ private fun BackupDialogContent(
     val alpha = if (enabled) 1f else DISABLED_ALPHA
 
     Column(
-        modifier = modifier,
+        modifier = modifier
+            .verticalScroll(state = rememberScrollState()),
     ) {
         ListItem(
             modifier = Modifier
@@ -182,6 +185,37 @@ private fun BackupDialogContent(
                         onOptionsChange(
                             options.copy(
                                 favorites = it,
+                            ),
+                        )
+                    },
+                )
+            },
+        )
+        ListItem(
+            modifier = Modifier
+                .clickable(enabled = enabled) {
+                    onOptionsChange(
+                        options.copy(
+                            lightDark = !options.lightDark,
+                        ),
+                    )
+                }
+                .padding(horizontal = 8.dp),
+            headlineContent = {
+                Text(
+                    text = stringResource(R.string.light_dark),
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
+                )
+            },
+            leadingContent = {
+                Checkbox(
+                    modifier = Modifier.size(24.dp),
+                    checked = options.lightDark,
+                    enabled = enabled,
+                    onCheckedChange = {
+                        onOptionsChange(
+                            options.copy(
+                                lightDark = it,
                             ),
                         )
                     },
@@ -426,7 +460,8 @@ private fun RestoreDialogContent(
     val context = LocalContext.current
 
     Column(
-        modifier = modifier,
+        modifier = modifier
+            .verticalScroll(state = rememberScrollState()),
     ) {
         OutlinedTextField(
             modifier = Modifier
@@ -495,6 +530,8 @@ private fun RestoreDialogContent(
             val settingsEnabled = restoreProgress == null && summary.settings
             val summaryHasFavs = summary.favorites != null && summary.favorites > 0
             val favoritesEnabled = restoreProgress == null && summaryHasFavs
+            val summaryHasLightDark = summary.lightDark != null && summary.lightDark > 0
+            val lightDarkEnabled = restoreProgress == null && summaryHasLightDark
             val summaryHasSearches = summary.savedSearches != null && summary.savedSearches > 0
             val savedSearchesEnabled = restoreProgress == null && summaryHasSearches
             val summaryHasViewed = summary.viewed != null && summary.viewed > 0
@@ -595,6 +632,61 @@ private fun RestoreDialogContent(
                             onOptionsChange(
                                 options.copy(
                                     favorites = it,
+                                ),
+                            )
+                        },
+                    )
+                },
+            )
+            ListItem(
+                modifier = Modifier
+                    .clickable(enabled = lightDarkEnabled) {
+                        onOptionsChange(
+                            options.copy(
+                                lightDark = !options.lightDark,
+                            ),
+                        )
+                    }
+                    .padding(horizontal = 8.dp),
+                headlineContent = {
+                    Text(
+                        text = stringResource(R.string.light_dark),
+                        color = MaterialTheme.colorScheme.onSurface.copy(
+                            alpha = getAlpha(lightDarkEnabled),
+                        ),
+                    )
+                },
+                supportingContent = {
+                    if (summaryHasLightDark) {
+                        Text(
+                            text = stringResource(
+                                R.string.found_n,
+                                summary.lightDark ?: 0,
+                            ),
+                            fontStyle = FontStyle.Italic,
+                            color = MaterialTheme.colorScheme.onSurface.copy(
+                                alpha = getAlpha(lightDarkEnabled),
+                            ),
+                        )
+                    } else {
+                        Text(
+                            text = stringResource(R.string.no_light_dark_found),
+                            fontStyle = FontStyle.Italic,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                                alpha = DISABLED_ALPHA,
+                            ),
+                        )
+                    }
+                },
+                leadingContent = {
+                    Checkbox(
+                        modifier = Modifier.size(24.dp),
+                        checked = options.lightDark,
+                        enabled = lightDarkEnabled,
+                        onCheckedChange = {
+                            onOptionsChange(
+                                options.copy(
+                                    lightDark = it,
                                 ),
                             )
                         },
