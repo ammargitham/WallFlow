@@ -356,4 +356,5 @@
     <string name="light_dark_info">Bir duvar kağıdını açık veya koyu olarak işaretlemek, otomatik duvar kağıdı hizmetinin sistem temasına bağlı olarak açık veya koyu duvar kağıtları ayarlamasına izin verecektir.
 \nİşaretledikten sonra, ayarlardaki otomatik duvar kağıdı kaynaklarında \'Açık / Koyu duvar kağıtları kullan\' seçeneğini etkinleştirin.</string>
     <string name="download_location">İndirme konumu</string>
+    <string name="no_light_dark_found">Açık/Koyu duvar kağıdı bulunamadı</string>
 </resources>
