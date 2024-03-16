@@ -368,4 +368,5 @@
         <item quantity="other">Экран блокировки: %d источников</item>
     </plurals>
     <string name="download_location">Место загрузки</string>
+    <string name="no_light_dark_found">Светлых/тёмных обоев не найдено</string>
 </resources>
