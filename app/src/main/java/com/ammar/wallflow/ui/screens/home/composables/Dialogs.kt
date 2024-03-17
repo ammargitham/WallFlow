@@ -92,6 +92,9 @@ private fun ManageSourcesDialogContent(
     val newSources = remember(currentSources) {
         OnlineSource.entries.toSet() - currentSources.keys
     }
+    val enabledSourcesCount = remember(currentSources) {
+        currentSources.count { it.value }
+    }
 
     Column(
         modifier = modifier,
@@ -104,8 +107,8 @@ private fun ManageSourcesDialogContent(
             newSources.forEach {
                 ListItem(
                     modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                        .clickable { onAddSourceClick(it) },
+                        .clickable { onAddSourceClick(it) }
+                        .padding(horizontal = 8.dp),
                     headlineContent = {
                         Text(text = getSourceLabel(it))
                     },
@@ -129,9 +132,17 @@ private fun ManageSourcesDialogContent(
             text = stringResource(R.string.current_sources),
         )
         currentSources.forEach {
+            val clickable = if (!it.value) {
+                // if this source is set to hidden, keep it enabled
+                true
+            } else {
+                enabledSourcesCount > 1
+            }
             ListItem(
                 modifier = Modifier
-                    .clickable(enabled = false) {}
+                    .clickable(enabled = clickable) {
+                        onVisibilityChange(it.key, !it.value)
+                    }
                     .padding(horizontal = 8.dp),
                 headlineContent = {
                     Text(text = getSourceLabel(it.key))
@@ -151,14 +162,7 @@ private fun ManageSourcesDialogContent(
                 trailingContent = {
                     Checkbox(
                         checked = it.value,
-                        enabled = if (!it.value) {
-                            // if this source is set to hidden, keep it enabled
-                            true
-                        } else {
-                            currentSources.count { entry ->
-                                entry.value
-                            } > 1
-                        },
+                        enabled = clickable,
                         onCheckedChange = { visibility ->
                             onVisibilityChange(it.key, visibility)
                         },
