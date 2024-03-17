@@ -27,6 +27,7 @@ import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SearchBar as MaterialSearchBar
 import androidx.compose.material3.SearchBarDefaults
@@ -190,6 +191,9 @@ object SearchBar {
             modifier = modifier.combinedClickable(
                 onClick = onClick,
                 onLongClick = onDeleteRequest,
+            ),
+            colors = ListItemDefaults.colors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             ),
             headlineContent = {
                 Row(

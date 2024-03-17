@@ -11,6 +11,8 @@ import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -71,6 +73,9 @@ fun AutoWallpaperSetToDialog(
                         modifier = Modifier
                             .clickable { toggleTarget(WallpaperTarget.HOME) }
                             .padding(horizontal = 8.dp),
+                        colors = ListItemDefaults.colors(
+                            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                        ),
                         headlineContent = { Text(text = stringResource(R.string.home_screen)) },
                         leadingContent = {
                             Checkbox(
@@ -84,6 +89,9 @@ fun AutoWallpaperSetToDialog(
                         modifier = Modifier
                             .clickable { toggleTarget(WallpaperTarget.LOCKSCREEN) }
                             .padding(horizontal = 8.dp),
+                        colors = ListItemDefaults.colors(
+                            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                        ),
                         headlineContent = { Text(text = stringResource(R.string.lock_screen)) },
                         leadingContent = {
                             Checkbox(
@@ -95,37 +103,6 @@ fun AutoWallpaperSetToDialog(
                             )
                         },
                     )
-                    // AnimatedVisibility(localSelectedTargets.size == 2) {
-                    //     Column {
-                    //         HorizontalDivider()
-                    //         ListItem(
-                    //             modifier = Modifier
-                    //                 .clickable {
-                    //                     localSetDifferentWallpapers = !localSetDifferentWallpapers
-                    //                 }
-                    //                 .padding(horizontal = 8.dp),
-                    //             headlineContent = {
-                    //                 Text(text = stringResource(R.string.set_different_wallapers))
-                    //             },
-                    //             supportingContent = {
-                    //                 Text(
-                    //                     text = stringResource(
-                    //                         R.string.set_different_wallapers_desc,
-                    //                     ),
-                    //                 )
-                    //             },
-                    //             leadingContent = {
-                    //                 Checkbox(
-                    //                     modifier = Modifier.size(24.dp),
-                    //                     checked = localSetDifferentWallpapers,
-                    //                     onCheckedChange = {
-                    //                         localSetDifferentWallpapers = it
-                    //                     },
-                    //                 )
-                    //             },
-                    //         )
-                    //     }
-                    // }
                 }
             },
             buttons = {

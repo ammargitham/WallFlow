@@ -132,6 +132,9 @@ private fun ObjectDetectionDelegateOptionsContent(
                     modifier = Modifier
                         .clickable(onClick = { onOptionClick(it) })
                         .padding(horizontal = 8.dp),
+                    colors = ListItemDefaults.colors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    ),
                     headlineContent = { Text(text = delegateString(it)) },
                     leadingContent = {
                         RadioButton(
@@ -261,6 +264,9 @@ private fun ObjectDetectionModelOptionsContent(
                 modifier = Modifier
                     .clickable(onClick = { onOptionClick(it) })
                     .padding(horizontal = 8.dp),
+                colors = ListItemDefaults.colors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                ),
                 headlineContent = { Text(text = it.name) },
                 leadingContent = {
                     RadioButton(
@@ -287,6 +293,7 @@ private fun ObjectDetectionModelOptionsContent(
             colors = ListItemDefaults.colors(
                 leadingIconColor = MaterialTheme.colorScheme.primary,
                 headlineColor = MaterialTheme.colorScheme.primary,
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             ),
             headlineContent = { Text(text = stringResource(R.string.add)) },
             leadingContent = {
@@ -605,106 +612,88 @@ private fun ConstraintOptionsDialogContent(
             orientation = Orientation.Vertical,
         ),
     ) {
-        ListItem(
-            modifier = Modifier
-                .clickable(
-                    onClick = {
-                        onChange(constraintTypeMap + (ConstraintType.WIFI to !wifiChecked))
-                    },
-                )
-                .padding(horizontal = 8.dp),
-            headlineContent = { Text(text = stringResource(R.string.on_wifi)) },
-            supportingContent = { Text(text = stringResource(R.string.on_wifi_desc)) },
-            leadingContent = {
-                Checkbox(
-                    modifier = Modifier.size(24.dp),
-                    checked = wifiChecked,
-                    onCheckedChange = {
-                        onChange(constraintTypeMap + (ConstraintType.WIFI to it))
-                    },
-                )
+        ConstraintOption(
+            label = stringResource(R.string.on_wifi),
+            desc = stringResource(R.string.on_wifi_desc),
+            checked = wifiChecked,
+            enabled = true,
+            onCheckedChange = {
+                onChange(constraintTypeMap + (ConstraintType.WIFI to it))
             },
         )
-        ListItem(
-            modifier = Modifier
-                .clickable(
-                    enabled = roamingEnabled,
-                    onClick = {
-                        val current = constraintTypeMap[ConstraintType.ROAMING] ?: false
-                        onChange(constraintTypeMap + (ConstraintType.ROAMING to !current))
-                    },
-                )
-                .padding(horizontal = 8.dp),
-            headlineContent = {
-                Text(
-                    text = stringResource(R.string.data_roaming),
-                    color = MaterialTheme.colorScheme.onSurface.copy(
-                        alpha = if (roamingEnabled) 1f else DISABLED_ALPHA,
-                    ),
-                )
-            },
-            supportingContent = {
-                Text(
-                    text = stringResource(R.string.data_roaming_desc),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
-                        alpha = if (roamingEnabled) 1f else DISABLED_ALPHA,
-                    ),
-                )
-            },
-            leadingContent = {
-                Checkbox(
-                    modifier = Modifier.size(24.dp),
-                    enabled = roamingEnabled,
-                    checked = constraintTypeMap[ConstraintType.ROAMING] ?: false,
-                    onCheckedChange = {
-                        onChange(constraintTypeMap + (ConstraintType.ROAMING to it))
-                    },
-                )
+        ConstraintOption(
+            label = stringResource(R.string.data_roaming),
+            desc = stringResource(R.string.data_roaming_desc),
+            checked = constraintTypeMap[ConstraintType.ROAMING] ?: false,
+            enabled = roamingEnabled,
+            onCheckedChange = {
+                onChange(constraintTypeMap + (ConstraintType.ROAMING to it))
             },
         )
-        ListItem(
-            modifier = Modifier
-                .clickable(
-                    onClick = {
-                        val current = constraintTypeMap[ConstraintType.CHARGING] ?: false
-                        onChange(constraintTypeMap + (ConstraintType.CHARGING to !current))
-                    },
-                )
-                .padding(horizontal = 8.dp),
-            headlineContent = { Text(text = stringResource(R.string.charging)) },
-            supportingContent = { Text(text = stringResource(R.string.charging_desc)) },
-            leadingContent = {
-                Checkbox(
-                    modifier = Modifier.size(24.dp),
-                    checked = constraintTypeMap[ConstraintType.CHARGING] ?: false,
-                    onCheckedChange = {
-                        onChange(constraintTypeMap + (ConstraintType.CHARGING to it))
-                    },
-                )
+        ConstraintOption(
+            label = stringResource(R.string.charging),
+            desc = stringResource(R.string.charging_desc),
+            checked = constraintTypeMap[ConstraintType.CHARGING] ?: false,
+            enabled = true,
+            onCheckedChange = {
+                onChange(constraintTypeMap + (ConstraintType.CHARGING to it))
             },
         )
-        ListItem(
-            modifier = Modifier
-                .clickable(
-                    onClick = {
-                        val current = constraintTypeMap[ConstraintType.IDLE] ?: false
-                        onChange(constraintTypeMap + (ConstraintType.IDLE to !current))
-                    },
-                )
-                .padding(horizontal = 8.dp),
-            headlineContent = { Text(text = stringResource(R.string.idle)) },
-            supportingContent = { Text(text = stringResource(R.string.idle_desc)) },
-            leadingContent = {
-                Checkbox(
-                    modifier = Modifier.size(24.dp),
-                    checked = constraintTypeMap[ConstraintType.IDLE] ?: false,
-                    onCheckedChange = {
-                        onChange(constraintTypeMap + (ConstraintType.IDLE to it))
-                    },
-                )
+        ConstraintOption(
+            label = stringResource(R.string.idle),
+            desc = stringResource(R.string.idle_desc),
+            checked = constraintTypeMap[ConstraintType.IDLE] ?: false,
+            enabled = true,
+            onCheckedChange = {
+                onChange(constraintTypeMap + (ConstraintType.IDLE to it))
             },
         )
     }
+}
+
+@Composable
+private fun ConstraintOption(
+    label: String,
+    desc: String,
+    checked: Boolean,
+    enabled: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+) {
+    ListItem(
+        modifier = Modifier
+            .clickable(
+                enabled = enabled,
+                onClick = { onCheckedChange(!checked) },
+            )
+            .padding(horizontal = 8.dp),
+        colors = ListItemDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+        ),
+        headlineContent = {
+            Text(
+                text = label,
+                color = MaterialTheme.colorScheme.onSurface.copy(
+                    alpha = if (enabled) 1f else DISABLED_ALPHA,
+                ),
+            )
+        },
+        supportingContent = {
+            Text(
+                text = desc,
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                    alpha = if (enabled) 1f else DISABLED_ALPHA,
+                ),
+            )
+        },
+        leadingContent = {
+            Checkbox(
+                modifier = Modifier.size(24.dp),
+                enabled = enabled,
+                checked = checked,
+                onCheckedChange = { onCheckedChange(it) },
+            )
+        },
+    )
 }
 
 @Preview
@@ -797,6 +786,9 @@ private fun ThemeOptionsContent(
                 modifier = Modifier
                     .clickable(onClick = { onOptionClick(it) })
                     .padding(horizontal = 8.dp),
+                colors = ListItemDefaults.colors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                ),
                 headlineContent = { Text(text = themeString(it)) },
                 leadingContent = {
                     RadioButton(
@@ -882,6 +874,9 @@ private fun ExifWriteTypeOptionsContent(
                     modifier = Modifier
                         .clickable(onClick = { onOptionClick(it) })
                         .padding(horizontal = 8.dp),
+                    colors = ListItemDefaults.colors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    ),
                     headlineContent = { Text(text = exifWriteTypeString(it)) },
                     leadingContent = {
                         RadioButton(

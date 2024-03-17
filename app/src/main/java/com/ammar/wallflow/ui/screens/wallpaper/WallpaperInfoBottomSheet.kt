@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.ModalBottomSheetDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -73,10 +72,6 @@ fun WallpaperInfoBottomSheet(
         modifier = modifier,
         onDismissRequest = onDismissRequest,
         sheetState = bottomSheetState,
-        properties = ModalBottomSheetDefaults.properties(
-            isFocusable = true,
-            shouldDismissOnBackPress = true,
-        ),
     ) {
         WallpaperInfoBottomSheetContent(
             modifier = contentModifier

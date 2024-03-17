@@ -15,6 +15,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -87,6 +89,9 @@ private fun ChangeDownloadLocationDialogContent(
             modifier = Modifier
                 .clickable(onClick = onDefaultClick)
                 .padding(horizontal = 8.dp),
+            colors = ListItemDefaults.colors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            ),
             headlineContent = {
                 Text(
                     text = getRealPath(context, defaultLocation)
@@ -106,6 +111,9 @@ private fun ChangeDownloadLocationDialogContent(
             modifier = Modifier
                 .clickable(onClick = onCustomClick)
                 .padding(horizontal = 8.dp),
+            colors = ListItemDefaults.colors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+            ),
             headlineContent = {
                 Text(
                     text = if (customLocation == null) {

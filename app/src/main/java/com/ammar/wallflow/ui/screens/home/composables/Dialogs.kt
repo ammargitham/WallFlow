@@ -13,6 +13,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -109,6 +110,9 @@ private fun ManageSourcesDialogContent(
                     modifier = Modifier
                         .clickable { onAddSourceClick(it) }
                         .padding(horizontal = 8.dp),
+                    colors = ListItemDefaults.colors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    ),
                     headlineContent = {
                         Text(text = getSourceLabel(it))
                     },
@@ -144,6 +148,9 @@ private fun ManageSourcesDialogContent(
                         onVisibilityChange(it.key, !it.value)
                     }
                     .padding(horizontal = 8.dp),
+                colors = ListItemDefaults.colors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                ),
                 headlineContent = {
                     Text(text = getSourceLabel(it.key))
                 },

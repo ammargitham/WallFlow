@@ -35,9 +35,9 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.ModalBottomSheetDefaults
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -238,10 +238,6 @@ internal fun DetectionsBottomSheet(
         modifier = modifier,
         onDismissRequest = onDismissRequest,
         sheetState = bottomSheetState,
-        properties = ModalBottomSheetDefaults.properties(
-            isFocusable = true,
-            shouldDismissOnBackPress = true,
-        ),
     ) {
         DetectionsBottomSheetContent(
             detections = detections,
@@ -268,6 +264,26 @@ internal fun DetectionsBottomSheetContent(
     }
 }
 
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun PreviewDetectionsBottomSheetContent() {
+    WallFlowTheme {
+        Surface(
+            color = MaterialTheme.colorScheme.surfaceContainerLow,
+        ) {
+            DetectionsBottomSheetContent(
+                detections = List(5) {
+                    DetectionWithBitmap(
+                        Detection.EMPTY,
+                        Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888),
+                    )
+                },
+            )
+        }
+    }
+}
+
 @Composable
 internal fun DetectionsItem(
     modifier: Modifier = Modifier,
@@ -277,6 +293,9 @@ internal fun DetectionsItem(
     val category = detection.detection.categories.firstOrNull()
     ListItem(
         modifier = modifier.clickable(onClick = onClick),
+        colors = ListItemDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+        ),
         headlineContent = {
             Text(text = category?.label?.capitalise() ?: stringResource(R.string.entity))
         },

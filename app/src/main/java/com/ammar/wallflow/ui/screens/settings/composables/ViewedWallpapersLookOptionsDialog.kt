@@ -20,6 +20,7 @@ import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
@@ -192,6 +193,9 @@ private fun ViewedWallpapersLookOptionsContent(
                     modifier = Modifier
                         .clickable(onClick = { onOptionClick(it) })
                         .padding(horizontal = 8.dp),
+                    colors = ListItemDefaults.colors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                    ),
                     headlineContent = { Text(text = viewedWallpapersLookString(it)) },
                     leadingContent = {
                         RadioButton(

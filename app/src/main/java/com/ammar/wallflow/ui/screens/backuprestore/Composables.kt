@@ -17,7 +17,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -126,161 +128,70 @@ private fun BackupDialogContent(
     val alpha = if (enabled) 1f else DISABLED_ALPHA
 
     Column(
-        modifier = modifier
-            .verticalScroll(state = rememberScrollState()),
+        modifier = modifier.verticalScroll(state = rememberScrollState()),
     ) {
-        ListItem(
-            modifier = Modifier
-                .clickable(enabled = enabled) {
-                    onOptionsChange(
-                        options.copy(
-                            settings = !options.settings,
-                        ),
-                    )
-                }
-                .padding(horizontal = 8.dp),
-            headlineContent = {
-                Text(
-                    text = stringResource(R.string.settings),
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
-                )
-            },
-            leadingContent = {
-                Checkbox(
-                    modifier = Modifier.size(24.dp),
-                    checked = options.settings,
-                    enabled = enabled,
-                    onCheckedChange = {
-                        onOptionsChange(
-                            options.copy(
-                                settings = it,
-                            ),
-                        )
-                    },
+        BackupOption(
+            label = stringResource(R.string.settings),
+            checked = options.settings,
+            enabled = enabled,
+            alpha = alpha,
+            onCheckedChange = {
+                onOptionsChange(
+                    options.copy(
+                        settings = it,
+                    ),
                 )
             },
         )
-        ListItem(
-            modifier = Modifier
-                .clickable(enabled = enabled) {
-                    onOptionsChange(
-                        options.copy(
-                            favorites = !options.favorites,
-                        ),
-                    )
-                }
-                .padding(horizontal = 8.dp),
-            headlineContent = {
-                Text(
-                    text = stringResource(R.string.favorites),
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
-                )
-            },
-            leadingContent = {
-                Checkbox(
-                    modifier = Modifier.size(24.dp),
-                    checked = options.favorites,
-                    enabled = enabled,
-                    onCheckedChange = {
-                        onOptionsChange(
-                            options.copy(
-                                favorites = it,
-                            ),
-                        )
-                    },
+        BackupOption(
+            label = stringResource(R.string.favorites),
+            checked = options.favorites,
+            enabled = enabled,
+            alpha = alpha,
+            onCheckedChange = {
+                onOptionsChange(
+                    options.copy(
+                        favorites = it,
+                    ),
                 )
             },
         )
-        ListItem(
-            modifier = Modifier
-                .clickable(enabled = enabled) {
-                    onOptionsChange(
-                        options.copy(
-                            lightDark = !options.lightDark,
-                        ),
-                    )
-                }
-                .padding(horizontal = 8.dp),
-            headlineContent = {
-                Text(
-                    text = stringResource(R.string.light_dark),
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
-                )
-            },
-            leadingContent = {
-                Checkbox(
-                    modifier = Modifier.size(24.dp),
-                    checked = options.lightDark,
-                    enabled = enabled,
-                    onCheckedChange = {
-                        onOptionsChange(
-                            options.copy(
-                                lightDark = it,
-                            ),
-                        )
-                    },
+        BackupOption(
+            label = stringResource(R.string.light_dark),
+            checked = options.lightDark,
+            enabled = enabled,
+            alpha = alpha,
+            onCheckedChange = {
+                onOptionsChange(
+                    options.copy(
+                        lightDark = it,
+                    ),
                 )
             },
         )
-        ListItem(
-            modifier = Modifier
-                .clickable(enabled = enabled) {
-                    onOptionsChange(
-                        options.copy(
-                            savedSearches = !options.savedSearches,
-                        ),
-                    )
-                }
-                .padding(horizontal = 8.dp),
-            headlineContent = {
-                Text(
-                    text = stringResource(R.string.saved_searches),
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
-                )
-            },
-            leadingContent = {
-                Checkbox(
-                    modifier = Modifier.size(24.dp),
-                    checked = options.savedSearches,
-                    enabled = enabled,
-                    onCheckedChange = {
-                        onOptionsChange(
-                            options.copy(
-                                savedSearches = it,
-                            ),
-                        )
-                    },
+        BackupOption(
+            label = stringResource(R.string.saved_searches),
+            checked = options.savedSearches,
+            enabled = enabled,
+            alpha = alpha,
+            onCheckedChange = {
+                onOptionsChange(
+                    options.copy(
+                        savedSearches = it,
+                    ),
                 )
             },
         )
-        ListItem(
-            modifier = Modifier
-                .clickable(enabled = enabled) {
-                    onOptionsChange(
-                        options.copy(
-                            viewed = !options.viewed,
-                        ),
-                    )
-                }
-                .padding(horizontal = 8.dp),
-            headlineContent = {
-                Text(
-                    text = stringResource(R.string.viewed),
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
-                )
-            },
-            leadingContent = {
-                Checkbox(
-                    modifier = Modifier.size(24.dp),
-                    checked = options.viewed,
-                    enabled = enabled,
-                    onCheckedChange = {
-                        onOptionsChange(
-                            options.copy(
-                                viewed = it,
-                            ),
-                        )
-                    },
+        BackupOption(
+            label = stringResource(R.string.viewed),
+            checked = options.viewed,
+            enabled = enabled,
+            alpha = alpha,
+            onCheckedChange = {
+                onOptionsChange(
+                    options.copy(
+                        viewed = it,
+                    ),
                 )
             },
         )
@@ -330,6 +241,40 @@ private fun BackupDialogContent(
             }
         }
     }
+}
+
+@Composable
+private fun BackupOption(
+    label: String,
+    checked: Boolean,
+    enabled: Boolean,
+    alpha: Float,
+    onCheckedChange: (Boolean) -> Unit,
+) {
+    ListItem(
+        modifier = Modifier
+            .clickable(enabled = enabled) {
+                onCheckedChange(!checked)
+            }
+            .padding(horizontal = 8.dp),
+        colors = ListItemDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+        ),
+        headlineContent = {
+            Text(
+                text = label,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
+            )
+        },
+        leadingContent = {
+            Checkbox(
+                modifier = Modifier.size(24.dp),
+                checked = checked,
+                enabled = enabled,
+                onCheckedChange = onCheckedChange,
+            )
+        },
+    )
 }
 
 private data class BackupDialogProps(
@@ -547,6 +492,9 @@ private fun RestoreDialogContent(
                         )
                     }
                     .padding(horizontal = 8.dp),
+                colors = ListItemDefaults.colors(
+                    containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+                ),
                 headlineContent = {
                     Text(
                         text = stringResource(R.string.settings),
@@ -583,223 +531,63 @@ private fun RestoreDialogContent(
                     )
                 },
             )
-            ListItem(
-                modifier = Modifier
-                    .clickable(enabled = favoritesEnabled) {
-                        onOptionsChange(
-                            options.copy(
-                                favorites = !options.favorites,
-                            ),
-                        )
-                    }
-                    .padding(horizontal = 8.dp),
-                headlineContent = {
-                    Text(
-                        text = stringResource(R.string.favorites),
-                        color = MaterialTheme.colorScheme.onSurface.copy(
-                            alpha = getAlpha(favoritesEnabled),
+            RestoreOption(
+                label = stringResource(R.string.favorites),
+                notFoundSupportingText = stringResource(R.string.no_favorites_found),
+                checked = options.favorites,
+                enabled = favoritesEnabled,
+                summaryHasOption = summaryHasFavs,
+                summaryCount = summary.favorites,
+                onCheckedChange = {
+                    onOptionsChange(
+                        options.copy(
+                            favorites = it,
                         ),
-                    )
-                },
-                supportingContent = {
-                    if (summaryHasFavs) {
-                        Text(
-                            text = stringResource(
-                                R.string.found_n,
-                                summary.favorites ?: 0,
-                            ),
-                            fontStyle = FontStyle.Italic,
-                            color = MaterialTheme.colorScheme.onSurface.copy(
-                                alpha = getAlpha(favoritesEnabled),
-                            ),
-                        )
-                    } else {
-                        Text(
-                            text = stringResource(R.string.no_favorites_found),
-                            fontStyle = FontStyle.Italic,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
-                                alpha = DISABLED_ALPHA,
-                            ),
-                        )
-                    }
-                },
-                leadingContent = {
-                    Checkbox(
-                        modifier = Modifier.size(24.dp),
-                        checked = options.favorites,
-                        enabled = favoritesEnabled,
-                        onCheckedChange = {
-                            onOptionsChange(
-                                options.copy(
-                                    favorites = it,
-                                ),
-                            )
-                        },
                     )
                 },
             )
-            ListItem(
-                modifier = Modifier
-                    .clickable(enabled = lightDarkEnabled) {
-                        onOptionsChange(
-                            options.copy(
-                                lightDark = !options.lightDark,
-                            ),
-                        )
-                    }
-                    .padding(horizontal = 8.dp),
-                headlineContent = {
-                    Text(
-                        text = stringResource(R.string.light_dark),
-                        color = MaterialTheme.colorScheme.onSurface.copy(
-                            alpha = getAlpha(lightDarkEnabled),
+            RestoreOption(
+                label = stringResource(R.string.light_dark),
+                notFoundSupportingText = stringResource(R.string.no_light_dark_found),
+                checked = options.lightDark,
+                enabled = lightDarkEnabled,
+                summaryHasOption = summaryHasLightDark,
+                summaryCount = summary.lightDark,
+                onCheckedChange = {
+                    onOptionsChange(
+                        options.copy(
+                            lightDark = it,
                         ),
-                    )
-                },
-                supportingContent = {
-                    if (summaryHasLightDark) {
-                        Text(
-                            text = stringResource(
-                                R.string.found_n,
-                                summary.lightDark ?: 0,
-                            ),
-                            fontStyle = FontStyle.Italic,
-                            color = MaterialTheme.colorScheme.onSurface.copy(
-                                alpha = getAlpha(lightDarkEnabled),
-                            ),
-                        )
-                    } else {
-                        Text(
-                            text = stringResource(R.string.no_light_dark_found),
-                            fontStyle = FontStyle.Italic,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
-                                alpha = DISABLED_ALPHA,
-                            ),
-                        )
-                    }
-                },
-                leadingContent = {
-                    Checkbox(
-                        modifier = Modifier.size(24.dp),
-                        checked = options.lightDark,
-                        enabled = lightDarkEnabled,
-                        onCheckedChange = {
-                            onOptionsChange(
-                                options.copy(
-                                    lightDark = it,
-                                ),
-                            )
-                        },
                     )
                 },
             )
-            ListItem(
-                modifier = Modifier
-                    .clickable(enabled = savedSearchesEnabled) {
-                        onOptionsChange(
-                            options.copy(
-                                savedSearches = !options.savedSearches,
-                            ),
-                        )
-                    }
-                    .padding(horizontal = 8.dp),
-                headlineContent = {
-                    Text(
-                        text = stringResource(R.string.saved_searches),
-                        color = MaterialTheme.colorScheme.onSurface.copy(
-                            alpha = getAlpha(savedSearchesEnabled),
+            RestoreOption(
+                label = stringResource(R.string.saved_searches),
+                notFoundSupportingText = stringResource(R.string.no_saved_searches_found),
+                checked = options.savedSearches,
+                enabled = savedSearchesEnabled,
+                summaryHasOption = summaryHasSearches,
+                summaryCount = summary.savedSearches,
+                onCheckedChange = {
+                    onOptionsChange(
+                        options.copy(
+                            savedSearches = it,
                         ),
-                    )
-                },
-                supportingContent = {
-                    if (summaryHasSearches) {
-                        Text(
-                            text = stringResource(
-                                R.string.found_n,
-                                summary.savedSearches ?: 0,
-                            ),
-                            fontStyle = FontStyle.Italic,
-                            color = MaterialTheme.colorScheme.onSurface.copy(
-                                alpha = getAlpha(savedSearchesEnabled),
-                            ),
-                        )
-                    } else {
-                        Text(
-                            text = stringResource(R.string.no_saved_searches_found),
-                            fontStyle = FontStyle.Italic,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
-                                alpha = DISABLED_ALPHA,
-                            ),
-                        )
-                    }
-                },
-                leadingContent = {
-                    Checkbox(
-                        modifier = Modifier.size(24.dp),
-                        checked = options.savedSearches,
-                        enabled = savedSearchesEnabled,
-                        onCheckedChange = {
-                            onOptionsChange(
-                                options.copy(
-                                    savedSearches = it,
-                                ),
-                            )
-                        },
                     )
                 },
             )
-            ListItem(
-                modifier = Modifier
-                    .clickable(enabled = viewedEnabled) {
-                        onOptionsChange(
-                            options.copy(
-                                viewed = !options.viewed,
-                            ),
-                        )
-                    }
-                    .padding(horizontal = 8.dp),
-                headlineContent = {
-                    Text(
-                        text = stringResource(R.string.viewed),
-                        color = MaterialTheme.colorScheme.onSurface.copy(
-                            alpha = getAlpha(viewedEnabled),
+            RestoreOption(
+                label = stringResource(R.string.viewed),
+                notFoundSupportingText = stringResource(R.string.no_viewed_found),
+                checked = options.viewed,
+                enabled = viewedEnabled,
+                summaryHasOption = summaryHasViewed,
+                summaryCount = summary.viewed,
+                onCheckedChange = {
+                    onOptionsChange(
+                        options.copy(
+                            viewed = it,
                         ),
-                    )
-                },
-                supportingContent = {
-                    if (summaryHasViewed) {
-                        Text(
-                            text = stringResource(
-                                R.string.found_n,
-                                summary.viewed ?: 0,
-                            ),
-                            fontStyle = FontStyle.Italic,
-                            color = MaterialTheme.colorScheme.onSurface.copy(
-                                alpha = getAlpha(viewedEnabled),
-                            ),
-                        )
-                    } else {
-                        Text(
-                            text = stringResource(R.string.no_viewed_found),
-                            fontStyle = FontStyle.Italic,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
-                                alpha = DISABLED_ALPHA,
-                            ),
-                        )
-                    }
-                },
-                leadingContent = {
-                    Checkbox(
-                        modifier = Modifier.size(24.dp),
-                        checked = options.viewed,
-                        enabled = viewedEnabled,
-                        onCheckedChange = {
-                            onOptionsChange(
-                                options.copy(
-                                    viewed = it,
-                                ),
-                            )
-                        },
                     )
                 },
             )
@@ -821,6 +609,66 @@ private fun RestoreDialogContent(
             }
         }
     }
+}
+
+@Composable
+private fun RestoreOption(
+    label: String,
+    notFoundSupportingText: String,
+    checked: Boolean,
+    enabled: Boolean,
+    summaryHasOption: Boolean,
+    summaryCount: Int?,
+    onCheckedChange: (Boolean) -> Unit,
+) {
+    ListItem(
+        modifier = Modifier
+            .clickable(enabled = enabled) {
+                onCheckedChange(!checked)
+            }
+            .padding(horizontal = 8.dp),
+        colors = ListItemDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+        ),
+        headlineContent = {
+            Text(
+                text = label,
+                color = MaterialTheme.colorScheme.onSurface.copy(
+                    alpha = getAlpha(enabled),
+                ),
+            )
+        },
+        supportingContent = {
+            if (summaryHasOption) {
+                Text(
+                    text = stringResource(
+                        R.string.found_n,
+                        summaryCount ?: 0,
+                    ),
+                    fontStyle = FontStyle.Italic,
+                    color = MaterialTheme.colorScheme.onSurface.copy(
+                        alpha = getAlpha(enabled),
+                    ),
+                )
+            } else {
+                Text(
+                    text = notFoundSupportingText,
+                    fontStyle = FontStyle.Italic,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(
+                        alpha = DISABLED_ALPHA,
+                    ),
+                )
+            }
+        },
+        leadingContent = {
+            Checkbox(
+                modifier = Modifier.size(24.dp),
+                checked = checked,
+                enabled = enabled,
+                onCheckedChange = onCheckedChange,
+            )
+        },
+    )
 }
 
 private data class RestoreDialogProps(
@@ -891,17 +739,27 @@ private class RestoreDialogPPP : CollectionPreviewParameterProvider<RestoreDialo
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun PreviewRestoreDialog(
-    @PreviewParameter(RestoreDialogPPP::class) props: RestoreDialogProps,
+    // @PreviewParameter(RestoreDialogPPP::class) props: RestoreDialogProps,
 ) {
     WallFlowTheme {
-        Surface {
-            RestoreDialog(
-                options = props.options,
-                summary = props.summary,
-                parsingJson = props.parsingJson,
-                restoreProgress = props.restoreProgress,
-                exception = props.exception,
-            )
+        Surface(
+            color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        ) {
+            val ppp = RestoreDialogPPP()
+            Column {
+                ppp.values.forEach { props ->
+                    RestoreDialogContent(
+                        options = props.options,
+                        summary = props.summary,
+                        parsingJson = props.parsingJson,
+                        restoreProgress = props.restoreProgress,
+                        exception = props.exception,
+                    )
+                    HorizontalDivider(
+                        modifier = Modifier.padding(vertical = 8.dp),
+                    )
+                }
+            }
         }
     }
 }
