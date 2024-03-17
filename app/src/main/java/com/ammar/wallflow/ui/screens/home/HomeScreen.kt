@@ -8,11 +8,9 @@ import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -25,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -77,10 +76,7 @@ import com.ramcosta.composedestinations.navigation.navigate
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 
-@OptIn(
-    ExperimentalMaterialApi::class,
-    ExperimentalMaterial3Api::class,
-)
+@OptIn(ExperimentalMaterial3Api::class)
 @Destination(
     navArgsDelegate = HomeScreenNavArgs::class,
 )
@@ -94,16 +90,9 @@ fun HomeScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val viewerUiState by viewerViewModel.uiState.collectAsStateWithLifecycle()
     val wallpapers = viewModel.wallpapers.collectAsLazyPagingItems()
-    // TODO: Replace with M3 PullToRefresh
+    val refreshState = rememberPullToRefreshState()
     val showRefreshingIndicator = wallpapers.loadState.refresh == LoadState.Loading &&
         wallpapers.itemCount > 0
-    val refreshState = rememberPullRefreshState(
-        refreshing = showRefreshingIndicator,
-        onRefresh = {
-            wallpapers.refresh()
-            viewModel.refresh()
-        },
-    )
     val searchBarController = LocalMainSearchBarController.current
     val bottomBarController = LocalBottomBarController.current
     val systemController = LocalSystemController.current
@@ -119,6 +108,9 @@ fun HomeScreen(
     )
     val systemState by systemController.state
     val clipboardManager = LocalClipboardManager.current
+    var prevLoadState by remember {
+        mutableStateOf(wallpapers.loadState.refresh)
+    }
 
     LaunchedEffect(Unit) {
         systemController.resetBarsState()
@@ -145,6 +137,28 @@ fun HomeScreen(
                 search = search,
                 source = uiState.selectedSource,
             )
+        }
+    }
+
+    LaunchedEffect(refreshState.isRefreshing, wallpapers.loadState.refresh) {
+        try {
+            if (!refreshState.isRefreshing) {
+                return@LaunchedEffect
+            }
+            val loadState = wallpapers.loadState.refresh
+            if (prevLoadState !is LoadState.Loading &&
+                loadState is LoadState.NotLoading
+            ) {
+                wallpapers.refresh()
+                viewModel.refresh()
+                return@LaunchedEffect
+            }
+            if (loadState is LoadState.Loading) {
+                return@LaunchedEffect
+            }
+            refreshState.endRefresh()
+        } finally {
+            prevLoadState = wallpapers.loadState.refresh
         }
     }
 
@@ -212,7 +226,7 @@ fun HomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .windowInsetsPadding(topWindowInsets)
-            .pullRefresh(state = refreshState),
+            .nestedScroll(refreshState.nestedScrollConnection),
     ) {
         HomeScreenContent(
             modifier = Modifier.fillMaxSize(),
@@ -311,14 +325,28 @@ fun HomeScreen(
             onFullWallpaperDownloadPermissionsGranted = viewerViewModel::download,
         )
 
-        PullRefreshIndicator(
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .offset(y = SearchBar.Defaults.height - 8.dp),
-            refreshing = showRefreshingIndicator,
-            // refreshing = true,
-            state = refreshState,
-        )
+        // PullRefreshIndicator(
+        //     modifier = Modifier
+        //         .align(Alignment.TopCenter)
+        //         .offset(y = SearchBar.Defaults.height - 8.dp),
+        //     refreshing = showRefreshingIndicator,
+        //     // refreshing = true,
+        //     state = refreshState,
+        // )
+        if (showRefreshingIndicator || refreshState.progress > 0) {
+            PullToRefreshContainer(
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .offset(y = SearchBar.Defaults.height - 8.dp),
+                state = refreshState,
+                // contentColor = MaterialTheme.colorScheme.onSurface,
+                // indicator = if (showRefreshingIndicator) {
+                //     { PullToRefreshDefaults.Indicator(state = it) }
+                // } else {
+                //     {}
+                // },
+            )
+        }
     }
 
     if (uiState.showFilters) {
