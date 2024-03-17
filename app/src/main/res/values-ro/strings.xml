@@ -361,4 +361,5 @@
     <string name="help">Ajutor</string>
     <string name="light_dark_info">Setarea imaginii de fundal la culoare deschisă sau întunecată va permite schimbătorului de imagini de fundal să seteze un tapet deschis sau întunecat, în funcție de tema sistemului.
 \nDupă marcare, activează „Utilizează imagine de fundal luminoasă/întunecată” în setările sursei pentru a schimba imaginea de fundal.</string>
+    <string name="download_location">Locație de descărcare</string>
 </resources>
