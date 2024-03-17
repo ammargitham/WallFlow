@@ -1,0 +1,3 @@
+Bug Fixes
+* Fix crash when creating backup with more than 999 favorites
+* Add missing Light/Dark in backup/restore
