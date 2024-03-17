@@ -308,4 +308,24 @@
     <string name="custom">Індывідуальны…</string>
     <string name="staggered">Мазаіка</string>
     <string name="mark_light_dark">Пазначыць як Светлы або Цёмны</string>
+    <string name="no_favorites">Няма шпалер, пазначаных як абраныя</string>
+    <string name="no_light_dark">Няма шпалер, пазначаных як светлыя або цёмныя</string>
+    <string name="use_same_sources_homescreen_lockscreen">Выкарыстоўваць адну і тую ж крыніцу для галоўнага экрана і экрана блакавання</string>
+    <string name="use_light_dark_wallpapers">Выкарыстоўваць Светлыя / Цёмныя шпалеры</string>
+    <string name="use_dark_with_extra_dim_desc">Дазволіць звычайныя цёмныя шпалеры, калі актывавана \"Дадатковае зацямненне\"</string>
+    <string name="use_dark_with_extra_dim">Выкарыстоўваць цёмныя шпалеры пры \"Дадатковым зацямненні\"</string>
+    <string name="use_saved_searches">Выкарыстоўваць захаваныя пошукі</string>
+    <string name="choose_saved_searches">Выберыце захаваныя пошукі</string>
+    <string name="use_favorites">Выкарыстоўваць абранае</string>
+    <string name="use_local_dirs">Выкарыстоўваць лакальныя каталогі</string>
+    <string name="choose_local_dirs">Выберыце лакальныя каталогі</string>
+    <string name="light_dark_enabled">Светлыя / Цёмныя шпалеры ўключаны</string>
+    <string name="wallpaper_not_changed">Шпалеры не мяняліся</string>
+    <string name="wallpaper_not_changed_with_reason">Шпалеры не мяняліся: %s</string>
+    <string name="no_wallpaper_found">Шпалеры не знойдзены</string>
+    <string name="url">URL</string>
+    <string name="file_name">Імя файла</string>
+    <string name="file_name_invalid">Няправільнае імя файла</string>
+    <string name="no_light_dark_found">Светлыя/Цёмныя шпалеры не знойдзены</string>
+    <string name="download_location">Месца загрузкі</string>
 </resources>
