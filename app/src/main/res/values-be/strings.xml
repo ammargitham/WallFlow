@@ -300,12 +300,12 @@
     <string name="restore">Аднаўленне</string>
     <string name="file_name_cannot_be_empty">Імя файла не можа быць пустым</string>
     <string name="file_name_already_used">Імя файла ўжо выкарыстоўваецца</string>
-    <string name="light_dark">Светлы / Цёмны</string>
+    <string name="light_dark">Светлыя / Цёмныя</string>
     <string name="extra_dim">«Дадатковае зацямненне»</string>
     <string name="help">Даведка</string>
     <string name="collections">Калекцыі</string>
     <string name="top_range">Топ</string>
-    <string name="custom">Індывідуальны…</string>
+    <string name="custom">Карыстальніцкае…</string>
     <string name="staggered">Мазаіка</string>
     <string name="mark_light_dark">Пазначыць як Светлы або Цёмны</string>
     <string name="no_favorites">Няма шпалер, пазначаных як абраныя</string>
@@ -328,4 +328,15 @@
     <string name="file_name_invalid">Няправільнае імя файла</string>
     <string name="no_light_dark_found">Светлыя/Цёмныя шпалеры не знойдзены</string>
     <string name="download_location">Месца загрузкі</string>
+    <string name="app_prefs_null">Налады праграмы не знойдзены</string>
+    <string name="auto_wallpaper_disabled">Змена шпалер адключана</string>
+    <string name="auto_wallpaper_cancelled">Змена шпалер адменена</string>
+    <string name="light_dark_info">Прызначэнне шпалер як светлых ці цёмных дазволіць службе змены шпалер ўсталёўваць светлыя ці цёмныя шпалеры ў залежнасці ад тэмы сістэмы.
+\nПасля прызначэння ўключыце \"Выкарыстоўваць Светлыя / Цёмныя шпалеры\" ў наладах крыніц для змены шпалер.</string>
+    <plurals name="every_x_hrs">
+        <item quantity="one">Кожная %d гадзіна</item>
+        <item quantity="few">Кожныя %d гадзіны</item>
+        <item quantity="many">Кожныя %d гадзін</item>
+        <item quantity="other">Кожныя %d гадзін</item>
+    </plurals>
 </resources>
