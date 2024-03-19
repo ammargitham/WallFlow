@@ -17,7 +17,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
@@ -739,27 +738,19 @@ private class RestoreDialogPPP : CollectionPreviewParameterProvider<RestoreDialo
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 private fun PreviewRestoreDialog(
-    // @PreviewParameter(RestoreDialogPPP::class) props: RestoreDialogProps,
+    @PreviewParameter(RestoreDialogPPP::class) props: RestoreDialogProps,
 ) {
     WallFlowTheme {
         Surface(
             color = MaterialTheme.colorScheme.surfaceContainerHigh,
         ) {
-            val ppp = RestoreDialogPPP()
-            Column {
-                ppp.values.forEach { props ->
-                    RestoreDialogContent(
-                        options = props.options,
-                        summary = props.summary,
-                        parsingJson = props.parsingJson,
-                        restoreProgress = props.restoreProgress,
-                        exception = props.exception,
-                    )
-                    HorizontalDivider(
-                        modifier = Modifier.padding(vertical = 8.dp),
-                    )
-                }
-            }
+            RestoreDialogContent(
+                options = props.options,
+                summary = props.summary,
+                parsingJson = props.parsingJson,
+                restoreProgress = props.restoreProgress,
+                exception = props.exception,
+            )
         }
     }
 }
