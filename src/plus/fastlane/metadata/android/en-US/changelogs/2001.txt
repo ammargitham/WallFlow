@@ -1,0 +1,3 @@
+What's New
+* Updated Pull to refresh component
+* Updated jvm target to 17 to fix F-Droid build
