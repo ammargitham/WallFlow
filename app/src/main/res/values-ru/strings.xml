@@ -151,7 +151,7 @@
     <string name="sorting">"Сортировка"</string>
     <string name="top_range">"Топ"</string>
     <string name="order">"Давние"</string>
-    <string name="custom">"Своя…"</string>
+    <string name="custom">Пользовательское…</string>
     <string name="no_browser_found">"Браузер не найден!"</string>
     <string name="cropped_image">"Обрезанное изображение"</string>
     <string name="model_download_title">"Модель машинного обучения: %1s"</string>
@@ -322,10 +322,10 @@
     <string name="file_name_cannot_be_empty">Название файла не может быть пустым</string>
     <string name="file_name_already_used">Данное название файла уже используется</string>
     <string name="mark_light_dark">Отметить как светлую или тёмную</string>
-    <string name="light_dark">Светлая / Тёмная</string>
+    <string name="light_dark">Светлые / Тёмные</string>
     <string name="help">Справка</string>
     <string name="collections">Коллекции</string>
-    <string name="use_light_dark_wallpapers">Использовать светлые/тёмные обои</string>
+    <string name="use_light_dark_wallpapers">Использовать Светлые / Тёмные обои</string>
     <string name="use_dark_with_extra_dim">Использовать тёмные обои с функцией «Дополнительного затемнения»</string>
     <string name="choose_saved_searches">Выберите сохранённые поисковые запросы</string>
     <string name="use_favorites">Использовать избранные</string>
