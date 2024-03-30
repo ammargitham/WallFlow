@@ -93,6 +93,8 @@ object PreferencesKeys {
         "auto_wallpaper_ls_use_dark_with_extra_dim",
     )
     val AUTO_WALLPAPER_BACKOFF_UPDATED = booleanPreferencesKey("auto_wallpaper_backoff_updated")
+    val AUTO_WALLPAPER_PREV_HOME_SOURCE = stringPreferencesKey("auto_wallpaper_prev_home_source")
+    val AUTO_WALLPAPER_PREV_LS_SOURCE = stringPreferencesKey("auto_wallpaper_prev_ls_source")
     val THEME = stringPreferencesKey("theme")
     val LAYOUT_GRID_TYPE = stringPreferencesKey("layout_grid_type")
     val LAYOUT_GRID_COL_TYPE = stringPreferencesKey("layout_grid_col_type")

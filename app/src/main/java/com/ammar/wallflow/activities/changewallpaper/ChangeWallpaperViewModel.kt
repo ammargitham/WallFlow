@@ -1,10 +1,12 @@
 package com.ammar.wallflow.activities.changewallpaper
 
 import android.app.Application
+import android.util.Log
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.ammar.wallflow.data.preferences.Theme
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
+import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.workers.AutoWallpaperWorker
 import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.Status as AutoWallpaperWorkerStatus
 import com.github.materiiapps.partial.Partialize
@@ -42,18 +44,19 @@ class ChangeWallpaperViewModel @Inject constructor(
         initialValue = ChangeWallpaperActivityUiState(),
     )
 
-    fun changeNow() {
-        viewModelScope.launch {
-            val requestId = AutoWallpaperWorker.triggerImmediate(
-                context = application,
-                force = true,
-            )
-            AutoWallpaperWorker.getProgress(
-                context = application,
-                requestId = requestId,
-            ).collectLatest { status ->
-                localUiStateFlow.update { it.copy(autoWallpaperStatus = partial(status)) }
-            }
+    fun changeNow() = viewModelScope.launch {
+        Log.d(TAG, "changeNow: triggering immediate wallpaper change")
+        val requestId = AutoWallpaperWorker.triggerImmediate(
+            context = application,
+            force = true,
+        )
+        Log.d(TAG, "changeNow: triggered with request id: $requestId")
+        AutoWallpaperWorker.getProgress(
+            context = application,
+            requestId = requestId,
+        ).collectLatest { status ->
+            Log.d(TAG, "changeNow: change status: $status")
+            localUiStateFlow.update { it.copy(autoWallpaperStatus = partial(status)) }
         }
     }
 }

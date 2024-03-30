@@ -7,12 +7,16 @@ import androidx.paging.LoadStates
 import androidx.paging.PagingData
 import com.ammar.wallflow.IoDispatcher
 import com.ammar.wallflow.SUPPORTED_MIME_TYPES
+import com.ammar.wallflow.data.repository.AutoWallpaperHistoryRepository
 import com.ammar.wallflow.data.repository.utils.Resource
 import com.ammar.wallflow.extensions.deepListFiles
+import com.ammar.wallflow.extensions.fromUri
 import com.ammar.wallflow.extensions.toLocalWallpaper
+import com.ammar.wallflow.extensions.toUriOrNull
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.local.LocalWallpaper
 import com.ammar.wallflow.ui.screens.local.LocalSort
+import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.SourceChoice
 import com.lazygeniouz.dfc.file.DocumentFileCompat
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -23,7 +27,8 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.withContext
 
 class DefaultLocalWallpapersRepository @Inject constructor(
-    @IoDispatcher val ioDispatcher: CoroutineDispatcher,
+    private val autoWallpaperHistoryRepository: AutoWallpaperHistoryRepository,
+    @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) : LocalWallpapersRepository {
     override fun wallpapersPager(
         context: Context,
@@ -46,7 +51,7 @@ class DefaultLocalWallpapersRepository @Inject constructor(
         context: Context,
         uris: Collection<Uri>,
         sort: LocalSort = LocalSort.NO_SORT,
-    ) = uris.fold(mutableListOf<Wallpaper>()) { acc, uri ->
+    ): List<Wallpaper> = uris.fold(mutableListOf()) { acc, uri ->
         var tempFiles = DocumentFileCompat.fromTreeUri(
             context = context,
             uri = uri,
@@ -93,5 +98,30 @@ class DefaultLocalWallpapersRepository @Inject constructor(
         uris: Collection<Uri>,
     ) = withContext(ioDispatcher) {
         getAllLocalWallpapers(context, uris).randomOrNull()
+    }
+
+    override suspend fun getFirstFresh(
+        context: Context,
+        uris: Collection<Uri>,
+    ) = withContext(ioDispatcher) {
+        val wallpapersInUri = getAllLocalWallpapers(
+            context = context,
+            uris = uris,
+            sort = LocalSort.LAST_MODIFIED,
+        )
+        val historyIds = autoWallpaperHistoryRepository.getAllSourceIdsBySourceChoice(
+            SourceChoice.LOCAL,
+        )
+        wallpapersInUri.firstOrNull { it.id !in historyIds }
+    }
+
+    override suspend fun getByOldestSetOn(
+        context: Context,
+    ) = withContext(ioDispatcher) {
+        val oldestId = autoWallpaperHistoryRepository.getOldestSetOnSourceIdBySourceChoice(
+            SourceChoice.LOCAL,
+        ) ?: return@withContext null
+        val uri = oldestId.toUriOrNull() ?: return@withContext null
+        DocumentFileCompat.fromUri(context, uri)?.toLocalWallpaper(context)
     }
 }

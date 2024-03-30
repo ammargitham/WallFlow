@@ -122,20 +122,41 @@ class LightDarkRepository @Inject constructor(
         typeFlags: Set<Int>,
     ) = withContext(ioDispatcher) {
         val entity = lightDarkDao.getRandomByTypeFlag(typeFlags) ?: return@withContext null
-        when (entity.source) {
-            Source.WALLHAVEN -> {
-                val wallpaperEntity = wallhavenWallpapersDao.getByWallhavenId(entity.sourceId)
-                wallpaperEntity?.toWallpaper()
-            }
-            Source.REDDIT -> {
-                val wallpaperEntity = redditWallpapersDao.getByRedditId(entity.sourceId)
-                wallpaperEntity?.toWallpaper()
-            }
-            Source.LOCAL -> localWallpapersRepository.wallpaper(
-                context = context,
-                wallpaperUriStr = entity.sourceId,
-            ).firstOrNull()?.successOr(null)
+        getWallpaperFromEntity(context, entity)
+    }
+
+    suspend fun getFirstFreshByTypeFlags(
+        context: Context,
+        typeFlags: Set<Int>,
+    ) = withContext(ioDispatcher) {
+        val entity = lightDarkDao.getFirstFreshByTypeFlag(typeFlags) ?: return@withContext null
+        getWallpaperFromEntity(context, entity)
+    }
+
+    suspend fun getByOldestSetOnAndTypeFlags(
+        context: Context,
+        typeFlags: Set<Int>,
+    ) = withContext(ioDispatcher) {
+        val entity = lightDarkDao.getByOldestSetOnAndTypeFlags(typeFlags) ?: return@withContext null
+        getWallpaperFromEntity(context, entity)
+    }
+
+    private suspend fun getWallpaperFromEntity(
+        context: Context,
+        entity: LightDarkEntity,
+    ) = when (entity.source) {
+        Source.WALLHAVEN -> {
+            val wallpaperEntity = wallhavenWallpapersDao.getByWallhavenId(entity.sourceId)
+            wallpaperEntity?.toWallpaper()
         }
+        Source.REDDIT -> {
+            val wallpaperEntity = redditWallpapersDao.getByRedditId(entity.sourceId)
+            wallpaperEntity?.toWallpaper()
+        }
+        Source.LOCAL -> localWallpapersRepository.wallpaper(
+            context = context,
+            wallpaperUriStr = entity.sourceId,
+        ).firstOrNull()?.successOr(null)
     }
 
     suspend fun insertEntities(entities: Collection<LightDarkEntity>) = withContext(ioDispatcher) {

@@ -23,6 +23,54 @@ interface LightDarkDao {
     @Query("SELECT * FROM light_dark WHERE typeFlags IN (:typeFlags) ORDER BY RANDOM() LIMIT 1")
     suspend fun getRandomByTypeFlag(typeFlags: Set<Int>): LightDarkEntity?
 
+    @Query(
+        """
+        SELECT * FROM light_dark
+        WHERE id NOT IN (
+            SELECT DISTINCT ld.id
+            FROM auto_wallpaper_history awh JOIN light_dark ld
+                    ON awh.source = ld.source AND  awh.source_id = ld.source_id
+        )
+        AND typeFlags IN (:typeFlags)
+        ORDER BY updated_on
+        LIMIT 1
+        """,
+    )
+    suspend fun getFirstFreshByTypeFlag(typeFlags: Set<Int>): LightDarkEntity?
+
+    @Query(
+        """
+        SELECT ld.*
+        FROM light_dark ld INNER JOIN (
+            SELECT awh.* FROM auto_wallpaper_history awh
+            INNER JOIN (
+                SELECT id, source, source_id, max(set_on) max_value
+                FROM auto_wallpaper_history
+                GROUP BY source, source_id
+            ) t on t.id = awh.id
+        ) awh
+        WHERE awh.source = ld.source
+            AND  awh.source_id = ld.source_id
+            AND ld.typeFlags IN (:typeFlags)
+        ORDER BY awh.set_on
+        LIMIT 1
+        """,
+    )
+    suspend fun getByOldestSetOnAndTypeFlags(typeFlags: Set<Int>): LightDarkEntity?
+
+    // @Query(
+    //     """
+    //     select awh.* from auto_wallpaper_history awh
+    //     inner join (
+    //         select id, source, source_id, max(set_on) max_value
+    //         from auto_wallpaper_history
+    //         group by source, source_id
+    //     ) t on t.id = awh.id
+    //     order by set_on
+    //     """
+    // )
+    // suspend fun getAllInHistoryByTypeFlags(): List<AutoWallpaperHistoryEntity>
+
     @Query("SELECT * FROM light_dark ORDER BY updated_on DESC")
     fun pagingSource(): PagingSource<Int, LightDarkEntity>
 

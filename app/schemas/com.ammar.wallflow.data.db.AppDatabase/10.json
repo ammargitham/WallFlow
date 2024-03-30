@@ -1,0 +1,1210 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 10,
+    "identityHash": "31a40a0eb18b4dafd8fd96ff7cbbdd67",
+    "entities": [
+      {
+        "tableName": "last_updated",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `key` TEXT NOT NULL, `last_updated_on` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "key",
+            "columnName": "key",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastUpdatedOn",
+            "columnName": "last_updated_on",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "wallhaven_popular_tags",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `tag_id` INTEGER NOT NULL, FOREIGN KEY(`tag_id`) REFERENCES `wallhaven_tags`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tagId",
+            "columnName": "tag_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_wallhaven_popular_tags_tag_id",
+            "unique": true,
+            "columnNames": [
+              "tag_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_wallhaven_popular_tags_tag_id` ON `${TABLE_NAME}` (`tag_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "wallhaven_tags",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "tag_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "search_query",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `query_string` TEXT NOT NULL, `last_updated_on` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "queryString",
+            "columnName": "query_string",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastUpdatedOn",
+            "columnName": "last_updated_on",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_search_query_query_string",
+            "unique": true,
+            "columnNames": [
+              "query_string"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_search_query_query_string` ON `${TABLE_NAME}` (`query_string`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "search_query_remote_keys",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `search_query_id` INTEGER NOT NULL, `next_page` TEXT, FOREIGN KEY(`search_query_id`) REFERENCES `search_query`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "searchQueryId",
+            "columnName": "search_query_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "nextPage",
+            "columnName": "next_page",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_search_query_remote_keys_search_query_id",
+            "unique": true,
+            "columnNames": [
+              "search_query_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_search_query_remote_keys_search_query_id` ON `${TABLE_NAME}` (`search_query_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "search_query",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "search_query_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "wallhaven_search_query_wallpapers",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`search_query_id` INTEGER NOT NULL, `wallpaper_id` INTEGER NOT NULL, `order` INTEGER, PRIMARY KEY(`search_query_id`, `wallpaper_id`), FOREIGN KEY(`search_query_id`) REFERENCES `search_query`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`wallpaper_id`) REFERENCES `wallhaven_wallpapers`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "searchQueryId",
+            "columnName": "search_query_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaperId",
+            "columnName": "wallpaper_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "order",
+            "columnName": "order",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "search_query_id",
+            "wallpaper_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_wallhaven_search_query_wallpapers_wallpaper_id",
+            "unique": false,
+            "columnNames": [
+              "wallpaper_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_wallhaven_search_query_wallpapers_wallpaper_id` ON `${TABLE_NAME}` (`wallpaper_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "search_query",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "search_query_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "wallhaven_wallpapers",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "wallpaper_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "wallhaven_wallpapers",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `wallhaven_id` TEXT NOT NULL, `url` TEXT NOT NULL, `short_url` TEXT NOT NULL, `views` INTEGER NOT NULL, `favorites` INTEGER NOT NULL, `source` TEXT NOT NULL, `purity` TEXT NOT NULL, `category` TEXT NOT NULL, `dimension_x` INTEGER NOT NULL, `dimension_y` INTEGER NOT NULL, `file_size` INTEGER NOT NULL, `file_type` TEXT NOT NULL, `created_at` INTEGER NOT NULL, `colors` TEXT NOT NULL, `path` TEXT NOT NULL, `thumb_large` TEXT NOT NULL, `thumb_original` TEXT NOT NULL, `thumb_small` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallhavenId",
+            "columnName": "wallhaven_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "url",
+            "columnName": "url",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "shortUrl",
+            "columnName": "short_url",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "views",
+            "columnName": "views",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "favorites",
+            "columnName": "favorites",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "source",
+            "columnName": "source",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "purity",
+            "columnName": "purity",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "category",
+            "columnName": "category",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dimensionX",
+            "columnName": "dimension_x",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "dimensionY",
+            "columnName": "dimension_y",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fileSize",
+            "columnName": "file_size",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fileType",
+            "columnName": "file_type",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "colors",
+            "columnName": "colors",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "path",
+            "columnName": "path",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "thumbs.large",
+            "columnName": "thumb_large",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "thumbs.original",
+            "columnName": "thumb_original",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "thumbs.small",
+            "columnName": "thumb_small",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_wallhaven_wallpapers_wallhaven_id",
+            "unique": true,
+            "columnNames": [
+              "wallhaven_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_wallhaven_wallpapers_wallhaven_id` ON `${TABLE_NAME}` (`wallhaven_id`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "wallhaven_uploaders",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `username` TEXT NOT NULL, `group` TEXT NOT NULL, `avatar_large` TEXT NOT NULL, `avatar_medium` TEXT NOT NULL, `avatar_small` TEXT NOT NULL, `avatar_tiny` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "username",
+            "columnName": "username",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "group",
+            "columnName": "group",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "avatar.large",
+            "columnName": "avatar_large",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "avatar.medium",
+            "columnName": "avatar_medium",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "avatar.small",
+            "columnName": "avatar_small",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "avatar.tiny",
+            "columnName": "avatar_tiny",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_wallhaven_uploaders_username",
+            "unique": true,
+            "columnNames": [
+              "username"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_wallhaven_uploaders_username` ON `${TABLE_NAME}` (`username`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "wallhaven_tags",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `wallhaven_id` INTEGER NOT NULL, `name` TEXT NOT NULL, `alias` TEXT NOT NULL, `category_id` INTEGER NOT NULL, `category` TEXT NOT NULL, `purity` TEXT NOT NULL, `created_at` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallhavenId",
+            "columnName": "wallhaven_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "alias",
+            "columnName": "alias",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "categoryId",
+            "columnName": "category_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "category",
+            "columnName": "category",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "purity",
+            "columnName": "purity",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "createdAt",
+            "columnName": "created_at",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_wallhaven_tags_wallhaven_id",
+            "unique": true,
+            "columnNames": [
+              "wallhaven_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_wallhaven_tags_wallhaven_id` ON `${TABLE_NAME}` (`wallhaven_id`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "wallhaven_wallpaper_tags",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`wallpaper_id` INTEGER NOT NULL, `tag_id` INTEGER NOT NULL, PRIMARY KEY(`wallpaper_id`, `tag_id`))",
+        "fields": [
+          {
+            "fieldPath": "wallpaperId",
+            "columnName": "wallpaper_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "tagId",
+            "columnName": "tag_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "wallpaper_id",
+            "tag_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_wallhaven_wallpaper_tags_wallpaper_id",
+            "unique": false,
+            "columnNames": [
+              "wallpaper_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_wallhaven_wallpaper_tags_wallpaper_id` ON `${TABLE_NAME}` (`wallpaper_id`)"
+          },
+          {
+            "name": "index_wallhaven_wallpaper_tags_tag_id",
+            "unique": false,
+            "columnNames": [
+              "tag_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_wallhaven_wallpaper_tags_tag_id` ON `${TABLE_NAME}` (`tag_id`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "wallhaven_wallpaper_uploaders",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`wallpaper_id` INTEGER NOT NULL, `uploader_id` INTEGER NOT NULL, PRIMARY KEY(`wallpaper_id`, `uploader_id`))",
+        "fields": [
+          {
+            "fieldPath": "wallpaperId",
+            "columnName": "wallpaper_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "uploaderId",
+            "columnName": "uploader_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "wallpaper_id",
+            "uploader_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_wallhaven_wallpaper_uploaders_wallpaper_id",
+            "unique": false,
+            "columnNames": [
+              "wallpaper_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_wallhaven_wallpaper_uploaders_wallpaper_id` ON `${TABLE_NAME}` (`wallpaper_id`)"
+          },
+          {
+            "name": "index_wallhaven_wallpaper_uploaders_uploader_id",
+            "unique": false,
+            "columnNames": [
+              "uploader_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_wallhaven_wallpaper_uploaders_uploader_id` ON `${TABLE_NAME}` (`uploader_id`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "search_history",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `query` TEXT NOT NULL COLLATE NOCASE, `filters` TEXT NOT NULL, `last_updated_on` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "query",
+            "columnName": "query",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "filters",
+            "columnName": "filters",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastUpdatedOn",
+            "columnName": "last_updated_on",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_search_history_query",
+            "unique": true,
+            "columnNames": [
+              "query"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_search_history_query` ON `${TABLE_NAME}` (`query`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "object_detection_models",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `file_name` TEXT NOT NULL, `url` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "fileName",
+            "columnName": "file_name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "url",
+            "columnName": "url",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_object_detection_models_name",
+            "unique": true,
+            "columnNames": [
+              "name"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_object_detection_models_name` ON `${TABLE_NAME}` (`name`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "saved_searches",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `query` TEXT NOT NULL, `filters` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "query",
+            "columnName": "query",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "filters",
+            "columnName": "filters",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_saved_searches_name",
+            "unique": true,
+            "columnNames": [
+              "name"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_saved_searches_name` ON `${TABLE_NAME}` (`name`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "auto_wallpaper_history",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `source_id` TEXT NOT NULL, `source` TEXT NOT NULL, `source_choice` TEXT NOT NULL DEFAULT 'SAVED_SEARCH', `set_on` INTEGER NOT NULL, `targets` TEXT)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceId",
+            "columnName": "source_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "source",
+            "columnName": "source",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceChoice",
+            "columnName": "source_choice",
+            "affinity": "TEXT",
+            "notNull": true,
+            "defaultValue": "'SAVED_SEARCH'"
+          },
+          {
+            "fieldPath": "setOn",
+            "columnName": "set_on",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "targets",
+            "columnName": "targets",
+            "affinity": "TEXT",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_auto_wallpaper_history_source_id",
+            "unique": true,
+            "columnNames": [
+              "source_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_auto_wallpaper_history_source_id` ON `${TABLE_NAME}` (`source_id`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "favorites",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `source_id` TEXT NOT NULL, `source` TEXT NOT NULL, `favorited_on` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceId",
+            "columnName": "source_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "source",
+            "columnName": "source",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "favoritedOn",
+            "columnName": "favorited_on",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_favorites_source_id_source",
+            "unique": true,
+            "columnNames": [
+              "source_id",
+              "source"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_favorites_source_id_source` ON `${TABLE_NAME}` (`source_id`, `source`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "rate_limits",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `source` TEXT NOT NULL, `limit` INTEGER, `remaining` INTEGER, `reset` INTEGER)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "source",
+            "columnName": "source",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "limit",
+            "columnName": "limit",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "remaining",
+            "columnName": "remaining",
+            "affinity": "INTEGER",
+            "notNull": false
+          },
+          {
+            "fieldPath": "reset",
+            "columnName": "reset",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_rate_limits_source",
+            "unique": true,
+            "columnNames": [
+              "source"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_rate_limits_source` ON `${TABLE_NAME}` (`source`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "reddit_wallpapers",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `reddit_id` TEXT NOT NULL, `subreddit` TEXT NOT NULL, `post_id` TEXT NOT NULL, `post_title` TEXT NOT NULL, `post_url` TEXT NOT NULL, `purity` TEXT NOT NULL, `url` TEXT NOT NULL, `thumbnail_url` TEXT NOT NULL, `width` INTEGER NOT NULL, `height` INTEGER NOT NULL, `author` TEXT NOT NULL, `mime_type` TEXT, `gallery_pos` INTEGER)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "redditId",
+            "columnName": "reddit_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "subreddit",
+            "columnName": "subreddit",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "postId",
+            "columnName": "post_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "postTitle",
+            "columnName": "post_title",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "postUrl",
+            "columnName": "post_url",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "purity",
+            "columnName": "purity",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "url",
+            "columnName": "url",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "thumbnailUrl",
+            "columnName": "thumbnail_url",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "width",
+            "columnName": "width",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "height",
+            "columnName": "height",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "author",
+            "columnName": "author",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "mimeType",
+            "columnName": "mime_type",
+            "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "galleryPosition",
+            "columnName": "gallery_pos",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_reddit_wallpapers_reddit_id",
+            "unique": true,
+            "columnNames": [
+              "reddit_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_reddit_wallpapers_reddit_id` ON `${TABLE_NAME}` (`reddit_id`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "reddit_search_query_wallpapers",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`search_query_id` INTEGER NOT NULL, `wallpaper_id` INTEGER NOT NULL, `order` INTEGER, PRIMARY KEY(`search_query_id`, `wallpaper_id`), FOREIGN KEY(`search_query_id`) REFERENCES `search_query`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`wallpaper_id`) REFERENCES `reddit_wallpapers`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "searchQueryId",
+            "columnName": "search_query_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "wallpaperId",
+            "columnName": "wallpaper_id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "order",
+            "columnName": "order",
+            "affinity": "INTEGER",
+            "notNull": false
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "search_query_id",
+            "wallpaper_id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_reddit_search_query_wallpapers_wallpaper_id",
+            "unique": false,
+            "columnNames": [
+              "wallpaper_id"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_reddit_search_query_wallpapers_wallpaper_id` ON `${TABLE_NAME}` (`wallpaper_id`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "search_query",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "search_query_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          },
+          {
+            "table": "reddit_wallpapers",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "wallpaper_id"
+            ],
+            "referencedColumns": [
+              "id"
+            ]
+          }
+        ]
+      },
+      {
+        "tableName": "viewed",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `source_id` TEXT NOT NULL, `source` TEXT NOT NULL, `last_viewed_on` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceId",
+            "columnName": "source_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "source",
+            "columnName": "source",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "lastViewedOn",
+            "columnName": "last_viewed_on",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_viewed_source_id_source",
+            "unique": true,
+            "columnNames": [
+              "source_id",
+              "source"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_viewed_source_id_source` ON `${TABLE_NAME}` (`source_id`, `source`)"
+          }
+        ],
+        "foreignKeys": []
+      },
+      {
+        "tableName": "light_dark",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `source_id` TEXT NOT NULL, `source` TEXT NOT NULL, `typeFlags` INTEGER NOT NULL, `updated_on` INTEGER NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "sourceId",
+            "columnName": "source_id",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "source",
+            "columnName": "source",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "typeFlags",
+            "columnName": "typeFlags",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "updatedOn",
+            "columnName": "updated_on",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        },
+        "indices": [
+          {
+            "name": "index_light_dark_source_id_source",
+            "unique": true,
+            "columnNames": [
+              "source_id",
+              "source"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_light_dark_source_id_source` ON `${TABLE_NAME}` (`source_id`, `source`)"
+          }
+        ],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '31a40a0eb18b4dafd8fd96ff7cbbdd67')"
+    ]
+  }
+}

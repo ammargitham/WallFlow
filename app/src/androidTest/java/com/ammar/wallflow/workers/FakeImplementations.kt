@@ -35,6 +35,7 @@ import com.ammar.wallflow.model.local.LocalWallpaper
 import com.ammar.wallflow.model.search.RedditSearch
 import com.ammar.wallflow.model.search.WallhavenSearch
 import com.ammar.wallflow.ui.screens.local.LocalSort
+import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.SourceChoice
 import kotlinx.coroutines.flow.Flow
 import okhttp3.Call
 import okhttp3.OkHttpClient
@@ -84,6 +85,16 @@ internal open class FakeAutoWallpaperHistoryDao : AutoWallpaperHistoryDao {
     override suspend fun getAllBySource(
         source: Source,
     ): List<AutoWallpaperHistoryEntity> {
+        throw RuntimeException()
+    }
+
+    override suspend fun getAllBySourceChoice(sourceChoice: SourceChoice) = throw RuntimeException()
+
+    override suspend fun getAllSourceIdsBySourceChoice(sourceChoice: SourceChoice): List<String> {
+        throw RuntimeException()
+    }
+
+    override suspend fun getOldestSetOnSourceIdBySourceChoice(sourceChoice: SourceChoice): String? {
         throw RuntimeException()
     }
 
@@ -187,6 +198,10 @@ internal open class FakeFavoriteDao : FavoriteDao {
     override suspend fun getRandom(): FavoriteEntity? {
         throw RuntimeException()
     }
+
+    override suspend fun getFirstFresh() = throw RuntimeException()
+
+    override suspend fun getByOldestSetOn() = throw RuntimeException()
 
     override suspend fun insertAll(favoriteEntities: Collection<FavoriteEntity>) {
         throw RuntimeException()
@@ -376,6 +391,14 @@ internal open class FakeLocalWallpapersRepository : LocalWallpapersRepository {
     ): Wallpaper? {
         throw RuntimeException()
     }
+
+    override suspend fun getFirstFresh(context: Context, uris: Collection<Uri>): Wallpaper? {
+        throw RuntimeException()
+    }
+
+    override suspend fun getByOldestSetOn(context: Context): Wallpaper? {
+        throw RuntimeException()
+    }
 }
 
 internal open class FakeViewedDao : ViewedDao {
@@ -406,6 +429,18 @@ internal open class FakeLightDarkDao : LightDarkDao {
     ) = throw RuntimeException()
 
     override suspend fun getRandomByTypeFlag(typeFlags: Set<Int>) = throw RuntimeException()
+
+    override suspend fun getFirstFreshByTypeFlag(
+        typeFlags: Set<Int>,
+    ): LightDarkEntity? = throw RuntimeException()
+
+    override suspend fun getByOldestSetOnAndTypeFlags(
+        typeFlags: Set<Int>,
+    ) = throw RuntimeException()
+
+    // override suspend fun getAllInHistoryByTypeFlags(): List<AutoWallpaperHistoryEntity> {
+    //     throw RuntimeException()
+    // }
 
     override fun pagingSource() = throw RuntimeException()
 

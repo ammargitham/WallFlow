@@ -68,7 +68,7 @@ import com.ammar.wallflow.data.db.entity.wallpaper.WallhavenWallpaperEntity
         ViewedEntity::class,
         LightDarkEntity::class,
     ],
-    version = 9,
+    version = 11,
     autoMigrations = [
         AutoMigration(from = 2, to = 3),
         AutoMigration(from = 4, to = 5),
@@ -79,6 +79,8 @@ import com.ammar.wallflow.data.db.entity.wallpaper.WallhavenWallpaperEntity
         ),
         AutoMigration(from = 7, to = 8),
         AutoMigration(from = 8, to = 9),
+        AutoMigration(from = 9, to = 10),
+        AutoMigration(from = 10, to = 11),
     ],
 )
 @TypeConverters(Converters::class)

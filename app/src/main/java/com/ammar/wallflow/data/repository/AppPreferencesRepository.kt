@@ -42,6 +42,8 @@ import com.ammar.wallflow.model.serializers.constraintTypeMapSerializer
 import com.ammar.wallflow.ui.screens.local.LocalSort
 import com.ammar.wallflow.utils.ExifWriteType
 import com.ammar.wallflow.utils.objectdetection.objectsDetector
+import com.ammar.wallflow.utils.valueOf
+import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.SourceChoice
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.IOException
 import java.util.UUID
@@ -217,6 +219,12 @@ class AppPreferencesRepository @Inject constructor(
         set(PreferencesKeys.AUTO_WALLPAPER_LS_LIGHT_DARK_ENABLED, lsLightDarkEnabled)
         set(PreferencesKeys.AUTO_WALLPAPER_USE_DARK_WITH_EXTRA_DIM, useDarkWithExtraDim)
         set(PreferencesKeys.AUTO_WALLPAPER_LS_USE_DARK_WITH_EXTRA_DIM, lsUseDarkWithExtraDim)
+        if (prevHomeSource != null) {
+            set(PreferencesKeys.AUTO_WALLPAPER_PREV_HOME_SOURCE, prevHomeSource.name)
+        }
+        if (prevLockScreenSource != null) {
+            set(PreferencesKeys.AUTO_WALLPAPER_PREV_LS_SOURCE, prevLockScreenSource.name)
+        }
     }
 
     private fun MutablePreferences.updateLookAndFeelPreferences(
@@ -554,6 +562,12 @@ class AppPreferencesRepository @Inject constructor(
             useDarkWithExtraDim = useDarkWithExtraDim,
             lsUseDarkWithExtraDim = lsUseDarkWithExtraDim,
             backoffUpdated = get(PreferencesKeys.AUTO_WALLPAPER_BACKOFF_UPDATED) ?: false,
+            prevHomeSource = valueOf<SourceChoice>(
+                get(PreferencesKeys.AUTO_WALLPAPER_PREV_HOME_SOURCE),
+            ),
+            prevLockScreenSource = valueOf<SourceChoice>(
+                get(PreferencesKeys.AUTO_WALLPAPER_PREV_LS_SOURCE),
+            ),
         )
     }
 

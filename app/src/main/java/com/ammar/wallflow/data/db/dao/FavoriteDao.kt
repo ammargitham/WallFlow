@@ -48,6 +48,39 @@ interface FavoriteDao {
     @Query("SELECT * FROM favorites ORDER BY RANDOM() LIMIT 1")
     suspend fun getRandom(): FavoriteEntity?
 
+    @Query(
+        """
+        SELECT * FROM favorites
+        WHERE id NOT IN (
+            SELECT DISTINCT f.id
+            FROM auto_wallpaper_history awh JOIN favorites f
+                    ON awh.source = f.source AND  awh.source_id = f.source_id
+        )
+        ORDER BY favorited_on
+        LIMIT 1
+        """,
+    )
+    suspend fun getFirstFresh(): FavoriteEntity?
+
+    @Query(
+        """
+        SELECT f.*
+        FROM favorites f INNER JOIN (
+            SELECT awh.* FROM auto_wallpaper_history awh
+            INNER JOIN (
+                SELECT id, source, source_id, max(set_on) max_value
+                FROM auto_wallpaper_history
+                GROUP BY source, source_id
+            ) t on t.id = awh.id
+        ) awh
+        WHERE awh.source = f.source
+            AND  awh.source_id = f.source_id
+        ORDER BY awh.set_on
+        LIMIT 1
+        """,
+    )
+    suspend fun getByOldestSetOn(): FavoriteEntity?
+
     @Insert
     suspend fun insertAll(favoriteEntities: Collection<FavoriteEntity>)
 

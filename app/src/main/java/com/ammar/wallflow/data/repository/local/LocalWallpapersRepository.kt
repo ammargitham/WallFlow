@@ -25,4 +25,13 @@ interface LocalWallpapersRepository {
         context: Context,
         uris: Collection<Uri>,
     ): Wallpaper?
+
+    suspend fun getFirstFresh(
+        context: Context,
+        uris: Collection<Uri>,
+    ): Wallpaper?
+
+    suspend fun getByOldestSetOn(
+        context: Context,
+    ): Wallpaper?
 }

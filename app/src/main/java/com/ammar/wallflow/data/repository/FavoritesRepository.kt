@@ -118,24 +118,37 @@ class FavoritesRepository @Inject constructor(
         )
     }
 
-    suspend fun getRandom(
-        context: Context,
-    ) = withContext(ioDispatcher) {
+    suspend fun getRandom(context: Context) = withContext(ioDispatcher) {
         val entity = favoriteDao.getRandom() ?: return@withContext null
-        when (entity.source) {
-            Source.WALLHAVEN -> {
-                val wallpaperEntity = wallhavenWallpapersDao.getByWallhavenId(entity.sourceId)
-                wallpaperEntity?.toWallpaper()
-            }
-            Source.REDDIT -> {
-                val wallpaperEntity = redditWallpapersDao.getByRedditId(entity.sourceId)
-                wallpaperEntity?.toWallpaper()
-            }
-            Source.LOCAL -> localWallpapersRepository.wallpaper(
-                context = context,
-                wallpaperUriStr = entity.sourceId,
-            ).firstOrNull()?.successOr(null)
+        getWallpaperFromEntity(context, entity)
+    }
+
+    suspend fun getFirstFresh(context: Context) = withContext(ioDispatcher) {
+        val entity = favoriteDao.getFirstFresh() ?: return@withContext null
+        getWallpaperFromEntity(context, entity)
+    }
+
+    suspend fun getByOldestSetOn(context: Context) = withContext(ioDispatcher) {
+        val entity = favoriteDao.getByOldestSetOn() ?: return@withContext null
+        getWallpaperFromEntity(context, entity)
+    }
+
+    private suspend fun getWallpaperFromEntity(
+        context: Context,
+        entity: FavoriteEntity,
+    ) = when (entity.source) {
+        Source.WALLHAVEN -> {
+            val wallpaperEntity = wallhavenWallpapersDao.getByWallhavenId(entity.sourceId)
+            wallpaperEntity?.toWallpaper()
         }
+        Source.REDDIT -> {
+            val wallpaperEntity = redditWallpapersDao.getByRedditId(entity.sourceId)
+            wallpaperEntity?.toWallpaper()
+        }
+        Source.LOCAL -> localWallpapersRepository.wallpaper(
+            context = context,
+            wallpaperUriStr = entity.sourceId,
+        ).firstOrNull()?.successOr(null)
     }
 
     suspend fun insertEntities(entities: Collection<FavoriteEntity>) = withContext(ioDispatcher) {

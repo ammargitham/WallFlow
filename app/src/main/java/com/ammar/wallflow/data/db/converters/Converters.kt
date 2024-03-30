@@ -9,6 +9,7 @@ import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.json
 import com.ammar.wallflow.model.Order
 import com.ammar.wallflow.model.Purity
+import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.model.search.WallhavenCategory
 import com.ammar.wallflow.model.search.WallhavenSorting
 import com.ammar.wallflow.model.search.WallhavenTopRange
@@ -113,4 +114,18 @@ object Converters {
 
     @TypeConverter
     fun colorToString(color: Color) = color.toHexString()
+
+    @TypeConverter
+    fun fromWallpaperTargetSetStr(value: String) = value
+        .split(",")
+        .filter { it.isNotBlank() }
+        .sorted()
+        .map { WallpaperTarget.valueOf(it) }
+        .toSet()
+
+    @TypeConverter
+    fun wallpaperTargetSetToString(targets: Set<WallpaperTarget>) = targets
+        .map { it.name }
+        .sorted()
+        .joinToString(",")
 }

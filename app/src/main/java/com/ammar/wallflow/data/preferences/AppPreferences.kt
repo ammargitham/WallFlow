@@ -24,6 +24,7 @@ import com.ammar.wallflow.model.serializers.UUIDSerializer
 import com.ammar.wallflow.model.serializers.UriSerializer
 import com.ammar.wallflow.ui.screens.local.LocalSort
 import com.ammar.wallflow.utils.ExifWriteType
+import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.SourceChoice
 import java.util.UUID
 import kotlinx.datetime.DateTimePeriod
 import kotlinx.serialization.Serializable
@@ -106,6 +107,8 @@ data class AutoWallpaperPreferences(
     val useDarkWithExtraDim: Boolean = false,
     val lsUseDarkWithExtraDim: Boolean = false,
     val backoffUpdated: Boolean = false,
+    val prevHomeSource: SourceChoice? = null,
+    val prevLockScreenSource: SourceChoice? = null,
 ) {
     private val anyHomeScreenSourceEnabled = lightDarkEnabled || (
         savedSearchEnabled &&

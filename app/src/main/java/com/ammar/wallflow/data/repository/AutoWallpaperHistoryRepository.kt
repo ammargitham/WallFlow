@@ -6,6 +6,7 @@ import com.ammar.wallflow.data.db.entity.toModel
 import com.ammar.wallflow.model.AutoWallpaperHistory
 import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.model.toEntity
+import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.SourceChoice
 import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher
@@ -24,15 +25,25 @@ class AutoWallpaperHistoryRepository @Inject constructor(
         autoWallpaperHistoryDao.getAllBySource(source).map { it.toModel() }
     }
 
-    suspend fun addOrUpdateHistory(
+    suspend fun getAllBySourceChoice(sourceChoice: SourceChoice) = withContext(ioDispatcher) {
+        autoWallpaperHistoryDao.getAllBySourceChoice(sourceChoice).map { it.toModel() }
+    }
+
+    suspend fun getAllSourceIdsBySourceChoice(
+        sourceChoice: SourceChoice,
+    ) = withContext(ioDispatcher) {
+        autoWallpaperHistoryDao.getAllSourceIdsBySourceChoice(sourceChoice)
+    }
+
+    suspend fun getOldestSetOnSourceIdBySourceChoice(
+        sourceChoice: SourceChoice,
+    ) = withContext(ioDispatcher) {
+        autoWallpaperHistoryDao.getOldestSetOnSourceIdBySourceChoice(sourceChoice)
+    }
+
+    suspend fun addHistory(
         autoWallpaperHistory: AutoWallpaperHistory,
     ) = withContext(ioDispatcher) {
-        val entity = autoWallpaperHistoryDao.getBySourceId(
-            autoWallpaperHistory.sourceId,
-            autoWallpaperHistory.source,
-        )?.copy(
-            setOn = autoWallpaperHistory.setOn,
-        ) ?: autoWallpaperHistory.toEntity()
-        autoWallpaperHistoryDao.upsert(entity)
+        autoWallpaperHistoryDao.upsert(autoWallpaperHistory.toEntity())
     }
 }

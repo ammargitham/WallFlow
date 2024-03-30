@@ -11,6 +11,7 @@ data class AutoWallpaperHistory(
     val source: Source,
     val sourceChoice: SourceChoice,
     val setOn: Instant,
+    val targets: Set<WallpaperTarget>?,
 )
 
 fun AutoWallpaperHistory.toEntity(id: Long = 0) = AutoWallpaperHistoryEntity(
@@ -19,4 +20,5 @@ fun AutoWallpaperHistory.toEntity(id: Long = 0) = AutoWallpaperHistoryEntity(
     source = source,
     sourceChoice = sourceChoice,
     setOn = setOn,
+    targets = targets,
 )
