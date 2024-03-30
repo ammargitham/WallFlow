@@ -115,7 +115,7 @@ internal fun ColumnScope.SavedSearchesSection(
                     },
                 )
             },
-            initialSelectedOptions = savedSearchIds,
+            selected = savedSearchIds,
             onChange = onChangeSavedSearchIds,
         )
     }

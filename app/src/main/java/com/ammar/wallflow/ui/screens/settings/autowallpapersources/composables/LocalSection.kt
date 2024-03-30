@@ -98,7 +98,7 @@ internal fun ColumnScope.LocalSection(
                     text = it.path,
                 )
             },
-            initialSelectedOptions = selectedUris,
+            selected = selectedUris,
             onChange = onChangeSelectedUris,
         )
     }
