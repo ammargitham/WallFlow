@@ -2,56 +2,39 @@ package com.ammar.wallflow.ui.screens.settings.composables
 
 import android.content.res.Configuration
 import android.os.Build
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextRange
-import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.work.Constraints
@@ -61,7 +44,6 @@ import com.ammar.wallflow.data.db.entity.ObjectDetectionModelEntity
 import com.ammar.wallflow.data.preferences.ObjectDetectionDelegate
 import com.ammar.wallflow.data.preferences.Theme
 import com.ammar.wallflow.data.preferences.defaultAutoWallpaperConstraints
-import com.ammar.wallflow.data.preferences.defaultAutoWallpaperFreq
 import com.ammar.wallflow.extensions.toConstraintTypeMap
 import com.ammar.wallflow.extensions.toConstraints
 import com.ammar.wallflow.model.ConstraintType
@@ -69,8 +51,6 @@ import com.ammar.wallflow.model.search.SavedSearch
 import com.ammar.wallflow.ui.common.UnpaddedAlertDialogContent
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import com.ammar.wallflow.utils.ExifWriteType
-import kotlinx.coroutines.delay
-import kotlinx.datetime.DateTimePeriod
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -391,168 +371,6 @@ private fun PreviewDeleteSavedSearchConfirmDialog() {
                 savedSearch = SavedSearch(
                     name = "test",
                 ),
-            )
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun FrequencyDialog(
-    modifier: Modifier = Modifier,
-    frequency: DateTimePeriod = defaultAutoWallpaperFreq,
-    onSaveClick: (DateTimePeriod) -> Unit = {},
-    onDismissRequest: () -> Unit = {},
-) {
-    var value by rememberSaveable(
-        frequency,
-        stateSaver = TextFieldValue.Saver,
-    ) {
-        val hours = frequency.hours
-        val minutes = frequency.minutes
-        val value = if (hours != 0 && minutes == 0) {
-            frequency.hours
-        } else {
-            frequency.hours * 60 + frequency.minutes
-        }
-        mutableStateOf(TextFieldValue(value.toString()))
-    }
-    var selectedChronoUnit by rememberSaveable(frequency) {
-        val hours = frequency.hours
-        val minutes = frequency.minutes
-        mutableStateOf(
-            if (hours != 0 && minutes == 0) {
-                FrequencyChronoUnit.HOURS
-            } else {
-                FrequencyChronoUnit.MINUTES
-            },
-        )
-    }
-    var expanded by rememberSaveable { mutableStateOf(false) }
-
-    fun getFrequency(): DateTimePeriod {
-        val inputInt = value.text.toIntOrNull() ?: 0
-        return when (selectedChronoUnit) {
-            FrequencyChronoUnit.HOURS -> DateTimePeriod(hours = inputInt)
-            FrequencyChronoUnit.MINUTES -> DateTimePeriod(minutes = inputInt)
-        }
-    }
-
-    val hasMinError by rememberSaveable(value, selectedChronoUnit) {
-        val freq = getFrequency()
-        val minutes = freq.hours * 60 + freq.minutes
-        mutableStateOf(minutes < 15)
-    }
-
-    val focusRequester = remember { FocusRequester() }
-
-    LaunchedEffect(Unit) {
-        // put cursor at end of value
-        value = value.copy(selection = TextRange(value.text.length))
-        delay(200)
-        focusRequester.requestFocus()
-    }
-
-    AlertDialog(
-        modifier = modifier,
-        onDismissRequest = onDismissRequest,
-        title = { Text(text = stringResource(R.string.frequency)) },
-        text = {
-            OutlinedTextField(
-                modifier = Modifier.focusRequester(focusRequester),
-                keyboardOptions = KeyboardOptions(
-                    autoCorrect = false,
-                    keyboardType = KeyboardType.Number,
-                    imeAction = ImeAction.Done,
-                ),
-                keyboardActions = KeyboardActions(
-                    onDone = {
-                        val newFreq = getFrequency()
-                        if (newFreq.hours <= 0 && newFreq.minutes <= 0) {
-                            return@KeyboardActions
-                        }
-                        onSaveClick(newFreq)
-                    },
-                ),
-                value = value,
-                isError = hasMinError,
-                supportingText = if (hasMinError) {
-                    {
-                        Text(text = stringResource(R.string.frequency_min_val_error))
-                    }
-                } else {
-                    null
-                },
-                onValueChange = { newValue ->
-                    val newText = newValue.text
-                    if (newText.isEmpty()) {
-                        value = newValue
-                        return@OutlinedTextField
-                    }
-                    val newTextInt = newText.toIntOrNull() ?: 0
-                    if (newTextInt >= 0) {
-                        value = newValue
-                    }
-                },
-                suffix = {
-                    ExposedDropdownMenuBox(
-                        expanded = expanded,
-                        onExpandedChange = { expanded = !expanded },
-                    ) {
-                        Row {
-                            Text(
-                                modifier = Modifier.menuAnchor(),
-                                text = chronoUnitString(selectedChronoUnit),
-                            )
-                            ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
-                        }
-                        ExposedDropdownMenu(
-                            modifier = Modifier.width(IntrinsicSize.Min),
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false },
-                        ) {
-                            FrequencyChronoUnit.entries.forEach { chronoUnit ->
-                                DropdownMenuItem(
-                                    text = { Text(text = chronoUnitString(chronoUnit)) },
-                                    onClick = {
-                                        selectedChronoUnit = chronoUnit
-                                        expanded = false
-                                    },
-                                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding,
-                                )
-                            }
-                        }
-                    }
-                },
-            )
-        },
-        confirmButton = {
-            TextButton(
-                enabled = (value.text.toIntOrNull() ?: 0) > 0,
-                onClick = { onSaveClick(getFrequency()) },
-            ) {
-                Text(text = stringResource(R.string.save))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismissRequest) {
-                Text(text = stringResource(R.string.cancel))
-            }
-        },
-    )
-}
-
-@Preview
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
-@Composable
-private fun PreviewFrequencyDialog() {
-    WallFlowTheme {
-        Surface {
-            FrequencyDialog(
-                frequency = DateTimePeriod.parse("PT60M"),
-                onSaveClick = {
-                    Log.d("PreviewFrequencyDialog", "newFreq: $it")
-                },
             )
         }
     }

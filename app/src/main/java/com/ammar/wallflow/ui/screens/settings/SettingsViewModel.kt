@@ -35,6 +35,7 @@ import com.ammar.wallflow.model.search.SavedSearch
 import com.ammar.wallflow.utils.DownloadManager
 import com.ammar.wallflow.utils.DownloadStatus
 import com.ammar.wallflow.utils.ExifWriteType
+import com.ammar.wallflow.utils.combine
 import com.ammar.wallflow.utils.getLocalDirs
 import com.ammar.wallflow.utils.objectdetection.validateModelFile
 import com.ammar.wallflow.workers.AutoWallpaperWorker
@@ -52,7 +53,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -70,6 +70,7 @@ class SettingsViewModel @Inject constructor(
 ) : AndroidViewModel(application) {
     private val localUiStateFlow = MutableStateFlow(SettingsUiStatePartial())
     private val autoWallpaperNextRunFlow = getAutoWallpaperNextRun()
+    private val lsAutoWallpaperNextRunFlow = getLsAutoWallpaperNextRun()
     private var changeNowJob: Job? = null
 
     val uiState = combine(
@@ -78,12 +79,14 @@ class SettingsViewModel @Inject constructor(
         localUiStateFlow,
         savedSearchRepository.observeAll(),
         autoWallpaperNextRunFlow,
+        lsAutoWallpaperNextRunFlow,
     ) {
             appPreferences,
             objectDetectionModels,
             localUiState,
             savedSearches,
             autoWallpaperNextRun,
+            lsAutoWallpaperNextRun,
         ->
         val selectedModelId = appPreferences.objectDetectionPreferences.modelId
         val selectedModel = if (selectedModelId == 0L) {
@@ -105,6 +108,7 @@ class SettingsViewModel @Inject constructor(
                     appPreferences.autoWallpaperPreferences.savedSearchIds.contains(it.id)
                 }.toPersistentList(),
                 autoWallpaperNextRun = autoWallpaperNextRun,
+                lsAutoWallpaperNextRun = lsAutoWallpaperNextRun,
                 localDirectories = getLocalDirs(application, appPreferences).toPersistentList(),
             ),
         )
@@ -442,9 +446,15 @@ class SettingsViewModel @Inject constructor(
 
     private fun getAutoWallpaperNextRun() = application.workManager.getWorkInfosForUniqueWorkFlow(
         AutoWallpaperWorker.PERIODIC_WORK_NAME,
-    ).map {
-        val info = it.firstOrNull() ?: return@map NextRun.NotScheduled
-        return@map when (info.state) {
+    ).map { getNextRun(it) }
+
+    private fun getLsAutoWallpaperNextRun() = application.workManager.getWorkInfosForUniqueWorkFlow(
+        AutoWallpaperWorker.PERIODIC_LS_WORK_NAME,
+    ).map { getNextRun(it) }
+
+    private fun getNextRun(it: List<WorkInfo>): NextRun {
+        val info = it.firstOrNull() ?: return NextRun.NotScheduled
+        return when (info.state) {
             WorkInfo.State.ENQUEUED -> {
                 NextRun.NextRunTime(Instant.fromEpochMilliseconds(info.nextScheduleTimeMillis))
             }
@@ -549,6 +559,7 @@ data class SettingsUiState(
     val showPermissionRationaleDialog: Boolean = false,
     val tempAutoWallpaperPreferences: AutoWallpaperPreferences? = null,
     val autoWallpaperNextRun: NextRun = NextRun.NotScheduled,
+    val lsAutoWallpaperNextRun: NextRun = NextRun.NotScheduled,
     val showAutoWallpaperNextRunInfoDialog: Boolean = false,
     val autoWallpaperStatus: AutoWallpaperWorker.Companion.Status? = null,
     val showThemeOptionsDialog: Boolean = false,

@@ -69,10 +69,17 @@ object PreferencesKeys {
     val AUTO_WALLPAPER_USE_OBJECT_DETECTION = booleanPreferencesKey(
         "auto_wallpaper_use_object_detection",
     )
+    val AUTO_WALLPAPER_USE_SAME_FREQUENCY = booleanPreferencesKey(
+        "auto_wallpaper_use_same_frequency",
+    )
     val AUTO_WALLPAPER_FREQUENCY = stringPreferencesKey("auto_wallpaper_frequency")
+    val AUTO_WALLPAPER_LS_FREQUENCY = stringPreferencesKey("auto_wallpaper_ls_frequency")
     val AUTO_WALLPAPER_CONSTRAINTS = stringPreferencesKey("auto_wallpaper_constraints")
     val AUTO_WALLPAPER_SHOW_NOTIFICATION = booleanPreferencesKey("auto_wallpaper_show_notification")
     val AUTO_WALLPAPER_WORK_REQUEST_ID = stringPreferencesKey("auto_wallpaper_work_request_id")
+    val AUTO_WALLPAPER_LS_WORK_REQUEST_ID = stringPreferencesKey(
+        "auto_wallpaper_ls_work_request_id",
+    )
     val AUTO_WALLPAPER_TARGETS = stringSetPreferencesKey("auto_wallpaper_targets")
     val AUTO_WALLPAPER_MARK_FAVORITE = booleanPreferencesKey("auto_wallpaper_mark_favorite")
     val AUTO_WALLPAPER_DOWNLOAD = booleanPreferencesKey("auto_wallpaper_download")

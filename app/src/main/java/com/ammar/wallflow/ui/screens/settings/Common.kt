@@ -10,6 +10,7 @@ import com.ammar.wallflow.data.repository.AppPreferencesRepository
 import com.ammar.wallflow.services.ChangeWallpaperTileService
 import com.ammar.wallflow.workers.AutoWallpaperWorker
 import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.FailureReason
+import kotlinx.datetime.DateTimePeriod
 
 suspend fun updateAutoWallpaperPrefs(
     context: Context,
@@ -38,9 +39,17 @@ suspend fun updateAutoWallpaperPrefs(
     if (prefs.enabled) {
         // only reschedule if enabled or frequency or constraints change
         val currentPrefs = prevAppPreferences.autoWallpaperPreferences
+        val frequenciesEqual = areFrequenciesEqual(
+            currentUseSameFreq = currentPrefs.useSameFreq,
+            currentFreq = currentPrefs.frequency,
+            currentLsFreq = currentPrefs.lsFrequency,
+            newUseSameFreq = prefs.useSameFreq,
+            newFreq = prefs.frequency,
+            newLsFreq = prefs.lsFrequency,
+        )
         if (
             currentPrefs.enabled &&
-            currentPrefs.frequency == prefs.frequency &&
+            frequenciesEqual &&
             currentPrefs.constraints == prefs.constraints
         ) {
             return
@@ -48,8 +57,7 @@ suspend fun updateAutoWallpaperPrefs(
         // schedule worker with updated preferences
         AutoWallpaperWorker.schedule(
             context = context,
-            constraints = prefs.constraints,
-            interval = prefs.frequency,
+            autoWallpaperPreferences = prefs,
             appPreferencesRepository = appPreferencesRepository,
         )
     } else {
@@ -61,6 +69,24 @@ suspend fun updateAutoWallpaperPrefs(
     }
 }
 
+private fun areFrequenciesEqual(
+    currentUseSameFreq: Boolean,
+    currentFreq: DateTimePeriod,
+    currentLsFreq: DateTimePeriod,
+    newUseSameFreq: Boolean,
+    newFreq: DateTimePeriod,
+    newLsFreq: DateTimePeriod,
+): Boolean {
+    if (currentUseSameFreq != newUseSameFreq) {
+        return false
+    }
+    if (currentUseSameFreq) {
+        return currentFreq == newFreq
+    }
+    return currentFreq == newFreq &&
+        currentLsFreq == newLsFreq
+}
+
 @Composable
 internal fun getFailureReasonString(reason: FailureReason): String {
     val reasonStr = when (reason) {
@@ -70,6 +96,7 @@ internal fun getFailureReasonString(reason: FailureReason): String {
         FailureReason.SAVED_SEARCH_NOT_SET -> stringResource(R.string.no_saved_searches)
         FailureReason.NO_WALLPAPER_FOUND -> stringResource(R.string.no_wallpaper_found)
         FailureReason.CANCELLED -> stringResource(R.string.auto_wallpaper_cancelled)
+        FailureReason.CURRENT_TARGETS_DISABLED -> stringResource(R.string.current_target_disabled)
     }
     return stringResource(R.string.wallpaper_not_changed_with_reason, reasonStr)
 }

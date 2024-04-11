@@ -199,9 +199,9 @@ internal open class FakeFavoriteDao : FavoriteDao {
         throw RuntimeException()
     }
 
-    override suspend fun getFirstFresh() = throw RuntimeException()
+    override suspend fun getFirstFresh(): FavoriteEntity? = throw RuntimeException()
 
-    override suspend fun getByOldestSetOn() = throw RuntimeException()
+    override suspend fun getByOldestSetOn(): FavoriteEntity? = throw RuntimeException()
 
     override suspend fun insertAll(favoriteEntities: Collection<FavoriteEntity>) {
         throw RuntimeException()
@@ -392,9 +392,10 @@ internal open class FakeLocalWallpapersRepository : LocalWallpapersRepository {
         throw RuntimeException()
     }
 
-    override suspend fun getFirstFresh(context: Context, uris: Collection<Uri>): Wallpaper? {
-        throw RuntimeException()
-    }
+    override suspend fun getFirstFresh(
+        context: Context,
+        uris: Collection<Uri>,
+    ): Wallpaper? = throw RuntimeException()
 
     override suspend fun getByOldestSetOn(context: Context): Wallpaper? {
         throw RuntimeException()

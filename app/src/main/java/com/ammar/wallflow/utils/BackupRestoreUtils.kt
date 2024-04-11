@@ -335,11 +335,17 @@ suspend fun restoreBackupV1(
         val updatedSavedSearchIds = prevAutoWallpaperPrefs.savedSearchIds.filter {
             savedSearchRepository.exists(it)
         }.toSet()
+        val updatedLsSavedSearchIds = prevAutoWallpaperPrefs.lsSavedSearchIds.filter {
+            savedSearchRepository.exists(it)
+        }.toSet()
         val updatedPrefs = backup.preferences.copy(
             autoWallpaperPreferences = prevAutoWallpaperPrefs.copy(
                 savedSearchIds = updatedSavedSearchIds,
                 savedSearchEnabled = prevAutoWallpaperPrefs.savedSearchEnabled &&
                     updatedSavedSearchIds.isNotEmpty(),
+                lsSavedSearchIds = updatedLsSavedSearchIds,
+                lsSavedSearchEnabled = prevAutoWallpaperPrefs.lsSavedSearchEnabled &&
+                    updatedLsSavedSearchIds.isNotEmpty(),
             ),
         )
         appPreferencesRepository.setPreferences(updatedPrefs)

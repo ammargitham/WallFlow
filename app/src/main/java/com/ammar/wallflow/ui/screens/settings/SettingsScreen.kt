@@ -200,6 +200,7 @@ fun SettingsScreen(
             model = uiState.selectedModel,
             hasSetWallpaperPermission = context.checkSetWallpaperPermission(),
             autoWallpaperNextRun = uiState.autoWallpaperNextRun,
+            lsAutoWallpaperNextRun = uiState.lsAutoWallpaperNextRun,
             autoWallpaperSavedSearches = uiState.autoWallpaperSavedSearches,
             autoWallpaperStatus = uiState.autoWallpaperStatus,
             showLocalTab = uiState.appPreferences.lookAndFeelPreferences.showLocalTab,
@@ -380,11 +381,15 @@ fun SettingsScreen(
 
     if (uiState.showAutoWallpaperFrequencyDialog) {
         FrequencyDialog(
+            useSameFreq = uiState.appPreferences.autoWallpaperPreferences.useSameFreq,
             frequency = uiState.appPreferences.autoWallpaperPreferences.frequency,
-            onSaveClick = {
+            lsFrequency = uiState.appPreferences.autoWallpaperPreferences.lsFrequency,
+            onSaveClick = { useSameFreq, freq, lsFreq ->
                 viewModel.updateAutoWallpaperPrefs(
                     uiState.appPreferences.autoWallpaperPreferences.copy(
-                        frequency = it,
+                        useSameFreq = useSameFreq,
+                        frequency = freq,
+                        lsFrequency = lsFreq,
                     ),
                 )
                 viewModel.showAutoWallpaperFrequencyDialog(false)
@@ -515,6 +520,7 @@ fun SettingsScreenContent(
     autoWallpaperSavedSearches: ImmutableList<SavedSearch> = persistentListOf(),
     hasSetWallpaperPermission: Boolean = true,
     autoWallpaperNextRun: NextRun = NextRun.NotScheduled,
+    lsAutoWallpaperNextRun: NextRun = NextRun.NotScheduled,
     autoWallpaperStatus: Status? = null,
     showLocalTab: Boolean = true,
     downloadLocation: String = "",
@@ -633,7 +639,10 @@ fun SettingsScreenContent(
                         .crop,
                     useObjectDetection = appPreferences.autoWallpaperPreferences.useObjectDetection,
                     nextRun = autoWallpaperNextRun,
+                    lsNextRun = lsAutoWallpaperNextRun,
+                    useSameFrequency = appPreferences.autoWallpaperPreferences.useSameFreq,
                     frequency = appPreferences.autoWallpaperPreferences.frequency,
+                    lsFrequency = appPreferences.autoWallpaperPreferences.lsFrequency,
                     showNotification = appPreferences.autoWallpaperPreferences.showNotification,
                     autoWallpaperStatus = autoWallpaperStatus,
                     targets = appPreferences.autoWallpaperPreferences.targets,

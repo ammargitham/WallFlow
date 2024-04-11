@@ -93,10 +93,13 @@ data class AutoWallpaperPreferences(
     val localDirs: Set<Uri> = emptySet(),
     val lsLocalDirs: Set<Uri> = emptySet(),
     val useObjectDetection: Boolean = true,
+    val useSameFreq: Boolean = true,
     val frequency: DateTimePeriod = defaultAutoWallpaperFreq,
+    val lsFrequency: DateTimePeriod = defaultAutoWallpaperFreq,
     val constraints: Constraints = defaultAutoWallpaperConstraints,
     val showNotification: Boolean = false,
     val workRequestId: UUID? = null,
+    val lsWorkRequestId: UUID? = null,
     val targets: Set<WallpaperTarget> = setOf(WallpaperTarget.HOME, WallpaperTarget.LOCKSCREEN),
     val markFavorite: Boolean = false,
     val download: Boolean = false,
@@ -110,14 +113,14 @@ data class AutoWallpaperPreferences(
     val prevHomeSource: SourceChoice? = null,
     val prevLockScreenSource: SourceChoice? = null,
 ) {
-    private val anyHomeScreenSourceEnabled = lightDarkEnabled || (
+    val anyHomeScreenSourceEnabled = lightDarkEnabled || (
         savedSearchEnabled &&
             savedSearchIds.isNotEmpty() &&
             savedSearchIds.all { it > 0 }
         ) ||
         favoritesEnabled ||
         localEnabled
-    private val anyLockScreenSourceEnabled = lsLightDarkEnabled || (
+    val anyLockScreenSourceEnabled = lsLightDarkEnabled || (
         lsSavedSearchEnabled &&
             lsSavedSearchIds.isNotEmpty() &&
             lsSavedSearchIds.all { it > 0 }

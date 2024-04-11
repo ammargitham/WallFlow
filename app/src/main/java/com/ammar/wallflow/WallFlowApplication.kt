@@ -18,7 +18,7 @@ import com.ammar.wallflow.workers.CleanupWorker
 import dagger.hilt.android.HiltAndroidApp
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 
@@ -68,7 +68,7 @@ class WallFlowApplication : Application(), Configuration.Provider, ImageLoaderFa
                 val workerNeedsUpdate = AutoWallpaperWorker.checkIfNeedsUpdate(
                     appPreferencesRepository = appPreferencesRepository,
                 )
-                val scheduled = AutoWallpaperWorker.checkIfScheduled(
+                val scheduled = AutoWallpaperWorker.checkIfAnyScheduled(
                     context = this@WallFlowApplication,
                     appPreferencesRepository = appPreferencesRepository,
                 )
@@ -77,12 +77,12 @@ class WallFlowApplication : Application(), Configuration.Provider, ImageLoaderFa
                 }
                 val prefs = appPreferencesRepository
                     .appPreferencesFlow
-                    .first()
-                    .autoWallpaperPreferences
+                    .firstOrNull()
+                    ?.autoWallpaperPreferences
+                    ?: return@launch
                 AutoWallpaperWorker.schedule(
                     context = this@WallFlowApplication,
-                    constraints = prefs.constraints,
-                    interval = prefs.frequency,
+                    autoWallpaperPreferences = prefs,
                     appPreferencesRepository = appPreferencesRepository,
                     enqueuePolicy = if (scheduled) {
                         ExistingPeriodicWorkPolicy.UPDATE

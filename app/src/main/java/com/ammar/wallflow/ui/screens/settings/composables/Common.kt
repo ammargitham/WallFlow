@@ -1,5 +1,6 @@
 package com.ammar.wallflow.ui.screens.settings.composables
 
+import android.text.format.DateFormat
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -7,7 +8,9 @@ import com.ammar.wallflow.R
 import com.ammar.wallflow.data.preferences.ObjectDetectionDelegate
 import com.ammar.wallflow.data.preferences.ViewedWallpapersLook
 import com.ammar.wallflow.model.WallpaperTarget
+import com.ammar.wallflow.ui.screens.settings.NextRun
 import com.ammar.wallflow.utils.ExifWriteType
+import java.util.Locale
 import kotlinx.datetime.DateTimePeriod
 
 @Composable
@@ -48,6 +51,19 @@ internal fun chronoUnitString(chronoUnit: FrequencyChronoUnit) = stringResource(
 
 @Composable
 internal fun getFrequencyString(
+    useSameFrequency: Boolean,
+    frequency: DateTimePeriod,
+    lsFrequency: DateTimePeriod,
+): String {
+    if (useSameFrequency) {
+        return getFrequencyString(frequency)
+    }
+    return "${stringResource(R.string.home_screen)}: ${getFrequencyString(frequency)}\n" +
+        "${stringResource(R.string.lock_screen)}: ${getFrequencyString(lsFrequency)}"
+}
+
+@Composable
+private fun getFrequencyString(
     frequency: DateTimePeriod,
 ): String {
     val hours = frequency.hours
@@ -92,3 +108,42 @@ internal fun viewedWallpapersLookString(
         ViewedWallpapersLook.ICON -> R.string.icon
     },
 )
+
+@Composable
+fun getNextRunString(
+    useSameFrequency: Boolean,
+    nextRun: NextRun,
+    lsNextRun: NextRun,
+): String {
+    if (useSameFrequency) {
+        return getNextRunString(nextRun)
+    }
+    return "${stringResource(R.string.next_run_approximate)}:\n" +
+        "${stringResource(R.string.home_screen)}: ${getNextRunString(nextRun, false)}\n" +
+        "${stringResource(R.string.lock_screen)}: ${getNextRunString(lsNextRun, false)}"
+}
+
+@Composable
+private fun getNextRunString(
+    nextRun: NextRun,
+    useSameFrequency: Boolean = true,
+) = when (nextRun) {
+    is NextRun.NextRunTime -> if (useSameFrequency) {
+        stringResource(R.string.next_run_at, getFormattedDateTime(nextRun))
+    } else {
+        getFormattedDateTime(nextRun)
+    }
+    NextRun.NotScheduled -> stringResource(R.string.not_scheduled)
+    NextRun.Running -> stringResource(R.string.running)
+}
+
+@Composable
+private fun getFormattedDateTime(
+    nextRun: NextRun.NextRunTime,
+) = DateFormat.format(
+    DateFormat.getBestDateTimePattern(
+        Locale.getDefault(),
+        "yyyyy.MMMM.dd hh:mm",
+    ),
+    nextRun.instant.toEpochMilliseconds(),
+).toString()

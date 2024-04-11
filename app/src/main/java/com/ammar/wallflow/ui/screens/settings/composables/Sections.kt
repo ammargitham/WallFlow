@@ -1,7 +1,6 @@
 package com.ammar.wallflow.ui.screens.settings.composables
 
 import android.content.res.Configuration
-import android.text.format.DateFormat
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateValueAsState
 import androidx.compose.animation.core.tween
@@ -67,7 +66,6 @@ import com.ammar.wallflow.ui.theme.WallFlowTheme
 import com.ammar.wallflow.utils.ExifWriteType
 import com.ammar.wallflow.utils.objectdetection.objectsDetector
 import com.ammar.wallflow.workers.AutoWallpaperWorker
-import java.util.Locale
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.datetime.DateTimePeriod
@@ -454,8 +452,11 @@ internal fun LazyListScope.autoWallpaperSection(
     sourcesSummary: String? = null,
     crop: Boolean = true,
     useObjectDetection: Boolean = true,
+    useSameFrequency: Boolean = true,
     frequency: DateTimePeriod = defaultAutoWallpaperFreq,
+    lsFrequency: DateTimePeriod = defaultAutoWallpaperFreq,
     nextRun: NextRun = NextRun.NotScheduled,
+    lsNextRun: NextRun = NextRun.NotScheduled,
     markFavorite: Boolean = false,
     download: Boolean = false,
     showNotification: Boolean = false,
@@ -493,25 +494,14 @@ internal fun LazyListScope.autoWallpaperSection(
     }
     if (enabled) {
         item {
-            val text = when (nextRun) {
-                is NextRun.NextRunTime -> {
-                    val format = DateFormat.getBestDateTimePattern(
-                        Locale.getDefault(),
-                        "yyyyy.MMMM.dd hh:mm",
-                    )
-                    val formatted = DateFormat.format(
-                        format,
-                        nextRun.instant.toEpochMilliseconds(),
-                    ).toString()
-                    stringResource(R.string.next_run_at, formatted)
-                }
-                NextRun.NotScheduled -> stringResource(R.string.not_scheduled)
-                NextRun.Running -> stringResource(R.string.running)
-            }
             ListItem(
                 headlineContent = {
                     Text(
-                        text = text,
+                        text = getNextRunString(
+                            useSameFrequency = useSameFrequency,
+                            nextRun = nextRun,
+                            lsNextRun = lsNextRun,
+                        ),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
@@ -589,7 +579,11 @@ internal fun LazyListScope.autoWallpaperSection(
             },
             supportingContent = {
                 Text(
-                    text = getFrequencyString(frequency),
+                    text = getFrequencyString(
+                        useSameFrequency = useSameFrequency,
+                        frequency = frequency,
+                        lsFrequency = lsFrequency,
+                    ),
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = alpha),
                 )
             },

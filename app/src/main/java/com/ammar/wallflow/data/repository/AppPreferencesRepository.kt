@@ -198,7 +198,9 @@ class AppPreferencesRepository @Inject constructor(
             lsLocalDirs.mapTo(HashSet()) { it.toString() },
         )
         set(PreferencesKeys.AUTO_WALLPAPER_USE_OBJECT_DETECTION, useObjectDetection)
+        set(PreferencesKeys.AUTO_WALLPAPER_USE_SAME_FREQUENCY, useSameFreq)
         set(PreferencesKeys.AUTO_WALLPAPER_FREQUENCY, frequency.toString())
+        set(PreferencesKeys.AUTO_WALLPAPER_LS_FREQUENCY, lsFrequency.toString())
         set(
             PreferencesKeys.AUTO_WALLPAPER_CONSTRAINTS,
             json.encodeToString(
@@ -245,6 +247,12 @@ class AppPreferencesRepository @Inject constructor(
     suspend fun updateAutoWallpaperWorkRequestId(id: UUID?) = withContext(ioDispatcher) {
         dataStore.edit {
             it[PreferencesKeys.AUTO_WALLPAPER_WORK_REQUEST_ID] = id?.toString() ?: ""
+        }
+    }
+
+    suspend fun updateAutoWallpaperLsWorkRequestId(id: UUID?) = withContext(ioDispatcher) {
+        dataStore.edit {
+            it[PreferencesKeys.AUTO_WALLPAPER_LS_WORK_REQUEST_ID] = id?.toString() ?: ""
         }
     }
 
@@ -536,10 +544,15 @@ class AppPreferencesRepository @Inject constructor(
             lsLocalDirs = lsLocalDirs,
             useObjectDetection = get(PreferencesKeys.AUTO_WALLPAPER_USE_OBJECT_DETECTION)
                 ?: true,
+            useSameFreq = get(PreferencesKeys.AUTO_WALLPAPER_USE_SAME_FREQUENCY) ?: true,
             frequency = parseFrequency(get(PreferencesKeys.AUTO_WALLPAPER_FREQUENCY)),
+            lsFrequency = parseFrequency(get(PreferencesKeys.AUTO_WALLPAPER_LS_FREQUENCY)),
             constraints = parseConstraints(get(PreferencesKeys.AUTO_WALLPAPER_CONSTRAINTS)),
             workRequestId = parseWorkRequestId(
                 get(PreferencesKeys.AUTO_WALLPAPER_WORK_REQUEST_ID),
+            ),
+            lsWorkRequestId = parseWorkRequestId(
+                get(PreferencesKeys.AUTO_WALLPAPER_LS_WORK_REQUEST_ID),
             ),
             showNotification = get(PreferencesKeys.AUTO_WALLPAPER_SHOW_NOTIFICATION) ?: false,
             targets = get(PreferencesKeys.AUTO_WALLPAPER_TARGETS)?.map {
@@ -656,9 +669,13 @@ class AppPreferencesRepository @Inject constructor(
 
     suspend fun getWallHavenApiKey() = getWallhavenApiKey(dataStore.data.first())
 
-    suspend fun getAutoWallHavenWorkRequestId() = getAutoWallpaperPreferences(
+    suspend fun getAutoWallpaperWorkRequestId() = getAutoWallpaperPreferences(
         dataStore.data.first(),
     ).workRequestId
+
+    suspend fun getAutoWallpaperLsWorkRequestId() = getAutoWallpaperPreferences(
+        dataStore.data.first(),
+    ).lsWorkRequestId
 
     suspend fun getAutoWallBackoffUpdated() = getAutoWallpaperPreferences(
         dataStore.data.first(),

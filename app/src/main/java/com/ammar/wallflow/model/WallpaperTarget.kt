@@ -5,6 +5,11 @@ import android.app.WallpaperManager
 enum class WallpaperTarget {
     HOME,
     LOCKSCREEN,
+    ;
+
+    companion object {
+        val ALL = setOf(HOME, LOCKSCREEN)
+    }
 }
 
 fun Set<WallpaperTarget>.toWhichInt() = this.fold(0) { acc, target ->

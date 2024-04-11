@@ -524,7 +524,8 @@ class AutoWallpaperTest {
                 dataStore = testDataStore,
                 appPreferencesRepository = appPreferencesRepository,
                 favoriteDao = object : FakeFavoriteDao() {
-                    override suspend fun getRandom() = null
+                    override suspend fun getFirstFresh() = null
+                    override suspend fun getByOldestSetOn() = null
                 },
             )
 
@@ -583,7 +584,7 @@ class AutoWallpaperTest {
                 appPreferencesRepository = appPreferencesRepository,
                 autoWallpaperHistoryDao = autoWallpaperHistoryDao,
                 favoriteDao = object : FakeFavoriteDao() {
-                    override suspend fun getRandom() = FavoriteEntity(
+                    override suspend fun getFirstFresh() = FavoriteEntity(
                         id = 1,
                         sourceId = "1",
                         source = Source.WALLHAVEN,
@@ -721,7 +722,7 @@ class AutoWallpaperTest {
                 appPreferencesRepository = appPreferencesRepository,
                 autoWallpaperHistoryDao = autoWallpaperHistoryDao,
                 localWallpapersRepository = object : FakeLocalWallpapersRepository() {
-                    override suspend fun getRandom(
+                    override suspend fun getFirstFresh(
                         context: Context,
                         uris: Collection<Uri>,
                     ) = localWallpaper
