@@ -22,6 +22,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.ammar.wallflow.extensions.rememberLazyStaggeredGridState
+import com.ammar.wallflow.extensions.safeLaunch
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.bottomWindowInsets
@@ -108,7 +109,7 @@ fun LocalScreen(
 
     val onAddFolderClick: () -> Unit = remember(openDocumentTreeLauncher) {
         {
-            openDocumentTreeLauncher.launch(null)
+            openDocumentTreeLauncher.safeLaunch(context, null)
         }
     }
 

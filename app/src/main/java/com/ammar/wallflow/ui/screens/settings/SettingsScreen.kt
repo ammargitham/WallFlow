@@ -44,6 +44,7 @@ import com.ammar.wallflow.R
 import com.ammar.wallflow.data.preferences.AppPreferences
 import com.ammar.wallflow.data.preferences.AutoWallpaperPreferences
 import com.ammar.wallflow.data.preferences.ObjectDetectionPreferences
+import com.ammar.wallflow.extensions.safeLaunch
 import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.model.ObjectDetectionModel
 import com.ammar.wallflow.model.search.SavedSearch
@@ -500,10 +501,13 @@ fun SettingsScreen(
                 viewModel.removeDownloadLocation()
             },
             onCustomClick = {
-                chooseDownloadLocationLauncher.launch(null)
+                chooseDownloadLocationLauncher.safeLaunch(context, null)
             },
             onCustomEditClick = {
-                chooseDownloadLocationLauncher.launch(uiState.appPreferences.downloadLocation)
+                chooseDownloadLocationLauncher.safeLaunch(
+                    context = context,
+                    input = uiState.appPreferences.downloadLocation,
+                )
             },
             onDismissRequest = {
                 viewModel.showChangeDownloadLocationDialog(false)

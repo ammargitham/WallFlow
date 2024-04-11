@@ -1,5 +1,8 @@
 package com.ammar.wallflow.extensions
 
+import android.content.ActivityNotFoundException
+import android.content.Context
+import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.ui.geometry.Offset
@@ -9,8 +12,10 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.IntSize
+import androidx.core.app.ActivityOptionsCompat
 import androidx.core.graphics.ColorUtils
 import androidx.core.graphics.toColorInt
+import com.ammar.wallflow.R
 
 fun Color.toHexString() = String.format("#%06X", 0xFFFFFF and this.toArgb())
 
@@ -61,3 +66,13 @@ val IntSize.Companion.Saver
             )
         },
     )
+
+fun <I, O> ManagedActivityResultLauncher<I, O>.safeLaunch(
+    context: Context,
+    input: I,
+    options: ActivityOptionsCompat? = null,
+) = try {
+    launch(input, options)
+} catch (e: ActivityNotFoundException) {
+    context.toast(context.getString(R.string.target_activity_not_found))
+}
