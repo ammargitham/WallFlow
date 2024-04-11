@@ -357,4 +357,8 @@
 \nİşaretledikten sonra, ayarlardaki otomatik duvar kağıdı kaynaklarında \'Açık / Koyu duvar kağıtları kullan\' seçeneğini etkinleştirin.</string>
     <string name="download_location">İndirme konumu</string>
     <string name="no_light_dark_found">Açık/Koyu duvar kağıdı bulunamadı</string>
+    <string name="use_same_freq_homescreen_lockscreen">Ana ekran ve kilit ekranı için aynı sıklığı kullan</string>
+    <string name="current_target_disabled">Geçerli duvar kağıdı hedefi tercihlerde devre dışı bırakıldı</string>
+    <string name="target_activity_not_found">Hedef etkinlik bulunamadı</string>
+    <string name="next_run_approximate">Sonraki çalışma (yaklaşık)</string>
 </resources>
