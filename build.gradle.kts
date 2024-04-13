@@ -30,7 +30,8 @@ subprojects {
     tasks.withType<KotlinCompile>().configureEach {
         kotlinOptions {
             val pluginPrefix = "plugin:androidx.compose.compiler.plugins.kotlin"
-            val destination = "${project.buildDir.absolutePath}/compose_compiler"
+            val buildDirPath = layout.buildDirectory.asFile.get().absolutePath
+            val destination = "${buildDirPath}/compose_compiler"
             if (project.findProperty("composeCompilerReports") == "true") {
                 freeCompilerArgs += listOf(
                     "-P",
