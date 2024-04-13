@@ -1,0 +1,8 @@
+What's New
+* Auto wallpaper will choose next wallpaper in sequence instead of random to prevent re-using previous wallpapers
+* Allow separate frequency for home and lock screen in auto wallpaper
+
+Bug Fixes
+* Fix incorrect UI state when setting saved and local folders in Auto wallpaper sources
+* Handle crash if Files app is disabled when trying to choose a local directory or file
+* Fix UI logic for 'Set to' dialog
