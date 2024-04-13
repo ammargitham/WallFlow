@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="wallhaven_api_key_desc">Необхідно для перегляду вмісту NSFW.</string>
+    <string name="confirm">Підтвердити</string>
+    <string name="dismiss">Відхилити</string>
+    <string name="popular_tags">Популярні теги</string>
+    <string name="info">Інформація</string>
+    <string name="apply_wallpaper">Нанести шпалери</string>
+    <string name="more">Більше</string>
+    <string name="settings">Налаштування</string>
+    <string name="back">Назад</string>
+    <string name="wallhaven_api_key">Ключ API Wallhaven</string>
+    <string name="favorites">Вибрані</string>
+    <string name="top">Популярні</string>
+    <string name="three_days">3 дні</string>
+    <string name="app_name">WallFlow</string>
+    <string name="home">Головна</string>
+    <string name="download">Завантажити</string>
+    <string name="date_added">Дата додавання</string>
+    <string name="relevance">Актуальність</string>
+    <string name="random">Випадкові</string>
+    <string name="views">Перегляди</string>
+    <string name="one_day">1 день</string>
+</resources>
