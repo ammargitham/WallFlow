@@ -41,20 +41,9 @@ fun AutoWallpaperSetToDialog(
     var localSelectedTargets by remember(selectedTargets) {
         mutableStateOf(selectedTargets)
     }
-    // var localSetDifferentWallpapers by remember(setDifferentWallpapers) {
-    //     mutableStateOf(setDifferentWallpapers)
-    // }
 
     fun toggleTarget(target: WallpaperTarget) {
-        localSelectedTargets = if (target in localSelectedTargets) {
-            localSelectedTargets - target
-        } else {
-            localSelectedTargets + target
-        }
-    }
-
-    fun addOrRemoveTarget(target: WallpaperTarget, add: Boolean = false) {
-        localSelectedTargets = if (add) {
+        localSelectedTargets = if (target !in localSelectedTargets) {
             localSelectedTargets + target
         } else {
             localSelectedTargets - target
@@ -69,39 +58,15 @@ fun AutoWallpaperSetToDialog(
             title = { Text(text = stringResource(R.string.set_to)) },
             text = {
                 Column {
-                    ListItem(
-                        modifier = Modifier
-                            .clickable { toggleTarget(WallpaperTarget.HOME) }
-                            .padding(horizontal = 8.dp),
-                        colors = ListItemDefaults.colors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                        ),
-                        headlineContent = { Text(text = stringResource(R.string.home_screen)) },
-                        leadingContent = {
-                            Checkbox(
-                                modifier = Modifier.size(24.dp),
-                                checked = WallpaperTarget.HOME in localSelectedTargets,
-                                onCheckedChange = { addOrRemoveTarget(WallpaperTarget.HOME, it) },
-                            )
-                        },
+                    WallpaperTargetItem(
+                        target = WallpaperTarget.HOME,
+                        localSelectedTargets = localSelectedTargets,
+                        onClick = { toggleTarget(WallpaperTarget.HOME) },
                     )
-                    ListItem(
-                        modifier = Modifier
-                            .clickable { toggleTarget(WallpaperTarget.LOCKSCREEN) }
-                            .padding(horizontal = 8.dp),
-                        colors = ListItemDefaults.colors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
-                        ),
-                        headlineContent = { Text(text = stringResource(R.string.lock_screen)) },
-                        leadingContent = {
-                            Checkbox(
-                                modifier = Modifier.size(24.dp),
-                                checked = WallpaperTarget.LOCKSCREEN in localSelectedTargets,
-                                onCheckedChange = {
-                                    addOrRemoveTarget(WallpaperTarget.LOCKSCREEN, it)
-                                },
-                            )
-                        },
+                    WallpaperTargetItem(
+                        target = WallpaperTarget.LOCKSCREEN,
+                        localSelectedTargets = localSelectedTargets,
+                        onClick = { toggleTarget(WallpaperTarget.LOCKSCREEN) },
                     )
                 }
             },
@@ -119,6 +84,40 @@ fun AutoWallpaperSetToDialog(
             },
         )
     }
+}
+
+@Composable
+private fun WallpaperTargetItem(
+    target: WallpaperTarget,
+    localSelectedTargets: Set<WallpaperTarget>,
+    onClick: () -> Unit = {},
+) {
+    ListItem(
+        modifier = Modifier
+            .clickable(onClick = onClick)
+            .padding(horizontal = 8.dp),
+        colors = ListItemDefaults.colors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
+        ),
+        headlineContent = {
+            Text(
+                text = stringResource(
+                    when (target) {
+                        WallpaperTarget.HOME -> R.string.home_screen
+                        WallpaperTarget.LOCKSCREEN -> R.string.lock_screen
+                    },
+                ),
+            )
+        },
+        leadingContent = {
+            Checkbox(
+                modifier = Modifier.size(24.dp),
+                enabled = localSelectedTargets.size > 1 || target !in localSelectedTargets,
+                checked = target in localSelectedTargets,
+                onCheckedChange = { onClick() },
+            )
+        },
+    )
 }
 
 @Preview
