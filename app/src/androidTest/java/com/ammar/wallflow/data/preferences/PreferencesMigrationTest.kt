@@ -28,7 +28,7 @@ class PreferencesMigrationTest {
     private val testDispatcher = StandardTestDispatcher()
 
     private fun TestScope.dataStore() = PreferenceDataStoreFactory.create(
-        scope = this,
+        scope = this.backgroundScope,
         produceFile = { context.preferencesDataStoreFile(TEST_DATASTORE_NAME) },
     )
 

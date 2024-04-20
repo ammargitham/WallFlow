@@ -945,7 +945,7 @@ class AutoWallpaperTest {
     }
 
     private fun TestScope.dataStore() = PreferenceDataStoreFactory.create(
-        scope = this,
+        scope = this.backgroundScope,
         produceFile = { context.preferencesDataStoreFile(TEST_DATASTORE_NAME) },
     )
 
