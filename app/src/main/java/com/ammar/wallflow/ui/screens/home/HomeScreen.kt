@@ -325,26 +325,12 @@ fun HomeScreen(
             onFullWallpaperDownloadPermissionsGranted = viewerViewModel::download,
         )
 
-        // PullRefreshIndicator(
-        //     modifier = Modifier
-        //         .align(Alignment.TopCenter)
-        //         .offset(y = SearchBar.Defaults.height - 8.dp),
-        //     refreshing = showRefreshingIndicator,
-        //     // refreshing = true,
-        //     state = refreshState,
-        // )
         if (showRefreshingIndicator || refreshState.progress > 0) {
             PullToRefreshContainer(
                 modifier = Modifier
                     .align(Alignment.TopCenter)
                     .offset(y = SearchBar.Defaults.height - 8.dp),
                 state = refreshState,
-                // contentColor = MaterialTheme.colorScheme.onSurface,
-                // indicator = if (showRefreshingIndicator) {
-                //     { PullToRefreshDefaults.Indicator(state = it) }
-                // } else {
-                //     {}
-                // },
             )
         }
     }

@@ -1,6 +1,5 @@
 package com.ammar.wallflow.ui.screens.home
 
-import android.annotation.SuppressLint
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -189,7 +188,6 @@ private fun HomeScreenContent(
     }
 }
 
-@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @Composable
 private fun Feed(
     wallpapers: LazyPagingItems<Wallpaper>,
@@ -207,8 +205,8 @@ private fun Feed(
     isHome: Boolean = true,
     showFAB: Boolean = true,
     header: (LazyStaggeredGridScope.() -> Unit)? = null,
-    onWallpaperClick: (wallpaper: Wallpaper) -> Unit = {},
-    onWallpaperFavoriteClick: (wallpaper: Wallpaper) -> Unit = {},
+    onWallpaperClick: (Wallpaper) -> Unit = {},
+    onWallpaperFavoriteClick: (Wallpaper) -> Unit = {},
     onFABClick: () -> Unit = {},
 ) {
     val gridState = wallpapers.rememberLazyStaggeredGridState()
@@ -250,7 +248,9 @@ private fun Feed(
         },
     ) {
         WallpaperStaggeredGrid(
-            modifier = Modifier.testTag("home:feed"),
+            modifier = Modifier
+                .testTag("home:feed")
+                .padding(it),
             state = gridState,
             contentPadding = contentPadding,
             wallpapers = wallpapers,

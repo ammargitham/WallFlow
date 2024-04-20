@@ -82,7 +82,6 @@ fun MainActivityContent(
             ) {
                 content(it)
             }
-            searchBar()
             if (globalErrors.isNotEmpty()) {
                 GlobalErrorsColumn(
                     modifier = Modifier
@@ -116,6 +115,7 @@ fun MainActivityContent(
                     onItemClick = onBottomBarItemClick,
                 )
             }
+            searchBar()
         }
     }
 }

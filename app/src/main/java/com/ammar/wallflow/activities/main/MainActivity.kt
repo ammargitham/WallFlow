@@ -325,7 +325,6 @@ class MainActivity : ComponentActivity() {
                                             },
                                         )
                                     }
-                                    bottomBarController.update { it.copy(visible = !active) }
                                 }
                                 searchBarControllerState.onActiveChange(active)
                             },
