@@ -21,6 +21,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
@@ -256,7 +257,7 @@ private fun FrequencyInputField(
             null
         },
         keyboardOptions = KeyboardOptions(
-            autoCorrect = false,
+            autoCorrectEnabled = false,
             keyboardType = KeyboardType.Number,
             imeAction = ImeAction.Done,
         ),
@@ -288,7 +289,9 @@ private fun FrequencyInputField(
             ) {
                 Row {
                     Text(
-                        modifier = Modifier.menuAnchor(),
+                        modifier = Modifier.menuAnchor(
+                            type = MenuAnchorType.PrimaryNotEditable,
+                        ),
                         text = chronoUnitString(selectedChronoUnit),
                     )
                     ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)

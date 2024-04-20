@@ -43,6 +43,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -629,7 +630,9 @@ internal fun RatioFilter(
         TagInputField(
             modifier = Modifier
                 .fillMaxWidth()
-                .menuAnchor(),
+                .menuAnchor(
+                    type = MenuAnchorType.PrimaryNotEditable,
+                ),
             readOnly = true,
             tags = ratios,
             showTagClearAction = false,
@@ -1193,7 +1196,7 @@ fun CustomResolutionDialog(
                             }
                         },
                     keyboardOptions = KeyboardOptions(
-                        autoCorrect = false,
+                        autoCorrectEnabled = false,
                         keyboardType = KeyboardType.Number,
                         imeAction = ImeAction.Next,
                     ),
@@ -1222,7 +1225,7 @@ fun CustomResolutionDialog(
                             }
                         },
                     keyboardOptions = KeyboardOptions(
-                        autoCorrect = false,
+                        autoCorrectEnabled = false,
                         keyboardType = KeyboardType.Number,
                         imeAction = ImeAction.Done,
                     ),

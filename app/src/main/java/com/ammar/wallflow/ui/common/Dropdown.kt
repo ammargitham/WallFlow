@@ -8,6 +8,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -47,7 +48,9 @@ fun <T> Dropdown(
         onExpandedChange = { expanded = !expanded },
     ) {
         OutlinedTextField(
-            modifier = Modifier.menuAnchor(),
+            modifier = Modifier.menuAnchor(
+                type = MenuAnchorType.PrimaryNotEditable,
+            ),
             readOnly = true,
             value = selectedOption?.text ?: "",
             onValueChange = {},
@@ -155,7 +158,9 @@ fun <T> DropdownMultiple(
         onExpandedChange = { expanded = !expanded },
     ) {
         TagInputField(
-            modifier = Modifier.menuAnchor(),
+            modifier = Modifier.menuAnchor(
+                type = MenuAnchorType.PrimaryNotEditable,
+            ),
             readOnly = true,
             tags = selectedOptions,
             label = label,

@@ -230,7 +230,7 @@ fun <T> TagInputField(
                         bottom = if (tags.isNotEmpty()) 0.dp else 16.dp,
                     ),
                     container = {
-                        OutlinedTextFieldDefaults.ContainerBox(
+                        OutlinedTextFieldDefaults.Container(
                             enabled = enabled,
                             isError = localIsError,
                             interactionSource = interactionSource,

@@ -2,7 +2,6 @@ package com.ammar.wallflow.ui.screens.settings.layout
 
 import android.content.res.Configuration
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -32,6 +31,7 @@ import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Surface
@@ -87,7 +87,6 @@ private val resolutions = COMMON_RESOLUTIONS.values
     .take(15)
     .toList()
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun LayoutPreview(
     modifier: Modifier = Modifier,
@@ -200,7 +199,7 @@ internal fun LayoutPreview(
                     items(resolutions) { resolution ->
                         Box(
                             modifier = Modifier
-                                .animateItemPlacement()
+                                .animateItem()
                                 .clip(RoundedCornerShape(corner = CornerSize(cornerRadiusPx)))
                                 .background(MaterialTheme.colorScheme.onSurfaceVariant)
                                 .fillMaxWidth()
@@ -282,7 +281,9 @@ internal fun LazyListScope.gridTypeSection(
                 ) {
                     OutlinedTextField(
                         modifier = Modifier
-                            .menuAnchor()
+                            .menuAnchor(
+                                type = MenuAnchorType.PrimaryNotEditable,
+                            )
                             .fillMaxWidth(0.5f),
                         readOnly = true,
                         value = options[gridType] ?: "",
@@ -355,7 +356,9 @@ internal fun LazyListScope.gridColTypeSection(
                 ) {
                     OutlinedTextField(
                         modifier = Modifier
-                            .menuAnchor()
+                            .menuAnchor(
+                                type = MenuAnchorType.PrimaryNotEditable,
+                            )
                             .fillMaxWidth(0.5f),
                         readOnly = true,
                         value = options[gridColType] ?: "",

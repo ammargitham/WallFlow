@@ -42,7 +42,7 @@ fun GlobalErrorsColumn(
                 else -> ({})
             }
             SingleLineError(
-                modifier = Modifier.animateItemPlacement(),
+                modifier = Modifier.animateItem(),
                 errorMsg = errorMsg,
                 actionText = actionText,
                 onActionClick = onActionClick,

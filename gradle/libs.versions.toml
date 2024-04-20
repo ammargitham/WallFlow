@@ -3,15 +3,15 @@ aboutLibraries = "11.1.3"
 accompanist = "0.35.0-alpha"
 androidGradlePlugin = "8.3.2"
 androidToolsDesugar = "2.0.4"
-androidxActivity = "1.8.2"
-androidxBenchmark = "1.2.3"
+androidxActivity = "1.9.0"
+androidxBenchmark = "1.2.4"
 # @keep
-androidxComposeCompiler = "1.5.11"
-androidxComposeMaterial3 = "1.3.0-alpha04"
+androidxComposeCompiler = "1.5.12"
+androidxComposeMaterial3 = "1.3.0-alpha05"
 androidxComposeRuntimeTracing = "1.0.0-beta01"
-androidxComposeUi = "1.6.5"
-androidxCore = "1.12.0"
-androidxDatastore = "1.0.0"
+androidxComposeUi = "1.6.6"
+androidxCore = "1.13.0"
+androidxDatastore = "1.1.0"
 androidXExifInterface = "1.3.7"
 androidxHilt = "1.2.0"
 androidxLifecycle = "2.7.0"
@@ -30,7 +30,7 @@ cloudy = "0.1.2"
 coil = "2.6.0"
 coroutines = "1.8.0"
 composeDestinations = "1.10.2"
-daggerHilt = "2.51.1"
+dagger = "2.51.1"
 documentFileCompat = "1.0.8"
 #easycrop = "0.1.1"
 easycrop-fork = "0.2.0"
@@ -43,15 +43,15 @@ kotlinxSerializationJson = "1.6.3"
 ksp = "1.9.23-1.0.20"
 # @keep
 ktlint = "0.50.0"
-leakcanary = "2.13"
+leakcanary = "2.14"
 mockk = "1.13.10"
 partial = "1.2.0"
 okhttp = "4.12.0"
 retrofit = "2.11.0"
 spotless = "6.25.0"
-telephoto = "0.9.0"
+telephoto = "0.10.0"
+tensorflow = "2.16.1"
 tflite = "0.4.4"
-tflite-gpu = "2.14.0"
 
 [libraries]
 about-libraries-core = { module = "com.mikepenz:aboutlibraries-core", version.ref = "aboutLibraries" }
@@ -103,9 +103,9 @@ compose-destinations-ksp = { module = "io.github.raamcosta.compose-destinations:
 documentfilecompat = { module = "com.lazygeniouz:dfc", version.ref = "documentFileCompat" }
 #easycrop = { module = "io.github.mr0xf00:easycrop", version.ref = "easycrop" }
 easycrop-fork = { module = "com.github.ammargitham:easycrop", version.ref = "easycrop-fork" }
-hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "daggerHilt" }
-hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "daggerHilt" }
-hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "daggerHilt" }
+hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "dagger" }
+hilt-android-compiler = { module = "com.google.dagger:hilt-android-compiler", version.ref = "dagger" }
+hilt-android-testing = { module = "com.google.dagger:hilt-android-testing", version.ref = "dagger" }
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
 junit = { module = "junit:junit", version.ref = "junit" }
 kotlin-test-junit = { module = "org.jetbrains.kotlin:kotlin-test-junit", version.ref = "kotlin" }
@@ -121,8 +121,8 @@ partial-ksp = { module = "io.github.materiiapps:partial-ksp", version.ref = "par
 retrofit-core = { module = "com.squareup.retrofit2:retrofit", version.ref = "retrofit" }
 retrofit-kotlinx-serialization = { module = "com.squareup.retrofit2:converter-kotlinx-serialization", version.ref = "retrofit" }
 telephoto-zoomable-image-coil = { module = "me.saket.telephoto:zoomable-image-coil", version.ref = "telephoto" }
-tflite-gpu = { module = "org.tensorflow:tensorflow-lite-gpu", version.ref = "tflite-gpu" }
-tflite-gpu-api = { module = "org.tensorflow:tensorflow-lite-gpu-api", version.ref = "tflite-gpu" }
+tflite-gpu = { module = "org.tensorflow:tensorflow-lite-gpu", version.ref = "tensorflow" }
+tflite-gpu-api = { module = "org.tensorflow:tensorflow-lite-gpu-api", version.ref = "tensorflow" }
 tflite-gpu-delegate-plugin = { module = "org.tensorflow:tensorflow-lite-gpu-delegate-plugin", version.ref = "tflite" }
 tflite-task-vision = { module = "org.tensorflow:tensorflow-lite-task-vision", version.ref = "tflite" }
 
@@ -131,7 +131,7 @@ about-libraries = { id = "com.mikepenz.aboutlibraries.plugin", version.ref = "ab
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 android-test = { id = "com.android.test", version.ref = "androidGradlePlugin" }
 baselineprofile = { id = "androidx.baselineprofile", version.ref = "androidxBenchmark" }
-hilt-gradle = { id = "com.google.dagger.hilt.android", version.ref = "daggerHilt" }
+hilt-gradle = { id = "com.google.dagger.hilt.android", version.ref = "dagger" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlinx-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }

@@ -257,36 +257,46 @@ object SearchBar {
                 modifier = modifier
                     .windowInsetsPadding(topWindowInsets)
                     .align(Alignment.TopStart),
-                query = query,
-                onQueryChange = onQueryChange,
-                onSearch = onSearch,
-                active = active,
-                onActiveChange = onActiveChange,
-                placeholder = placeholder,
-                leadingIcon = leadingIcon,
-                trailingIcon = trailingIcon,
-                enabled = enabled,
+                inputField = {
+                    SearchBarDefaults.InputField(
+                        query = query,
+                        onQueryChange = onQueryChange,
+                        onSearch = onSearch,
+                        expanded = active,
+                        onExpandedChange = onActiveChange,
+                        placeholder = placeholder,
+                        leadingIcon = leadingIcon,
+                        trailingIcon = trailingIcon,
+                        enabled = enabled,
+                    )
+                },
+                expanded = active,
+                onExpandedChange = onActiveChange,
                 content = content,
             )
         } else {
             MaterialSearchBar(
                 modifier = modifier.align(Alignment.TopCenter),
-                query = query,
-                onQueryChange = onQueryChange,
-                onSearch = onSearch,
-                active = active,
-                onActiveChange = onActiveChange,
-                placeholder = placeholder,
-                leadingIcon = leadingIcon,
-                trailingIcon = trailingIcon,
-                enabled = enabled,
+                inputField = {
+                    SearchBarDefaults.InputField(
+                        query = query,
+                        onQueryChange = onQueryChange,
+                        onSearch = onSearch,
+                        expanded = active,
+                        onExpandedChange = onActiveChange,
+                        placeholder = placeholder,
+                        leadingIcon = leadingIcon,
+                        trailingIcon = trailingIcon,
+                        enabled = enabled,
+                        colors = SearchBarDefaults.inputFieldColors(
+                            disabledLeadingIconColor = MaterialTheme.colorScheme.onSurface,
+                            disabledTrailingIconColor = MaterialTheme.colorScheme.onSurface,
+                        ),
+                    )
+                },
+                expanded = active,
+                onExpandedChange = onActiveChange,
                 content = content,
-                colors = SearchBarDefaults.colors(
-                    inputFieldColors = SearchBarDefaults.inputFieldColors(
-                        disabledLeadingIconColor = MaterialTheme.colorScheme.onSurface,
-                        disabledTrailingIconColor = MaterialTheme.colorScheme.onSurface,
-                    ),
-                ),
             )
         }
     }
