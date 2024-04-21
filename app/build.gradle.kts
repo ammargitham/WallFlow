@@ -48,7 +48,7 @@ android {
             }
         }
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.ammar.wallflow.HiltTestRunner"
 
         ksp {
             arg("room.generateKotlin", "true")
