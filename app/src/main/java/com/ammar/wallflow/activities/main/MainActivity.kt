@@ -55,6 +55,7 @@ import com.ammar.wallflow.model.search.WallhavenSearch
 import com.ammar.wallflow.model.search.WallhavenTagSearchMeta
 import com.ammar.wallflow.model.search.WallhavenUploaderSearchMeta
 import com.ammar.wallflow.navArgs
+import com.ammar.wallflow.navigation.MainNavigation
 import com.ammar.wallflow.ui.common.DefaultSystemController
 import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.SearchBar

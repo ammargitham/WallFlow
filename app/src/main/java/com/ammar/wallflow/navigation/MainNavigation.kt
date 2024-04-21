@@ -1,4 +1,4 @@
-package com.ammar.wallflow.activities.main
+package com.ammar.wallflow.navigation
 
 import androidx.compose.animation.core.animateValueAsState
 import androidx.compose.animation.core.tween
