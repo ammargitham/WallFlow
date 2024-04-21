@@ -28,7 +28,6 @@ import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.TopBar
 import com.ammar.wallflow.ui.common.bottomWindowInsets
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
-import com.ammar.wallflow.ui.common.mainsearch.LocalMainSearchBarController
 import com.ammar.wallflow.utils.backupFileName
 import com.ramcosta.composedestinations.annotation.Destination
 
@@ -45,7 +44,6 @@ fun BackupRestoreScreen(
     viewModel: BackupRestoreViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val searchBarController = LocalMainSearchBarController.current
     val systemController = LocalSystemController.current
     val bottomBarController = LocalBottomBarController.current
     val context = LocalContext.current
@@ -66,10 +64,6 @@ fun BackupRestoreScreen(
         viewModel.setRestoreFile(
             it ?: return@rememberLauncherForActivityResult,
         )
-    }
-
-    LaunchedEffect(Unit) {
-        searchBarController.update { it.copy(visible = false) }
     }
 
     LaunchedEffect(systemState.isExpanded) {

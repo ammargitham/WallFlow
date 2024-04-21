@@ -56,7 +56,6 @@ fun MainActivityContent(
     bottomBarVisible: Boolean = true,
     bottomBarSize: IntSize = IntSize.Zero,
     showLocalTab: Boolean = true,
-    searchBar: @Composable () -> Unit = {},
     onFixWallHavenApiKeyClick: () -> Unit = {},
     onDismissGlobalError: (error: GlobalError) -> Unit = {},
     onBottomBarSizeChanged: (size: IntSize) -> Unit = {},
@@ -115,7 +114,6 @@ fun MainActivityContent(
                     onItemClick = onBottomBarItemClick,
                 )
             }
-            searchBar()
         }
     }
 }

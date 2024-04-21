@@ -60,7 +60,6 @@ import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.TopBar
 import com.ammar.wallflow.ui.common.bottomWindowInsets
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
-import com.ammar.wallflow.ui.common.mainsearch.LocalMainSearchBarController
 import com.ammar.wallflow.ui.common.permissions.DownloadPermissionsRationalDialog
 import com.ammar.wallflow.ui.common.permissions.MultiplePermissionItem
 import com.ammar.wallflow.ui.common.permissions.checkSetWallpaperPermission
@@ -118,7 +117,6 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val searchBarController = LocalMainSearchBarController.current
     val bottomBarController = LocalBottomBarController.current
     val context = LocalContext.current
     val systemController = LocalSystemController.current
@@ -183,10 +181,6 @@ fun SettingsScreen(
         getPublicDownloadsDir().absolutePath
     } else {
         getRealPath(context, prefsDownloadLocationUri) ?: prefsDownloadLocationUri.toString()
-    }
-
-    LaunchedEffect(Unit) {
-        searchBarController.update { it.copy(visible = false) }
     }
 
     LaunchedEffect(systemState.isExpanded) {

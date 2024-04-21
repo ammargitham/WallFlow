@@ -36,7 +36,6 @@ import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.TopBar
 import com.ammar.wallflow.ui.common.bottomWindowInsets
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
-import com.ammar.wallflow.ui.common.mainsearch.LocalMainSearchBarController
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import com.ramcosta.composedestinations.annotation.Destination
 
@@ -49,14 +48,9 @@ fun LayoutSettingsScreen(
     viewModel: LayoutSettingsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val searchBarController = LocalMainSearchBarController.current
     val bottomBarController = LocalBottomBarController.current
     val systemController = LocalSystemController.current
     val systemState by systemController.state
-
-    LaunchedEffect(Unit) {
-        searchBarController.update { it.copy(visible = false) }
-    }
 
     LaunchedEffect(systemState.isExpanded) {
         bottomBarController.update { it.copy(visible = systemState.isExpanded) }

@@ -18,7 +18,6 @@ import com.ammar.wallflow.NavGraphs
 import com.ammar.wallflow.navigation.AppNavGraphs
 import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
-import com.ammar.wallflow.ui.common.mainsearch.LocalMainSearchBarController
 import com.ammar.wallflow.ui.common.topWindowInsets
 import com.ramcosta.composedestinations.DestinationsNavHost
 import com.ramcosta.composedestinations.annotation.Destination
@@ -33,7 +32,6 @@ import com.ramcosta.composedestinations.utils.startDestination
 fun MoreScreen(
     navController: NavController,
 ) {
-    val searchBarController = LocalMainSearchBarController.current
     val bottomBarController = LocalBottomBarController.current
     val systemController = LocalSystemController.current
     val systemState by systemController.state
@@ -77,7 +75,6 @@ fun MoreScreen(
     }
 
     LaunchedEffect(Unit) {
-        searchBarController.update { it.copy(visible = false) }
         bottomBarController.update { it.copy(visible = true) }
     }
 

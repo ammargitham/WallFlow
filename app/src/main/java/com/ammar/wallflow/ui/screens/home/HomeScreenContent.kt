@@ -1,6 +1,9 @@
 package com.ammar.wallflow.ui.screens.home
 
 import android.content.res.Configuration
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
@@ -81,6 +84,7 @@ internal fun HomeScreenContent(
     showFullWallpaperInfo: Boolean = false,
     isFullWallpaperFavorite: Boolean = false,
     fullWallpaperLightDarkTypeFlags: Int = LightDarkType.UNSPECIFIED,
+    searchBar: @Composable () -> Unit = {},
     header: (LazyStaggeredGridScope.() -> Unit)? = null,
     onWallpaperClick: (wallpaper: Wallpaper) -> Unit = {},
     onWallpaperFavoriteClick: (wallpaper: Wallpaper) -> Unit = {},
@@ -113,6 +117,7 @@ internal fun HomeScreenContent(
                 lightDarkList = lightDarkList,
                 blurSketchy = blurSketchy,
                 blurNsfw = blurNsfw,
+                searchBar = searchBar,
                 header = header,
                 selectedWallpaper = selectedWallpaper,
                 showSelection = isExpanded,
@@ -204,6 +209,7 @@ private fun Feed(
     selectedWallpaper: Wallpaper? = null,
     isHome: Boolean = true,
     showFAB: Boolean = true,
+    searchBar: @Composable () -> Unit = {},
     header: (LazyStaggeredGridScope.() -> Unit)? = null,
     onWallpaperClick: (Wallpaper) -> Unit = {},
     onWallpaperFavoriteClick: (Wallpaper) -> Unit = {},
@@ -214,7 +220,15 @@ private fun Feed(
         modifier = modifier,
         contentWindowInsets = WindowInsets(0.dp),
         floatingActionButton = {
-            if (showFAB) {
+            AnimatedVisibility(
+                visible = showFAB,
+                enter = slideInVertically(
+                    initialOffsetY = { it / 2 },
+                ),
+                exit = slideOutVertically(
+                    targetOffsetY = { it / 2 },
+                ),
+            ) {
                 val isFabExpanded by remember(gridState) {
                     derivedStateOf { gridState.firstVisibleItemIndex == 0 }
                 }
@@ -247,30 +261,35 @@ private fun Feed(
             }
         },
     ) {
-        WallpaperStaggeredGrid(
-            modifier = Modifier
-                .testTag("home:feed")
-                .padding(it),
-            state = gridState,
-            contentPadding = contentPadding,
-            wallpapers = wallpapers,
-            favorites = favorites,
-            viewedList = viewedList,
-            viewedWallpapersLook = viewedWallpapersLook,
-            lightDarkList = lightDarkList,
-            blurSketchy = blurSketchy,
-            blurNsfw = blurNsfw,
-            header = header,
-            selectedWallpaper = selectedWallpaper,
-            showSelection = showSelection,
-            gridType = layoutPreferences.gridType,
-            gridColType = layoutPreferences.gridColType,
-            gridColCount = layoutPreferences.gridColCount,
-            gridColMinWidthPct = layoutPreferences.gridColMinWidthPct,
-            roundedCorners = layoutPreferences.roundedCorners,
-            onWallpaperClick = onWallpaperClick,
-            onWallpaperFavoriteClick = onWallpaperFavoriteClick,
-        )
+        Box(
+            modifier = Modifier.fillMaxSize(),
+        ) {
+            WallpaperStaggeredGrid(
+                modifier = Modifier
+                    .testTag("home:feed")
+                    .padding(it),
+                state = gridState,
+                contentPadding = contentPadding,
+                wallpapers = wallpapers,
+                favorites = favorites,
+                viewedList = viewedList,
+                viewedWallpapersLook = viewedWallpapersLook,
+                lightDarkList = lightDarkList,
+                blurSketchy = blurSketchy,
+                blurNsfw = blurNsfw,
+                header = header,
+                selectedWallpaper = selectedWallpaper,
+                showSelection = showSelection,
+                gridType = layoutPreferences.gridType,
+                gridColType = layoutPreferences.gridColType,
+                gridColCount = layoutPreferences.gridColCount,
+                gridColMinWidthPct = layoutPreferences.gridColMinWidthPct,
+                roundedCorners = layoutPreferences.roundedCorners,
+                onWallpaperClick = onWallpaperClick,
+                onWallpaperFavoriteClick = onWallpaperFavoriteClick,
+            )
+            searchBar()
+        }
     }
 }
 

@@ -252,8 +252,14 @@ class HomeViewModel @Inject constructor(
         )
     }
 
-    fun showSavedSearches(show: Boolean = true) = localUiState.update {
-        it.copy(showSavedSearchesDialog = partial(show))
+    fun showSavedSearches(
+        show: Boolean = true,
+        isFromSearchBar: Boolean = false,
+    ) = localUiState.update {
+        it.copy(
+            showSavedSearchesDialog = partial(show),
+            showSavedSearchesForSearchBar = partial(isFromSearchBar),
+        )
     }
 
     fun toggleFavorite(wallpaper: Wallpaper) = viewModelScope.launch {
@@ -397,6 +403,7 @@ data class HomeUiState(
     val showNSFW: Boolean = false,
     val selectedWallpaper: Wallpaper? = null,
     val showSavedSearchesDialog: Boolean = false,
+    val showSavedSearchesForSearchBar: Boolean = false,
     val layoutPreferences: LayoutPreferences = LayoutPreferences(),
     val favorites: ImmutableList<Favorite> = persistentListOf(),
     val viewedList: ImmutableList<Viewed> = persistentListOf(),

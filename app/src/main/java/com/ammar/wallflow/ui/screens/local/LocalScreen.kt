@@ -29,7 +29,6 @@ import com.ammar.wallflow.navigation.AppNavGraphs
 import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.bottomWindowInsets
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
-import com.ammar.wallflow.ui.common.mainsearch.LocalMainSearchBarController
 import com.ammar.wallflow.ui.common.topWindowInsets
 import com.ammar.wallflow.ui.wallpaperviewer.WallpaperViewerViewModel
 import com.ammar.wallflow.utils.applyWallpaper
@@ -53,7 +52,6 @@ fun LocalScreen(
     val wallpapers = viewModel.wallpapers.collectAsLazyPagingItems()
     val systemController = LocalSystemController.current
     val bottomBarController = LocalBottomBarController.current
-    val searchBarController = LocalMainSearchBarController.current
     val bottomWindowInsets = bottomWindowInsets
     val gridState = wallpapers.rememberLazyStaggeredGridState()
     val navigationBarsInsets = WindowInsets.navigationBars
@@ -85,7 +83,6 @@ fun LocalScreen(
     LaunchedEffect(Unit) {
         systemController.resetBarsState()
         bottomBarController.update { it.copy(visible = true) }
-        searchBarController.update { it.copy(visible = false) }
     }
 
     val onWallpaperClick: (wallpaper: Wallpaper) -> Unit = remember(systemState.isExpanded) {

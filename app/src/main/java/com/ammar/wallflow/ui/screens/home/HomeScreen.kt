@@ -7,14 +7,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -22,7 +26,10 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
@@ -32,6 +39,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -41,10 +49,12 @@ import androidx.paging.compose.collectAsLazyPagingItems
 import com.ammar.wallflow.R
 import com.ammar.wallflow.destinations.WallpaperScreenDestination
 import com.ammar.wallflow.extensions.search
+import com.ammar.wallflow.extensions.toPxF
 import com.ammar.wallflow.extensions.toast
 import com.ammar.wallflow.model.OnlineSource
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.search.RedditSearch
+import com.ammar.wallflow.model.search.Search
 import com.ammar.wallflow.model.search.SearchSaver
 import com.ammar.wallflow.model.search.WallhavenSearch
 import com.ammar.wallflow.model.search.WallhavenTagSearchMeta
@@ -56,12 +66,10 @@ import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.SearchBar
 import com.ammar.wallflow.ui.common.bottomWindowInsets
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
-import com.ammar.wallflow.ui.common.mainsearch.LocalMainSearchBarController
 import com.ammar.wallflow.ui.common.mainsearch.MainSearchBar
 import com.ammar.wallflow.ui.common.searchedit.EditSearchModalBottomSheet
 import com.ammar.wallflow.ui.common.searchedit.SaveAsDialog
 import com.ammar.wallflow.ui.common.searchedit.SavedSearchesDialog
-import com.ammar.wallflow.ui.common.topWindowInsets
 import com.ammar.wallflow.ui.screens.home.composables.FiltersBottomSheetHeader
 import com.ammar.wallflow.ui.screens.home.composables.ManageSourcesDialog
 import com.ammar.wallflow.ui.screens.home.composables.RedditInitDialog
@@ -74,6 +82,7 @@ import com.ammar.wallflow.utils.shareWallpaper
 import com.ammar.wallflow.utils.shareWallpaperUrl
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.navigate
+import kotlin.math.roundToInt
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 
@@ -85,17 +94,17 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeScreen(
     navController: NavController,
-    nestedScrollConnectionGetter: () -> NestedScrollConnection,
 ) {
     val viewModel: HomeViewModel = hiltViewModel()
     val viewerViewModel: WallpaperViewerViewModel = hiltViewModel()
+    val searchBarViewModel: SearchBarViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val viewerUiState by viewerViewModel.uiState.collectAsStateWithLifecycle()
+    val searchBarUiState by searchBarViewModel.uiState.collectAsStateWithLifecycle()
     val wallpapers = viewModel.wallpapers.collectAsLazyPagingItems()
     val refreshState = rememberPullToRefreshState()
     val showRefreshingIndicator = wallpapers.loadState.refresh == LoadState.Loading &&
         wallpapers.itemCount > 0
-    val searchBarController = LocalMainSearchBarController.current
     val bottomBarController = LocalBottomBarController.current
     val systemController = LocalSystemController.current
     val density = LocalDensity.current
@@ -112,6 +121,38 @@ fun HomeScreen(
     val clipboardManager = LocalClipboardManager.current
     var prevLoadState by remember {
         mutableStateOf(wallpapers.loadState.refresh)
+    }
+    val bottomBarState by bottomBarController.state
+
+    val searchBarQuery by remember {
+        derivedStateOf {
+            when (searchBarUiState.search.meta) {
+                is WallhavenTagSearchMeta, is WallhavenUploaderSearchMeta -> {
+                    if (searchBarUiState.active) {
+                        searchBarUiState.search.query
+                    } else {
+                        ""
+                    }
+                }
+                else -> searchBarUiState.search.query
+            }
+        }
+    }
+
+    val searchBarHeightPx = SearchBar.Defaults.height.toPxF()
+    var searchBarOffsetHeightPx by remember { mutableFloatStateOf(0f) }
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+            override fun onPreScroll(
+                available: Offset,
+                source: NestedScrollSource,
+            ): Offset {
+                val delta = available.y
+                val newOffset = searchBarOffsetHeightPx + delta
+                searchBarOffsetHeightPx = newOffset.coerceIn(-searchBarHeightPx, 0f)
+                return Offset.Zero
+            }
+        }
     }
 
     LaunchedEffect(Unit) {
@@ -133,13 +174,8 @@ fun HomeScreen(
                     subreddits = uiState.reddit.subreddits,
                 )
             }
-        searchBarController.update {
-            it.copy(
-                visible = true,
-                search = search,
-                source = uiState.selectedSource,
-            )
-        }
+        searchBarViewModel.setSearch(search)
+        searchBarViewModel.setSource(uiState.selectedSource)
     }
 
     LaunchedEffect(refreshState.isRefreshing, wallpapers.loadState.refresh) {
@@ -187,7 +223,7 @@ fun HomeScreen(
     }
 
     val onTagClick: (wallhavenTag: WallhavenTag) -> Unit = remember(
-        searchBarController.state.value.search,
+        searchBarUiState.search,
         uiState.prevMainWallhavenSearch,
     ) {
         fn@{
@@ -197,7 +233,7 @@ fun HomeScreen(
                 query = "id:${it.id}",
                 meta = WallhavenTagSearchMeta(it),
             )
-            if (searchBarController.state.value.search == search) {
+            if (searchBarUiState.search == search) {
                 return@fn
             }
             navController.search(search)
@@ -205,7 +241,7 @@ fun HomeScreen(
     }
 
     val onUploaderClick: (WallhavenUploader) -> Unit = remember(
-        searchBarController.state.value.search,
+        searchBarUiState.search,
         uiState.prevMainWallhavenSearch,
     ) {
         fn@{
@@ -215,7 +251,7 @@ fun HomeScreen(
                 query = "@${it.username}",
                 meta = WallhavenUploaderSearchMeta(uploader = it),
             )
-            if (searchBarController.state.value.search == search) {
+            if (searchBarUiState.search == search) {
                 return@fn
             }
             navController.search(search)
@@ -227,21 +263,91 @@ fun HomeScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .windowInsetsPadding(topWindowInsets)
             .nestedScroll(refreshState.nestedScrollConnection)
             .testTag("Home Screen"),
     ) {
         HomeScreenContent(
             modifier = Modifier.fillMaxSize(),
-            nestedScrollConnectionGetter = nestedScrollConnectionGetter,
+            nestedScrollConnectionGetter = { nestedScrollConnection },
             isExpanded = systemState.isExpanded,
             contentPadding = PaddingValues(
                 start = 8.dp,
                 end = 8.dp,
-                top = SearchBar.Defaults.height,
+                top = SearchBar.Defaults.height + 16.dp,
                 bottom = bottomPadding + 8.dp,
             ),
             wallpapers = wallpapers,
+            searchBar = {
+                HomeSearch(
+                    modifier = Modifier.offset {
+                        IntOffset(x = 0, y = searchBarOffsetHeightPx.roundToInt())
+                    },
+                    active = searchBarUiState.active,
+                    useDocked = systemState.isExpanded || bottomBarState.isRail,
+                    useFullWidth = systemState.isExpanded,
+                    search = searchBarUiState.search,
+                    query = searchBarQuery,
+                    suggestions = searchBarUiState.suggestions,
+                    showQuery = if (uiState.isHome) {
+                        searchBarUiState.active
+                    } else {
+                        true
+                    },
+                    onQueryChange = searchBarViewModel::setQuery,
+                    onBackClick = if (!uiState.isHome) {
+                        { navController.navigateUp() }
+                    } else {
+                        null
+                    },
+                    onSearch = {
+                        doSearch(
+                            mainSearch = uiState.mainSearch,
+                            search = it,
+                            searchBarViewModel = searchBarViewModel,
+                            navController = navController,
+                        )
+                    },
+                    onSearchChange = searchBarViewModel::setSearch,
+                    onSearchDeleteRequest = searchBarViewModel::setSearchToDelete,
+                    onActiveChange = { active ->
+                        searchBarViewModel.setActive(active)
+                        if (systemState.isExpanded || bottomBarState.isRail) {
+                            return@HomeSearch
+                        }
+                        systemController.update {
+                            it.copy(
+                                statusBarColor = if (active) {
+                                    Color.Transparent
+                                } else {
+                                    Color.Unspecified
+                                },
+                            )
+                        }
+                        bottomBarController.update {
+                            it.copy(visible = !active)
+                        }
+                    },
+                    onSaveAsClick = {
+                        val searchBarSearch = searchBarUiState.search
+                        val query = searchBarSearch.query
+                        val updated = when (searchBarSearch) {
+                            is RedditSearch -> searchBarSearch.copy(
+                                query = query,
+                            )
+                            is WallhavenSearch -> searchBarSearch.copy(
+                                query = query,
+                            )
+                        }
+                        viewModel.showSaveSearchAsDialog(updated)
+                    },
+                    onLoadClick = {
+                        viewModel.showSavedSearches(
+                            show = true,
+                            isFromSearchBar = true,
+                        )
+                    },
+                )
+            },
             header = if (uiState.isHome) {
                 {
                     header(
@@ -277,6 +383,7 @@ fun HomeScreen(
             } else {
                 null
             },
+            showFAB = !searchBarUiState.active,
             favorites = uiState.favorites,
             viewedList = uiState.viewedList,
             viewedWallpapersLook = uiState.viewedWallpapersLook,
@@ -443,8 +550,19 @@ fun HomeScreen(
                 }
             },
             onSelect = {
-                viewModel.updateHomeSearch(it.search)
-                viewModel.showSavedSearches(false)
+                if (uiState.showSavedSearchesForSearchBar) {
+                    doSearch(
+                        mainSearch = uiState.mainSearch,
+                        navController = navController,
+                        searchBarViewModel = searchBarViewModel,
+                        search = it.search,
+                    )
+                    viewModel.showSavedSearches(false)
+                    searchBarViewModel.setActive(false)
+                } else {
+                    viewModel.updateHomeSearch(it.search)
+                    viewModel.showSavedSearches(false)
+                }
             },
             onDismissRequest = { viewModel.showSavedSearches(false) },
         )
@@ -471,4 +589,35 @@ fun HomeScreen(
             onDismissRequest = { viewModel.showRedditInitDialog(false) },
         )
     }
+
+    searchBarUiState.searchToDelete?.run {
+        AlertDialog(
+            title = { Text(text = this.query) },
+            text = { Text(text = stringResource(R.string.delete_suggestion_dialog_text)) },
+            confirmButton = {
+                TextButton(onClick = searchBarViewModel::onConfirmDeleteSearch) {
+                    Text(text = stringResource(R.string.confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = searchBarViewModel::onCancelDeleteSearch) {
+                    Text(text = stringResource(R.string.cancel))
+                }
+            },
+            onDismissRequest = searchBarViewModel::onCancelDeleteSearch,
+        )
+    }
+}
+
+private fun doSearch(
+    mainSearch: Search?,
+    search: Search,
+    searchBarViewModel: SearchBarViewModel,
+    navController: NavController,
+) {
+    if (mainSearch == search) {
+        return
+    }
+    searchBarViewModel.onSearch(search)
+    navController.search(search)
 }

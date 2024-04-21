@@ -37,7 +37,6 @@ import com.ammar.wallflow.navigation.AppNavGraphs
 import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.bottomWindowInsets
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
-import com.ammar.wallflow.ui.common.mainsearch.LocalMainSearchBarController
 import com.ammar.wallflow.ui.common.mainsearch.MainSearchBar
 import com.ammar.wallflow.ui.common.topWindowInsets
 import com.ammar.wallflow.ui.wallpaperviewer.WallpaperViewerViewModel
@@ -63,7 +62,6 @@ fun CollectionsScreen(
     val context = LocalContext.current
     val systemController = LocalSystemController.current
     val bottomBarController = LocalBottomBarController.current
-    val searchBarController = LocalMainSearchBarController.current
     val systemState by systemController.state
     val bottomWindowInsets = bottomWindowInsets
     val navigationBarsInsets = WindowInsets.navigationBars
@@ -85,7 +83,6 @@ fun CollectionsScreen(
     LaunchedEffect(Unit) {
         systemController.resetBarsState()
         bottomBarController.update { it.copy(visible = true) }
-        searchBarController.update { it.copy(visible = false) }
     }
 
     val onWallpaperClick: (wallpaper: Wallpaper) -> Unit = remember(systemState.isExpanded) {
@@ -111,7 +108,6 @@ fun CollectionsScreen(
     }
 
     val onTagClick: (wallhavenTag: WallhavenTag) -> Unit = remember(
-        searchBarController.state.value.search,
         uiState.prevMainWallhavenSearch,
     ) {
         fn@{
@@ -121,15 +117,11 @@ fun CollectionsScreen(
                 query = "id:${it.id}",
                 meta = WallhavenTagSearchMeta(it),
             )
-            if (searchBarController.state.value.search == search) {
-                return@fn
-            }
             navController.search(search)
         }
     }
 
     val onUploaderClick: (WallhavenUploader) -> Unit = remember(
-        searchBarController.state.value.search,
         uiState.prevMainWallhavenSearch,
     ) {
         fn@{
@@ -139,9 +131,6 @@ fun CollectionsScreen(
                 query = "@${it.username}",
                 meta = WallhavenUploaderSearchMeta(uploader = it),
             )
-            if (searchBarController.state.value.search == search) {
-                return@fn
-            }
             navController.search(search)
         }
     }

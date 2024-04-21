@@ -30,7 +30,6 @@ import com.ammar.wallflow.model.wallhaven.WallhavenUploader
 import com.ammar.wallflow.navigation.AppNavGraphs
 import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
-import com.ammar.wallflow.ui.common.mainsearch.LocalMainSearchBarController
 import com.ammar.wallflow.ui.common.mainsearch.MainSearchBar
 import com.ammar.wallflow.ui.wallpaperviewer.WallpaperViewer
 import com.ammar.wallflow.ui.wallpaperviewer.WallpaperViewerViewModel
@@ -61,7 +60,6 @@ fun WallpaperScreen(
     val sheetColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
         BottomSheetDefaults.Elevation,
     )
-    val searchBarController = LocalMainSearchBarController.current
     val bottomBarController = LocalBottomBarController.current
     val systemController = LocalSystemController.current
     val context = LocalContext.current
@@ -83,7 +81,6 @@ fun WallpaperScreen(
     }
 
     DisposableEffect(Unit) {
-        searchBarController.update { it.copy(visible = false) }
         bottomBarController.update { it.copy(visible = false) }
         systemController.update { it.copy(applyScaffoldPadding = false) }
 
@@ -112,7 +109,6 @@ fun WallpaperScreen(
     }
 
     val onTagClick: (wallhavenTag: WallhavenTag) -> Unit = remember(
-        searchBarController.state.value.search,
         uiState.prevMainWallhavenSearch,
     ) {
         fn@{
@@ -127,7 +123,6 @@ fun WallpaperScreen(
     }
 
     val onUploaderClick: (WallhavenUploader) -> Unit = remember(
-        searchBarController.state.value.search,
         uiState.prevMainWallhavenSearch,
     ) {
         fn@{
@@ -137,9 +132,6 @@ fun WallpaperScreen(
                 query = "@${it.username}",
                 meta = WallhavenUploaderSearchMeta(uploader = it),
             )
-            if (searchBarController.state.value.search == search) {
-                return@fn
-            }
             navController.search(search)
         }
     }
