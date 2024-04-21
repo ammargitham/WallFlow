@@ -41,7 +41,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.parameters.DeepLink
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Destination<AppNavGraphs.MainGraph>(
+@Destination<AppNavGraphs.MainNavGraph>(
     deepLinks = [
         DeepLink(uriPattern = wallpaperScreenLocalDeepLinkUriPattern),
     ],

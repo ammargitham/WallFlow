@@ -34,7 +34,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.spec.DestinationStyle
 
-@Destination<AppNavGraphs.MainGraph>(
+@Destination<AppNavGraphs.MainNavGraph>(
     style = DestinationStyle.Dialog::class,
 )
 @Destination<AppNavGraphs.MoreDetailNavGraph>(

@@ -7,20 +7,20 @@ object AppNavGraphs {
     @NavHostGraph(
         defaultTransitions = MainNavHostAnimatedDestinationStyle::class,
     )
-    annotation class MainGraph
+    annotation class MainNavGraph
 
-    @NavGraph<MainGraph>(
+    @NavGraph<MainNavGraph>(
         start = true,
     )
     annotation class HomeNavGraph
 
-    @NavGraph<MainGraph>
+    @NavGraph<MainNavGraph>
     annotation class CollectionsNavGraph
 
-    @NavGraph<MainGraph>
+    @NavGraph<MainNavGraph>
     annotation class LocalNavGraph
 
-    @NavGraph<MainGraph>
+    @NavGraph<MainNavGraph>
     annotation class MoreNavGraph
 
     @NavGraph<MoreNavGraph>
