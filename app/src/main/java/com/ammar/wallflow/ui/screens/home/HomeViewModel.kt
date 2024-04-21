@@ -41,7 +41,7 @@ import com.ammar.wallflow.model.search.WallhavenSearch
 import com.ammar.wallflow.model.search.WallhavenSorting
 import com.ammar.wallflow.model.search.WallhavenTopRange
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
-import com.ammar.wallflow.ui.screens.navArgs
+import com.ammar.wallflow.navArgs
 import com.github.materiiapps.partial.Partialize
 import com.github.materiiapps.partial.getOrElse
 import com.github.materiiapps.partial.partial

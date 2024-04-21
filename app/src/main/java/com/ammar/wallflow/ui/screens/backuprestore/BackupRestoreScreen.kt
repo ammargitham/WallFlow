@@ -28,11 +28,17 @@ import com.ammar.wallflow.ui.common.TopBar
 import com.ammar.wallflow.ui.common.bottomWindowInsets
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
 import com.ammar.wallflow.ui.common.mainsearch.LocalMainSearchBarController
+import com.ammar.wallflow.ui.navigation.AppNavGraphs
 import com.ammar.wallflow.utils.backupFileName
 import com.ramcosta.composedestinations.annotation.Destination
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Destination
+@Destination<AppNavGraphs.BackupRestoreNavGraph>(
+    start = true,
+)
+@Destination<AppNavGraphs.BackupRestoreForMoreDetailNavGraph>(
+    start = true,
+)
 @Composable
 fun BackupRestoreScreen(
     navController: NavController,

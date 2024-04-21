@@ -40,6 +40,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.ammar.wallflow.MainDispatcher
 import com.ammar.wallflow.data.preferences.Theme
+import com.ammar.wallflow.destinations.HomeScreenDestination
+import com.ammar.wallflow.destinations.MainWallhavenApiKeyDialogDestination
+import com.ammar.wallflow.destinations.WallpaperScreenDestination
 import com.ammar.wallflow.extensions.search
 import com.ammar.wallflow.extensions.toPxF
 import com.ammar.wallflow.extensions.trimAll
@@ -51,6 +54,7 @@ import com.ammar.wallflow.model.search.WallhavenFilters
 import com.ammar.wallflow.model.search.WallhavenSearch
 import com.ammar.wallflow.model.search.WallhavenTagSearchMeta
 import com.ammar.wallflow.model.search.WallhavenUploaderSearchMeta
+import com.ammar.wallflow.navArgs
 import com.ammar.wallflow.ui.common.DefaultSystemController
 import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.SearchBar
@@ -66,11 +70,7 @@ import com.ammar.wallflow.ui.common.mainsearch.MainSearchBarController
 import com.ammar.wallflow.ui.common.mainsearch.MainSearchBarState
 import com.ammar.wallflow.ui.common.searchedit.SaveAsDialog
 import com.ammar.wallflow.ui.common.searchedit.SavedSearchesDialog
-import com.ammar.wallflow.ui.screens.destinations.HomeScreenDestination
-import com.ammar.wallflow.ui.screens.destinations.WallhavenApiKeyDialogDestination
-import com.ammar.wallflow.ui.screens.destinations.WallpaperScreenDestination
 import com.ammar.wallflow.ui.screens.home.HomeScreenNavArgs
-import com.ammar.wallflow.ui.screens.navArgs
 import com.ammar.wallflow.ui.theme.EdgeToEdge
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import com.ramcosta.composedestinations.navigation.navigate
@@ -353,14 +353,14 @@ class MainActivity : ComponentActivity() {
                         )
                     },
                     onFixWallHavenApiKeyClick = {
-                        navController.navigate(WallhavenApiKeyDialogDestination)
+                        navController.navigate(MainWallhavenApiKeyDialogDestination)
                     },
                     onDismissGlobalError = viewModel::dismissGlobalError,
                     onBottomBarSizeChanged = { size ->
                         bottomBarController.update { it.copy(size = size) }
                     },
                     onBottomBarItemClick = {
-                        navController.navigate(it) {
+                        navController.navigate(it.route) {
                             popUpTo(navController.graph.findStartDestination().id) {
                                 saveState = true
                             }

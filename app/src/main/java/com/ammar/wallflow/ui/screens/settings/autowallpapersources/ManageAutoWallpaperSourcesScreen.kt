@@ -43,6 +43,7 @@ import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.TopBar
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
 import com.ammar.wallflow.ui.common.mainsearch.LocalMainSearchBarController
+import com.ammar.wallflow.ui.navigation.AppNavGraphs
 import com.ammar.wallflow.ui.screens.settings.autowallpapersources.composables.FavoritesSection
 import com.ammar.wallflow.ui.screens.settings.autowallpapersources.composables.LightDarkSection
 import com.ammar.wallflow.ui.screens.settings.autowallpapersources.composables.LocalSection
@@ -55,7 +56,8 @@ import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Destination
+@Destination<AppNavGraphs.SettingsNavGraph>
+@Destination<AppNavGraphs.SettingsForMoreDetailNavGraph>
 @Composable
 fun ManageAutoWallpaperSourcesScreen(
     navController: NavController,

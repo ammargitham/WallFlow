@@ -15,7 +15,7 @@ androidxDatastore = "1.1.0"
 androidXExifInterface = "1.3.7"
 androidxHilt = "1.2.0"
 androidxLifecycle = "2.7.0"
-androidxNavigation = "2.7.7" # match with lib version in compose-destinations
+androidxNavigation = "2.8.0-alpha04" # match with lib version in compose-destinations
 androidxPaging = "3.2.1"
 androidxProfileinstaller = "1.3.1"
 androidxRoom = "2.6.1"
@@ -29,7 +29,7 @@ androidxWork = "2.9.0"
 cloudy = "0.1.2"
 coil = "2.6.0"
 coroutines = "1.8.0"
-composeDestinations = "1.10.2"
+composeDestinations = "2.1.0-beta01"
 dagger = "2.51.1"
 documentFileCompat = "1.0.8"
 #easycrop = "0.1.1"
@@ -98,7 +98,7 @@ androidx-work-ktx = { module = "androidx.work:work-runtime-ktx", version.ref = "
 androidx-work-testing = { module = "androidx.work:work-testing", version.ref = "androidxWork" }
 cloudy = { module = "com.github.skydoves:cloudy", version.ref = "cloudy" }
 coil-compose = { module = "io.coil-kt:coil-compose", version.ref = "coil" }
-compose-destinations-core = { module = "io.github.raamcosta.compose-destinations:animations-core", version.ref = "composeDestinations" }
+compose-destinations-core = { module = "io.github.raamcosta.compose-destinations:core", version.ref = "composeDestinations" }
 compose-destinations-ksp = { module = "io.github.raamcosta.compose-destinations:ksp", version.ref = "composeDestinations" }
 documentfilecompat = { module = "com.lazygeniouz:dfc", version.ref = "documentFileCompat" }
 #easycrop = { module = "io.github.mr0xf00:easycrop", version.ref = "easycrop" }

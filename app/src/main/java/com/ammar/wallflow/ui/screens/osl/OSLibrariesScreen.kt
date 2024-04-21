@@ -31,13 +31,19 @@ import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.TopBar
 import com.ammar.wallflow.ui.common.bottomWindowInsets
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
+import com.ammar.wallflow.ui.navigation.AppNavGraphs
 import com.mikepenz.aboutlibraries.Libs
 import com.mikepenz.aboutlibraries.entity.Library
 import com.mikepenz.aboutlibraries.util.withContext
 import com.ramcosta.composedestinations.annotation.Destination
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Destination
+@Destination<AppNavGraphs.OpenSourceLicensesNavGraph>(
+    start = true,
+)
+@Destination<AppNavGraphs.OpenSourceLicensesForMoreDetailNavGraph>(
+    start = true,
+)
 @Composable
 fun OSLibrariesScreen(
     navController: NavController,

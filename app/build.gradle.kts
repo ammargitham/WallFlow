@@ -52,7 +52,7 @@ android {
 
         ksp {
             arg("room.generateKotlin", "true")
-            arg("compose-destinations.generateNavGraphs", "false")
+            arg("compose-destinations.codeGenPackageName", "com.ammar.wallflow")
         }
     }
 

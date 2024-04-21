@@ -36,11 +36,13 @@ import com.ammar.wallflow.ui.common.TopBar
 import com.ammar.wallflow.ui.common.bottomWindowInsets
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
 import com.ammar.wallflow.ui.common.mainsearch.LocalMainSearchBarController
+import com.ammar.wallflow.ui.navigation.AppNavGraphs
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import com.ramcosta.composedestinations.annotation.Destination
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Destination
+@Destination<AppNavGraphs.SettingsNavGraph>
+@Destination<AppNavGraphs.SettingsForMoreDetailNavGraph>
 @Composable
 fun LayoutSettingsScreen(
     navController: NavController,

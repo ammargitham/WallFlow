@@ -44,6 +44,12 @@ import com.ammar.wallflow.R
 import com.ammar.wallflow.data.preferences.AppPreferences
 import com.ammar.wallflow.data.preferences.AutoWallpaperPreferences
 import com.ammar.wallflow.data.preferences.ObjectDetectionPreferences
+import com.ammar.wallflow.destinations.MainWallhavenApiKeyDialogDestination
+import com.ammar.wallflow.destinations.MoreDetailWallhavenApiKeyDialogDestination
+import com.ammar.wallflow.destinations.SettingsForMoreDetailLayoutSettingsScreenDestination
+import com.ammar.wallflow.destinations.SettingsForMoreDetailManageAutoWallpaperSourcesScreenDestination
+import com.ammar.wallflow.destinations.SettingsLayoutSettingsScreenDestination
+import com.ammar.wallflow.destinations.SettingsManageAutoWallpaperSourcesScreenDestination
 import com.ammar.wallflow.extensions.safeLaunch
 import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.model.ObjectDetectionModel
@@ -62,9 +68,7 @@ import com.ammar.wallflow.ui.common.permissions.rememberMultiplePermissionsState
 import com.ammar.wallflow.ui.common.permissions.shouldShowRationale
 import com.ammar.wallflow.ui.common.searchedit.EditSearchModalBottomSheet
 import com.ammar.wallflow.ui.common.searchedit.SavedSearchesDialog
-import com.ammar.wallflow.ui.screens.destinations.LayoutSettingsScreenDestination
-import com.ammar.wallflow.ui.screens.destinations.ManageAutoWallpaperSourcesScreenDestination
-import com.ammar.wallflow.ui.screens.destinations.WallhavenApiKeyDialogDestination
+import com.ammar.wallflow.ui.navigation.AppNavGraphs
 import com.ammar.wallflow.ui.screens.settings.composables.AutoWallpaperSetToDialog
 import com.ammar.wallflow.ui.screens.settings.composables.ChangeDownloadLocationDialog
 import com.ammar.wallflow.ui.screens.settings.composables.ClearViewedWallpapersConfirmDialog
@@ -102,7 +106,12 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Destination
+@Destination<AppNavGraphs.SettingsNavGraph>(
+    start = true,
+)
+@Destination<AppNavGraphs.SettingsForMoreDetailNavGraph>(
+    start = true,
+)
 @Composable
 fun SettingsScreen(
     navController: NavController,
@@ -148,7 +157,13 @@ fun SettingsScreen(
         } ?: AutoWallpaperPreferences()
         viewModel.setTempAutoWallpaperPrefs(null)
         if (!updatedAutoWallpaperPreferences.anySourceEnabled) {
-            navController.navigate(ManageAutoWallpaperSourcesScreenDestination)
+            navController.navigate(
+                if (systemState.isExpanded) {
+                    SettingsForMoreDetailManageAutoWallpaperSourcesScreenDestination
+                } else {
+                    SettingsManageAutoWallpaperSourcesScreenDestination
+                },
+            )
             return@rememberMultiplePermissionsState
         }
         viewModel.updateAutoWallpaperPrefs(updatedAutoWallpaperPreferences)
@@ -212,7 +227,13 @@ fun SettingsScreen(
             onTagsWriteTypeClick = { viewModel.showTagsWriteTypeDialog(true) },
             onDownloadLocationClick = { viewModel.showChangeDownloadLocationDialog(true) },
             onWallhavenApiKeyItemClick = {
-                navController.navigate(WallhavenApiKeyDialogDestination)
+                navController.navigate(
+                    if (systemState.isExpanded) {
+                        MoreDetailWallhavenApiKeyDialogDestination
+                    } else {
+                        MainWallhavenApiKeyDialogDestination
+                    },
+                )
             },
             onObjectDetectionPrefsChange = viewModel::updateSubjectDetectionPrefs,
             onObjectDetectionDelegateClick = { viewModel.showObjectDetectionDelegateOptions(true) },
@@ -228,8 +249,13 @@ fun SettingsScreen(
                 viewModel.updateAutoWallpaperPrefs(it)
             },
             onAutoWallpaperSourcesClick = {
-                // viewModel.showAutoWallpaperSourcesDialog(true)
-                navController.navigate(ManageAutoWallpaperSourcesScreenDestination)
+                navController.navigate(
+                    if (systemState.isExpanded) {
+                        SettingsForMoreDetailManageAutoWallpaperSourcesScreenDestination
+                    } else {
+                        SettingsManageAutoWallpaperSourcesScreenDestination
+                    },
+                )
             },
             onAutoWallpaperFrequencyClick = { viewModel.showAutoWallpaperFrequencyDialog(true) },
             onAutoWallpaperConstraintsClick = {
@@ -243,7 +269,15 @@ fun SettingsScreen(
                 viewModel.showAutoWallpaperSetToDialog(true)
             },
             onThemeClick = { viewModel.showThemeOptionsDialog(true) },
-            onLayoutClick = { navController.navigate(LayoutSettingsScreenDestination) },
+            onLayoutClick = {
+                navController.navigate(
+                    if (systemState.isExpanded) {
+                        SettingsForMoreDetailLayoutSettingsScreenDestination
+                    } else {
+                        SettingsLayoutSettingsScreenDestination
+                    },
+                )
+            },
             onShowLocalTabChange = {
                 viewModel.updateLookAndFeelPrefs(
                     uiState.appPreferences.lookAndFeelPreferences.copy(

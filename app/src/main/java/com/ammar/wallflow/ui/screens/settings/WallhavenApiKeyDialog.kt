@@ -28,12 +28,18 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import com.ammar.wallflow.R
 import com.ammar.wallflow.extensions.trimAll
+import com.ammar.wallflow.ui.navigation.AppNavGraphs
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 import com.ramcosta.composedestinations.spec.DestinationStyle
 
-@Destination(style = DestinationStyle.Dialog::class)
+@Destination<AppNavGraphs.MainGraph>(
+    style = DestinationStyle.Dialog::class,
+)
+@Destination<AppNavGraphs.MoreDetailNavGraph>(
+    style = DestinationStyle.Dialog::class,
+)
 @Composable
 fun WallhavenApiKeyDialog(
     viewModel: WallhavenApiKeyViewModel = hiltViewModel(),

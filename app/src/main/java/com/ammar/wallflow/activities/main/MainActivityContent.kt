@@ -37,11 +37,11 @@ import com.ammar.wallflow.ui.common.bottombar.BottomBar
 import com.ammar.wallflow.ui.common.bottombar.NavRail
 import com.ammar.wallflow.ui.common.globalerrors.GlobalErrorsColumn
 import com.ammar.wallflow.ui.common.topWindowInsets
-import com.ammar.wallflow.ui.screens.NavGraph
 import com.ammar.wallflow.ui.screens.home.HomeScreenContent
 import com.ammar.wallflow.ui.screens.home.composables.header
 import com.ammar.wallflow.ui.screens.home.composables.wallhavenHeader
 import com.ammar.wallflow.ui.theme.WallFlowTheme
+import com.ramcosta.composedestinations.spec.Route
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.flowOf
@@ -60,7 +60,7 @@ fun MainActivityContent(
     onFixWallHavenApiKeyClick: () -> Unit = {},
     onDismissGlobalError: (error: GlobalError) -> Unit = {},
     onBottomBarSizeChanged: (size: IntSize) -> Unit = {},
-    onBottomBarItemClick: (destination: NavGraph) -> Unit = {},
+    onBottomBarItemClick: (destination: Route) -> Unit = {},
     content: @Composable (contentPadding: PaddingValues) -> Unit,
 ) {
     Scaffold(

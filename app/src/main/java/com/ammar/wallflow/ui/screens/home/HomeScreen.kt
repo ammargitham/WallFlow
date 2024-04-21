@@ -39,6 +39,7 @@ import androidx.navigation.NavController
 import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.ammar.wallflow.R
+import com.ammar.wallflow.destinations.WallpaperScreenDestination
 import com.ammar.wallflow.extensions.search
 import com.ammar.wallflow.extensions.toast
 import com.ammar.wallflow.model.OnlineSource
@@ -60,7 +61,7 @@ import com.ammar.wallflow.ui.common.searchedit.EditSearchModalBottomSheet
 import com.ammar.wallflow.ui.common.searchedit.SaveAsDialog
 import com.ammar.wallflow.ui.common.searchedit.SavedSearchesDialog
 import com.ammar.wallflow.ui.common.topWindowInsets
-import com.ammar.wallflow.ui.screens.destinations.WallpaperScreenDestination
+import com.ammar.wallflow.ui.navigation.AppNavGraphs
 import com.ammar.wallflow.ui.screens.home.composables.FiltersBottomSheetHeader
 import com.ammar.wallflow.ui.screens.home.composables.ManageSourcesDialog
 import com.ammar.wallflow.ui.screens.home.composables.RedditInitDialog
@@ -77,8 +78,9 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Destination(
-    navArgsDelegate = HomeScreenNavArgs::class,
+@Destination<AppNavGraphs.HomeNavGraph>(
+    start = true,
+    navArgs = HomeScreenNavArgs::class,
 )
 @Composable
 fun HomeScreen(
@@ -226,7 +228,8 @@ fun HomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .windowInsetsPadding(topWindowInsets)
-            .nestedScroll(refreshState.nestedScrollConnection),
+            .nestedScroll(refreshState.nestedScrollConnection)
+            .testTag("Home Screen"),
     ) {
         HomeScreenContent(
             modifier = Modifier.fillMaxSize(),

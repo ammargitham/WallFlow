@@ -21,6 +21,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
+import com.ammar.wallflow.destinations.WallpaperScreenDestination
 import com.ammar.wallflow.extensions.rememberLazyStaggeredGridState
 import com.ammar.wallflow.extensions.safeLaunch
 import com.ammar.wallflow.model.Wallpaper
@@ -29,7 +30,7 @@ import com.ammar.wallflow.ui.common.bottomWindowInsets
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
 import com.ammar.wallflow.ui.common.mainsearch.LocalMainSearchBarController
 import com.ammar.wallflow.ui.common.topWindowInsets
-import com.ammar.wallflow.ui.screens.destinations.WallpaperScreenDestination
+import com.ammar.wallflow.ui.navigation.AppNavGraphs
 import com.ammar.wallflow.ui.wallpaperviewer.WallpaperViewerViewModel
 import com.ammar.wallflow.utils.applyWallpaper
 import com.ammar.wallflow.utils.getStartBottomPadding
@@ -38,7 +39,9 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.navigate
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Destination
+@Destination<AppNavGraphs.LocalNavGraph>(
+    start = true,
+)
 @Composable
 fun LocalScreen(
     navController: NavController,

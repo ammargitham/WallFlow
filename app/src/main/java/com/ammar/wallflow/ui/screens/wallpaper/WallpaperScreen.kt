@@ -14,6 +14,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -30,16 +31,17 @@ import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
 import com.ammar.wallflow.ui.common.mainsearch.LocalMainSearchBarController
 import com.ammar.wallflow.ui.common.mainsearch.MainSearchBar
+import com.ammar.wallflow.ui.navigation.AppNavGraphs
 import com.ammar.wallflow.ui.wallpaperviewer.WallpaperViewer
 import com.ammar.wallflow.ui.wallpaperviewer.WallpaperViewerViewModel
 import com.ammar.wallflow.utils.applyWallpaper
 import com.ammar.wallflow.utils.shareWallpaper
 import com.ammar.wallflow.utils.shareWallpaperUrl
-import com.ramcosta.composedestinations.annotation.DeepLink
 import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.annotation.parameters.DeepLink
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Destination(
+@Destination<AppNavGraphs.MainGraph>(
     deepLinks = [
         DeepLink(uriPattern = wallpaperScreenLocalDeepLinkUriPattern),
     ],
@@ -143,7 +145,9 @@ fun WallpaperScreen(
     }
 
     Box(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .testTag("Wallpaper Screen"),
     ) {
         WallpaperViewer(
             wallpaper = viewerUiState.wallpaper,

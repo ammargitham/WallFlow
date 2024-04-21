@@ -14,14 +14,14 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hierarchy
-import com.ammar.wallflow.ui.screens.NavGraph
+import com.ramcosta.composedestinations.spec.Route
 
 @Composable
 fun BottomBar(
     modifier: Modifier = Modifier,
     currentDestination: NavDestination? = null,
     showLocalTab: Boolean = true,
-    onItemClick: (destination: NavGraph) -> Unit = {},
+    onItemClick: (destination: Route) -> Unit = {},
 ) {
     val bottomBarController = LocalBottomBarController.current
     val state by bottomBarController.state

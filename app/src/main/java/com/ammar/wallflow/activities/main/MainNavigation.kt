@@ -13,12 +13,9 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.ammar.wallflow.ui.animations.materialFadeThroughIn
-import com.ammar.wallflow.ui.animations.materialFadeThroughOut
+import com.ammar.wallflow.NavGraphs
 import com.ammar.wallflow.ui.common.getPaddingValuesConverter
-import com.ammar.wallflow.ui.navigation.NavGraphs
 import com.ramcosta.composedestinations.DestinationsNavHost
-import com.ramcosta.composedestinations.animations.defaults.RootNavGraphDefaultAnimations
 import com.ramcosta.composedestinations.navigation.dependency
 import com.ramcosta.composedestinations.rememberNavHostEngine
 
@@ -30,12 +27,7 @@ fun MainNavigation(
     nestedScrollConnection: NestedScrollConnection,
     modifier: Modifier = Modifier,
 ) {
-    val navHostEngine = rememberNavHostEngine(
-        rootDefaultAnimations = RootNavGraphDefaultAnimations(
-            enterTransition = { materialFadeThroughIn() },
-            exitTransition = { materialFadeThroughOut() },
-        ),
-    )
+    val navHostEngine = rememberNavHostEngine()
     val layoutDirection = LocalLayoutDirection.current
     val hostPadding by animateValueAsState(
         targetValue = if (applyContentPadding) contentPadding else PaddingValues(0.dp),
@@ -50,7 +42,7 @@ fun MainNavigation(
             .padding(hostPadding),
         engine = navHostEngine,
         navController = navController,
-        navGraph = NavGraphs.root,
+        navGraph = NavGraphs.main,
         dependenciesContainerBuilder = {
             dependency { nestedScrollConnection }
         },
