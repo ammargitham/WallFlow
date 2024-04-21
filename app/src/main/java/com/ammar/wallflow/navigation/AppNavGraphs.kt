@@ -1,4 +1,4 @@
-package com.ammar.wallflow.ui.navigation
+package com.ammar.wallflow.navigation
 
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition

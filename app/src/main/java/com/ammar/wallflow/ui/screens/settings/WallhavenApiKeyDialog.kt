@@ -28,7 +28,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import com.ammar.wallflow.R
 import com.ammar.wallflow.extensions.trimAll
-import com.ammar.wallflow.ui.navigation.AppNavGraphs
+import com.ammar.wallflow.navigation.AppNavGraphs
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator

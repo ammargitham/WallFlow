@@ -33,13 +33,13 @@ import com.ammar.wallflow.model.search.WallhavenTagSearchMeta
 import com.ammar.wallflow.model.search.WallhavenUploaderSearchMeta
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.model.wallhaven.WallhavenUploader
+import com.ammar.wallflow.navigation.AppNavGraphs
 import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.bottomWindowInsets
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
 import com.ammar.wallflow.ui.common.mainsearch.LocalMainSearchBarController
 import com.ammar.wallflow.ui.common.mainsearch.MainSearchBar
 import com.ammar.wallflow.ui.common.topWindowInsets
-import com.ammar.wallflow.ui.navigation.AppNavGraphs
 import com.ammar.wallflow.ui.wallpaperviewer.WallpaperViewerViewModel
 import com.ammar.wallflow.utils.applyWallpaper
 import com.ammar.wallflow.utils.getStartBottomPadding

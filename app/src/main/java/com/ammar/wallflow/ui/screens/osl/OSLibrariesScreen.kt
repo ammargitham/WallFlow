@@ -27,11 +27,11 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.ammar.wallflow.R
 import com.ammar.wallflow.extensions.filterNotNullValues
+import com.ammar.wallflow.navigation.AppNavGraphs
 import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.TopBar
 import com.ammar.wallflow.ui.common.bottomWindowInsets
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
-import com.ammar.wallflow.ui.navigation.AppNavGraphs
 import com.mikepenz.aboutlibraries.Libs
 import com.mikepenz.aboutlibraries.entity.Library
 import com.mikepenz.aboutlibraries.util.withContext

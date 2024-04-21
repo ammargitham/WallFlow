@@ -39,11 +39,11 @@ import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.model.local.LocalDirectory
 import com.ammar.wallflow.model.search.SavedSearch
 import com.ammar.wallflow.model.search.WallhavenSearch
+import com.ammar.wallflow.navigation.AppNavGraphs
 import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.TopBar
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
 import com.ammar.wallflow.ui.common.mainsearch.LocalMainSearchBarController
-import com.ammar.wallflow.ui.navigation.AppNavGraphs
 import com.ammar.wallflow.ui.screens.settings.autowallpapersources.composables.FavoritesSection
 import com.ammar.wallflow.ui.screens.settings.autowallpapersources.composables.LightDarkSection
 import com.ammar.wallflow.ui.screens.settings.autowallpapersources.composables.LocalSection

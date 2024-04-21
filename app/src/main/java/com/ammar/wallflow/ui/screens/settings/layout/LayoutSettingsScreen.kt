@@ -31,12 +31,12 @@ import androidx.navigation.NavController
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.preferences.GridColType
 import com.ammar.wallflow.data.preferences.LayoutPreferences
+import com.ammar.wallflow.navigation.AppNavGraphs
 import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.TopBar
 import com.ammar.wallflow.ui.common.bottomWindowInsets
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
 import com.ammar.wallflow.ui.common.mainsearch.LocalMainSearchBarController
-import com.ammar.wallflow.ui.navigation.AppNavGraphs
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import com.ramcosta.composedestinations.annotation.Destination
 

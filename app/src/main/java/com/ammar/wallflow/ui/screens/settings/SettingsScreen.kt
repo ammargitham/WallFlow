@@ -55,6 +55,7 @@ import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.model.ObjectDetectionModel
 import com.ammar.wallflow.model.search.SavedSearch
 import com.ammar.wallflow.model.search.SavedSearchSaver
+import com.ammar.wallflow.navigation.AppNavGraphs
 import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.TopBar
 import com.ammar.wallflow.ui.common.bottomWindowInsets
@@ -68,7 +69,6 @@ import com.ammar.wallflow.ui.common.permissions.rememberMultiplePermissionsState
 import com.ammar.wallflow.ui.common.permissions.shouldShowRationale
 import com.ammar.wallflow.ui.common.searchedit.EditSearchModalBottomSheet
 import com.ammar.wallflow.ui.common.searchedit.SavedSearchesDialog
-import com.ammar.wallflow.ui.navigation.AppNavGraphs
 import com.ammar.wallflow.ui.screens.settings.composables.AutoWallpaperSetToDialog
 import com.ammar.wallflow.ui.screens.settings.composables.ChangeDownloadLocationDialog
 import com.ammar.wallflow.ui.screens.settings.composables.ClearViewedWallpapersConfirmDialog
