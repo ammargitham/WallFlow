@@ -98,7 +98,6 @@ import com.ammar.wallflow.utils.objectdetection.objectsDetector
 import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.AutoWallpaperException
 import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.Status
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.navigation.navigate
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.delay
@@ -160,7 +159,7 @@ fun SettingsScreen(
                     SettingsForMoreDetailManageAutoWallpaperSourcesScreenDestination
                 } else {
                     SettingsManageAutoWallpaperSourcesScreenDestination
-                },
+                }.route,
             )
             return@rememberMultiplePermissionsState
         }
@@ -226,7 +225,7 @@ fun SettingsScreen(
                         MoreDetailWallhavenApiKeyDialogDestination
                     } else {
                         MainWallhavenApiKeyDialogDestination
-                    },
+                    }.route,
                 )
             },
             onObjectDetectionPrefsChange = viewModel::updateSubjectDetectionPrefs,
@@ -248,7 +247,7 @@ fun SettingsScreen(
                         SettingsForMoreDetailManageAutoWallpaperSourcesScreenDestination
                     } else {
                         SettingsManageAutoWallpaperSourcesScreenDestination
-                    },
+                    }.route,
                 )
             },
             onAutoWallpaperFrequencyClick = { viewModel.showAutoWallpaperFrequencyDialog(true) },
@@ -269,7 +268,7 @@ fun SettingsScreen(
                         SettingsForMoreDetailLayoutSettingsScreenDestination
                     } else {
                         SettingsLayoutSettingsScreenDestination
-                    },
+                    }.route,
                 )
             },
             onShowLocalTabChange = {

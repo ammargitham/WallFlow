@@ -232,7 +232,6 @@ dependencies {
 
     // Arch Components
     implementation(libs.androidx.lifecycle.viewmodel.compose)
-    // implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.hilt.navigation.compose)
 
     // Room
@@ -242,6 +241,7 @@ dependencies {
     androidTestImplementation(libs.androidx.room.testing)
 
     // Compose
+    implementation(libs.androidx.compose.animation)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.ui.util)
@@ -259,6 +259,9 @@ dependencies {
     implementation(libs.compose.destinations.core)
     ksp(libs.compose.destinations.ksp)
     androidTestImplementation(libs.androidx.navigation.testing)
+    constraints {
+        implementation(libs.androidx.navigation.compose)
+    }
 
     // Retrofit
     implementation(libs.kotlinx.datetime)

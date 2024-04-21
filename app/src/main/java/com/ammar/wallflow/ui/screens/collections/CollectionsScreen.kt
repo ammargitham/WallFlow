@@ -45,7 +45,6 @@ import com.ammar.wallflow.utils.getStartBottomPadding
 import com.ammar.wallflow.utils.shareWallpaper
 import com.ammar.wallflow.utils.shareWallpaperUrl
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.navigation.navigate
 
 @Destination<AppNavGraphs.CollectionsNavGraph>(
     start = true,
@@ -101,7 +100,7 @@ fun CollectionsScreen(
                         source = it.source,
                         wallpaperId = it.id,
                         thumbData = it.thumbData,
-                    ),
+                    ).route,
                 )
             }
         }
@@ -212,7 +211,7 @@ fun CollectionsScreen(
                             source = source,
                             thumbData = thumbData,
                             wallpaperId = id,
-                        ),
+                        ).route,
                     )
                 }
             },

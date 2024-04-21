@@ -43,7 +43,6 @@ import com.ammar.wallflow.ui.common.bottombar.DefaultBottomBarController
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
 import com.ammar.wallflow.ui.theme.EdgeToEdge
 import com.ammar.wallflow.ui.theme.WallFlowTheme
-import com.ramcosta.composedestinations.navigation.navigate
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -167,7 +166,7 @@ class MainActivity : ComponentActivity() {
                     bottomBarSize = bottomBarController.state.value.size,
                     showLocalTab = uiState.showLocalTab,
                     onFixWallHavenApiKeyClick = {
-                        navController.navigate(MainWallhavenApiKeyDialogDestination)
+                        navController.navigate(MainWallhavenApiKeyDialogDestination.route)
                     },
                     onDismissGlobalError = viewModel::dismissGlobalError,
                     onBottomBarSizeChanged = { size ->
@@ -218,7 +217,7 @@ class MainActivity : ComponentActivity() {
                 source = Source.WALLHAVEN,
                 wallpaperId = wallpaperId,
                 thumbData = null,
-            ),
+            ).route,
         )
     }
 

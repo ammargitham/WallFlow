@@ -4,10 +4,9 @@ import androidx.navigation.NavController
 import com.ammar.wallflow.destinations.HomeScreenDestination
 import com.ammar.wallflow.model.search.Search
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
-import com.ramcosta.composedestinations.navigation.navigate
 
 fun NavController.search(search: Search) = this.navigate(
-    HomeScreenDestination(search = search),
+    HomeScreenDestination(search = search).route,
 )
 
 fun DestinationsNavigator.search(search: Search) = this.navigate(

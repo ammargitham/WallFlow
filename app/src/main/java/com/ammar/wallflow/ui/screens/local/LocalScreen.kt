@@ -35,7 +35,6 @@ import com.ammar.wallflow.utils.applyWallpaper
 import com.ammar.wallflow.utils.getStartBottomPadding
 import com.ammar.wallflow.utils.shareWallpaper
 import com.ramcosta.composedestinations.annotation.Destination
-import com.ramcosta.composedestinations.navigation.navigate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Destination<AppNavGraphs.LocalNavGraph>(
@@ -101,7 +100,7 @@ fun LocalScreen(
                         source = it.source,
                         wallpaperId = it.id,
                         thumbData = it.thumbData,
-                    ),
+                    ).route,
                 )
             }
         }
@@ -159,7 +158,7 @@ fun LocalScreen(
                         source = source,
                         thumbData = thumbData,
                         wallpaperId = id,
-                    ),
+                    ).route,
                 )
             }
         },

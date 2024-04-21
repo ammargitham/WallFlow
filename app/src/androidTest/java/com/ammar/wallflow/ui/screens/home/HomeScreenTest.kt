@@ -1,8 +1,6 @@
 package com.ammar.wallflow.ui.screens.home
 
 import android.content.Context
-import androidx.compose.runtime.remember
-import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ApplicationProvider
@@ -45,12 +43,8 @@ class HomeScreenTest {
         // )
         composeTestRule.setContent {
             WallFlowTheme {
-                val nestedScrollConnection = remember {
-                    object : NestedScrollConnection {}
-                }
                 HomeScreen(
                     navController = TestNavHostController(context),
-                    nestedScrollConnectionGetter = { nestedScrollConnection },
                 )
             }
         }
