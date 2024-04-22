@@ -1,5 +1,6 @@
 package com.ammar.wallflow.ui.common
 
+import androidx.compose.material3.SearchBar as MaterialSearchBar
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
@@ -13,7 +14,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.ime
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -29,7 +29,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SearchBar as MaterialSearchBar
 import androidx.compose.material3.SearchBarDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.minimumInteractiveComponentSize
@@ -89,9 +88,7 @@ object SearchBar {
                 .fillMaxWidth(),
         ) {
             SwitchableSearchBar(
-                modifier = Modifier
-                    .searchBar(useFullWidth = useFullWidth)
-                    .padding(bottom = 8.dp),
+                modifier = Modifier.searchBar(useFullWidth = useFullWidth),
                 useDocked = useDocked,
                 query = query,
                 onQueryChange = onQueryChange,

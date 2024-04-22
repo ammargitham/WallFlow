@@ -272,7 +272,7 @@ fun HomeScreen(
             contentPadding = PaddingValues(
                 start = 8.dp,
                 end = 8.dp,
-                top = SearchBar.Defaults.height + 16.dp,
+                top = SearchBar.Defaults.height,
                 bottom = bottomPadding + 8.dp,
             ),
             wallpapers = wallpapers,
