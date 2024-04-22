@@ -33,13 +33,11 @@ fun materialFadeThroughIn(
 ): EnterTransition = fadeIn(
     animationSpec = tween(
         durationMillis = durationMillis.ForIncoming,
-        delayMillis = durationMillis.ForOutgoing,
         easing = LinearOutSlowInEasing,
     ),
 ) + scaleIn(
     animationSpec = tween(
         durationMillis = durationMillis.ForIncoming,
-        delayMillis = durationMillis.ForOutgoing,
         easing = LinearOutSlowInEasing,
     ),
     initialScale = initialScale,
@@ -55,7 +53,6 @@ fun materialFadeThroughOut(
 ): ExitTransition = fadeOut(
     animationSpec = tween(
         durationMillis = durationMillis.ForOutgoing,
-        delayMillis = durationMillis.ForOutgoing / 2,
         easing = FastOutLinearInEasing,
     ),
 )

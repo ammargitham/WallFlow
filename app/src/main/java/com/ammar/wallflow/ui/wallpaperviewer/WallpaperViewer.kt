@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -37,7 +36,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.IntSize
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
@@ -48,7 +46,6 @@ import coil.request.NullRequestDataException
 import coil.size.Scale
 import com.ammar.wallflow.R
 import com.ammar.wallflow.extensions.TAG
-import com.ammar.wallflow.extensions.aspectRatio
 import com.ammar.wallflow.extensions.openUrl
 import com.ammar.wallflow.extensions.toDp
 import com.ammar.wallflow.extensions.toast
@@ -71,7 +68,6 @@ import com.ammar.wallflow.ui.screens.wallpaper.WallpaperActions
 import com.ammar.wallflow.ui.screens.wallpaper.WallpaperInfoBottomSheet
 import com.ammar.wallflow.utils.DownloadStatus
 import java.net.SocketTimeoutException
-import kotlin.math.roundToInt
 import me.saket.telephoto.zoomable.ZoomSpec
 import me.saket.telephoto.zoomable.rememberZoomableState
 import me.saket.telephoto.zoomable.zoomable
@@ -115,35 +111,35 @@ fun WallpaperViewer(
         onGranted = onDownloadPermissionsGranted,
     )
 
-    val imageSize: IntSize by produceState(
-        initialValue = IntSize.Zero,
-        key1 = wallpaper?.resolution,
-        key2 = containerIntSize,
-    ) {
-        val resolution = wallpaper?.resolution
-        if (resolution == null) {
-            value = IntSize.Zero
-            return@produceState
-        }
-        val containerWidth = containerIntSize.width
-        val containerHeight = containerIntSize.height
-        val containerAspectRatio = containerWidth.toFloat() / containerHeight
-        val imageAspectRatio = resolution.aspectRatio
-        value = when {
-            containerAspectRatio == imageAspectRatio -> IntSize(
-                containerWidth,
-                containerHeight,
-            )
-            containerAspectRatio < imageAspectRatio -> IntSize(
-                containerWidth,
-                (containerWidth / imageAspectRatio).roundToInt(),
-            )
-            else -> IntSize(
-                (containerHeight * imageAspectRatio).roundToInt(),
-                containerHeight,
-            )
-        }
-    }
+    // val imageSize: IntSize by produceState(
+    //     initialValue = IntSize.Zero,
+    //     key1 = wallpaper?.resolution,
+    //     key2 = containerIntSize,
+    // ) {
+    //     val resolution = wallpaper?.resolution
+    //     if (resolution == null) {
+    //         value = IntSize.Zero
+    //         return@produceState
+    //     }
+    //     val containerWidth = containerIntSize.width
+    //     val containerHeight = containerIntSize.height
+    //     val containerAspectRatio = containerWidth.toFloat() / containerHeight
+    //     val imageAspectRatio = resolution.aspectRatio
+    //     value = when {
+    //         containerAspectRatio == imageAspectRatio -> IntSize(
+    //             containerWidth,
+    //             containerHeight,
+    //         )
+    //         containerAspectRatio < imageAspectRatio -> IntSize(
+    //             containerWidth,
+    //             (containerWidth / imageAspectRatio).roundToInt(),
+    //         )
+    //         else -> IntSize(
+    //             (containerHeight * imageAspectRatio).roundToInt(),
+    //             containerHeight,
+    //         )
+    //     }
+    // }
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val listener = remember {
@@ -167,17 +163,21 @@ fun WallpaperViewer(
         initialValue = null as ImageRequest?,
         key1 = context,
         key2 = wallpaper?.data,
-        key3 = listOf(thumbData, imageSize, listener),
+        key3 = listOf(
+            thumbData,
+            // imageSize,
+            listener,
+        ),
     ) {
-        if (wallpaper?.data == null && thumbData == null) {
-            return@produceState
-        }
+        // if (wallpaper?.data == null && thumbData == null) {
+        //     return@produceState
+        // }
         value = ImageRequest.Builder(context).apply {
             data(wallpaper?.data ?: thumbData)
             placeholderMemoryCacheKey(thumbData)
-            if (imageSize != IntSize.Zero) {
-                size(imageSize.width, imageSize.height)
-            }
+            // if (imageSize != IntSize.Zero) {
+            //     size(imageSize.width, imageSize.height)
+            // }
             scale(Scale.FIT)
             crossfade(true)
             lifecycle(lifecycleOwner)
@@ -241,7 +241,9 @@ fun WallpaperViewer(
                     .zoomable(
                         state = zoomableState,
                         onClick = { _ ->
-                            if (it.state !is AsyncImagePainter.State.Success) return@zoomable
+                            if (it.state !is AsyncImagePainter.State.Success) {
+                                return@zoomable
+                            }
                             onWallpaperTap()
                         },
                     ),
@@ -275,18 +277,18 @@ fun WallpaperViewer(
             )
         }
 
-        AnimatedVisibility(
-            modifier = Modifier
-                .size(60.dp)
-                .align(Alignment.Center),
-            visible = loading || painter.state is AsyncImagePainter.State.Loading,
-            enter = fadeIn(),
-            exit = fadeOut(),
-        ) {
-            CircularProgressIndicator(
-                modifier = Modifier.fillMaxSize(),
-            )
-        }
+        // AnimatedVisibility(
+        //     modifier = Modifier
+        //         .size(60.dp)
+        //         .align(Alignment.Center),
+        //     visible = loading || painter.state is AsyncImagePainter.State.Loading,
+        //     enter = fadeIn(),
+        //     exit = fadeOut(),
+        // ) {
+        //     CircularProgressIndicator(
+        //         modifier = Modifier.fillMaxSize(),
+        //     )
+        // }
 
         TopBar(
             visible = actionsVisible,
