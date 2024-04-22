@@ -39,6 +39,7 @@ import com.ammar.wallflow.ui.common.bottomWindowInsets
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
 import com.ammar.wallflow.ui.common.mainsearch.MainSearchBar
 import com.ammar.wallflow.ui.common.topWindowInsets
+import com.ammar.wallflow.ui.screens.main.RootNavControllerWrapper
 import com.ammar.wallflow.ui.wallpaperviewer.WallpaperViewerViewModel
 import com.ammar.wallflow.utils.applyWallpaper
 import com.ammar.wallflow.utils.getStartBottomPadding
@@ -52,9 +53,11 @@ import com.ramcosta.composedestinations.annotation.Destination
 @Composable
 fun CollectionsScreen(
     navController: NavController,
+    rootNavControllerWrapper: RootNavControllerWrapper,
     viewModel: CollectionsViewModel = hiltViewModel(),
     viewerViewModel: WallpaperViewerViewModel = hiltViewModel(),
 ) {
+    val rootNavController = rootNavControllerWrapper.navController
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val viewerUiState by viewerViewModel.uiState.collectAsStateWithLifecycle()
     val wallpapers = viewModel.wallpapers.collectAsLazyPagingItems()
@@ -95,7 +98,7 @@ fun CollectionsScreen(
                 )
             } else {
                 // navigate to wallpaper screen
-                navController.navigate(
+                rootNavController.navigate(
                     WallpaperScreenDestination(
                         source = it.source,
                         wallpaperId = it.id,
@@ -206,7 +209,7 @@ fun CollectionsScreen(
             },
             onFullWallpaperFullScreenClick = {
                 viewerUiState.wallpaper?.run {
-                    navController.navigate(
+                    rootNavController.navigate(
                         WallpaperScreenDestination(
                             source = source,
                             thumbData = thumbData,

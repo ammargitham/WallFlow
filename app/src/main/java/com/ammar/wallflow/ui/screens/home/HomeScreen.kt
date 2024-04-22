@@ -75,6 +75,7 @@ import com.ammar.wallflow.ui.screens.home.composables.ManageSourcesDialog
 import com.ammar.wallflow.ui.screens.home.composables.RedditInitDialog
 import com.ammar.wallflow.ui.screens.home.composables.header
 import com.ammar.wallflow.ui.screens.home.composables.wallhavenHeader
+import com.ammar.wallflow.ui.screens.main.RootNavControllerWrapper
 import com.ammar.wallflow.ui.wallpaperviewer.WallpaperViewerViewModel
 import com.ammar.wallflow.utils.applyWallpaper
 import com.ammar.wallflow.utils.getStartBottomPadding
@@ -93,7 +94,9 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeScreen(
     navController: NavController,
+    rootNavControllerWrapper: RootNavControllerWrapper,
 ) {
+    val rootNavController = rootNavControllerWrapper.navController
     val viewModel: HomeViewModel = hiltViewModel()
     val viewerViewModel: WallpaperViewerViewModel = hiltViewModel()
     val searchBarViewModel: SearchBarViewModel = hiltViewModel()
@@ -210,7 +213,7 @@ fun HomeScreen(
                 )
             } else {
                 // navigate to wallpaper screen
-                navController.navigate(
+                rootNavController.navigate(
                     WallpaperScreenDestination(
                         source = it.source,
                         wallpaperId = it.id,
@@ -421,7 +424,7 @@ fun HomeScreen(
             },
             onFullWallpaperFullScreenClick = {
                 viewerUiState.wallpaper?.run {
-                    navController.navigate(
+                    rootNavController.navigate(
                         WallpaperScreenDestination(
                             source = source,
                             wallpaperId = id,

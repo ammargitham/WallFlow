@@ -25,13 +25,10 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.ammar.wallflow.MainDispatcher
 import com.ammar.wallflow.data.preferences.Theme
-import com.ammar.wallflow.destinations.MainWallhavenApiKeyDialogDestination
 import com.ammar.wallflow.destinations.WallpaperScreenDestination
 import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.navigation.MainNavigation
@@ -108,8 +105,6 @@ class MainActivity : ComponentActivity() {
         navController = rememberNavController()
         val viewModel: MainActivityViewModel = hiltViewModel()
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-        val currentBackStackEntry by navController.currentBackStackEntryAsState()
-        val currentDestination = currentBackStackEntry?.destination
         val systemController = LocalSystemController.current
         val systemState by systemController.state
         val bottomBarController = LocalBottomBarController.current
@@ -158,36 +153,9 @@ class MainActivity : ComponentActivity() {
                     .semantics { testTagsAsResourceId = true },
                 color = MaterialTheme.colorScheme.background,
             ) {
-                MainActivityContent(
-                    currentDestination = currentDestination,
-                    useNavRail = useNavRail,
-                    globalErrors = uiState.globalErrors,
-                    bottomBarVisible = bottomBarController.state.value.visible,
-                    bottomBarSize = bottomBarController.state.value.size,
-                    showLocalTab = uiState.showLocalTab,
-                    onFixWallHavenApiKeyClick = {
-                        navController.navigate(MainWallhavenApiKeyDialogDestination.route)
-                    },
-                    onDismissGlobalError = viewModel::dismissGlobalError,
-                    onBottomBarSizeChanged = { size ->
-                        bottomBarController.update { it.copy(size = size) }
-                    },
-                    onBottomBarItemClick = {
-                        navController.navigate(it.route) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    },
-                ) {
-                    MainNavigation(
-                        navController = navController,
-                        contentPadding = it,
-                        applyContentPadding = systemState.applyScaffoldPadding,
-                    )
-                }
+                MainNavigation(
+                    navController = navController,
+                )
             }
         }
     }

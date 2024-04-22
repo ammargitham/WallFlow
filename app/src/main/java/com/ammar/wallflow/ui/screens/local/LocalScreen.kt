@@ -19,7 +19,6 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.ammar.wallflow.destinations.WallpaperScreenDestination
 import com.ammar.wallflow.extensions.rememberLazyStaggeredGridState
@@ -30,6 +29,7 @@ import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.bottomWindowInsets
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
 import com.ammar.wallflow.ui.common.topWindowInsets
+import com.ammar.wallflow.ui.screens.main.RootNavControllerWrapper
 import com.ammar.wallflow.ui.wallpaperviewer.WallpaperViewerViewModel
 import com.ammar.wallflow.utils.applyWallpaper
 import com.ammar.wallflow.utils.getStartBottomPadding
@@ -42,10 +42,12 @@ import com.ramcosta.composedestinations.annotation.Destination
 )
 @Composable
 fun LocalScreen(
-    navController: NavController,
+    // navController: NavController,
+    rootNavControllerWrapper: RootNavControllerWrapper,
     viewModel: LocalScreenViewModel = hiltViewModel(),
     viewerViewModel: WallpaperViewerViewModel = hiltViewModel(),
 ) {
+    val rootNavController = rootNavControllerWrapper.navController
     val uiState by viewModel.uiState.collectAsState()
     val viewerUiState by viewerViewModel.uiState.collectAsStateWithLifecycle()
     val wallpapers = viewModel.wallpapers.collectAsLazyPagingItems()
@@ -95,7 +97,7 @@ fun LocalScreen(
                 )
             } else {
                 // navigate to wallpaper screen
-                navController.navigate(
+                rootNavController.navigate(
                     WallpaperScreenDestination(
                         source = it.source,
                         wallpaperId = it.id,
@@ -153,7 +155,7 @@ fun LocalScreen(
         },
         onFullWallpaperFullScreenClick = {
             viewerUiState.wallpaper?.run {
-                navController.navigate(
+                rootNavController.navigate(
                     WallpaperScreenDestination(
                         source = source,
                         thumbData = thumbData,

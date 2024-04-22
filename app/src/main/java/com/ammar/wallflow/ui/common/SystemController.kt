@@ -21,7 +21,6 @@ data class SystemState(
     val navigationBarColor: Color = Color.Unspecified,
     val isExpanded: Boolean = false,
     val size: IntSize = IntSize.Zero,
-    val applyScaffoldPadding: Boolean = true,
     val isStatusBarLight: Boolean? = null,
 )
 
@@ -38,7 +37,6 @@ class DefaultSystemController(initialState: SystemState) : SystemController() {
         _state.value = SystemState(
             isExpanded = _state.value.isExpanded,
             size = _state.value.size,
-            applyScaffoldPadding = _state.value.applyScaffoldPadding,
         )
     }
 }

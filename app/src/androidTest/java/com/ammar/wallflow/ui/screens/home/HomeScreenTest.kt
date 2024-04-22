@@ -5,6 +5,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.navigation.testing.TestNavHostController
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.ammar.wallflow.ui.screens.main.RootNavControllerWrapper
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -45,6 +46,9 @@ class HomeScreenTest {
             WallFlowTheme {
                 HomeScreen(
                     navController = TestNavHostController(context),
+                    rootNavControllerWrapper = RootNavControllerWrapper(
+                        navController = TestNavHostController(context),
+                    ),
                 )
             }
         }

@@ -29,7 +29,6 @@ import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.model.wallhaven.WallhavenUploader
 import com.ammar.wallflow.navigation.AppNavGraphs
 import com.ammar.wallflow.ui.common.LocalSystemController
-import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
 import com.ammar.wallflow.ui.common.mainsearch.MainSearchBar
 import com.ammar.wallflow.ui.wallpaperviewer.WallpaperViewer
 import com.ammar.wallflow.ui.wallpaperviewer.WallpaperViewerViewModel
@@ -40,7 +39,7 @@ import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.annotation.parameters.DeepLink
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Destination<AppNavGraphs.MainNavGraph>(
+@Destination<AppNavGraphs.RootNavGraph>(
     deepLinks = [
         DeepLink(uriPattern = wallpaperScreenLocalDeepLinkUriPattern),
     ],
@@ -60,7 +59,6 @@ fun WallpaperScreen(
     val sheetColor = MaterialTheme.colorScheme.surfaceColorAtElevation(
         BottomSheetDefaults.Elevation,
     )
-    val bottomBarController = LocalBottomBarController.current
     val systemController = LocalSystemController.current
     val context = LocalContext.current
 
@@ -81,13 +79,9 @@ fun WallpaperScreen(
     }
 
     DisposableEffect(Unit) {
-        bottomBarController.update { it.copy(visible = false) }
-        systemController.update { it.copy(applyScaffoldPadding = false) }
-
         onDispose {
             systemController.update {
                 it.copy(
-                    applyScaffoldPadding = true,
                     isStatusBarLight = null,
                 )
             }

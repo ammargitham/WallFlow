@@ -7,6 +7,11 @@ object AppNavGraphs {
     @NavHostGraph(
         defaultTransitions = MainNavHostAnimatedDestinationStyle::class,
     )
+    annotation class RootNavGraph
+
+    @NavHostGraph(
+        defaultTransitions = MainNavHostAnimatedDestinationStyle::class,
+    )
     annotation class MainNavGraph
 
     @NavGraph<MainNavGraph>(
