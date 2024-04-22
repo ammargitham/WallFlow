@@ -86,6 +86,7 @@ internal fun HomeScreenContent(
     showFullWallpaperInfo: Boolean = false,
     isFullWallpaperFavorite: Boolean = false,
     fullWallpaperLightDarkTypeFlags: Int = LightDarkType.UNSPECIFIED,
+    pullToRefresh: @Composable () -> Unit = {},
     searchBar: @Composable () -> Unit = {},
     header: (LazyStaggeredGridScope.() -> Unit)? = null,
     onWallpaperClick: (wallpaper: Wallpaper) -> Unit = {},
@@ -119,6 +120,7 @@ internal fun HomeScreenContent(
                 lightDarkList = lightDarkList,
                 blurSketchy = blurSketchy,
                 blurNsfw = blurNsfw,
+                pullToRefresh = pullToRefresh,
                 searchBar = searchBar,
                 header = header,
                 selectedWallpaper = selectedWallpaper,
@@ -211,6 +213,7 @@ private fun Feed(
     selectedWallpaper: Wallpaper? = null,
     isHome: Boolean = true,
     showFAB: Boolean = true,
+    pullToRefresh: @Composable () -> Unit = {},
     searchBar: @Composable () -> Unit = {},
     header: (LazyStaggeredGridScope.() -> Unit)? = null,
     onWallpaperClick: (Wallpaper) -> Unit = {},
@@ -291,6 +294,7 @@ private fun Feed(
                 onWallpaperClick = onWallpaperClick,
                 onWallpaperFavoriteClick = onWallpaperFavoriteClick,
             )
+            pullToRefresh()
             searchBar()
         }
     }

@@ -279,6 +279,16 @@ fun HomeScreen(
                 bottom = bottomPadding + 8.dp,
             ),
             wallpapers = wallpapers,
+            pullToRefresh = {
+                if (showRefreshingIndicator || refreshState.progress > 0) {
+                    PullToRefreshContainer(
+                        modifier = Modifier
+                            .align(Alignment.TopCenter)
+                            .offset(y = SearchBar.Defaults.height - 8.dp),
+                        state = refreshState,
+                    )
+                }
+            },
             searchBar = {
                 HomeSearch(
                     modifier = Modifier.offset {
@@ -436,15 +446,6 @@ fun HomeScreen(
             onFullWallpaperUploaderClick = onUploaderClick,
             onFullWallpaperDownloadPermissionsGranted = viewerViewModel::download,
         )
-
-        if (showRefreshingIndicator || refreshState.progress > 0) {
-            PullToRefreshContainer(
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .offset(y = SearchBar.Defaults.height - 8.dp),
-                state = refreshState,
-            )
-        }
     }
 
     if (uiState.showFilters) {
