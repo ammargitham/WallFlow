@@ -5,11 +5,11 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -19,8 +19,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavController
 import com.ammar.wallflow.R
@@ -70,20 +68,7 @@ fun TopBar(
         exit = slideOutVertically(),
     ) {
         TopAppBar(
-            modifier = modifier.run {
-                if (gradientBg) {
-                    background(
-                        Brush.verticalGradient(
-                            colors = listOf(
-                                Color.Black,
-                                Color.Transparent,
-                            ),
-                        ),
-                    )
-                } else {
-                    this
-                }
-            },
+            modifier = modifier,
             windowInsets = windowInsets,
             navigationIcon = {
                 AnimatedVisibility(
@@ -103,7 +88,7 @@ fun TopBar(
             scrollBehavior = scrollBehavior,
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = if (gradientBg) {
-                    Color.Transparent
+                    BottomAppBarDefaults.containerColor.copy(alpha = 0.8f)
                 } else {
                     MaterialTheme.colorScheme.surface
                 },

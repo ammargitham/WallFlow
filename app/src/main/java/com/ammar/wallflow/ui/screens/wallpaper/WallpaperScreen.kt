@@ -7,7 +7,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
@@ -72,17 +71,6 @@ fun WallpaperScreen(
                 it.copy(
                     statusBarColor = Color.Transparent,
                     navigationBarColor = Color.Transparent,
-                    isStatusBarLight = false,
-                )
-            }
-        }
-    }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            systemController.update {
-                it.copy(
-                    isStatusBarLight = null,
                 )
             }
         }

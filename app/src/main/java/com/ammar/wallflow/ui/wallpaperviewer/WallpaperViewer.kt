@@ -290,16 +290,28 @@ fun WallpaperViewer(
 
         TopBar(
             visible = actionsVisible,
-            gradientBg = true,
+            gradientBg = if (showBackButton) {
+                true
+            } else {
+                painter.state is AsyncImagePainter.State.Success &&
+                    painter.request.data == wallpaper?.data
+            },
             showBackButton = showBackButton,
             onBackClick = onBackClick,
             actions = {
-                ShareButton(
-                    showShareLinkAction = wallpaper is WallhavenWallpaper ||
-                        wallpaper is RedditWallpaper,
-                    onLinkClick = onShareLinkClick,
-                    onImageClick = onShareImageClick,
-                )
+                AnimatedVisibility(
+                    visible = painter.state is AsyncImagePainter.State.Success &&
+                        painter.request.data == wallpaper?.data,
+                    enter = fadeIn(),
+                    exit = fadeOut(),
+                ) {
+                    ShareButton(
+                        showShareLinkAction = wallpaper is WallhavenWallpaper ||
+                            wallpaper is RedditWallpaper,
+                        onLinkClick = onShareLinkClick,
+                        onImageClick = onShareImageClick,
+                    )
+                }
             },
         )
     }
