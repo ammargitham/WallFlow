@@ -33,7 +33,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -61,10 +63,18 @@ class WallpaperViewerViewModel @Inject constructor(
         if (it.source == null || it.wallpaperId == null) {
             flowOf(Resource.Success(null))
         } else {
-            when (it.source) {
-                Source.WALLHAVEN -> wallhavenRepository.wallpaper(it.wallpaperId)
-                Source.REDDIT -> redditRepository.wallpaper(it.wallpaperId)
-                Source.LOCAL -> localWallpapersRepository.wallpaper(application, it.wallpaperId)
+            flow<Resource<Wallpaper?>> {
+                emit(Resource.Success(null))
+                emitAll(
+                    when (it.source) {
+                        Source.WALLHAVEN -> wallhavenRepository.wallpaper(it.wallpaperId)
+                        Source.REDDIT -> redditRepository.wallpaper(it.wallpaperId)
+                        Source.LOCAL -> localWallpapersRepository.wallpaper(
+                            application,
+                            it.wallpaperId,
+                        )
+                    },
+                )
             }
         }
     }.stateIn(
