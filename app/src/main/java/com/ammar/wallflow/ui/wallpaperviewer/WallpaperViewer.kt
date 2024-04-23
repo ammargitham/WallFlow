@@ -192,6 +192,10 @@ fun WallpaperViewer(
     )
     var hasTransformed by rememberSaveable { mutableStateOf(false) }
 
+    LaunchedEffect(wallpaper?.data) {
+        zoomableState.resetZoom(false)
+    }
+
     LaunchedEffect(zoomableState.contentTransformation, painter) {
         val scale = zoomableState.contentTransformation.scale
         if (
