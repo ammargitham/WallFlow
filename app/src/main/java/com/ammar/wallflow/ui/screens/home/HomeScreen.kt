@@ -67,6 +67,7 @@ import com.ammar.wallflow.ui.common.SearchBar
 import com.ammar.wallflow.ui.common.bottomWindowInsets
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
 import com.ammar.wallflow.ui.common.mainsearch.MainSearchBar
+import com.ammar.wallflow.ui.common.rememberAdaptiveBottomSheetState
 import com.ammar.wallflow.ui.common.searchedit.EditSearchModalBottomSheet
 import com.ammar.wallflow.ui.common.searchedit.SaveAsDialog
 import com.ammar.wallflow.ui.common.searchedit.SavedSearchesDialog
@@ -449,8 +450,10 @@ fun HomeScreen(
     }
 
     if (uiState.showFilters) {
-        val state = rememberModalBottomSheetState(
-            skipPartiallyExpanded = uiState.selectedSource == OnlineSource.REDDIT,
+        val state = rememberAdaptiveBottomSheetState(
+            bottomSheetState = rememberModalBottomSheetState(
+                skipPartiallyExpanded = uiState.selectedSource == OnlineSource.REDDIT,
+            ),
         )
         val scope = rememberCoroutineScope()
         val initialSearch = if (uiState.isHome) {

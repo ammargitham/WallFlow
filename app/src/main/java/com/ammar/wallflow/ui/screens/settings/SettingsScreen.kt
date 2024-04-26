@@ -21,7 +21,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -66,6 +65,7 @@ import com.ammar.wallflow.ui.common.permissions.checkSetWallpaperPermission
 import com.ammar.wallflow.ui.common.permissions.isGranted
 import com.ammar.wallflow.ui.common.permissions.rememberMultiplePermissionsState
 import com.ammar.wallflow.ui.common.permissions.shouldShowRationale
+import com.ammar.wallflow.ui.common.rememberAdaptiveBottomSheetState
 import com.ammar.wallflow.ui.common.searchedit.EditSearchModalBottomSheet
 import com.ammar.wallflow.ui.common.searchedit.SavedSearchesDialog
 import com.ammar.wallflow.ui.screens.settings.composables.AutoWallpaperSetToDialog
@@ -354,7 +354,7 @@ fun SettingsScreen(
     }
 
     uiState.editSavedSearch?.run {
-        val state = rememberModalBottomSheetState()
+        val state = rememberAdaptiveBottomSheetState()
         val scope = rememberCoroutineScope()
         var localSavedSearch by rememberSaveable(
             this,

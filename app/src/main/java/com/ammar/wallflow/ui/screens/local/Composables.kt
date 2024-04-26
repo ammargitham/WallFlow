@@ -29,11 +29,8 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SheetState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -42,13 +39,16 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.R
 import com.ammar.wallflow.model.local.LocalDirectory
+import com.ammar.wallflow.ui.common.AdaptiveBottomSheet
+import com.ammar.wallflow.ui.common.AdaptiveBottomSheetState
+import com.ammar.wallflow.ui.common.rememberAdaptiveBottomSheetState
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun ManageFoldersBottomSheet(
     modifier: Modifier = Modifier,
-    state: SheetState = rememberModalBottomSheetState(),
+    state: AdaptiveBottomSheetState = rememberAdaptiveBottomSheetState(),
     folders: List<LocalDirectory> = emptyList(),
     sort: LocalSort = LocalSort.NO_SORT,
     onDismissRequest: () -> Unit = {},
@@ -56,7 +56,7 @@ internal fun ManageFoldersBottomSheet(
     onRemoveClick: (LocalDirectory) -> Unit = {},
     onSortChange: (LocalSort) -> Unit = {},
 ) {
-    ModalBottomSheet(
+    AdaptiveBottomSheet(
         modifier = modifier,
         onDismissRequest = onDismissRequest,
         sheetState = state,

@@ -12,8 +12,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material3.ScaffoldDefaults
 import androidx.compose.material3.Surface
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -116,8 +120,11 @@ class SetWallpaperActivity : ComponentActivity() {
         }
     }
 
+    @OptIn(ExperimentalMaterial3WindowSizeClassApi::class)
     @Composable
     private fun Content(viewModel: CropViewModel) {
+        val windowSizeClass = calculateWindowSizeClass(this)
+        val isExpanded = windowSizeClass.widthSizeClass >= WindowWidthSizeClass.Expanded
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
         val systemController = LocalSystemController.current
         val systemState by systemController.state
@@ -125,6 +132,9 @@ class SetWallpaperActivity : ComponentActivity() {
             Theme.SYSTEM -> isSystemInDarkTheme()
             Theme.LIGHT -> false
             Theme.DARK -> true
+        }
+        LaunchedEffect(isExpanded) {
+            systemController.update { it.copy(isExpanded = isExpanded) }
         }
         EdgeToEdge(
             darkTheme = darkTheme,

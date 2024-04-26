@@ -7,9 +7,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.SheetState
-import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -23,6 +20,9 @@ import com.ammar.wallflow.extensions.toDp
 import com.ammar.wallflow.model.search.RedditSearch
 import com.ammar.wallflow.model.search.Search
 import com.ammar.wallflow.model.search.WallhavenSearch
+import com.ammar.wallflow.ui.common.AdaptiveBottomSheet
+import com.ammar.wallflow.ui.common.AdaptiveBottomSheetState
+import com.ammar.wallflow.ui.common.rememberAdaptiveBottomSheetState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -31,7 +31,7 @@ import kotlinx.coroutines.launch
 fun EditSearchModalBottomSheet(
     modifier: Modifier = Modifier,
     contentModifier: Modifier = Modifier,
-    state: SheetState = rememberModalBottomSheetState(),
+    state: AdaptiveBottomSheetState = rememberAdaptiveBottomSheetState(),
     search: Search = WallhavenSearch(),
     header: @Composable (ColumnScope.() -> Unit)? = null,
     showNSFW: Boolean = false,
@@ -55,7 +55,7 @@ fun EditSearchModalBottomSheet(
         }
     }
 
-    ModalBottomSheet(
+    AdaptiveBottomSheet(
         modifier = modifier,
         onDismissRequest = onDismissRequest,
         sheetState = state,

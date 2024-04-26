@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
@@ -39,6 +38,8 @@ import com.ammar.wallflow.model.reddit.redditWallpaper1
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.model.wallhaven.WallhavenWallpaper
 import com.ammar.wallflow.model.wallhaven.wallhavenWallpaper1
+import com.ammar.wallflow.ui.common.AdaptiveBottomSheet
+import com.ammar.wallflow.ui.common.rememberAdaptiveBottomSheetState
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import com.ammar.wallflow.utils.getRealPath
 import kotlinx.coroutines.launch
@@ -56,22 +57,24 @@ fun WallpaperInfoBottomSheet(
     onSourceLongClick: () -> Unit = {},
 ) {
     val coroutineScope = rememberCoroutineScope()
-    val bottomSheetState = rememberModalBottomSheetState(
-        skipPartiallyExpanded = true,
+    val adaptiveBottomSheetState = rememberAdaptiveBottomSheetState(
+        bottomSheetState = rememberModalBottomSheetState(
+            skipPartiallyExpanded = true,
+        ),
     )
 
     fun dismissSheet() {
-        coroutineScope.launch { bottomSheetState.hide() }.invokeOnCompletion {
-            if (!bottomSheetState.isVisible) {
+        coroutineScope.launch { adaptiveBottomSheetState.hide() }.invokeOnCompletion {
+            if (!adaptiveBottomSheetState.isVisible) {
                 onDismissRequest()
             }
         }
     }
 
-    ModalBottomSheet(
+    AdaptiveBottomSheet(
         modifier = modifier,
         onDismissRequest = onDismissRequest,
-        sheetState = bottomSheetState,
+        sheetState = adaptiveBottomSheetState,
     ) {
         WallpaperInfoBottomSheetContent(
             modifier = contentModifier
