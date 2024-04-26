@@ -250,7 +250,7 @@ private fun DrawScope.drawScrollbar(
         color = color,
         topLeft = topLeft,
         size = size,
-        alpha = alpha(),
+        alpha = alpha().coerceIn(0f, 1f),
     )
 }
 
