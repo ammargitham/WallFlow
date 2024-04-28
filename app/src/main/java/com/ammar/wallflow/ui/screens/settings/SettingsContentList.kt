@@ -29,6 +29,7 @@ fun SettingsContentList(
         modifier = modifier,
         contentPadding = PaddingValues(
             horizontal = (if (isExpanded) 16 else 0).dp,
+            vertical = 8.dp,
         ),
     ) {
         mainSettingsListItem(

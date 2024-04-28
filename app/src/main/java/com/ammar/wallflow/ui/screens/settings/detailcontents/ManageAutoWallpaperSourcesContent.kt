@@ -10,7 +10,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SecondaryTabRow
 import androidx.compose.material3.Surface
@@ -34,6 +33,7 @@ import com.ammar.wallflow.model.local.LocalDirectory
 import com.ammar.wallflow.model.search.SavedSearch
 import com.ammar.wallflow.model.search.WallhavenSearch
 import com.ammar.wallflow.ui.screens.settings.AutoWallpaperSources
+import com.ammar.wallflow.ui.screens.settings.composables.SettingsExtraListItem
 import com.ammar.wallflow.ui.screens.settings.composables.wallpaperTargetString
 import com.ammar.wallflow.ui.screens.settings.detailcontents.composables.FavoritesSection
 import com.ammar.wallflow.ui.screens.settings.detailcontents.composables.LightDarkSection
@@ -55,6 +55,7 @@ fun ManageAutoWallpaperSourcesContent(
     localDirectories: ImmutableList<LocalDirectory> = persistentListOf(),
     homeScreenSources: AutoWallpaperSources = AutoWallpaperSources(),
     lockScreenSources: AutoWallpaperSources = AutoWallpaperSources(),
+    isExpanded: Boolean = false,
     onChangeUseSameSources: (Boolean) -> Unit = {},
     onChangeLightDarkEnabled: (Boolean, WallpaperTarget) -> Unit = { _, _ -> },
     onChangeUseDarkWithExtraDim: (Boolean, WallpaperTarget) -> Unit = { _, _ -> },
@@ -80,8 +81,9 @@ fun ManageAutoWallpaperSourcesContent(
             .fillMaxSize()
             .verticalScroll(state = rememberScrollState()),
     ) {
-        ListItem(
+        SettingsExtraListItem(
             modifier = Modifier.clickable { onChangeUseSameSources(!useSameSources) },
+            isExpanded = isExpanded,
             headlineContent = {
                 Text(
                     text = stringResource(R.string.use_same_sources_homescreen_lockscreen),
@@ -117,6 +119,7 @@ fun ManageAutoWallpaperSourcesContent(
             hasLightDarkWallpapers = hasLightDarkWallpapers,
             lightDarkEnabled = activeSources.lightDarkEnabled,
             useDarkWithExtraDim = activeSources.useDarkWithExtraDim,
+            isExpanded = isExpanded,
             onChangeLightDarkEnabled = { onChangeLightDarkEnabled(it, activeTarget) },
             onChangeUseDarkWithExtraDim = { onChangeUseDarkWithExtraDim(it, activeTarget) },
         )
@@ -125,6 +128,7 @@ fun ManageAutoWallpaperSourcesContent(
             savedSearchEnabled = activeSources.savedSearchEnabled,
             savedSearchIds = activeSources.savedSearchIds,
             lightDarkEnabled = activeSources.lightDarkEnabled,
+            isExpanded = isExpanded,
             onChangeSavedSearchEnabled = { onChangeSavedSearchEnabled(it, activeTarget) },
             onChangeSavedSearchIds = { onChangeSavedSearchIds(it, activeTarget) },
         )
@@ -132,6 +136,7 @@ fun ManageAutoWallpaperSourcesContent(
             favoritesEnabled = activeSources.favoritesEnabled,
             hasFavorites = hasFavorites,
             lightDarkEnabled = activeSources.lightDarkEnabled,
+            isExpanded = isExpanded,
             onChangeFavoritesEnabled = { onChangeFavoritesEnabled(it, activeTarget) },
         )
         LocalSection(
@@ -139,6 +144,7 @@ fun ManageAutoWallpaperSourcesContent(
             localEnabled = activeSources.localEnabled,
             selectedUris = activeSources.localDirs,
             lightDarkEnabled = activeSources.lightDarkEnabled,
+            isExpanded = isExpanded,
             onChangeLocalEnabled = { onChangeLocalEnabled(it, activeTarget) },
             onChangeSelectedUris = { onChangeSelectedLocalDirs(it, activeTarget) },
         )

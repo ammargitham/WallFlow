@@ -273,9 +273,10 @@ fun HomeScreen(
             modifier = Modifier.fillMaxSize(),
             nestedScrollConnectionGetter = { nestedScrollConnection },
             isExpanded = systemState.isExpanded,
+            isMedium = systemState.isMedium,
             contentPadding = PaddingValues(
-                start = 8.dp,
-                end = 8.dp,
+                start = if (systemState.isExpanded) 0.dp else 8.dp,
+                end = if (systemState.isExpanded) 0.dp else 8.dp,
                 top = SearchBar.Defaults.height,
                 bottom = bottomPadding + 8.dp,
             ),

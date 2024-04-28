@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -24,7 +23,7 @@ import com.ammar.wallflow.destinations.WallpaperScreenDestination
 import com.ammar.wallflow.extensions.rememberLazyStaggeredGridState
 import com.ammar.wallflow.extensions.safeLaunch
 import com.ammar.wallflow.model.Wallpaper
-import com.ammar.wallflow.navigation.AppNavGraphs
+import com.ammar.wallflow.navigation.AppNavGraphs.LocalNavGraph
 import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.bottomWindowInsets
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
@@ -36,13 +35,11 @@ import com.ammar.wallflow.utils.getStartBottomPadding
 import com.ammar.wallflow.utils.shareWallpaper
 import com.ramcosta.composedestinations.annotation.Destination
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Destination<AppNavGraphs.LocalNavGraph>(
+@Destination<LocalNavGraph>(
     start = true,
 )
 @Composable
 fun LocalScreen(
-    // navController: NavController,
     rootNavControllerWrapper: RootNavControllerWrapper,
     viewModel: LocalScreenViewModel = hiltViewModel(),
     viewerViewModel: WallpaperViewerViewModel = hiltViewModel(),
@@ -122,8 +119,8 @@ fun LocalScreen(
         folders = uiState.folders,
         isExpanded = systemState.isExpanded,
         contentPadding = PaddingValues(
-            start = 8.dp,
-            end = 8.dp,
+            start = if (systemState.isExpanded) 0.dp else 8.dp,
+            end = if (systemState.isExpanded) 0.dp else 8.dp,
             top = 8.dp,
             bottom = bottomPadding + 8.dp,
         ),

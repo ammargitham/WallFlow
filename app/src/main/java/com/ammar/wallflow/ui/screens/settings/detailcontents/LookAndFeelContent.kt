@@ -5,7 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -16,7 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.R
 import com.ammar.wallflow.ui.screens.settings.SettingsExtraType
-import com.ammar.wallflow.ui.screens.settings.composables.settingsListItem
+import com.ammar.wallflow.ui.screens.settings.composables.SettingsDetailListItem
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 
 @Composable
@@ -37,20 +36,25 @@ internal fun LookAndFeelContent(
         modifier = modifier.fillMaxSize(),
     ) {
         item {
-            ListItem(
+            SettingsDetailListItem(
                 modifier = Modifier.clickable(onClick = onThemeClick),
+                isExpanded = isExpanded,
+                isFirst = true,
                 headlineContent = { Text(text = stringResource(R.string.theme)) },
             )
         }
-        settingsListItem(
-            isExpanded = isExpanded,
-            selected = selectedType == SettingsExtraType.LAYOUT,
-            labelRes = R.string.layout,
-            onClick = onLayoutClick,
-        )
         item {
-            ListItem(
+            SettingsDetailListItem(
+                modifier = Modifier.clickable(onClick = onLayoutClick),
+                isExpanded = isExpanded,
+                selected = selectedType == SettingsExtraType.LAYOUT,
+                headlineContent = { Text(text = stringResource(R.string.layout)) },
+            )
+        }
+        item {
+            SettingsDetailListItem(
                 modifier = Modifier.clickable { onBlurSketchyCheckChange(!blurSketchy) },
+                isExpanded = isExpanded,
                 headlineContent = { Text(text = stringResource(R.string.blur_sketchy_wallpapers)) },
                 trailingContent = {
                     Switch(
@@ -62,8 +66,9 @@ internal fun LookAndFeelContent(
             )
         }
         item {
-            ListItem(
+            SettingsDetailListItem(
                 modifier = Modifier.clickable { onBlurNsfwCheckChange(!blurNsfw) },
+                isExpanded = isExpanded,
                 headlineContent = { Text(text = stringResource(R.string.blur_nsfw_wallpapers)) },
                 trailingContent = {
                     Switch(
@@ -75,8 +80,10 @@ internal fun LookAndFeelContent(
             )
         }
         item {
-            ListItem(
+            SettingsDetailListItem(
                 modifier = Modifier.clickable { onShowLocalTabChange(!showLocalTab) },
+                isExpanded = isExpanded,
+                isLast = true,
                 headlineContent = { Text(text = stringResource(R.string.show_local_tab)) },
                 trailingContent = {
                     Switch(

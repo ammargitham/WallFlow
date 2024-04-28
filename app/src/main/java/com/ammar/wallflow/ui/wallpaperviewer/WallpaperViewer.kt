@@ -6,15 +6,21 @@ import androidx.compose.animation.Crossfade
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
@@ -26,16 +32,20 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.ScaleFactor
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import coil.compose.AsyncImagePainter
 import coil.compose.rememberAsyncImagePainter
@@ -82,7 +92,7 @@ fun WallpaperViewer(
     loading: Boolean = false,
     thumbData: String? = null,
     showInfo: Boolean = false,
-    showFullScreenAction: Boolean = false,
+    isExpanded: Boolean = false,
     isFavorite: Boolean = false,
     showBackButton: Boolean = false,
     lightDarkTypeFlags: Int = LightDarkType.UNSPECIFIED,
@@ -102,6 +112,7 @@ fun WallpaperViewer(
     onLightDarkTypeFlagsChange: (Int) -> Unit = {},
 ) {
     val clipboardManager = LocalClipboardManager.current
+    val layoutDirection = LocalLayoutDirection.current
     var showRationale by rememberSaveable { mutableStateOf(false) }
     var containerIntSize by remember { mutableStateOf(IntSize.Zero) }
     var showLightDarkInfo by rememberSaveable { mutableStateOf(false) }
@@ -221,6 +232,22 @@ fun WallpaperViewer(
     Box(
         modifier = modifier
             .fillMaxSize()
+            .then(
+                if (isExpanded) {
+                    Modifier
+                        .windowInsetsPadding(WindowInsets.systemBars)
+                        .padding(
+                            top = 16.dp,
+                            bottom = 16.dp,
+                            end = if (layoutDirection == LayoutDirection.Ltr) 16.dp else 0.dp,
+                            start = if (layoutDirection == LayoutDirection.Rtl) 16.dp else 0.dp,
+                        )
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(MaterialTheme.colorScheme.surfaceBright)
+                } else {
+                    Modifier
+                },
+            )
             .onSizeChanged { containerIntSize = it },
     ) {
         Crossfade(
@@ -230,7 +257,7 @@ fun WallpaperViewer(
         ) {
             val imageRequest = it.request
             if (
-                showFullScreenAction && // means two pane mode
+                isExpanded && // means two pane mode
                 it.state !is AsyncImagePainter.State.Loading &&
                 imageRequest.data is NullRequestData
             ) {
@@ -267,7 +294,7 @@ fun WallpaperViewer(
             WallpaperActions(
                 downloadStatus = downloadStatus,
                 showApplyWallpaperAction = applyWallpaperEnabled,
-                showFullScreenAction = showFullScreenAction,
+                showFullScreenAction = isExpanded,
                 showDownloadAction = wallpaper is DownloadableWallpaper,
                 isFavorite = isFavorite,
                 lightDarkTypeFlags = lightDarkTypeFlags,
@@ -295,7 +322,12 @@ fun WallpaperViewer(
         // }
 
         TopBar(
-            visible = if (showFullScreenAction) {
+            windowInsets = if (isExpanded) {
+                WindowInsets(top = 0)
+            } else {
+                TopAppBarDefaults.windowInsets
+            },
+            visible = if (isExpanded) {
                 painter.state is AsyncImagePainter.State.Success &&
                     painter.request.data == wallpaper?.data &&
                     actionsVisible

@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
@@ -31,6 +30,7 @@ import com.ammar.wallflow.model.search.WallhavenSearch
 import com.ammar.wallflow.ui.common.DropdownMultiple
 import com.ammar.wallflow.ui.common.DropdownOption
 import com.ammar.wallflow.ui.common.SectionHeader
+import com.ammar.wallflow.ui.screens.settings.composables.SettingsExtraListItem
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -42,6 +42,7 @@ internal fun ColumnScope.SavedSearchesSection(
     savedSearchEnabled: Boolean = false,
     savedSearchIds: Set<Long> = emptySet(),
     lightDarkEnabled: Boolean = false,
+    isExpanded: Boolean = false,
     onChangeSavedSearchEnabled: (Boolean) -> Unit = {},
     onChangeSavedSearchIds: (Set<Long>) -> Unit = {},
 ) {
@@ -56,10 +57,11 @@ internal fun ColumnScope.SavedSearchesSection(
     }
 
     SectionHeader(text = stringResource(R.string.saved_searches))
-    ListItem(
+    SettingsExtraListItem(
         modifier = Modifier.clickable(enabled = !disabled) {
             onChangeSavedSearchEnabled(!savedSearchEnabled)
         },
+        isExpanded = isExpanded,
         headlineContent = {
             Text(
                 text = stringResource(R.string.use_saved_searches),

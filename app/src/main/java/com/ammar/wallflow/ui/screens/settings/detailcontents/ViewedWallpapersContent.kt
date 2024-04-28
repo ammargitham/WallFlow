@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
@@ -20,7 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.preferences.ViewedWallpapersLook
 import com.ammar.wallflow.ui.screens.settings.SettingsExtraType
-import com.ammar.wallflow.ui.screens.settings.composables.settingsListItem
+import com.ammar.wallflow.ui.screens.settings.composables.SettingsDetailListItem
 import com.ammar.wallflow.ui.screens.settings.composables.viewedWallpapersLookString
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 
@@ -39,12 +38,12 @@ internal fun ViewedWallpapersContent(
         modifier = modifier.fillMaxSize(),
     ) {
         item {
-            ListItem(
+            SettingsDetailListItem(
                 modifier = Modifier.clickable { onEnabledChange(!enabled) },
+                isExpanded = isExpanded,
+                isFirst = true,
                 headlineContent = {
-                    Text(
-                        text = stringResource(R.string.remember_viewed_wallpapers),
-                    )
+                    Text(text = stringResource(R.string.remember_viewed_wallpapers))
                 },
                 trailingContent = {
                     Switch(
@@ -55,14 +54,18 @@ internal fun ViewedWallpapersContent(
                 },
             )
         }
-        settingsListItem(
-            modifier = Modifier.clickable(onClick = onViewedWallpapersLookClick),
-            isExpanded = isExpanded,
-            selected = selectedType == SettingsExtraType.VIEW_WALLPAPERS_LOOK,
-            labelRes = R.string.viewed_wallpapers_look,
-            supportingContent = { Text(text = viewedWallpapersLookString(look)) },
-            onClick = onViewedWallpapersLookClick,
-        )
+        item {
+            SettingsDetailListItem(
+                modifier = Modifier.clickable(onClick = onViewedWallpapersLookClick),
+                isExpanded = isExpanded,
+                isLast = true,
+                selected = selectedType == SettingsExtraType.VIEW_WALLPAPERS_LOOK,
+                headlineContent = {
+                    Text(text = stringResource(R.string.viewed_wallpapers_look))
+                },
+                supportingContent = { Text(text = viewedWallpapersLookString(look)) },
+            )
+        }
         item {
             // TODO: Change to normal text button
             Box(

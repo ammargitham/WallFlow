@@ -3,11 +3,16 @@ package com.ammar.wallflow.ui.screens.settings.composables
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import com.ammar.wallflow.R
+import com.ammar.wallflow.ui.common.BackIcon
 import com.ammar.wallflow.ui.common.TopBar
 import com.ammar.wallflow.ui.screens.settings.SettingsExtraType
 import com.ammar.wallflow.ui.screens.settings.SettingsExtraType.AUTO_WALLPAPER_SOURCES
@@ -22,14 +27,21 @@ internal fun ExtraContentTopBar(
     onBackClick: () -> Unit = {},
 ) {
     TopBar(
+        modifier = Modifier.clipToBounds(),
         title = { ExtraTopBarTitle(selectedExtraType) },
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = if (isExpanded) {
+                MaterialTheme.colorScheme.surfaceBright
+            } else {
+                MaterialTheme.colorScheme.surface
+            },
+        ),
         showBackButton = !isExpanded || selectedExtraType != null,
         backIcon = if (isExpanded) {
             { CloseIcon(onClick = onBackClick) }
         } else {
-            null
+            { BackIcon(onClick = onBackClick) }
         },
-        onBackClick = onBackClick,
     )
 }
 

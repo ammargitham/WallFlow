@@ -5,6 +5,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationRail
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Text
@@ -35,6 +36,7 @@ fun NavRail(
     ) {
         NavigationRail(
             modifier = modifier,
+            containerColor = MaterialTheme.colorScheme.surfaceContainer,
         ) {
             Spacer(Modifier.weight(1f))
             BottomBarDestination.entries

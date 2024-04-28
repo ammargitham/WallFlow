@@ -99,7 +99,7 @@ class MainActivity : ComponentActivity() {
     @Composable
     private fun Content() {
         val windowSizeClass = calculateWindowSizeClass(this)
-        val useNavRail = windowSizeClass.widthSizeClass > WindowWidthSizeClass.Compact
+        val isMedium = windowSizeClass.widthSizeClass >= WindowWidthSizeClass.Medium
         val isExpanded = windowSizeClass.widthSizeClass >= WindowWidthSizeClass.Expanded
 
         navController = rememberNavController()
@@ -115,12 +115,17 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-        LaunchedEffect(useNavRail) {
-            bottomBarController.update { it.copy(isRail = useNavRail) }
+        LaunchedEffect(isMedium) {
+            bottomBarController.update { it.copy(isRail = isMedium) }
         }
 
-        LaunchedEffect(isExpanded) {
-            systemController.update { it.copy(isExpanded = isExpanded) }
+        LaunchedEffect(isExpanded, isMedium) {
+            systemController.update {
+                it.copy(
+                    isMedium = isMedium,
+                    isExpanded = isExpanded,
+                )
+            }
         }
 
         val systemInDarkTheme = isSystemInDarkTheme()
@@ -151,7 +156,11 @@ class MainActivity : ComponentActivity() {
                         }
                     }
                     .semantics { testTagsAsResourceId = true },
-                color = MaterialTheme.colorScheme.background,
+                color = if (isMedium) {
+                    MaterialTheme.colorScheme.surfaceContainer
+                } else {
+                    MaterialTheme.colorScheme.background
+                },
             ) {
                 MainNavigation(
                     navController = navController,

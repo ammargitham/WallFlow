@@ -46,6 +46,7 @@ fun MoreScreen(
             .fillMaxSize()
             .windowInsetsPadding(topWindowInsets),
         isExpanded = systemState.isExpanded,
+        isMedium = systemState.isMedium,
         onSettingsClick = { moreNavigate(ActiveOption.SETTINGS) },
         onBackupRestoreClick = { moreNavigate(ActiveOption.BACKUP_RESTORE) },
     ) { moreNavigate(ActiveOption.OSL) }

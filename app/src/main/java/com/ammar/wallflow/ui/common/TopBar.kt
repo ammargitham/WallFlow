@@ -15,6 +15,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
@@ -63,6 +64,73 @@ fun TopBar(
     actions: @Composable RowScope.() -> Unit = {},
     onBackClick: () -> Unit = {},
 ) {
+    TopBar(
+        modifier = modifier,
+        windowInsets = windowInsets,
+        scrollBehavior = scrollBehavior,
+        showBackButton = showBackButton,
+        title = title,
+        backIcon = backIcon ?: {
+            BackIcon(
+                onClick = onBackClick,
+            )
+        },
+        visible = visible,
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = if (gradientBg) {
+                BottomAppBarDefaults.containerColor.copy(alpha = 0.8f)
+            } else {
+                MaterialTheme.colorScheme.surface
+            },
+            actionIconContentColor = if (gradientBg) {
+                MaterialTheme.colorScheme.onSurface
+            } else {
+                MaterialTheme.colorScheme.onSurfaceVariant
+            },
+        ),
+        actions = actions,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopBar(
+    modifier: Modifier = Modifier,
+    windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
+    scrollBehavior: TopAppBarScrollBehavior? = null,
+    showBackButton: Boolean = false,
+    title: @Composable () -> Unit = {},
+    visible: Boolean = true,
+    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),
+    actions: @Composable RowScope.() -> Unit = {},
+    onBackClick: () -> Unit = {},
+) {
+    TopBar(
+        modifier = modifier,
+        windowInsets = windowInsets,
+        scrollBehavior = scrollBehavior,
+        showBackButton = showBackButton,
+        title = title,
+        backIcon = { BackIcon(onBackClick) },
+        visible = visible,
+        colors = colors,
+        actions = actions,
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun TopBar(
+    modifier: Modifier = Modifier,
+    windowInsets: WindowInsets = TopAppBarDefaults.windowInsets,
+    scrollBehavior: TopAppBarScrollBehavior? = null,
+    showBackButton: Boolean = false,
+    title: @Composable () -> Unit = {},
+    backIcon: @Composable () -> Unit = {},
+    visible: Boolean = true,
+    colors: TopAppBarColors = TopAppBarDefaults.topAppBarColors(),
+    actions: @Composable RowScope.() -> Unit = {},
+) {
     AnimatedVisibility(
         visible = visible,
         enter = slideInVertically(),
@@ -77,29 +145,25 @@ fun TopBar(
                     enter = slideInHorizontally(),
                     exit = slideOutHorizontally(),
                 ) {
-                    backIcon?.invoke() ?: IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back),
-                        )
-                    }
+                    backIcon()
                 }
             },
             title = title,
             scrollBehavior = scrollBehavior,
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = if (gradientBg) {
-                    BottomAppBarDefaults.containerColor.copy(alpha = 0.8f)
-                } else {
-                    MaterialTheme.colorScheme.surface
-                },
-                actionIconContentColor = if (gradientBg) {
-                    MaterialTheme.colorScheme.onSurface
-                } else {
-                    MaterialTheme.colorScheme.onSurfaceVariant
-                },
-            ),
+            colors = colors,
             actions = actions,
+        )
+    }
+}
+
+@Composable
+fun BackIcon(
+    onClick: () -> Unit = {},
+) {
+    IconButton(onClick = onClick) {
+        Icon(
+            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+            contentDescription = stringResource(R.string.back),
         )
     }
 }

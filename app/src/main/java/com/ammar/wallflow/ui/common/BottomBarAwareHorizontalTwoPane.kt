@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.extensions.findActivity
 import com.ammar.wallflow.extensions.toDp
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
@@ -33,7 +34,10 @@ fun BottomBarAwareHorizontalTwoPane(
         modifier = modifier,
         first = first,
         second = second,
-        strategy = HorizontalTwoPaneStrategy(splitOffset = feedWidth),
+        strategy = HorizontalTwoPaneStrategy(
+            splitOffset = feedWidth,
+            gapWidth = 24.dp,
+        ),
         displayFeatures = calculateDisplayFeatures(context.findActivity()),
         foldAwareConfiguration = FoldAwareConfiguration.VerticalFoldsOnly,
     )

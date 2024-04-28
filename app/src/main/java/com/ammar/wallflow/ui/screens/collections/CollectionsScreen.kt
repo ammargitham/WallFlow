@@ -33,7 +33,7 @@ import com.ammar.wallflow.model.search.WallhavenTagSearchMeta
 import com.ammar.wallflow.model.search.WallhavenUploaderSearchMeta
 import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.model.wallhaven.WallhavenUploader
-import com.ammar.wallflow.navigation.AppNavGraphs
+import com.ammar.wallflow.navigation.AppNavGraphs.CollectionsNavGraph
 import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.bottomWindowInsets
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
@@ -47,7 +47,7 @@ import com.ammar.wallflow.utils.shareWallpaper
 import com.ammar.wallflow.utils.shareWallpaperUrl
 import com.ramcosta.composedestinations.annotation.Destination
 
-@Destination<AppNavGraphs.CollectionsNavGraph>(
+@Destination<CollectionsNavGraph>(
     start = true,
 )
 @Composable
@@ -146,8 +146,8 @@ fun CollectionsScreen(
             modifier = Modifier.fillMaxSize(),
             isExpanded = systemState.isExpanded,
             contentPadding = PaddingValues(
-                start = 8.dp,
-                end = 8.dp,
+                start = if (systemState.isExpanded) 0.dp else 8.dp,
+                end = if (systemState.isExpanded) 0.dp else 8.dp,
                 top = 8.dp,
                 bottom = bottomPadding + 8.dp,
             ),

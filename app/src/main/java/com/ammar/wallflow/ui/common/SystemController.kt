@@ -19,6 +19,7 @@ data class SystemState(
     val statusBarColor: Color = Color.Unspecified,
     val navigationBarVisible: Boolean = true,
     val navigationBarColor: Color = Color.Unspecified,
+    val isMedium: Boolean = false,
     val isExpanded: Boolean = false,
     val size: IntSize = IntSize.Zero,
     val isStatusBarLight: Boolean? = null,
@@ -36,6 +37,7 @@ class DefaultSystemController(initialState: SystemState) : SystemController() {
     override fun resetBarsState() {
         _state.value = SystemState(
             isExpanded = _state.value.isExpanded,
+            isMedium = _state.value.isMedium,
             size = _state.value.size,
         )
     }

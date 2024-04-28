@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -20,6 +21,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Surface
@@ -47,10 +49,10 @@ import com.ammar.wallflow.ui.common.ProgressIndicator
 import com.ammar.wallflow.ui.common.getPaddingValuesConverter
 import com.ammar.wallflow.ui.screens.settings.NextRun
 import com.ammar.wallflow.ui.screens.settings.SettingsExtraType
+import com.ammar.wallflow.ui.screens.settings.composables.SettingsDetailListItem
 import com.ammar.wallflow.ui.screens.settings.composables.getFrequencyString
 import com.ammar.wallflow.ui.screens.settings.composables.getNextRunString
 import com.ammar.wallflow.ui.screens.settings.composables.getTargetsSummary
-import com.ammar.wallflow.ui.screens.settings.composables.settingsListItem
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import com.ammar.wallflow.utils.objectdetection.objectsDetector
 import com.ammar.wallflow.workers.AutoWallpaperWorker
@@ -97,8 +99,11 @@ internal fun AutoWallpaperContent(
         val objectDetectionAlpha = if (enabled && crop) 1f else DISABLED_ALPHA
 
         item {
-            ListItem(
+            SettingsDetailListItem(
                 modifier = Modifier.clickable { onEnabledChange(!enabled) },
+                isExpanded = isExpanded,
+                isFirst = true,
+                isLast = true,
                 headlineContent = { Text(text = stringResource(R.string.enable_auto_wallpaper)) },
                 trailingContent = {
                     Switch(
@@ -112,6 +117,7 @@ internal fun AutoWallpaperContent(
         if (enabled) {
             item {
                 ListItem(
+                    modifier = Modifier.animateItem(),
                     headlineContent = {
                         Text(
                             text = getNextRunString(
@@ -131,37 +137,58 @@ internal fun AutoWallpaperContent(
                             )
                         }
                     },
+                    colors = ListItemDefaults.colors(
+                        containerColor = if (isExpanded) {
+                            MaterialTheme.colorScheme.surfaceContainer
+                        } else {
+                            MaterialTheme.colorScheme.surface
+                        },
+                    ),
+                )
+            }
+        } else if (isExpanded) {
+            item {
+                Spacer(
+                    modifier = Modifier
+                        .requiredHeight(8.dp)
+                        .animateItem(),
                 )
             }
         }
-        settingsListItem(
-            headlineContent = {
-                Text(
-                    text = stringResource(R.string.sources),
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
-                )
-            },
-            supportingContent = if (sourcesSummary?.isNotBlank() == true) {
-                {
-                    Text(
-                        text = sourcesSummary,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = alpha),
-                    )
-                }
-            } else {
-                null
-            },
-            selected = selectedType == SettingsExtraType.AUTO_WALLPAPER_SOURCES,
-            isExpanded = isExpanded,
-            enabled = enabled,
-            onClick = onSourcesClick,
-        )
         item {
-            ListItem(
+            SettingsDetailListItem(
+                modifier = Modifier.clickable(
+                    enabled = enabled,
+                    onClick = onSourcesClick,
+                ),
+                isExpanded = isExpanded,
+                isFirst = isExpanded,
+                headlineContent = {
+                    Text(
+                        text = stringResource(R.string.sources),
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = alpha),
+                    )
+                },
+                supportingContent = if (sourcesSummary?.isNotBlank() == true) {
+                    {
+                        Text(
+                            text = sourcesSummary,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = alpha),
+                        )
+                    }
+                } else {
+                    null
+                },
+                selected = selectedType == SettingsExtraType.AUTO_WALLPAPER_SOURCES,
+            )
+        }
+        item {
+            SettingsDetailListItem(
                 modifier = Modifier.clickable(
                     enabled = enabled,
                     onClick = onSetToClick,
                 ),
+                isExpanded = isExpanded,
                 headlineContent = {
                     Text(
                         text = stringResource(R.string.set_to),
@@ -181,11 +208,12 @@ internal fun AutoWallpaperContent(
             )
         }
         item {
-            ListItem(
+            SettingsDetailListItem(
                 modifier = Modifier.clickable(
                     enabled = enabled,
                     onClick = onFrequencyClick,
                 ),
+                isExpanded = isExpanded,
                 headlineContent = {
                     Text(
                         text = stringResource(R.string.frequency),
@@ -205,11 +233,12 @@ internal fun AutoWallpaperContent(
             )
         }
         item {
-            ListItem(
+            SettingsDetailListItem(
                 modifier = Modifier.clickable(
                     enabled = enabled,
                     onClick = { onCropChange(!crop) },
                 ),
+                isExpanded = isExpanded,
                 headlineContent = {
                     Text(
                         text = stringResource(R.string.crop),
@@ -234,11 +263,12 @@ internal fun AutoWallpaperContent(
         }
         if (objectsDetector.isEnabled) {
             item {
-                ListItem(
+                SettingsDetailListItem(
                     modifier = Modifier.clickable(
                         enabled = enabled && crop,
                         onClick = { onUseObjectDetectionChange(!useObjectDetection) },
                     ),
+                    isExpanded = isExpanded,
                     headlineContent = {
                         Text(
                             text = stringResource(R.string.use_object_detection),
@@ -267,11 +297,12 @@ internal fun AutoWallpaperContent(
             }
         }
         item {
-            ListItem(
+            SettingsDetailListItem(
                 modifier = Modifier.clickable(
                     enabled = enabled,
                     onClick = onConstraintsClick,
                 ),
+                isExpanded = isExpanded,
                 headlineContent = {
                     Text(
                         text = stringResource(R.string.constraints),
@@ -287,11 +318,12 @@ internal fun AutoWallpaperContent(
             )
         }
         item {
-            ListItem(
+            SettingsDetailListItem(
                 modifier = Modifier.clickable(
                     enabled = enabled,
                     onClick = { onMarkFavoriteChange(!markFavorite) },
                 ),
+                isExpanded = isExpanded,
                 headlineContent = {
                     Text(
                         text = stringResource(R.string.mark_as_favorite),
@@ -315,11 +347,12 @@ internal fun AutoWallpaperContent(
             )
         }
         item {
-            ListItem(
+            SettingsDetailListItem(
                 modifier = Modifier.clickable(
                     enabled = enabled,
                     onClick = { onDownloadChange(!download) },
                 ),
+                isExpanded = isExpanded,
                 headlineContent = {
                     Text(
                         text = stringResource(R.string.download),
@@ -343,11 +376,13 @@ internal fun AutoWallpaperContent(
             )
         }
         item {
-            ListItem(
+            SettingsDetailListItem(
                 modifier = Modifier.clickable(
                     enabled = enabled,
                     onClick = { onShowNotificationChange(!showNotification) },
                 ),
+                isExpanded = isExpanded,
+                isLast = true,
                 headlineContent = {
                     Text(
                         text = stringResource(R.string.notification),
@@ -372,7 +407,11 @@ internal fun AutoWallpaperContent(
         }
         item {
             Box(
-                modifier = Modifier.padding(horizontal = 16.dp),
+                modifier = Modifier.padding(
+                    start = 16.dp,
+                    end = 16.dp,
+                    top = 8.dp,
+                ),
             ) {
                 ChangeNowButton(
                     autoWallpaperStatus = autoWallpaperStatus,

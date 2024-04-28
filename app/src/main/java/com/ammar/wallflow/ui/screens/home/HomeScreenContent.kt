@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridScope
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -69,6 +70,7 @@ internal fun HomeScreenContent(
     modifier: Modifier = Modifier,
     contentPadding: PaddingValues = PaddingValues(8.dp),
     isExpanded: Boolean = false,
+    isMedium: Boolean = false,
     favorites: ImmutableList<Favorite> = persistentListOf(),
     viewedList: ImmutableList<Viewed> = persistentListOf(),
     viewedWallpapersLook: ViewedWallpapersLook = ViewedWallpapersLook.DIM_WITH_LABEL,
@@ -109,25 +111,26 @@ internal fun HomeScreenContent(
         isExpanded = isExpanded,
         listContent = {
             Feed(
+                wallpapers = wallpapers,
                 modifier = Modifier
                     .fillMaxSize()
                     .nestedScroll(nestedScrollConnectionGetter()),
                 contentPadding = contentPadding,
-                wallpapers = wallpapers,
+                layoutPreferences = layoutPreferences,
                 favorites = favorites,
                 viewedList = viewedList,
                 viewedWallpapersLook = viewedWallpapersLook,
                 lightDarkList = lightDarkList,
                 blurSketchy = blurSketchy,
                 blurNsfw = blurNsfw,
+                showSelection = isExpanded,
+                selectedWallpaper = selectedWallpaper,
+                isHome = isHome,
+                showFAB = showFAB,
+                isMedium = isMedium,
                 pullToRefresh = pullToRefresh,
                 searchBar = searchBar,
                 header = header,
-                selectedWallpaper = selectedWallpaper,
-                showSelection = isExpanded,
-                layoutPreferences = layoutPreferences,
-                showFAB = showFAB,
-                isHome = isHome,
                 onWallpaperClick = onWallpaperClick,
                 onWallpaperFavoriteClick = onWallpaperFavoriteClick,
                 onFABClick = onFABClick,
@@ -140,7 +143,7 @@ internal fun HomeScreenContent(
                 downloadStatus = fullWallpaperDownloadStatus,
                 loading = fullWallpaperLoading,
                 thumbData = selectedWallpaper?.thumbData,
-                showFullScreenAction = isExpanded,
+                isExpanded = isExpanded,
                 showInfo = showFullWallpaperInfo,
                 isFavorite = isFullWallpaperFavorite,
                 lightDarkTypeFlags = fullWallpaperLightDarkTypeFlags,
@@ -213,6 +216,7 @@ private fun Feed(
     selectedWallpaper: Wallpaper? = null,
     isHome: Boolean = true,
     showFAB: Boolean = true,
+    isMedium: Boolean = false,
     pullToRefresh: @Composable () -> Unit = {},
     searchBar: @Composable () -> Unit = {},
     header: (LazyStaggeredGridScope.() -> Unit)? = null,
@@ -224,6 +228,11 @@ private fun Feed(
     Scaffold(
         modifier = modifier,
         contentWindowInsets = WindowInsets(0.dp),
+        containerColor = if (isMedium) {
+            MaterialTheme.colorScheme.surfaceContainer
+        } else {
+            MaterialTheme.colorScheme.background
+        },
         floatingActionButton = {
             AnimatedVisibility(
                 visible = showFAB,

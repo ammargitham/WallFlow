@@ -6,7 +6,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
@@ -21,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.DISABLED_ALPHA
 import com.ammar.wallflow.R
 import com.ammar.wallflow.ui.common.SectionHeader
+import com.ammar.wallflow.ui.screens.settings.composables.SettingsExtraListItem
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 
 @Composable
@@ -28,6 +28,7 @@ internal fun ColumnScope.LightDarkSection(
     hasLightDarkWallpapers: Boolean = false,
     lightDarkEnabled: Boolean = false,
     useDarkWithExtraDim: Boolean = false,
+    isExpanded: Boolean = false,
     onChangeLightDarkEnabled: (Boolean) -> Unit = {},
     onChangeUseDarkWithExtraDim: (Boolean) -> Unit = {},
 ) {
@@ -37,10 +38,11 @@ internal fun ColumnScope.LightDarkSection(
         modifier = Modifier.padding(top = 8.dp),
         text = stringResource(R.string.light_dark),
     )
-    ListItem(
+    SettingsExtraListItem(
         modifier = Modifier.clickable(
             enabled = hasLightDarkWallpapers,
         ) { onChangeLightDarkEnabled(!lightDarkEnabled) },
+        isExpanded = isExpanded,
         headlineContent = {
             Text(
                 text = stringResource(R.string.use_light_dark_wallpapers),
@@ -68,10 +70,11 @@ internal fun ColumnScope.LightDarkSection(
         },
     )
     AnimatedVisibility(visible = lightDarkEnabled && hasLightDarkWallpapers) {
-        ListItem(
+        SettingsExtraListItem(
             modifier = Modifier.clickable(
                 enabled = lightDarkEnabled && hasLightDarkWallpapers,
             ) { onChangeUseDarkWithExtraDim(!useDarkWithExtraDim) },
+            isExpanded = isExpanded,
             headlineContent = {
                 Text(text = stringResource(R.string.use_dark_with_extra_dim))
             },

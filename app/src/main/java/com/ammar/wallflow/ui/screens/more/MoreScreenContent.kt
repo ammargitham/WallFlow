@@ -22,6 +22,7 @@ import com.ammar.wallflow.ui.theme.WallFlowTheme
 internal fun MoreScreenContent(
     modifier: Modifier = Modifier,
     isExpanded: Boolean = false,
+    isMedium: Boolean = false,
     onSettingsClick: () -> Unit = {},
     onBackupRestoreClick: () -> Unit = {},
     onOpenSourceLicensesClick: () -> Unit = {},
@@ -65,6 +66,7 @@ internal fun MoreScreenContent(
         }
         MoreList(
             isExpanded = isExpanded,
+            isMedium = isMedium,
             items = items,
             onItemClick = {
                 when (it.value) {

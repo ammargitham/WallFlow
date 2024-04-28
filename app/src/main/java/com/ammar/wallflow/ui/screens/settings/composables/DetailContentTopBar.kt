@@ -1,7 +1,9 @@
 package com.ammar.wallflow.ui.screens.settings.composables
 
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.ammar.wallflow.R
@@ -18,6 +20,13 @@ internal fun DetailContentTopBar(
     TopBar(
         title = { DetailTopBarTitle(selectedType) },
         showBackButton = !isExpanded,
+        colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = if (isExpanded) {
+                MaterialTheme.colorScheme.surfaceContainer
+            } else {
+                MaterialTheme.colorScheme.surface
+            },
+        ),
         onBackClick = onBackClick,
     )
 }

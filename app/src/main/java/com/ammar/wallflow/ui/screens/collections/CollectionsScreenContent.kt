@@ -95,7 +95,7 @@ internal fun CollectionsScreenContent(
                 downloadStatus = fullWallpaperDownloadStatus,
                 loading = fullWallpaperLoading,
                 thumbData = selectedWallpaper?.thumbData,
-                showFullScreenAction = true,
+                isExpanded = true,
                 showInfo = showFullWallpaperInfo,
                 isFavorite = isFullWallpaperFavorite,
                 onWallpaperTransform = onFullWallpaperTransform,

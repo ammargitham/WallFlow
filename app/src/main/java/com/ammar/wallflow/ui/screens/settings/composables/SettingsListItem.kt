@@ -4,7 +4,9 @@ import android.content.res.Configuration
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.material3.Icon
@@ -23,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.R
 import com.ammar.wallflow.ui.common.NoRippleInteractionSource
 import com.ammar.wallflow.ui.theme.WallFlowTheme
@@ -133,10 +136,18 @@ fun LazyListScope.settingsListItem(
 fun PreviewSettingsListItem() {
     WallFlowTheme {
         Surface {
-            LazyColumn {
+            LazyColumn(
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                contentPadding = PaddingValues(8.dp),
+            ) {
                 settingsListItem(
                     labelRes = R.string.label,
                     iconRes = R.drawable.baseline_favorite_24,
+                )
+                settingsListItem(
+                    isExpanded = true,
+                    labelRes = R.string.label,
+                    selected = true,
                 )
                 settingsListItem(
                     isExpanded = true,

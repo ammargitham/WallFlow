@@ -1,4 +1,4 @@
-package com.ammar.wallflow.ui.screens.settings.composables
+package com.ammar.wallflow.ui.screens.settings.detailcontents
 
 import android.content.res.Configuration
 import androidx.compose.foundation.clickable
@@ -15,7 +15,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Surface
@@ -40,12 +39,15 @@ import com.ammar.wallflow.extensions.toPxF
 import com.ammar.wallflow.ui.common.CardFavoriteButton
 import com.ammar.wallflow.ui.common.CardLabel
 import com.ammar.wallflow.ui.common.CardViewedIcon
+import com.ammar.wallflow.ui.screens.settings.composables.SettingsExtraListItem
+import com.ammar.wallflow.ui.screens.settings.composables.viewedWallpapersLookString
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 
 @Composable
 fun ViewedWallpapersLookOptionsContent(
     modifier: Modifier = Modifier,
     selectedViewedWallpapersLook: ViewedWallpapersLook = ViewedWallpapersLook.DIM_WITH_LABEL,
+    isExpanded: Boolean = false,
     onOptionClick: (senWallpapersLook: ViewedWallpapersLook) -> Unit = {},
 ) {
     val cornerRadius = 12.dp
@@ -139,10 +141,11 @@ fun ViewedWallpapersLookOptionsContent(
                 .verticalScroll(state = scrollState),
         ) {
             ViewedWallpapersLook.entries.map {
-                ListItem(
+                SettingsExtraListItem(
                     modifier = Modifier
                         .clickable(onClick = { onOptionClick(it) })
                         .padding(horizontal = 8.dp),
+                    isExpanded = isExpanded,
                     headlineContent = { Text(text = viewedWallpapersLookString(it)) },
                     leadingContent = {
                         RadioButton(
@@ -164,7 +167,9 @@ fun ViewedWallpapersLookOptionsContent(
 private fun PreviewViewedWallpapersLookOptionsContent() {
     WallFlowTheme {
         Surface {
-            ViewedWallpapersLookOptionsContent()
+            Box(modifier = Modifier.padding(top = 16.dp)) {
+                ViewedWallpapersLookOptionsContent()
+            }
         }
     }
 }

@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
@@ -21,6 +20,7 @@ import com.ammar.wallflow.DISABLED_ALPHA
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.preferences.ObjectDetectionDelegate
 import com.ammar.wallflow.model.ObjectDetectionModel
+import com.ammar.wallflow.ui.screens.settings.composables.SettingsDetailListItem
 import com.ammar.wallflow.ui.screens.settings.composables.delegateString
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 
@@ -30,6 +30,7 @@ internal fun ObjectDetectionContent(
     enabled: Boolean = false,
     delegate: ObjectDetectionDelegate = ObjectDetectionDelegate.GPU,
     model: ObjectDetectionModel = ObjectDetectionModel.DEFAULT,
+    isExpanded: Boolean = false,
     onEnabledChange: (enabled: Boolean) -> Unit = {},
     onDelegateClick: () -> Unit = {},
     onModelClick: () -> Unit = {},
@@ -48,15 +49,21 @@ internal fun ObjectDetectionContent(
         }
         item {
             Text(
-                modifier = Modifier.padding(horizontal = 16.dp),
+                modifier = Modifier.padding(
+                    start = 16.dp,
+                    end = 16.dp,
+                    bottom = 8.dp
+                ),
                 text = stringResource(R.string.object_detection_setting_warning),
                 style = MaterialTheme.typography.bodySmall,
                 fontWeight = FontWeight.Bold,
             )
         }
         item {
-            ListItem(
+            SettingsDetailListItem(
                 modifier = Modifier.clickable { onEnabledChange(!enabled) },
+                isExpanded = isExpanded,
+                isFirst = true,
                 headlineContent = { Text(text = stringResource(R.string.enable_object_detection)) },
                 trailingContent = {
                     Switch(
@@ -68,11 +75,12 @@ internal fun ObjectDetectionContent(
             )
         }
         item {
-            ListItem(
+            SettingsDetailListItem(
                 modifier = Modifier.clickable(
                     enabled = enabled,
                     onClick = onDelegateClick,
                 ),
+                isExpanded = isExpanded,
                 headlineContent = {
                     Text(
                         text = stringResource(R.string.tflite_delegate),
@@ -88,11 +96,13 @@ internal fun ObjectDetectionContent(
             )
         }
         item {
-            ListItem(
+            SettingsDetailListItem(
                 modifier = Modifier.clickable(
                     enabled = enabled,
                     onClick = onModelClick,
                 ),
+                isExpanded = isExpanded,
+                isLast = true,
                 headlineContent = {
                     Text(
                         text = stringResource(R.string.tflite_model),

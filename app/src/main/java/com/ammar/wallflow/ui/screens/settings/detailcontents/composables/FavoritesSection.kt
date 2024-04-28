@@ -2,7 +2,6 @@ package com.ammar.wallflow.ui.screens.settings.detailcontents.composables
 
 import android.content.res.Configuration
 import androidx.compose.foundation.clickable
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
@@ -16,6 +15,7 @@ import androidx.compose.ui.tooling.preview.datasource.CollectionPreviewParameter
 import com.ammar.wallflow.DISABLED_ALPHA
 import com.ammar.wallflow.R
 import com.ammar.wallflow.ui.common.SectionHeader
+import com.ammar.wallflow.ui.screens.settings.composables.SettingsExtraListItem
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 
 @Composable
@@ -23,6 +23,7 @@ internal fun FavoritesSection(
     favoritesEnabled: Boolean = false,
     hasFavorites: Boolean = false,
     lightDarkEnabled: Boolean = false,
+    isExpanded: Boolean = false,
     onChangeFavoritesEnabled: (Boolean) -> Unit = {},
 ) {
     val disabled = !hasFavorites || lightDarkEnabled
@@ -36,10 +37,11 @@ internal fun FavoritesSection(
     }
 
     SectionHeader(text = stringResource(R.string.favorites))
-    ListItem(
+    SettingsExtraListItem(
         modifier = Modifier.clickable(enabled = !disabled) {
             onChangeFavoritesEnabled(!favoritesEnabled)
         },
+        isExpanded = isExpanded,
         headlineContent = {
             Text(
                 text = stringResource(R.string.use_favorites),

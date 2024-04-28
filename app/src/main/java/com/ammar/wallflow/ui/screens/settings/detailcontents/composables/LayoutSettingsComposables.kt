@@ -29,7 +29,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
@@ -77,6 +76,7 @@ import com.ammar.wallflow.extensions.aspectRatio
 import com.ammar.wallflow.extensions.getScreenResolution
 import com.ammar.wallflow.extensions.toDp
 import com.ammar.wallflow.extensions.toPxF
+import com.ammar.wallflow.ui.screens.settings.composables.SettingsExtraListItem
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import kotlin.random.Random
 
@@ -130,11 +130,9 @@ internal fun LayoutPreview(
         return@remember wDp
     }
 
-    BoxWithConstraints(
-        modifier = modifier.background(MaterialTheme.colorScheme.surfaceVariant),
-    ) {
+    BoxWithConstraints(modifier = modifier) {
         val deviceWidth = remember(maxWidth) {
-            var tempWidth = maxWidth / 3
+            var tempWidth = maxWidth / (if (supportsTwoPane) 2 else 3)
             if (maxDeviceHeight > 0.dp) {
                 val calcDeviceHeight = tempWidth / deviceAspectRatio
                 if (calcDeviceHeight > maxDeviceHeight) {
@@ -263,10 +261,12 @@ private fun PreviewLayoutPreview(
 @OptIn(ExperimentalMaterial3Api::class)
 internal fun LazyListScope.gridTypeSection(
     gridType: GridType = GridType.STAGGERED,
+    isExpanded: Boolean = false,
     onGridTypeChange: (GridType) -> Unit = {},
 ) {
     item {
-        ListItem(
+        SettingsExtraListItem(
+            isExpanded = isExpanded,
             headlineContent = {
                 Text(text = stringResource(R.string.grid_type))
             },
@@ -338,10 +338,12 @@ private fun getLabelForGridType(gridType: GridType) = when (gridType) {
 @OptIn(ExperimentalMaterial3Api::class)
 internal fun LazyListScope.gridColTypeSection(
     gridColType: GridColType = GridColType.ADAPTIVE,
+    isExpanded: Boolean = false,
     onGridColTypeChange: (GridColType) -> Unit = {},
 ) {
     item {
-        ListItem(
+        SettingsExtraListItem(
+            isExpanded = isExpanded,
             headlineContent = {
                 Text(text = stringResource(R.string.grid_col_type))
             },
@@ -413,13 +415,15 @@ private fun getLabelForGridColType(gridColType: GridColType) = when (gridColType
 internal fun LazyListScope.noOfColumnsSection(
     noOfColumns: Int = 2,
     sliderPadding: Dp = 0.dp,
+    isExpanded: Boolean = false,
     onNoOfColumnsChange: (Int) -> Unit = {},
 ) {
     item {
         val context = LocalContext.current
         var tempCols by remember(noOfColumns) { mutableIntStateOf(noOfColumns) }
         val sliderPosition = tempCols.toFloat()
-        ListItem(
+        SettingsExtraListItem(
+            isExpanded = isExpanded,
             headlineContent = {
                 Text(text = "${stringResource(R.string.no_of_columns)}: $tempCols")
             },
@@ -474,13 +478,15 @@ private fun PreviewNoOfColumnsSection() {
 internal fun LazyListScope.adaptiveColMinWidthPctSection(
     minWidthPct: Int = 40,
     sliderPadding: Dp = 0.dp,
+    isExpanded: Boolean = false,
     onMinWidthPctChange: (Int) -> Unit = {},
 ) {
     item {
         val context = LocalContext.current
         var tempPct by remember(minWidthPct) { mutableIntStateOf(minWidthPct) }
         val sliderPosition = tempPct.toFloat()
-        ListItem(
+        SettingsExtraListItem(
+            isExpanded = isExpanded,
             headlineContent = {
                 Text(text = "${stringResource(R.string.min_col_width)}: $tempPct%")
             },
@@ -535,10 +541,12 @@ private fun PreviewAdaptiveColMinWidthPctSection() {
 
 internal fun LazyListScope.roundedCornersSection(
     roundedCorners: Boolean = true,
+    isExpanded: Boolean = false,
     onRoundedCornersChange: (Boolean) -> Unit = {},
 ) {
     item {
-        ListItem(
+        SettingsExtraListItem(
+            isExpanded = isExpanded,
             modifier = Modifier.clickable { onRoundedCornersChange(!roundedCorners) },
             headlineContent = { Text(text = stringResource(R.string.rounded_corners)) },
             trailingContent = {

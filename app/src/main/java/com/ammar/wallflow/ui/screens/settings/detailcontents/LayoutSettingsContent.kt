@@ -63,6 +63,7 @@ fun LayoutSettingsScreenContent(
         ) {
             gridTypeSection(
                 gridType = layoutPreferences.gridType,
+                isExpanded = supportsTwoPane,
                 onGridTypeChange = {
                     onLayoutPreferencesChange(
                         layoutPreferences.copy(gridType = it),
@@ -71,6 +72,7 @@ fun LayoutSettingsScreenContent(
             )
             gridColTypeSection(
                 gridColType = layoutPreferences.gridColType,
+                isExpanded = supportsTwoPane,
                 onGridColTypeChange = {
                     onLayoutPreferencesChange(
                         layoutPreferences.copy(gridColType = it),
@@ -81,6 +83,7 @@ fun LayoutSettingsScreenContent(
                 GridColType.ADAPTIVE -> adaptiveColMinWidthPctSection(
                     minWidthPct = layoutPreferences.gridColMinWidthPct,
                     sliderPadding = sliderPadding,
+                    isExpanded = supportsTwoPane,
                     onMinWidthPctChange = {
                         onLayoutPreferencesChange(
                             layoutPreferences.copy(gridColMinWidthPct = it),
@@ -90,6 +93,7 @@ fun LayoutSettingsScreenContent(
                 GridColType.FIXED -> noOfColumnsSection(
                     noOfColumns = layoutPreferences.gridColCount,
                     sliderPadding = sliderPadding,
+                    isExpanded = supportsTwoPane,
                     onNoOfColumnsChange = {
                         onLayoutPreferencesChange(
                             layoutPreferences.copy(gridColCount = it),
@@ -99,6 +103,7 @@ fun LayoutSettingsScreenContent(
             }
             roundedCornersSection(
                 roundedCorners = layoutPreferences.roundedCorners,
+                isExpanded = supportsTwoPane,
                 onRoundedCornersChange = {
                     onLayoutPreferencesChange(
                         layoutPreferences.copy(roundedCorners = it),

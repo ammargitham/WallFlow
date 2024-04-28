@@ -16,6 +16,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -35,6 +37,7 @@ import com.ammar.wallflow.ui.theme.WallFlowTheme
 fun BoxScope.MoreList(
     modifier: Modifier = Modifier,
     isExpanded: Boolean = false,
+    isMedium: Boolean = false,
     items: List<MoreListItem> = emptyList(),
     onItemClick: (MoreListItem.Clickable) -> Unit = {},
 ) {
@@ -64,6 +67,13 @@ fun BoxScope.MoreList(
                             }
                         },
                         headlineContent = { Text(text = item.label) },
+                        colors = ListItemDefaults.colors(
+                            containerColor = if (isMedium || isExpanded) {
+                                MaterialTheme.colorScheme.surfaceContainer
+                            } else {
+                                MaterialTheme.colorScheme.surface
+                            },
+                        ),
                     )
                 }
                 is MoreListItem.Content -> item.content()
@@ -76,6 +86,13 @@ fun BoxScope.MoreList(
                     modifier = Modifier,
                     headlineContent = { Text(text = item.label) },
                     supportingContent = { Text(text = item.supportingText) },
+                    colors = ListItemDefaults.colors(
+                        containerColor = if (isMedium || isExpanded) {
+                            MaterialTheme.colorScheme.surfaceContainer
+                        } else {
+                            MaterialTheme.colorScheme.surface
+                        },
+                    ),
                 )
             }
         }
@@ -104,6 +121,7 @@ sealed interface MoreListItem {
 private data class MoreListContainerProps(
     val items: List<MoreListItem>,
     val isExpanded: Boolean,
+    val isMedium: Boolean,
     val selectedItemValue: String? = null,
 )
 
@@ -141,10 +159,12 @@ private class MoreListContainerCPP : CollectionPreviewParameterProvider<MoreList
         MoreListContainerProps(
             items = previewItems,
             isExpanded = false,
+            isMedium = false,
         ),
         MoreListContainerProps(
             items = previewItems,
             isExpanded = true,
+            isMedium = false,
             selectedItemValue = ActiveOption.SETTINGS.name,
         ),
     ),
@@ -157,7 +177,13 @@ private fun PreviewMoreListContainer(
     @PreviewParameter(MoreListContainerCPP::class) props: MoreListContainerProps,
 ) {
     WallFlowTheme {
-        Surface {
+        Surface(
+            color = if (props.isExpanded) {
+                MaterialTheme.colorScheme.surfaceContainer
+            } else {
+                MaterialTheme.colorScheme.surface
+            },
+        ) {
             Box(modifier = Modifier.fillMaxSize()) {
                 MoreList(
                     isExpanded = props.isExpanded,

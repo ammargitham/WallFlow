@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
@@ -26,6 +25,7 @@ import com.ammar.wallflow.model.local.LocalDirectory
 import com.ammar.wallflow.ui.common.DropdownMultiple
 import com.ammar.wallflow.ui.common.DropdownOption
 import com.ammar.wallflow.ui.common.SectionHeader
+import com.ammar.wallflow.ui.screens.settings.composables.SettingsExtraListItem
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
@@ -37,6 +37,7 @@ internal fun ColumnScope.LocalSection(
     localEnabled: Boolean = false,
     selectedUris: Set<Uri> = emptySet(),
     lightDarkEnabled: Boolean = false,
+    isExpanded: Boolean = false,
     onChangeLocalEnabled: (Boolean) -> Unit = {},
     onChangeSelectedUris: (Set<Uri>) -> Unit = {},
 ) {
@@ -51,10 +52,11 @@ internal fun ColumnScope.LocalSection(
     }
 
     SectionHeader(text = stringResource(R.string.local))
-    ListItem(
+    SettingsExtraListItem(
         modifier = Modifier.clickable(enabled = !disabled) {
             onChangeLocalEnabled(!localEnabled)
         },
+        isExpanded = isExpanded,
         headlineContent = {
             Text(
                 text = stringResource(R.string.use_local_dirs),
