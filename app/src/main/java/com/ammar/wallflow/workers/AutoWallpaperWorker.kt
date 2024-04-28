@@ -212,6 +212,11 @@ class AutoWallpaperWorker @AssistedInject constructor(
         }
         if (!autoWallpaperPreferences.enabled && !forced) {
             Log.d(TAG, "doWork: AutoWallpaper failed since it is disabled")
+            // worker should not be running, stop it
+            stop(
+                context = context,
+                appPreferencesRepository = appPreferencesRepository,
+            )
             return Result.failure(
                 workDataOf(
                     FAILURE_REASON to FailureReason.DISABLED.name,
