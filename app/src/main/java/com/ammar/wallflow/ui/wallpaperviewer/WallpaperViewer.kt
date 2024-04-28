@@ -295,7 +295,13 @@ fun WallpaperViewer(
         // }
 
         TopBar(
-            visible = actionsVisible,
+            visible = if (showFullScreenAction) {
+                painter.state is AsyncImagePainter.State.Success &&
+                    painter.request.data == wallpaper?.data &&
+                    actionsVisible
+            } else {
+                actionsVisible
+            },
             gradientBg = if (showBackButton) {
                 true
             } else {
