@@ -2,7 +2,6 @@ package com.ammar.wallflow.ui.screens.backuprestore
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,19 +22,13 @@ import androidx.navigation.NavController
 import com.ammar.wallflow.MIME_TYPE_JSON
 import com.ammar.wallflow.R
 import com.ammar.wallflow.extensions.safeLaunch
-import com.ammar.wallflow.navigation.AppNavGraphs
-import com.ammar.wallflow.ui.common.LocalSystemController
+import com.ammar.wallflow.navigation.AppNavGraphs.BackupRestoreNavGraph
 import com.ammar.wallflow.ui.common.TopBar
-import com.ammar.wallflow.ui.common.bottomWindowInsets
-import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
 import com.ammar.wallflow.utils.backupFileName
 import com.ramcosta.composedestinations.annotation.Destination
 
 @OptIn(ExperimentalMaterial3Api::class)
-@Destination<AppNavGraphs.BackupRestoreNavGraph>(
-    start = true,
-)
-@Destination<AppNavGraphs.BackupRestoreForMoreDetailNavGraph>(
+@Destination<BackupRestoreNavGraph>(
     start = true,
 )
 @Composable
@@ -44,10 +37,7 @@ fun BackupRestoreScreen(
     viewModel: BackupRestoreViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val systemController = LocalSystemController.current
-    val bottomBarController = LocalBottomBarController.current
     val context = LocalContext.current
-    val systemState by systemController.state
     val snackbarHostState = remember { SnackbarHostState() }
     val createDocumentLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument(MIME_TYPE_JSON),
@@ -66,10 +56,6 @@ fun BackupRestoreScreen(
         )
     }
 
-    LaunchedEffect(systemState.isExpanded) {
-        bottomBarController.update { it.copy(visible = systemState.isExpanded) }
-    }
-
     LaunchedEffect(context, uiState.showSnackbar) {
         val snackbarType = uiState.showSnackbar ?: return@LaunchedEffect
         snackbarHostState.showSnackbar(
@@ -85,65 +71,59 @@ fun BackupRestoreScreen(
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
+        topBar = {
+            TopBar(
+                navController = navController,
+                title = {
+                    Text(
+                        text = stringResource(R.string.backup_and_restore),
+                        maxLines = 1,
+                    )
+                },
+                showBackButton = true,
+            )
+        },
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        contentWindowInsets = bottomWindowInsets,
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(it),
-        ) {
-            if (!systemState.isExpanded) {
-                TopBar(
-                    navController = navController,
-                    title = {
-                        Text(
-                            text = stringResource(R.string.backup_and_restore),
-                            maxLines = 1,
-                        )
-                    },
-                    showBackButton = true,
-                )
-            }
-            BackupRestoreScreenContent(
-                onBackupClicked = { viewModel.showBackupDialog(true) },
-                onRestoreClicked = { viewModel.showRestoreDialog(true) },
-            )
-        }
-        if (uiState.showBackupDialog) {
-            BackupDialog(
-                options = uiState.backupOptions,
-                backupProgress = uiState.backupProgress,
-                onOptionsChange = viewModel::updateBackupOptions,
-                onFileInputClicked = { createDocumentLauncher.safeLaunch(context, backupFileName) },
-                onBackupClick = viewModel::performBackup,
-                onDismissRequest = {
-                    if (uiState.backupProgress != null) {
-                        // backup in progress
-                        return@BackupDialog
-                    }
-                    viewModel.showBackupDialog(false)
-                },
-            )
-        }
-        if (uiState.showRestoreDialog) {
-            RestoreDialog(
-                summary = uiState.restoreSummary,
-                options = uiState.restoreOptions,
-                parsingJson = uiState.parsingRestoreJson,
-                restoreProgress = uiState.restoreProgress,
-                exception = uiState.restoreException,
-                onOptionsChange = viewModel::updateRestoreOptions,
-                onFileInputClicked = { openDocumentLauncher.safeLaunch(context, arrayOf("*/*")) },
-                onRestoreClick = viewModel::performRestore,
-                onDismissRequest = {
-                    if (uiState.restoreProgress != null) {
-                        // restore in progress
-                        return@RestoreDialog
-                    }
-                    viewModel.showRestoreDialog(false)
-                },
-            )
-        }
+        BackupRestoreScreenContent(
+            modifier = Modifier.padding(it),
+            onBackupClicked = { viewModel.showBackupDialog(true) },
+            onRestoreClicked = { viewModel.showRestoreDialog(true) },
+        )
+    }
+    if (uiState.showBackupDialog) {
+        BackupDialog(
+            options = uiState.backupOptions,
+            backupProgress = uiState.backupProgress,
+            onOptionsChange = viewModel::updateBackupOptions,
+            onFileInputClicked = { createDocumentLauncher.safeLaunch(context, backupFileName) },
+            onBackupClick = viewModel::performBackup,
+            onDismissRequest = {
+                if (uiState.backupProgress != null) {
+                    // backup in progress
+                    return@BackupDialog
+                }
+                viewModel.showBackupDialog(false)
+            },
+        )
+    }
+    if (uiState.showRestoreDialog) {
+        RestoreDialog(
+            summary = uiState.restoreSummary,
+            options = uiState.restoreOptions,
+            parsingJson = uiState.parsingRestoreJson,
+            restoreProgress = uiState.restoreProgress,
+            exception = uiState.restoreException,
+            onOptionsChange = viewModel::updateRestoreOptions,
+            onFileInputClicked = { openDocumentLauncher.safeLaunch(context, arrayOf("*/*")) },
+            onRestoreClick = viewModel::performRestore,
+            onDismissRequest = {
+                if (uiState.restoreProgress != null) {
+                    // restore in progress
+                    return@RestoreDialog
+                }
+                viewModel.showRestoreDialog(false)
+            },
+        )
     }
 }

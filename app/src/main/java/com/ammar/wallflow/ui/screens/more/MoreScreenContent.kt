@@ -3,14 +3,11 @@ package com.ammar.wallflow.ui.screens.more
 import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.movableContentOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveableStateHolder
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -19,127 +16,66 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.BuildConfig
 import com.ammar.wallflow.R
-import com.ammar.wallflow.ui.common.BottomBarAwareHorizontalTwoPane
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 
 @Composable
 internal fun MoreScreenContent(
     modifier: Modifier = Modifier,
     isExpanded: Boolean = false,
-    activeOption: ActiveOption? = null,
-    detailContent: @Composable () -> Unit = {},
-    onSettingsClick: () -> Unit = {},
-    onBackupRestoreClick: () -> Unit = {},
-    onOpenSourceLicensesClick: () -> Unit = {},
-) {
-    MoreScreenContent(
-        modifier = modifier,
-        isExpanded = isExpanded,
-        listContent = {
-            MoreList(
-                modifier = Modifier.fillMaxSize(),
-                isExpanded = isExpanded,
-                activeOption = activeOption,
-                onSettingsClick = onSettingsClick,
-                onBackupRestoreClick = onBackupRestoreClick,
-                onOpenSourceLicensesClick = onOpenSourceLicensesClick,
-            )
-        },
-        detailContent = detailContent,
-    )
-}
-
-@Composable
-private fun MoreScreenContent(
-    modifier: Modifier = Modifier,
-    isExpanded: Boolean = false,
-    listContent: @Composable () -> Unit = {},
-    detailContent: @Composable () -> Unit = {},
-) {
-    val listSaveableStateHolder = rememberSaveableStateHolder()
-    val list = remember {
-        movableContentOf {
-            listSaveableStateHolder.SaveableStateProvider(0) {
-                listContent()
-            }
-        }
-    }
-
-    Box(
-        modifier = modifier,
-    ) {
-        if (isExpanded) {
-            BottomBarAwareHorizontalTwoPane(
-                modifier = Modifier.fillMaxSize(),
-                first = list,
-                second = detailContent,
-                splitFraction = 1f / 3f,
-            )
-        } else {
-            list()
-        }
-    }
-}
-
-@Composable
-private fun MoreList(
-    modifier: Modifier = Modifier,
-    isExpanded: Boolean = false,
-    activeOption: ActiveOption? = null,
     onSettingsClick: () -> Unit = {},
     onBackupRestoreClick: () -> Unit = {},
     onOpenSourceLicensesClick: () -> Unit = {},
 ) {
     val context = LocalContext.current
-
-    val items = remember {
-        listOf(
-            MoreListItem.Content {
-                Image(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(250.dp),
-                    painter = painterResource(R.drawable.ic_launcher_foreground),
-                    contentDescription = stringResource(R.string.app_name),
-                )
+    Box(
+        modifier = modifier,
+    ) {
+        val items = remember {
+            listOf(
+                MoreListItem.Content {
+                    Image(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(250.dp),
+                        painter = painterResource(R.drawable.ic_launcher_foreground),
+                        contentDescription = stringResource(R.string.app_name),
+                    )
+                },
+                MoreListItem.Divider,
+                MoreListItem.Clickable(
+                    icon = R.drawable.baseline_settings_24,
+                    label = context.getString(R.string.settings),
+                    value = ActiveOption.SETTINGS.name,
+                ),
+                MoreListItem.Clickable(
+                    icon = R.drawable.baseline_settings_backup_restore_24,
+                    label = context.getString(R.string.backup_and_restore),
+                    value = ActiveOption.BACKUP_RESTORE.name,
+                ),
+                MoreListItem.Divider,
+                MoreListItem.Clickable(
+                    label = context.getString(R.string.open_source_licenses),
+                    value = ActiveOption.OSL.name,
+                ),
+                MoreListItem.Static(
+                    label = context.getString(R.string.version),
+                    supportingText = BuildConfig.VERSION_NAME,
+                ),
+            )
+        }
+        MoreList(
+            isExpanded = isExpanded,
+            items = items,
+            onItemClick = {
+                when (it.value) {
+                    ActiveOption.SETTINGS.name -> onSettingsClick()
+                    ActiveOption.BACKUP_RESTORE.name -> onBackupRestoreClick()
+                    ActiveOption.OSL.name -> onOpenSourceLicensesClick()
+                    else -> {}
+                }
             },
-            MoreListItem.Divider,
-            MoreListItem.Clickable(
-                icon = R.drawable.baseline_settings_24,
-                label = context.getString(R.string.settings),
-                value = ActiveOption.SETTINGS.name,
-            ),
-            MoreListItem.Clickable(
-                icon = R.drawable.baseline_settings_backup_restore_24,
-                label = context.getString(R.string.backup_and_restore),
-                value = ActiveOption.BACKUP_RESTORE.name,
-            ),
-            MoreListItem.Divider,
-            MoreListItem.Clickable(
-                label = context.getString(R.string.open_source_licenses),
-                value = ActiveOption.OSL.name,
-            ),
-            MoreListItem.Static(
-                label = context.getString(R.string.version),
-                supportingText = BuildConfig.VERSION_NAME,
-            ),
         )
     }
-
-    MoreListContainer(
-        modifier.fillMaxSize(),
-        isExpanded = isExpanded,
-        items = items,
-        selectedItemValue = activeOption?.name,
-        onItemClick = {
-            when (it.value) {
-                ActiveOption.SETTINGS.name -> onSettingsClick()
-                ActiveOption.BACKUP_RESTORE.name -> onBackupRestoreClick()
-                ActiveOption.OSL.name -> onOpenSourceLicensesClick()
-                else -> {}
-            }
-        },
-    )
 }
 
 @Preview
@@ -148,10 +84,7 @@ private fun MoreList(
 fun PreviewMoreScreenContent() {
     WallFlowTheme {
         Surface {
-            MoreScreenContent(
-                // needed to use correct function
-                activeOption = null,
-            )
+            MoreScreenContent()
         }
     }
 }

@@ -2,7 +2,6 @@ package com.ammar.wallflow.ui.common
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
-import android.util.Log
 import android.view.Gravity
 import androidx.activity.BackEventCompat
 import androidx.activity.compose.PredictiveBackHandler
@@ -63,7 +62,6 @@ import androidx.compose.ui.util.lerp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.window.DialogWindowProvider
-import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 import kotlin.coroutines.cancellation.CancellationException
 import kotlin.math.min
@@ -143,7 +141,6 @@ fun ModalSideSheet(
                 }
 
                 LaunchedEffect(transitionState.isIdle) {
-                    Log.d(TAG, "SideSheet: ${transitionState.isIdle}")
                     if (transitionState.isIdle) {
                         state.done()
                     }

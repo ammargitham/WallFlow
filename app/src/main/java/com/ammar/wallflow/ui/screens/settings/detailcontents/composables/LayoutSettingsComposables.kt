@@ -1,4 +1,4 @@
-package com.ammar.wallflow.ui.screens.settings.layout
+package com.ammar.wallflow.ui.screens.settings.detailcontents.composables
 
 import android.content.res.Configuration
 import androidx.compose.animation.core.animateFloatAsState

@@ -3,24 +3,25 @@ package com.ammar.wallflow.ui.screens.settings
 import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.res.Configuration
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.EnterExitState
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
+import androidx.compose.material3.adaptive.layout.AnimatedPane
+import androidx.compose.material3.adaptive.layout.ListDetailPaneScaffoldRole
+import androidx.compose.material3.adaptive.navigation.NavigableListDetailPaneScaffold
+import androidx.compose.material3.adaptive.navigation.rememberListDetailPaneScaffoldNavigator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,38 +30,26 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.ammar.wallflow.R
-import com.ammar.wallflow.data.preferences.AppPreferences
 import com.ammar.wallflow.data.preferences.AutoWallpaperPreferences
-import com.ammar.wallflow.data.preferences.ObjectDetectionPreferences
-import com.ammar.wallflow.destinations.MainWallhavenApiKeyDialogDestination
-import com.ammar.wallflow.destinations.MoreDetailWallhavenApiKeyDialogDestination
-import com.ammar.wallflow.destinations.SettingsForMoreDetailLayoutSettingsScreenDestination
-import com.ammar.wallflow.destinations.SettingsForMoreDetailManageAutoWallpaperSourcesScreenDestination
-import com.ammar.wallflow.destinations.SettingsLayoutSettingsScreenDestination
-import com.ammar.wallflow.destinations.SettingsManageAutoWallpaperSourcesScreenDestination
+import com.ammar.wallflow.destinations.WallhavenApiKeyDialogDestination
 import com.ammar.wallflow.extensions.safeLaunch
 import com.ammar.wallflow.extensions.trimAll
-import com.ammar.wallflow.model.ObjectDetectionModel
-import com.ammar.wallflow.model.search.SavedSearch
 import com.ammar.wallflow.model.search.SavedSearchSaver
-import com.ammar.wallflow.navigation.AppNavGraphs
+import com.ammar.wallflow.navigation.AppNavGraphs.SettingsNavGraph
 import com.ammar.wallflow.ui.common.LocalSystemController
-import com.ammar.wallflow.ui.common.TopBar
 import com.ammar.wallflow.ui.common.bottomWindowInsets
-import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
 import com.ammar.wallflow.ui.common.permissions.DownloadPermissionsRationalDialog
 import com.ammar.wallflow.ui.common.permissions.MultiplePermissionItem
+import com.ammar.wallflow.ui.common.permissions.MultiplePermissionsState
 import com.ammar.wallflow.ui.common.permissions.checkSetWallpaperPermission
 import com.ammar.wallflow.ui.common.permissions.isGranted
 import com.ammar.wallflow.ui.common.permissions.rememberMultiplePermissionsState
@@ -73,41 +62,42 @@ import com.ammar.wallflow.ui.screens.settings.composables.ChangeDownloadLocation
 import com.ammar.wallflow.ui.screens.settings.composables.ClearViewedWallpapersConfirmDialog
 import com.ammar.wallflow.ui.screens.settings.composables.ConstraintOptionsDialog
 import com.ammar.wallflow.ui.screens.settings.composables.DeleteSavedSearchConfirmDialog
+import com.ammar.wallflow.ui.screens.settings.composables.DetailContentTopBar
 import com.ammar.wallflow.ui.screens.settings.composables.EditSavedSearchBottomSheetHeader
 import com.ammar.wallflow.ui.screens.settings.composables.ExifWriteTypeOptionsDialog
+import com.ammar.wallflow.ui.screens.settings.composables.ExtraContentTopBar
 import com.ammar.wallflow.ui.screens.settings.composables.FrequencyDialog
+import com.ammar.wallflow.ui.screens.settings.composables.ListContentTopBar
 import com.ammar.wallflow.ui.screens.settings.composables.NextRunInfoDialog
 import com.ammar.wallflow.ui.screens.settings.composables.ObjectDetectionDelegateOptionsDialog
 import com.ammar.wallflow.ui.screens.settings.composables.ObjectDetectionModelDeleteConfirmDialog
 import com.ammar.wallflow.ui.screens.settings.composables.ObjectDetectionModelEditDialog
 import com.ammar.wallflow.ui.screens.settings.composables.ObjectDetectionModelOptionsDialog
 import com.ammar.wallflow.ui.screens.settings.composables.ThemeOptionsDialog
-import com.ammar.wallflow.ui.screens.settings.composables.ViewedWallpapersLookOptionsDialog
-import com.ammar.wallflow.ui.screens.settings.composables.accountSection
-import com.ammar.wallflow.ui.screens.settings.composables.autoWallpaperSection
-import com.ammar.wallflow.ui.screens.settings.composables.dividerItem
-import com.ammar.wallflow.ui.screens.settings.composables.generalSection
-import com.ammar.wallflow.ui.screens.settings.composables.lookAndFeelSection
-import com.ammar.wallflow.ui.screens.settings.composables.objectDetectionSection
-import com.ammar.wallflow.ui.screens.settings.composables.viewedWallpapersSection
-import com.ammar.wallflow.ui.theme.WallFlowTheme
+import com.ammar.wallflow.ui.screens.settings.composables.ViewedWallpapersLookOptionsContent
+import com.ammar.wallflow.ui.screens.settings.detailcontents.AccountContent
+import com.ammar.wallflow.ui.screens.settings.detailcontents.AutoWallpaperContent
+import com.ammar.wallflow.ui.screens.settings.detailcontents.DownloadsContent
+import com.ammar.wallflow.ui.screens.settings.detailcontents.LayoutSettingsScreenContent
+import com.ammar.wallflow.ui.screens.settings.detailcontents.LookAndFeelContent
+import com.ammar.wallflow.ui.screens.settings.detailcontents.ManageAutoWallpaperSourcesContent
+import com.ammar.wallflow.ui.screens.settings.detailcontents.ObjectDetectionContent
+import com.ammar.wallflow.ui.screens.settings.detailcontents.SavedSearchesContent
+import com.ammar.wallflow.ui.screens.settings.detailcontents.ViewedWallpapersContent
 import com.ammar.wallflow.utils.StoragePermissions
 import com.ammar.wallflow.utils.getPublicDownloadsDir
 import com.ammar.wallflow.utils.getRealPath
-import com.ammar.wallflow.utils.objectdetection.objectsDetector
 import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.AutoWallpaperException
 import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.Status
 import com.ramcosta.composedestinations.annotation.Destination
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
-@Destination<AppNavGraphs.SettingsNavGraph>(
-    start = true,
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalMaterial3AdaptiveApi::class,
+    ExperimentalAnimationApi::class,
 )
-@Destination<AppNavGraphs.SettingsForMoreDetailNavGraph>(
+@Destination<SettingsNavGraph>(
     start = true,
 )
 @Composable
@@ -116,10 +106,13 @@ fun SettingsScreen(
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val bottomBarController = LocalBottomBarController.current
     val context = LocalContext.current
     val systemController = LocalSystemController.current
     val systemState by systemController.state
+
+    var selectedType by rememberSaveable { mutableStateOf(SettingsType.ACCOUNT) }
+    var selectedExtraType: SettingsExtraType? by rememberSaveable { mutableStateOf(null) }
+    val scaffoldNavigator = rememberListDetailPaneScaffoldNavigator<Any>()
 
     val storagePerms = remember {
         StoragePermissions.getPermissions(
@@ -154,16 +147,11 @@ fun SettingsScreen(
         } ?: AutoWallpaperPreferences()
         viewModel.setTempAutoWallpaperPrefs(null)
         if (!updatedAutoWallpaperPreferences.anySourceEnabled) {
-            navController.navigate(
-                if (systemState.isExpanded) {
-                    SettingsForMoreDetailManageAutoWallpaperSourcesScreenDestination
-                } else {
-                    SettingsManageAutoWallpaperSourcesScreenDestination
-                }.route,
-            )
+            selectedExtraType = SettingsExtraType.AUTO_WALLPAPER_SOURCES
+            scaffoldNavigator.navigateTo(ListDetailPaneScaffoldRole.Extra)
             return@rememberMultiplePermissionsState
         }
-        viewModel.updateAutoWallpaperPrefs(updatedAutoWallpaperPreferences)
+        viewModel.updateAutoWallpaperEnabled(updatedAutoWallpaperPreferences.enabled)
     }
 
     val chooseDownloadLocationLauncher = rememberLauncherForActivityResult(
@@ -175,116 +163,70 @@ fun SettingsScreen(
         viewModel.updateDownloadLocation(it)
     }
 
-    val prefsDownloadLocationUri = uiState.appPreferences.downloadLocation
-    val downloadLocationString = if (prefsDownloadLocationUri == null) {
-        getPublicDownloadsDir().absolutePath
-    } else {
-        getRealPath(context, prefsDownloadLocationUri) ?: prefsDownloadLocationUri.toString()
-    }
-
-    LaunchedEffect(systemState.isExpanded) {
-        bottomBarController.update { it.copy(visible = systemState.isExpanded) }
-    }
-
-    Column(
+    NavigableListDetailPaneScaffold(
         modifier = Modifier
             .fillMaxSize()
             .windowInsetsPadding(bottomWindowInsets),
-    ) {
-        if (!systemState.isExpanded) {
-            TopBar(
-                navController = navController,
-                title = {
-                    Text(
-                        text = stringResource(R.string.settings),
-                        maxLines = 1,
-                    )
-                },
-                showBackButton = true,
-            )
-        }
-
-        SettingsScreenContent(
-            appPreferences = uiState.appPreferences,
-            model = uiState.selectedModel,
-            hasSetWallpaperPermission = context.checkSetWallpaperPermission(),
-            autoWallpaperNextRun = uiState.autoWallpaperNextRun,
-            lsAutoWallpaperNextRun = uiState.lsAutoWallpaperNextRun,
-            autoWallpaperSavedSearches = uiState.autoWallpaperSavedSearches,
-            autoWallpaperStatus = uiState.autoWallpaperStatus,
-            showLocalTab = uiState.appPreferences.lookAndFeelPreferences.showLocalTab,
-            downloadLocation = downloadLocationString,
-            onBlurSketchyCheckChange = viewModel::setBlurSketchy,
-            onBlurNsfwCheckChange = viewModel::setBlurNsfw,
-            onWriteTagsToExifCheckChange = viewModel::updateWriteTagsToExif,
-            onTagsWriteTypeClick = { viewModel.showTagsWriteTypeDialog(true) },
-            onDownloadLocationClick = { viewModel.showChangeDownloadLocationDialog(true) },
-            onWallhavenApiKeyItemClick = {
-                navController.navigate(
-                    if (systemState.isExpanded) {
-                        MoreDetailWallhavenApiKeyDialogDestination
-                    } else {
-                        MainWallhavenApiKeyDialogDestination
-                    }.route,
+        navigator = scaffoldNavigator,
+        listPane = {
+            AnimatedPane(
+                modifier = Modifier.preferredWidth(360.dp),
+            ) {
+                ListContentScaffold(
+                    selectedType = selectedType,
+                    isExpanded = systemState.isExpanded,
+                    onBackClick = { navController.navigateUp() },
+                    onItemClick = { type ->
+                        selectedType = type
+                        scaffoldNavigator.navigateTo(ListDetailPaneScaffoldRole.Detail)
+                    },
                 )
-            },
-            onObjectDetectionPrefsChange = viewModel::updateSubjectDetectionPrefs,
-            onObjectDetectionDelegateClick = { viewModel.showObjectDetectionDelegateOptions(true) },
-            onObjectDetectionModelClick = { viewModel.showObjectDetectionModelOptions(true) },
-            onManageSavedSearchesClick = { viewModel.showSavedSearches(true) },
-            onAutoWallpaperPrefsChange = {
-                if (it.enabled) {
-                    viewModel.setTempAutoWallpaperPrefs(it)
-                    // need to check if we have all permissions before enabling auto wallpaper
-                    autoWallpaperPermissionsState.launchMultiplePermissionRequest()
-                    return@SettingsScreenContent
+            }
+        },
+        detailPane = {
+            AnimatedPane {
+                DetailContentScaffold(
+                    selectedType = selectedType,
+                    selectedExtraType = selectedExtraType,
+                    viewModel = viewModel,
+                    isExpanded = systemState.isExpanded,
+                    autoWallpaperPermissionsState = autoWallpaperPermissionsState,
+                    onBackClick = { scaffoldNavigator.navigateBack() },
+                    onWallhavenApiKeyItemClick = {
+                        navController.navigate(WallhavenApiKeyDialogDestination.route)
+                    },
+                    onLayoutClick = {
+                        selectedExtraType = SettingsExtraType.LAYOUT
+                        scaffoldNavigator.navigateTo(ListDetailPaneScaffoldRole.Extra)
+                    },
+                    onViewedWallpapersLookClick = {
+                        selectedExtraType = SettingsExtraType.VIEW_WALLPAPERS_LOOK
+                        scaffoldNavigator.navigateTo(ListDetailPaneScaffoldRole.Extra)
+                    },
+                ) {
+                    selectedExtraType = SettingsExtraType.AUTO_WALLPAPER_SOURCES
+                    scaffoldNavigator.navigateTo(ListDetailPaneScaffoldRole.Extra)
                 }
-                viewModel.updateAutoWallpaperPrefs(it)
-            },
-            onAutoWallpaperSourcesClick = {
-                navController.navigate(
-                    if (systemState.isExpanded) {
-                        SettingsForMoreDetailManageAutoWallpaperSourcesScreenDestination
-                    } else {
-                        SettingsManageAutoWallpaperSourcesScreenDestination
-                    }.route,
+            }
+        },
+        extraPane = {
+            AnimatedPane(
+                modifier = Modifier.preferredWidth(400.dp),
+            ) {
+                LaunchedEffect(transition.targetState) {
+                    if (transition.targetState == EnterExitState.PostExit) {
+                        selectedExtraType = null
+                    }
+                }
+                ExtraContentScaffold(
+                    selectedExtraType = selectedExtraType,
+                    viewModel = viewModel,
+                    isExpanded = systemState.isExpanded,
+                    onBackClick = { scaffoldNavigator.navigateBack() },
                 )
-            },
-            onAutoWallpaperFrequencyClick = { viewModel.showAutoWallpaperFrequencyDialog(true) },
-            onAutoWallpaperConstraintsClick = {
-                viewModel.showAutoWallpaperConstraintsDialog(true)
-            },
-            onAutoWallpaperChangeNowClick = viewModel::autoWallpaperChangeNow,
-            onAutoWallpaperNextRunInfoClick = {
-                viewModel.showAutoWallpaperNextRunInfoDialog(true)
-            },
-            onAutoWallpaperSetToClick = {
-                viewModel.showAutoWallpaperSetToDialog(true)
-            },
-            onThemeClick = { viewModel.showThemeOptionsDialog(true) },
-            onLayoutClick = {
-                navController.navigate(
-                    if (systemState.isExpanded) {
-                        SettingsForMoreDetailLayoutSettingsScreenDestination
-                    } else {
-                        SettingsLayoutSettingsScreenDestination
-                    }.route,
-                )
-            },
-            onShowLocalTabChange = {
-                viewModel.updateLookAndFeelPrefs(
-                    uiState.appPreferences.lookAndFeelPreferences.copy(
-                        showLocalTab = it,
-                    ),
-                )
-            },
-            onViewedWallpapersEnabledChange = viewModel::updateRememberViewedWallpapers,
-            onViewedWallpapersLookClick = { viewModel.showViewedWallpapersLookDialog(true) },
-            onViewedWallpapersClearClick = {
-                viewModel.showClearViewedWallpapersConfirmDialog(true)
-            },
-        )
-    }
+            }
+        },
+    )
 
     if (uiState.showObjectDetectionModelOptions) {
         ObjectDetectionModelOptionsDialog(
@@ -413,12 +355,10 @@ fun SettingsScreen(
             frequency = uiState.appPreferences.autoWallpaperPreferences.frequency,
             lsFrequency = uiState.appPreferences.autoWallpaperPreferences.lsFrequency,
             onSaveClick = { useSameFreq, freq, lsFreq ->
-                viewModel.updateAutoWallpaperPrefs(
-                    uiState.appPreferences.autoWallpaperPreferences.copy(
-                        useSameFreq = useSameFreq,
-                        frequency = freq,
-                        lsFrequency = lsFreq,
-                    ),
+                viewModel.updateAutoWallpaperFreq(
+                    useSameFreq = useSameFreq,
+                    frequency = freq,
+                    lsFrequency = lsFreq,
                 )
                 viewModel.showAutoWallpaperFrequencyDialog(false)
             },
@@ -430,10 +370,8 @@ fun SettingsScreen(
         ConstraintOptionsDialog(
             constraints = uiState.appPreferences.autoWallpaperPreferences.constraints,
             onSaveClick = {
-                viewModel.updateAutoWallpaperPrefs(
-                    uiState.appPreferences.autoWallpaperPreferences.copy(
-                        constraints = it,
-                    ),
+                viewModel.updateAutoWallpaperConstraints(
+                    constraints = it,
                 )
                 viewModel.showAutoWallpaperConstraintsDialog(false)
             },
@@ -475,11 +413,7 @@ fun SettingsScreen(
         AutoWallpaperSetToDialog(
             selectedTargets = uiState.appPreferences.autoWallpaperPreferences.targets,
             onSaveClick = { targets ->
-                viewModel.updateAutoWallpaperPrefs(
-                    uiState.appPreferences.autoWallpaperPreferences.copy(
-                        targets = targets,
-                    ),
-                )
+                viewModel.updateAutoWallpaperTargets(targets)
                 viewModel.showAutoWallpaperSetToDialog(false)
             },
             onDismissRequest = { viewModel.showAutoWallpaperSetToDialog(false) },
@@ -494,17 +428,6 @@ fun SettingsScreen(
                 viewModel.showTagsWriteTypeDialog(false)
             },
             onDismissRequest = { viewModel.showTagsWriteTypeDialog(false) },
-        )
-    }
-
-    if (uiState.showViewedWallpapersLookDialog) {
-        ViewedWallpapersLookOptionsDialog(
-            selectedViewedWallpapersLook = uiState.appPreferences.viewedWallpapersPreferences.look,
-            onSaveClick = {
-                viewModel.updateViewedWallpapersLook(it)
-                viewModel.showViewedWallpapersLookDialog(false)
-            },
-            onDismissRequest = { viewModel.showViewedWallpapersLookDialog(false) },
         )
     }
 
@@ -544,341 +467,433 @@ fun SettingsScreen(
 }
 
 @Composable
-fun SettingsScreenContent(
-    modifier: Modifier = Modifier,
-    appPreferences: AppPreferences = AppPreferences(),
-    model: ObjectDetectionModel = ObjectDetectionModel.DEFAULT,
-    autoWallpaperSavedSearches: ImmutableList<SavedSearch> = persistentListOf(),
-    hasSetWallpaperPermission: Boolean = true,
-    autoWallpaperNextRun: NextRun = NextRun.NotScheduled,
-    lsAutoWallpaperNextRun: NextRun = NextRun.NotScheduled,
-    autoWallpaperStatus: Status? = null,
-    showLocalTab: Boolean = true,
-    downloadLocation: String = "",
-    onBlurSketchyCheckChange: (checked: Boolean) -> Unit = {},
-    onBlurNsfwCheckChange: (checked: Boolean) -> Unit = {},
-    onWriteTagsToExifCheckChange: (checked: Boolean) -> Unit = {},
-    onTagsWriteTypeClick: () -> Unit = {},
-    onDownloadLocationClick: () -> Unit = {},
-    onWallhavenApiKeyItemClick: () -> Unit = {},
-    onObjectDetectionPrefsChange: (objectDetectionPrefs: ObjectDetectionPreferences) -> Unit = {},
-    onObjectDetectionDelegateClick: () -> Unit = {},
-    onObjectDetectionModelClick: () -> Unit = {},
-    onManageSavedSearchesClick: () -> Unit = {},
-    onAutoWallpaperPrefsChange: (AutoWallpaperPreferences) -> Unit = {},
-    onAutoWallpaperSourcesClick: () -> Unit = {},
-    onAutoWallpaperFrequencyClick: () -> Unit = {},
-    onAutoWallpaperConstraintsClick: () -> Unit = {},
-    onAutoWallpaperChangeNowClick: () -> Unit = {},
-    onAutoWallpaperNextRunInfoClick: () -> Unit = {},
-    onAutoWallpaperSetToClick: () -> Unit = {},
-    onThemeClick: () -> Unit = {},
-    onLayoutClick: () -> Unit = {},
-    onShowLocalTabChange: (Boolean) -> Unit = {},
-    onViewedWallpapersEnabledChange: (Boolean) -> Unit = {},
-    onViewedWallpapersLookClick: () -> Unit = {},
-    onViewedWallpapersClearClick: () -> Unit = {},
+private fun ListContentScaffold(
+    selectedType: SettingsType,
+    isExpanded: Boolean,
+    onBackClick: () -> Unit,
+    onItemClick: (SettingsType) -> Unit,
 ) {
     val context = LocalContext.current
-
-    Box(modifier = modifier) {
-        LazyColumn(
-            modifier = Modifier.fillMaxWidth(),
-        ) {
-            accountSection(onWallhavenApiKeyItemClick = onWallhavenApiKeyItemClick)
-            dividerItem()
-            generalSection(
-                blurSketchy = appPreferences.blurSketchy,
-                blurNsfw = appPreferences.blurNsfw,
-                writeTagsToExif = appPreferences.writeTagsToExif,
-                tagsExifWriteType = appPreferences.tagsExifWriteType,
-                downloadLocation = downloadLocation,
-                onBlurSketchyCheckChange = onBlurSketchyCheckChange,
-                onBlurNsfwCheckChange = onBlurNsfwCheckChange,
-                onWriteTagsToExifCheckChange = onWriteTagsToExifCheckChange,
-                onTagsWriteTypeClick = onTagsWriteTypeClick,
-                onManageSavedSearchesClick = onManageSavedSearchesClick,
-                onDownloadLocationClick = onDownloadLocationClick,
+    Scaffold(
+        topBar = {
+            ListContentTopBar(
+                onBackClick = onBackClick,
             )
-            dividerItem()
-            viewedWallpapersSection(
-                enabled = appPreferences.viewedWallpapersPreferences.enabled,
-                look = appPreferences.viewedWallpapersPreferences.look,
-                onEnabledChange = onViewedWallpapersEnabledChange,
-                onViewedWallpapersLookClick = onViewedWallpapersLookClick,
-                onClearClick = onViewedWallpapersClearClick,
-            )
-            dividerItem()
-            lookAndFeelSection(
-                showLocalTab = showLocalTab,
-                onThemeClick = onThemeClick,
-                onLayoutClick = onLayoutClick,
-                onShowLocalTabChange = onShowLocalTabChange,
-            )
-            if (objectsDetector.isEnabled) {
-                dividerItem()
-                objectDetectionSection(
-                    enabled = appPreferences.objectDetectionPreferences.enabled,
-                    delegate = appPreferences.objectDetectionPreferences.delegate,
-                    model = model,
-                    onEnabledChange = {
-                        onObjectDetectionPrefsChange(
-                            appPreferences.objectDetectionPreferences.copy(enabled = it),
-                        )
-                    },
-                    onDelegateClick = onObjectDetectionDelegateClick,
-                    onModelClick = onObjectDetectionModelClick,
-                )
-            }
-            dividerItem()
-            if (hasSetWallpaperPermission) {
-                autoWallpaperSection(
-                    enabled = appPreferences.autoWallpaperPreferences.enabled,
-                    sourcesSummary = getSourcesSummary(
-                        context = context,
-                        useSameSources = !appPreferences
-                            .autoWallpaperPreferences
-                            .setDifferentWallpapers,
-                        lightDarkEnabled = appPreferences
-                            .autoWallpaperPreferences
-                            .lightDarkEnabled,
-                        savedSearches = autoWallpaperSavedSearches,
-                        savedSearchEnabled = appPreferences
-                            .autoWallpaperPreferences
-                            .savedSearchEnabled,
-                        favoritesEnabled = appPreferences
-                            .autoWallpaperPreferences
-                            .favoritesEnabled,
-                        localEnabled = appPreferences
-                            .autoWallpaperPreferences
-                            .localEnabled,
-                        lsLightDarkEnabled = appPreferences
-                            .autoWallpaperPreferences
-                            .lsLightDarkEnabled,
-                        lsSavedSearchEnabled = appPreferences
-                            .autoWallpaperPreferences
-                            .lsSavedSearchEnabled,
-                        lsFavoritesEnabled = appPreferences
-                            .autoWallpaperPreferences
-                            .lsFavoritesEnabled,
-                        lsLocalEnabled = appPreferences
-                            .autoWallpaperPreferences
-                            .lsLocalEnabled,
-                    ),
-                    crop = appPreferences
-                        .autoWallpaperPreferences
-                        .crop,
-                    useObjectDetection = appPreferences.autoWallpaperPreferences.useObjectDetection,
-                    nextRun = autoWallpaperNextRun,
-                    lsNextRun = lsAutoWallpaperNextRun,
-                    useSameFrequency = appPreferences.autoWallpaperPreferences.useSameFreq,
-                    frequency = appPreferences.autoWallpaperPreferences.frequency,
-                    lsFrequency = appPreferences.autoWallpaperPreferences.lsFrequency,
-                    showNotification = appPreferences.autoWallpaperPreferences.showNotification,
-                    autoWallpaperStatus = autoWallpaperStatus,
-                    targets = appPreferences.autoWallpaperPreferences.targets,
-                    markFavorite = appPreferences.autoWallpaperPreferences.markFavorite,
-                    download = appPreferences.autoWallpaperPreferences.download,
-                    onEnabledChange = {
-                        onAutoWallpaperPrefsChange(
-                            appPreferences.autoWallpaperPreferences.copy(
-                                enabled = it,
-                            ),
-                        )
-                    },
-                    onSourcesClick = onAutoWallpaperSourcesClick,
-                    onFrequencyClick = onAutoWallpaperFrequencyClick,
-                    onUseObjectDetectionChange = {
-                        onAutoWallpaperPrefsChange(
-                            appPreferences.autoWallpaperPreferences.copy(
-                                useObjectDetection = it,
-                            ),
-                        )
-                    },
-                    onConstraintsClick = onAutoWallpaperConstraintsClick,
-                    onChangeNowClick = onAutoWallpaperChangeNowClick,
-                    onNextRunInfoClick = onAutoWallpaperNextRunInfoClick,
-                    onShowNotificationChange = {
-                        onAutoWallpaperPrefsChange(
-                            appPreferences.autoWallpaperPreferences.copy(
-                                showNotification = it,
-                            ),
-                        )
-                    },
-                    onSetToClick = onAutoWallpaperSetToClick,
-                    onMarkFavoriteChange = {
-                        onAutoWallpaperPrefsChange(
-                            appPreferences.autoWallpaperPreferences.copy(
-                                markFavorite = it,
-                            ),
-                        )
-                    },
-                    onDownloadChange = {
-                        onAutoWallpaperPrefsChange(
-                            appPreferences.autoWallpaperPreferences.copy(
-                                download = it,
-                            ),
-                        )
-                    },
-                    onCropChange = {
-                        onAutoWallpaperPrefsChange(
-                            appPreferences.autoWallpaperPreferences.copy(
-                                crop = it,
-                            ),
-                        )
-                    },
-                )
-            }
-        }
-
-        AnimatedVisibility(
-            modifier = Modifier.align(Alignment.BottomCenter),
-            visible = autoWallpaperStatus?.isSuccessOrFail() == true,
-            enter = slideInVertically(
-                initialOffsetY = { x -> x },
-            ),
-            exit = slideOutVertically(
-                targetOffsetY = { x -> x },
-            ),
-        ) {
-            Snackbar(modifier = Modifier.padding(16.dp)) {
-                Text(
-                    text = when (autoWallpaperStatus) {
-                        is Status.Success -> {
-                            stringResource(R.string.wallpaper_changed)
-                        }
-                        is Status.Failed -> {
-                            if (autoWallpaperStatus.e is AutoWallpaperException) {
-                                getFailureReasonString(autoWallpaperStatus.e.code)
-                            } else {
-                                stringResource(R.string.wallpaper_not_changed)
-                            }
-                        }
-                        else -> ""
-                    },
-                )
-            }
-        }
+        },
+    ) {
+        SettingsContentList(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(it),
+            isExpanded = isExpanded,
+            selectedType = selectedType,
+            hasSetWallpaperPermission = context.checkSetWallpaperPermission(),
+            onItemClick = onItemClick,
+        )
     }
 }
 
-private fun getSourcesSummary(
-    context: Context,
-    useSameSources: Boolean,
-    lightDarkEnabled: Boolean,
-    savedSearches: ImmutableList<SavedSearch>,
-    savedSearchEnabled: Boolean,
-    favoritesEnabled: Boolean,
-    localEnabled: Boolean,
-    lsLightDarkEnabled: Boolean,
-    lsSavedSearchEnabled: Boolean,
-    lsFavoritesEnabled: Boolean,
-    lsLocalEnabled: Boolean,
-) = mutableListOf<String>().apply {
-    if (useSameSources) {
-        if (lightDarkEnabled) {
-            add(context.getString(R.string.light_dark))
-            return@apply
-        }
-        if (savedSearchEnabled && savedSearches.size > 0) {
-            val searchNames = if (savedSearches.size > 2) {
-                context.resources.getQuantityString(
-                    R.plurals.n_searches,
-                    savedSearches.size,
-                    savedSearches.size,
-                )
-            } else {
-                savedSearches.joinToString(", ") { it.name }
-            }
-            add("${context.getString(R.string.saved_search)} ($searchNames)")
-        }
-        if (favoritesEnabled) {
-            add(context.getString(R.string.favorites))
-        }
-        if (localEnabled) {
-            add(context.getString(R.string.local))
-        }
-    } else {
-        val homeCount = getSourcesCount(
-            lightDarkEnabled,
-            savedSearchEnabled,
-            favoritesEnabled,
-            localEnabled,
-        )
-        if (homeCount > 0) {
-            add(
-                context.resources.getQuantityString(
-                    R.plurals.home_screen_sources,
-                    homeCount,
-                    homeCount,
-                ),
-            )
-        }
-        val lsCount = getSourcesCount(
-            lsLightDarkEnabled,
-            lsSavedSearchEnabled,
-            lsFavoritesEnabled,
-            lsLocalEnabled,
-        )
-        if (lsCount > 0) {
-            add(
-                context.resources.getQuantityString(
-                    R.plurals.lock_screen_sources,
-                    lsCount,
-                    lsCount,
-                ),
-            )
-        }
-    }
-}.joinToString(", ")
-
-private fun getSourcesCount(
-    lightDarkEnabled: Boolean,
-    savedSearchEnabled: Boolean,
-    favoritesEnabled: Boolean,
-    localEnabled: Boolean,
-): Int {
-    if (lightDarkEnabled) {
-        return 1
-    }
-    var count = 0
-    if (savedSearchEnabled) {
-        count += 1
-    }
-    if (favoritesEnabled) {
-        count += 1
-    }
-    if (localEnabled) {
-        count += 1
-    }
-    return count
-}
-
-@Preview
-@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun PreviewSettingsScreenContent() {
-    WallFlowTheme {
-        Surface {
-            val coroutineScope = rememberCoroutineScope()
-            var autoWallpaperStatus: Status? by remember {
-                mutableStateOf(null)
+private fun DetailContentScaffold(
+    selectedType: SettingsType,
+    selectedExtraType: SettingsExtraType?,
+    viewModel: SettingsViewModel,
+    isExpanded: Boolean,
+    autoWallpaperPermissionsState: MultiplePermissionsState,
+    onBackClick: () -> Unit,
+    onWallhavenApiKeyItemClick: () -> Unit,
+    onLayoutClick: () -> Unit,
+    onViewedWallpapersLookClick: () -> Unit,
+    onSourcesClick: () -> Unit,
+) {
+    val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
+    val coroutineScope = rememberCoroutineScope()
+
+    Scaffold(
+        topBar = {
+            DetailContentTopBar(
+                isExpanded = isExpanded,
+                selectedType = selectedType,
+                onBackClick = onBackClick,
+            )
+        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+    ) {
+        Crossfade(
+            modifier = Modifier.padding(it),
+            targetState = selectedType,
+            label = "Settings Detail Content",
+        ) { type ->
+            when (type) {
+                SettingsType.ACCOUNT -> AccountContent(
+                    onWallhavenApiKeyItemClick = onWallhavenApiKeyItemClick,
+                )
+                SettingsType.LOOK_AND_FEEL -> LookAndFeelSettingsScreen(
+                    selectedExtraType = selectedExtraType,
+                    viewModel = viewModel,
+                    isExpanded = isExpanded,
+                    onLayoutClick = onLayoutClick,
+                )
+                SettingsType.DOWNLOADS -> DownloadsSettingsScreen(
+                    viewModel = viewModel,
+                )
+                SettingsType.SAVED_SEARCHES -> SavedSearchesContent(
+                    onManageSavedSearchesClick = {
+                        viewModel.showSavedSearches(true)
+                    },
+                )
+                SettingsType.VIEWED_WALLPAPERS -> ViewWallpapersSettingsScreen(
+                    selectedExtraType = selectedExtraType,
+                    viewModel = viewModel,
+                    isExpanded = isExpanded,
+                    onViewedWallpapersLookClick = onViewedWallpapersLookClick,
+                )
+                SettingsType.OBJECT_DETECTION -> ObjectDetectionSettingsScreen(
+                    viewModel = viewModel,
+                )
+                SettingsType.AUTO_WALLPAPER -> AutoWallpaperSettingsScreen(
+                    selectedExtraType = selectedExtraType,
+                    isExpanded = isExpanded,
+                    viewModel = viewModel,
+                    autoWallpaperPermissionsState = autoWallpaperPermissionsState,
+                    onSourcesClick = onSourcesClick,
+                    onChangeNowStatusChange = { status ->
+                        if (status == null || !status.isSuccessOrFail()) {
+                            return@AutoWallpaperSettingsScreen
+                        }
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar(
+                                message = getStatusMessage(context, status),
+                                duration = if (status is Status.Failed) {
+                                    SnackbarDuration.Long
+                                } else {
+                                    SnackbarDuration.Short
+                                },
+                            )
+                        }
+                    },
+                )
             }
-            SettingsScreenContent(
-                appPreferences = AppPreferences(
-                    autoWallpaperPreferences = AutoWallpaperPreferences(
+        }
+    }
+}
+
+@Composable
+private fun ExtraContentScaffold(
+    selectedExtraType: SettingsExtraType?,
+    viewModel: SettingsViewModel,
+    isExpanded: Boolean,
+    onBackClick: () -> Unit,
+) {
+    Scaffold(
+        topBar = {
+            ExtraContentTopBar(
+                isExpanded = isExpanded,
+                selectedExtraType = selectedExtraType,
+                onBackClick = onBackClick,
+            )
+        },
+    ) {
+        Crossfade(
+            modifier = Modifier.padding(it),
+            targetState = selectedExtraType,
+            label = "Settings Extra Content",
+        ) { type ->
+            if (type == null) {
+                return@Crossfade
+            }
+            when (type) {
+                SettingsExtraType.LAYOUT -> LayoutSettings(
+                    viewModel = viewModel,
+                    isExpanded = isExpanded,
+                )
+                SettingsExtraType.VIEW_WALLPAPERS_LOOK -> ViewedWallpapersLookOptions(
+                    viewModel = viewModel,
+                )
+                SettingsExtraType.AUTO_WALLPAPER_SOURCES -> ManageAutoWallpaperSources(
+                    viewModel = viewModel,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun LookAndFeelSettingsScreen(
+    selectedExtraType: SettingsExtraType?,
+    viewModel: SettingsViewModel,
+    isExpanded: Boolean,
+    onLayoutClick: () -> Unit,
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val appPreferences = uiState.appPreferences
+    val lookAndFeelPreferences = appPreferences.lookAndFeelPreferences
+    LookAndFeelContent(
+        isExpanded = isExpanded,
+        selectedType = selectedExtraType,
+        blurNsfw = appPreferences.blurNsfw,
+        blurSketchy = appPreferences.blurSketchy,
+        showLocalTab = lookAndFeelPreferences.showLocalTab,
+        onThemeClick = { viewModel.showThemeOptionsDialog(true) },
+        onLayoutClick = onLayoutClick,
+        onBlurNsfwCheckChange = viewModel::setBlurNsfw,
+        onBlurSketchyCheckChange = viewModel::setBlurSketchy,
+        onShowLocalTabChange = { show ->
+            viewModel.updateLookAndFeelPrefs(
+                lookAndFeelPreferences.copy(
+                    showLocalTab = show,
+                ),
+            )
+        },
+    )
+}
+
+@Composable
+private fun DownloadsSettingsScreen(
+    viewModel: SettingsViewModel,
+) {
+    val context = LocalContext.current
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val appPreferences = uiState.appPreferences
+    val prefsDownloadLocationUri = appPreferences.downloadLocation
+    val downloadLocationString = if (prefsDownloadLocationUri == null) {
+        getPublicDownloadsDir().absolutePath
+    } else {
+        getRealPath(context, prefsDownloadLocationUri) ?: prefsDownloadLocationUri.toString()
+    }
+    DownloadsContent(
+        downloadLocation = downloadLocationString,
+        writeTagsToExif = appPreferences.writeTagsToExif,
+        tagsExifWriteType = appPreferences.tagsExifWriteType,
+        onDownloadLocationClick = { viewModel.showChangeDownloadLocationDialog(true) },
+        onWriteTagsToExifCheckChange = viewModel::updateWriteTagsToExif,
+        onTagsWriteTypeClick = { viewModel.showTagsWriteTypeDialog(true) },
+    )
+}
+
+@Composable
+private fun ViewWallpapersSettingsScreen(
+    viewModel: SettingsViewModel,
+    isExpanded: Boolean,
+    selectedExtraType: SettingsExtraType?,
+    onViewedWallpapersLookClick: () -> Unit,
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val viewedWallpapersPreferences = uiState.appPreferences.viewedWallpapersPreferences
+    ViewedWallpapersContent(
+        isExpanded = isExpanded,
+        selectedType = selectedExtraType,
+        enabled = viewedWallpapersPreferences.enabled,
+        look = viewedWallpapersPreferences.look,
+        onEnabledChange = viewModel::updateRememberViewedWallpapers,
+        onViewedWallpapersLookClick = onViewedWallpapersLookClick,
+        onClearClick = { viewModel.showClearViewedWallpapersConfirmDialog(true) },
+    )
+}
+
+@Composable
+private fun ObjectDetectionSettingsScreen(
+    viewModel: SettingsViewModel,
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val objectDetectionPreferences = uiState.appPreferences.objectDetectionPreferences
+    ObjectDetectionContent(
+        enabled = objectDetectionPreferences.enabled,
+        delegate = objectDetectionPreferences.delegate,
+        model = uiState.selectedModel,
+        onEnabledChange = { enabled ->
+            viewModel.updateSubjectDetectionPrefs(
+                objectDetectionPreferences.copy(
+                    enabled = enabled,
+                ),
+            )
+        },
+        onDelegateClick = { viewModel.showObjectDetectionDelegateOptions(true) },
+        onModelClick = { viewModel.showObjectDetectionModelOptions(true) },
+    )
+}
+
+@Composable
+private fun AutoWallpaperSettingsScreen(
+    viewModel: SettingsViewModel,
+    autoWallpaperPermissionsState: MultiplePermissionsState,
+    selectedExtraType: SettingsExtraType?,
+    isExpanded: Boolean,
+    onSourcesClick: () -> Unit,
+    onChangeNowStatusChange: (Status?) -> Unit,
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val autoWallpaperPreferences = uiState.appPreferences.autoWallpaperPreferences
+
+    LaunchedEffect(uiState.autoWallpaperStatus) {
+        onChangeNowStatusChange(uiState.autoWallpaperStatus)
+    }
+
+    AutoWallpaperContent(
+        enabled = autoWallpaperPreferences.enabled,
+        selectedType = selectedExtraType,
+        isExpanded = isExpanded,
+        sourcesSummary = getSourcesSummary(
+            context = LocalContext.current,
+            useSameSources = !autoWallpaperPreferences.setDifferentWallpapers,
+            lightDarkEnabled = autoWallpaperPreferences.lightDarkEnabled,
+            savedSearches = uiState.autoWallpaperSavedSearches,
+            savedSearchEnabled = autoWallpaperPreferences.savedSearchEnabled,
+            favoritesEnabled = autoWallpaperPreferences.favoritesEnabled,
+            localEnabled = autoWallpaperPreferences.localEnabled,
+            lsLightDarkEnabled = autoWallpaperPreferences.lsLightDarkEnabled,
+            lsSavedSearchEnabled = autoWallpaperPreferences.lsSavedSearchEnabled,
+            lsFavoritesEnabled = autoWallpaperPreferences.lsFavoritesEnabled,
+            lsLocalEnabled = autoWallpaperPreferences.lsLocalEnabled,
+        ),
+        crop = autoWallpaperPreferences.crop,
+        useObjectDetection = autoWallpaperPreferences.useObjectDetection,
+        nextRun = uiState.autoWallpaperNextRun,
+        lsNextRun = uiState.lsAutoWallpaperNextRun,
+        useSameFrequency = autoWallpaperPreferences.useSameFreq,
+        frequency = autoWallpaperPreferences.frequency,
+        lsFrequency = autoWallpaperPreferences.lsFrequency,
+        showNotification = autoWallpaperPreferences.showNotification,
+        autoWallpaperStatus = uiState.autoWallpaperStatus,
+        targets = autoWallpaperPreferences.targets,
+        markFavorite = autoWallpaperPreferences.markFavorite,
+        download = autoWallpaperPreferences.download,
+        onEnabledChange = { enabled ->
+            if (enabled) {
+                viewModel.setTempAutoWallpaperPrefs(
+                    autoWallpaperPreferences.copy(
                         enabled = true,
                     ),
+                )
+                // need to check if we have all permissions before enabling auto wallpaper
+                autoWallpaperPermissionsState.launchMultiplePermissionRequest()
+                return@AutoWallpaperContent
+            }
+            viewModel.updateAutoWallpaperEnabled(false)
+        },
+        onSourcesClick = onSourcesClick,
+        onFrequencyClick = {
+            viewModel.showAutoWallpaperFrequencyDialog(true)
+        },
+        onUseObjectDetectionChange = { use ->
+            viewModel.updateAutoWallpaperPrefs(
+                autoWallpaperPreferences.copy(
+                    useObjectDetection = use,
                 ),
-                autoWallpaperStatus = autoWallpaperStatus,
-                onAutoWallpaperChangeNowClick = {
-                    autoWallpaperStatus = Status.Success
-                    coroutineScope.launch {
-                        delay(5000)
-                        autoWallpaperStatus = null
-                    }
-                },
             )
+        },
+        onConstraintsClick = {
+            viewModel.showAutoWallpaperConstraintsDialog(true)
+        },
+        onChangeNowClick = viewModel::autoWallpaperChangeNow,
+        onNextRunInfoClick = {
+            viewModel.showAutoWallpaperNextRunInfoDialog(true)
+        },
+        onShowNotificationChange = { show ->
+            viewModel.updateAutoWallpaperPrefs(
+                autoWallpaperPreferences.copy(
+                    showNotification = show,
+                ),
+            )
+        },
+        onSetToClick = {
+            viewModel.showAutoWallpaperSetToDialog(true)
+        },
+        onMarkFavoriteChange = { mark ->
+            viewModel.updateAutoWallpaperPrefs(
+                autoWallpaperPreferences.copy(
+                    markFavorite = mark,
+                ),
+            )
+        },
+        onDownloadChange = { download ->
+            viewModel.updateAutoWallpaperPrefs(
+                autoWallpaperPreferences.copy(
+                    download = download,
+                ),
+            )
+        },
+        onCropChange = { crop ->
+            viewModel.updateAutoWallpaperPrefs(
+                autoWallpaperPreferences.copy(
+                    crop = crop,
+                ),
+            )
+        },
+    )
+}
+
+@Composable
+private fun LayoutSettings(
+    viewModel: SettingsViewModel,
+    isExpanded: Boolean,
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    LayoutSettingsScreenContent(
+        supportsTwoPane = isExpanded,
+        layoutPreferences = uiState
+            .appPreferences
+            .lookAndFeelPreferences
+            .layoutPreferences,
+        onLayoutPreferencesChange = viewModel::updateLayoutPreferences,
+    )
+}
+
+@Composable
+private fun ViewedWallpapersLookOptions(
+    viewModel: SettingsViewModel,
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    ViewedWallpapersLookOptionsContent(
+        selectedViewedWallpapersLook = uiState
+            .appPreferences
+            .viewedWallpapersPreferences
+            .look,
+        onOptionClick = viewModel::updateViewedWallpapersLook,
+    )
+}
+
+@Composable
+private fun ManageAutoWallpaperSources(
+    viewModel: SettingsViewModel,
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    ManageAutoWallpaperSourcesContent(
+        useSameSources = !uiState
+            .appPreferences
+            .autoWallpaperPreferences
+            .setDifferentWallpapers,
+        hasLightDarkWallpapers = uiState.hasLightDarkWallpapers,
+        hasFavorites = uiState.hasFavorites,
+        savedSearches = uiState.savedSearches,
+        localDirectories = uiState.localDirectories,
+        homeScreenSources = uiState.homeScreenAutoWallpaperSources,
+        lockScreenSources = uiState.lockScreenAutoWallpaperSources,
+        onChangeUseSameSources = viewModel::updateAutoWallpaperUseSameSources,
+        onChangeLightDarkEnabled = viewModel::updateAutoWallpaperLightDarkEnabled,
+        onChangeUseDarkWithExtraDim = viewModel::updateAutoWallpaperUseDarkWithExtraDim,
+        onChangeSavedSearchEnabled = viewModel::updateAutoWallpaperSavedSearchEnabled,
+        onChangeSavedSearchIds = viewModel::updateAutoWallpaperSavedSearchIds,
+        onChangeFavoritesEnabled = viewModel::updateAutoWallpaperFavoritesEnabled,
+        onChangeLocalEnabled = viewModel::updateAutoWallpaperLocalEnabled,
+        onChangeSelectedLocalDirs = viewModel::updateAutoWallpaperSelectedLocalDirs,
+    )
+}
+
+private fun getStatusMessage(
+    context: Context,
+    status: Status?,
+) = when (status) {
+    is Status.Success -> {
+        context.getString(R.string.wallpaper_changed)
+    }
+    is Status.Failed -> {
+        if (status.e is AutoWallpaperException) {
+            getFailureReasonString(context, status.e.code)
+        } else {
+            context.getString(R.string.wallpaper_not_changed)
         }
     }
+    else -> ""
 }

@@ -28,28 +28,12 @@ object AppNavGraphs {
     @NavGraph<MainNavGraph>
     annotation class MoreNavGraph
 
-    @NavGraph<MoreNavGraph>
+    @NavGraph<RootNavGraph>
     annotation class SettingsNavGraph
 
-    @NavGraph<MoreNavGraph>
+    @NavGraph<RootNavGraph>
     annotation class BackupRestoreNavGraph
 
-    @NavGraph<MoreNavGraph>
+    @NavGraph<RootNavGraph>
     annotation class OpenSourceLicensesNavGraph
-
-    @NavHostGraph(
-        defaultTransitions = MoreDetailNavHostAnimatedDestinationStyle::class,
-    )
-    annotation class MoreDetailNavGraph
-
-    @NavGraph<MoreDetailNavGraph>(
-        start = true,
-    )
-    annotation class SettingsForMoreDetailNavGraph
-
-    @NavGraph<MoreDetailNavGraph>
-    annotation class BackupRestoreForMoreDetailNavGraph
-
-    @NavGraph<MoreDetailNavGraph>
-    annotation class OpenSourceLicensesForMoreDetailNavGraph
 }

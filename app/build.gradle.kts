@@ -212,12 +212,12 @@ dependencies {
     coreLibraryDesugaring(libs.android.tools.desugar)
 
     // Core Android dependencies
+    implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.process)
     implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.service)
-    implementation(libs.androidx.lifecycle.process)
-    implementation(libs.androidx.activity.compose)
 
     // Hilt Dependency Injection
     implementation(libs.hilt.android)
@@ -241,12 +241,14 @@ dependencies {
     androidTestImplementation(libs.androidx.room.testing)
 
     // Compose
+    implementation(libs.androidx.compose.adaptive.layout)
+    implementation(libs.androidx.compose.adaptive.navigation)
     implementation(libs.androidx.compose.animation)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material3.window.size.cls)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.ui.util)
-    implementation(libs.androidx.compose.material3)
-    implementation(libs.androidx.compose.material3.window.size.cls)
     // Tooling
     debugImplementation(libs.androidx.compose.ui.tooling)
     // Compose Runtime tracing

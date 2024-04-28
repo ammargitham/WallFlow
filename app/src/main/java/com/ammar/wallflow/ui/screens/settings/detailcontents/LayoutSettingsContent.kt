@@ -1,4 +1,4 @@
-package com.ammar.wallflow.ui.screens.settings.layout
+package com.ammar.wallflow.ui.screens.settings.detailcontents
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
@@ -8,76 +8,28 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.mandatorySystemGestures
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.navigation.NavController
-import com.ammar.wallflow.R
 import com.ammar.wallflow.data.preferences.GridColType
 import com.ammar.wallflow.data.preferences.LayoutPreferences
-import com.ammar.wallflow.navigation.AppNavGraphs
-import com.ammar.wallflow.ui.common.LocalSystemController
-import com.ammar.wallflow.ui.common.TopBar
-import com.ammar.wallflow.ui.common.bottomWindowInsets
-import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
+import com.ammar.wallflow.ui.screens.settings.detailcontents.composables.LayoutPreferenceProvider
+import com.ammar.wallflow.ui.screens.settings.detailcontents.composables.LayoutPreview
+import com.ammar.wallflow.ui.screens.settings.detailcontents.composables.adaptiveColMinWidthPctSection
+import com.ammar.wallflow.ui.screens.settings.detailcontents.composables.gridColTypeSection
+import com.ammar.wallflow.ui.screens.settings.detailcontents.composables.gridTypeSection
+import com.ammar.wallflow.ui.screens.settings.detailcontents.composables.noOfColumnsSection
+import com.ammar.wallflow.ui.screens.settings.detailcontents.composables.roundedCornersSection
 import com.ammar.wallflow.ui.theme.WallFlowTheme
-import com.ramcosta.composedestinations.annotation.Destination
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Destination<AppNavGraphs.SettingsNavGraph>
-@Destination<AppNavGraphs.SettingsForMoreDetailNavGraph>
-@Composable
-fun LayoutSettingsScreen(
-    navController: NavController,
-    viewModel: LayoutSettingsViewModel = hiltViewModel(),
-) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val bottomBarController = LocalBottomBarController.current
-    val systemController = LocalSystemController.current
-    val systemState by systemController.state
-
-    LaunchedEffect(systemState.isExpanded) {
-        bottomBarController.update { it.copy(visible = systemState.isExpanded) }
-    }
-
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .windowInsetsPadding(bottomWindowInsets),
-    ) {
-        TopBar(
-            navController = navController,
-            title = {
-                Text(
-                    text = stringResource(R.string.layout),
-                    maxLines = 1,
-                )
-            },
-            showBackButton = true,
-        )
-        LayoutSettingsScreenContent(
-            supportsTwoPane = systemState.isExpanded,
-            layoutPreferences = uiState.appPreferences.lookAndFeelPreferences.layoutPreferences,
-            onLayoutPreferencesChange = viewModel::updatePreferences,
-        )
-    }
-}
 
 @Composable
 fun LayoutSettingsScreenContent(

@@ -57,6 +57,7 @@ fun TopBar(
     scrollBehavior: TopAppBarScrollBehavior? = null,
     showBackButton: Boolean = false,
     title: @Composable () -> Unit = {},
+    backIcon: (@Composable () -> Unit)? = null,
     visible: Boolean = true,
     gradientBg: Boolean = false,
     actions: @Composable RowScope.() -> Unit = {},
@@ -76,7 +77,7 @@ fun TopBar(
                     enter = slideInHorizontally(),
                     exit = slideOutHorizontally(),
                 ) {
-                    IconButton(onClick = onBackClick) {
+                    backIcon?.invoke() ?: IconButton(onClick = onBackClick) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.back),

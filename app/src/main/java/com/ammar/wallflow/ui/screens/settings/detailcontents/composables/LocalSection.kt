@@ -1,4 +1,4 @@
-package com.ammar.wallflow.ui.screens.settings.autowallpapersources.composables
+package com.ammar.wallflow.ui.screens.settings.detailcontents.composables
 
 import android.content.res.Configuration
 import android.net.Uri

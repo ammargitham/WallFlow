@@ -336,6 +336,8 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="use_same_freq_homescreen_lockscreen">Use same frequency for home and lock screen</string>
     <string name="next_run_approximate">Next run (approximate)</string>
     <string name="target_activity_not_found">Target activity not found</string>
+    <string name="downloads">Downloads</string>
+    <string name="close">Close</string>
     <plurals name="every_x_hrs">
         <item quantity="one">Every %d hour</item>
         <item quantity="other">Every %d hours</item>

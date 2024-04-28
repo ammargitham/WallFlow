@@ -1,15 +1,15 @@
 package com.ammar.wallflow.ui.screens.settings
 
 import android.content.Context
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.res.stringResource
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.preferences.AppPreferences
 import com.ammar.wallflow.data.preferences.AutoWallpaperPreferences
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
+import com.ammar.wallflow.model.search.SavedSearch
 import com.ammar.wallflow.services.ChangeWallpaperTileService
 import com.ammar.wallflow.workers.AutoWallpaperWorker
 import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.FailureReason
+import kotlinx.collections.immutable.ImmutableList
 import kotlinx.datetime.DateTimePeriod
 
 suspend fun updateAutoWallpaperPrefs(
@@ -87,16 +87,112 @@ private fun areFrequenciesEqual(
         currentLsFreq == newLsFreq
 }
 
-@Composable
-internal fun getFailureReasonString(reason: FailureReason): String {
+internal fun getFailureReasonString(
+    context: Context,
+    reason: FailureReason,
+): String {
     val reasonStr = when (reason) {
-        FailureReason.APP_PREFS_NULL -> stringResource(R.string.app_prefs_null)
-        FailureReason.DISABLED -> stringResource(R.string.auto_wallpaper_disabled)
-        FailureReason.NO_SOURCES_ENABLED -> stringResource(R.string.no_sources_set)
-        FailureReason.SAVED_SEARCH_NOT_SET -> stringResource(R.string.no_saved_searches)
-        FailureReason.NO_WALLPAPER_FOUND -> stringResource(R.string.no_wallpaper_found)
-        FailureReason.CANCELLED -> stringResource(R.string.auto_wallpaper_cancelled)
-        FailureReason.CURRENT_TARGETS_DISABLED -> stringResource(R.string.current_target_disabled)
+        FailureReason.APP_PREFS_NULL -> context.getString(R.string.app_prefs_null)
+        FailureReason.DISABLED -> context.getString(R.string.auto_wallpaper_disabled)
+        FailureReason.NO_SOURCES_ENABLED -> context.getString(R.string.no_sources_set)
+        FailureReason.SAVED_SEARCH_NOT_SET -> context.getString(R.string.no_saved_searches)
+        FailureReason.NO_WALLPAPER_FOUND -> context.getString(R.string.no_wallpaper_found)
+        FailureReason.CANCELLED -> context.getString(R.string.auto_wallpaper_cancelled)
+        FailureReason.CURRENT_TARGETS_DISABLED -> context.getString(
+            R.string.current_target_disabled,
+        )
     }
-    return stringResource(R.string.wallpaper_not_changed_with_reason, reasonStr)
+    return context.getString(R.string.wallpaper_not_changed_with_reason, reasonStr)
+}
+
+internal fun getSourcesSummary(
+    context: Context,
+    useSameSources: Boolean,
+    lightDarkEnabled: Boolean,
+    savedSearches: ImmutableList<SavedSearch>,
+    savedSearchEnabled: Boolean,
+    favoritesEnabled: Boolean,
+    localEnabled: Boolean,
+    lsLightDarkEnabled: Boolean,
+    lsSavedSearchEnabled: Boolean,
+    lsFavoritesEnabled: Boolean,
+    lsLocalEnabled: Boolean,
+) = mutableListOf<String>().apply {
+    if (useSameSources) {
+        if (lightDarkEnabled) {
+            add(context.getString(R.string.light_dark))
+            return@apply
+        }
+        if (savedSearchEnabled && savedSearches.size > 0) {
+            val searchNames = if (savedSearches.size > 2) {
+                context.resources.getQuantityString(
+                    R.plurals.n_searches,
+                    savedSearches.size,
+                    savedSearches.size,
+                )
+            } else {
+                savedSearches.joinToString(", ") { it.name }
+            }
+            add("${context.getString(R.string.saved_search)} ($searchNames)")
+        }
+        if (favoritesEnabled) {
+            add(context.getString(R.string.favorites))
+        }
+        if (localEnabled) {
+            add(context.getString(R.string.local))
+        }
+    } else {
+        val homeCount = getSourcesCount(
+            lightDarkEnabled,
+            savedSearchEnabled,
+            favoritesEnabled,
+            localEnabled,
+        )
+        if (homeCount > 0) {
+            add(
+                context.resources.getQuantityString(
+                    R.plurals.home_screen_sources,
+                    homeCount,
+                    homeCount,
+                ),
+            )
+        }
+        val lsCount = getSourcesCount(
+            lsLightDarkEnabled,
+            lsSavedSearchEnabled,
+            lsFavoritesEnabled,
+            lsLocalEnabled,
+        )
+        if (lsCount > 0) {
+            add(
+                context.resources.getQuantityString(
+                    R.plurals.lock_screen_sources,
+                    lsCount,
+                    lsCount,
+                ),
+            )
+        }
+    }
+}.joinToString(", ")
+
+internal fun getSourcesCount(
+    lightDarkEnabled: Boolean,
+    savedSearchEnabled: Boolean,
+    favoritesEnabled: Boolean,
+    localEnabled: Boolean,
+): Int {
+    if (lightDarkEnabled) {
+        return 1
+    }
+    var count = 0
+    if (savedSearchEnabled) {
+        count += 1
+    }
+    if (favoritesEnabled) {
+        count += 1
+    }
+    if (localEnabled) {
+        count += 1
+    }
+    return count
 }

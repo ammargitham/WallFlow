@@ -4,21 +4,22 @@ import android.content.res.Configuration
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.NavigationDrawerItem
-import androidx.compose.material3.NavigationDrawerItemDefaults
-import androidx.compose.material3.PermanentDrawerSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -31,62 +32,48 @@ import com.ammar.wallflow.R
 import com.ammar.wallflow.ui.theme.WallFlowTheme
 
 @Composable
-fun MoreListContainer(
+fun BoxScope.MoreList(
     modifier: Modifier = Modifier,
     isExpanded: Boolean = false,
     items: List<MoreListItem> = emptyList(),
-    selectedItemValue: String? = null,
     onItemClick: (MoreListItem.Clickable) -> Unit = {},
 ) {
-    PermanentDrawerSheet(
+    LazyColumn(
         modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(state = rememberScrollState()),
+            .fillMaxHeight()
+            .fillMaxWidth(
+                fraction = if (isExpanded) {
+                    0.75f
+                } else {
+                    1f
+                },
+            )
+            .align(Alignment.TopCenter),
     ) {
-        items.forEach { item ->
+        items(items) { item ->
             when (item) {
                 is MoreListItem.Clickable -> {
-                    if (isExpanded) {
-                        NavigationDrawerItem(
-                            modifier = Modifier.padding(NavigationDrawerItemDefaults.ItemPadding),
-                            icon = item.icon?.let {
-                                {
-                                    Icon(
-                                        painter = painterResource(it),
-                                        contentDescription = null,
-                                    )
-                                }
-                            },
-                            label = { Text(text = item.label) },
-                            selected = item.value == selectedItemValue,
-                            onClick = { onItemClick(item) },
-                        )
-                    } else {
-                        ListItem(
-                            modifier = Modifier.clickable { onItemClick(item) },
-                            leadingContent = item.icon?.let {
-                                {
-                                    Icon(
-                                        painter = painterResource(it),
-                                        contentDescription = null,
-                                    )
-                                }
-                            },
-                            headlineContent = { Text(text = item.label) },
-                        )
-                    }
+                    ListItem(
+                        modifier = Modifier.clickable { onItemClick(item) },
+                        leadingContent = item.icon?.let {
+                            {
+                                Icon(
+                                    painter = painterResource(it),
+                                    contentDescription = null,
+                                )
+                            }
+                        },
+                        headlineContent = { Text(text = item.label) },
+                    )
                 }
                 is MoreListItem.Content -> item.content()
                 MoreListItem.Divider -> HorizontalDivider(
                     modifier = Modifier.padding(
                         vertical = 8.dp,
-                        horizontal = if (isExpanded) 28.dp else 0.dp,
                     ),
                 )
                 is MoreListItem.Static -> ListItem(
-                    modifier = Modifier.padding(
-                        horizontal = if (isExpanded) 12.dp else 0.dp,
-                    ),
+                    modifier = Modifier,
                     headlineContent = { Text(text = item.label) },
                     supportingContent = { Text(text = item.supportingText) },
                 )
@@ -171,11 +158,12 @@ private fun PreviewMoreListContainer(
 ) {
     WallFlowTheme {
         Surface {
-            MoreListContainer(
-                items = props.items,
-                isExpanded = props.isExpanded,
-                selectedItemValue = props.selectedItemValue,
-            )
+            Box(modifier = Modifier.fillMaxSize()) {
+                MoreList(
+                    isExpanded = props.isExpanded,
+                    items = props.items,
+                )
+            }
         }
     }
 }
