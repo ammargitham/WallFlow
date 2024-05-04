@@ -52,7 +52,7 @@ internal fun ObjectDetectionContent(
                 modifier = Modifier.padding(
                     start = 16.dp,
                     end = 16.dp,
-                    bottom = 8.dp
+                    bottom = 8.dp,
                 ),
                 text = stringResource(R.string.object_detection_setting_warning),
                 style = MaterialTheme.typography.bodySmall,
