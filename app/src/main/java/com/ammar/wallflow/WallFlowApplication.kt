@@ -121,6 +121,13 @@ class WallFlowApplication : Application(), Configuration.Provider, ImageLoaderFa
     private fun scheduleAutoWallpaperWorker() {
         with(ProcessLifecycleOwner.get()) {
             lifecycleScope.launch {
+                val appPreferences = appPreferencesRepository
+                    .appPreferencesFlow
+                    .firstOrNull() ?: return@launch
+                val autoWallpaperPreferences = appPreferences.autoWallpaperPreferences
+                if (!autoWallpaperPreferences.enabled) {
+                    return@launch
+                }
                 val workerNeedsUpdate = AutoWallpaperWorker.checkIfNeedsUpdate(
                     appPreferencesRepository = appPreferencesRepository,
                 )
@@ -131,14 +138,9 @@ class WallFlowApplication : Application(), Configuration.Provider, ImageLoaderFa
                 if (scheduled && !workerNeedsUpdate) {
                     return@launch
                 }
-                val prefs = appPreferencesRepository
-                    .appPreferencesFlow
-                    .firstOrNull()
-                    ?.autoWallpaperPreferences
-                    ?: return@launch
                 AutoWallpaperWorker.schedule(
                     context = this@WallFlowApplication,
-                    autoWallpaperPreferences = prefs,
+                    autoWallpaperPreferences = autoWallpaperPreferences,
                     appPreferencesRepository = appPreferencesRepository,
                     enqueuePolicy = if (scheduled) {
                         ExistingPeriodicWorkPolicy.UPDATE
