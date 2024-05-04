@@ -87,6 +87,14 @@
             android:icon="@mipmap/ic_change_wallpaper"
             android:launchMode="singleTask"
             android:theme="@style/Theme.WallFlow.Dialog" />
+        <activity
+            android:name="com.ammar.wallflow.activities.crashreport.CrashReportActivity"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:finishOnTaskLaunch="true"
+            android:launchMode="singleInstance"
+            android:process=":acra"
+            android:theme="@style/Theme.WallFlow.Dialog" />
 
         <service
             android:name="androidx.work.impl.foreground.SystemForegroundService"

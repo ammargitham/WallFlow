@@ -5,6 +5,8 @@ import androidx.core.util.PatternsCompat
 
 const val WALLHAVEN_BASE_URL = "https://wallhaven.cc/api/v1/"
 const val REDDIT_BASE_URL = "https://reddit.com/"
+const val ISSUE_TRACKER_URL = "https://github.com/ammargitham/WallFlow/issues"
+const val BUG_REPORTS_EMAIL_ADDRESS = "bug-reports@wallflow.app"
 
 val COMMON_RESOLUTIONS = mapOf(
     "VGA" to IntSize(640, 480),

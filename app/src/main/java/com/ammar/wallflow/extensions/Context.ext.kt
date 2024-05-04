@@ -322,3 +322,50 @@ fun Context.isExtraDimActive() = try {
     Log.e(TAG, "isExtraDimActive: ", e)
     false
 }
+
+// From https://stackoverflow.com/a/46848226/1436766
+fun Context.restartApp() {
+    val intent = packageManager.getLaunchIntentForPackage(packageName) ?: return
+    val mainIntent = Intent.makeRestartActivityTask(intent.component)
+    // Required for API 34 and later
+    // Ref: https://developer.android.com/about/versions/14/behavior-changes-14#safer-intents
+    mainIntent.setPackage(packageName)
+    startActivity(mainIntent)
+    Runtime.getRuntime().exit(0)
+}
+
+fun Context.sendEmail(
+    address: String,
+    subject: String,
+    body: String,
+) {
+    try {
+        startActivity(
+            buildEmailChooserIntent(
+                title = getString(R.string.send_email),
+                address = address,
+                subject = subject,
+                body = body,
+            ).apply {
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            },
+        )
+    } catch (e: Exception) {
+        Log.e(TAG, "sendEmail: No email app found", e)
+    }
+}
+
+private fun buildEmailChooserIntent(
+    title: String,
+    address: String,
+    subject: String,
+    body: String?,
+) = Intent.createChooser(
+    Intent(Intent.ACTION_SENDTO).apply {
+        data = Uri.fromParts("mailto", address, null)
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        putExtra(Intent.EXTRA_SUBJECT, subject)
+        putExtra(Intent.EXTRA_TEXT, body)
+    },
+    title,
+)

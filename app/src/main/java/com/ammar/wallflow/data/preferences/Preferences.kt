@@ -114,4 +114,5 @@ object PreferencesKeys {
     val LOCAL_DIRS = stringSetPreferencesKey("local_dirs")
     val VIEWED_WALLPAPERS_ENABLED = booleanPreferencesKey("viewed_wallpapers_enabled")
     val VIEWED_WALLPAPERS_LOOK = stringPreferencesKey("viewed_wallpapers_look")
+    val ENABLE_ACRA = booleanPreferencesKey("enable_acra")
 }

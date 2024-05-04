@@ -774,6 +774,14 @@ class SettingsViewModel @Inject constructor(
             ),
         )
     }
+
+    fun updateAcraEnabled(enabled: Boolean) = viewModelScope.launch {
+        appPreferencesRepository.updateAcraEnabled(enabled)
+        // need to restart to init acra
+        localUiStateFlow.update {
+            it.copy(showRestartDialog = partial(enabled))
+        }
+    }
 }
 
 @Stable
@@ -811,6 +819,7 @@ data class SettingsUiState(
     val hasFavorites: Boolean = false,
     val homeScreenAutoWallpaperSources: AutoWallpaperSources = AutoWallpaperSources(),
     val lockScreenAutoWallpaperSources: AutoWallpaperSources = AutoWallpaperSources(),
+    val showRestartDialog: Boolean = false,
 )
 
 sealed class NextRun {

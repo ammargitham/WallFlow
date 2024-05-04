@@ -147,3 +147,10 @@ private fun getFormattedDateTime(
     ),
     nextRun.instant.toEpochMilliseconds(),
 ).toString()
+
+@Composable
+fun getRestartReasonText(reason: RestartReason) = stringResource(
+    when (reason) {
+        RestartReason.ACRA_ENABLED -> R.string.acra_enabled_reason
+    },
+)

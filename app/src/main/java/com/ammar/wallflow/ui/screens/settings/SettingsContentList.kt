@@ -92,6 +92,14 @@ fun SettingsContentList(
                 onItemClick = onItemClick,
             )
         }
+        mainSettingsListItem(
+            type = SettingsType.CRASH_REPORTS,
+            labelRes = R.string.crash_reports,
+            iconRes = R.drawable.baseline_bug_report_24,
+            isExpanded = isExpanded,
+            selectedType = selectedType,
+            onItemClick = onItemClick,
+        )
     }
 }
 

@@ -43,6 +43,7 @@ private fun DetailTopBarTitle(selectedType: SettingsType) {
                 SettingsType.VIEWED_WALLPAPERS -> R.string.viewed_wallpapers
                 SettingsType.OBJECT_DETECTION -> R.string.object_detection
                 SettingsType.AUTO_WALLPAPER -> R.string.auto_wallpaper
+                SettingsType.CRASH_REPORTS -> R.string.crash_reports
             },
         ),
         maxLines = 1,

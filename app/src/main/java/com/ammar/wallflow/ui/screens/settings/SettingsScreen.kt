@@ -49,6 +49,7 @@ import androidx.navigation.NavController
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.preferences.AutoWallpaperPreferences
 import com.ammar.wallflow.destinations.WallhavenApiKeyDialogDestination
+import com.ammar.wallflow.extensions.restartApp
 import com.ammar.wallflow.extensions.safeLaunch
 import com.ammar.wallflow.extensions.toDp
 import com.ammar.wallflow.extensions.trimAll
@@ -81,9 +82,12 @@ import com.ammar.wallflow.ui.screens.settings.composables.ObjectDetectionDelegat
 import com.ammar.wallflow.ui.screens.settings.composables.ObjectDetectionModelDeleteConfirmDialog
 import com.ammar.wallflow.ui.screens.settings.composables.ObjectDetectionModelEditDialog
 import com.ammar.wallflow.ui.screens.settings.composables.ObjectDetectionModelOptionsDialog
+import com.ammar.wallflow.ui.screens.settings.composables.RestartDialog
+import com.ammar.wallflow.ui.screens.settings.composables.RestartReason
 import com.ammar.wallflow.ui.screens.settings.composables.ThemeOptionsDialog
 import com.ammar.wallflow.ui.screens.settings.detailcontents.AccountContent
 import com.ammar.wallflow.ui.screens.settings.detailcontents.AutoWallpaperContent
+import com.ammar.wallflow.ui.screens.settings.detailcontents.CrashReportsContent
 import com.ammar.wallflow.ui.screens.settings.detailcontents.DownloadsContent
 import com.ammar.wallflow.ui.screens.settings.detailcontents.LayoutSettingsScreenContent
 import com.ammar.wallflow.ui.screens.settings.detailcontents.LookAndFeelContent
@@ -477,6 +481,14 @@ fun SettingsScreen(
             },
         )
     }
+
+    if (uiState.showRestartDialog) {
+        RestartDialog(
+            reason = RestartReason.ACRA_ENABLED,
+            onRestartClick = { context.restartApp() },
+            onCancelClick = { viewModel.updateAcraEnabled(false) },
+        )
+    }
 }
 
 @Composable
@@ -617,6 +629,10 @@ private fun DetailContentScaffold(
                                 )
                             }
                         },
+                    )
+                    SettingsType.CRASH_REPORTS -> CrashReportsSettingsScreen(
+                        isExpanded = isExpanded,
+                        viewModel = viewModel,
                     )
                 }
             }
@@ -891,6 +907,20 @@ private fun AutoWallpaperSettingsScreen(
                 ),
             )
         },
+    )
+}
+
+@Composable
+private fun CrashReportsSettingsScreen(
+    viewModel: SettingsViewModel,
+    isExpanded: Boolean,
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+    CrashReportsContent(
+        acraEnabled = uiState.appPreferences.acraEnabled,
+        isExpanded = isExpanded,
+        onAcraEnabledChange = viewModel::updateAcraEnabled,
     )
 }
 

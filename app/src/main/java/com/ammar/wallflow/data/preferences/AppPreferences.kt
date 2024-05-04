@@ -55,6 +55,7 @@ data class AppPreferences(
     val mainRedditSearch: RedditSearch? = null,
     val viewedWallpapersPreferences: ViewedWallpapersPreferences = ViewedWallpapersPreferences(),
     val downloadLocation: Uri? = null,
+    val acraEnabled: Boolean = true,
 ) {
     companion object {
         const val CURRENT_VERSION = 2
