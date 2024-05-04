@@ -11,7 +11,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.pulltorefresh.PullToRefreshContainer
+import androidx.compose.material3.pulltorefresh.PullToRefreshDefaults
 import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -30,7 +30,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
@@ -122,9 +121,6 @@ fun HomeScreen(
     )
     val systemState by systemController.state
     val clipboardManager = LocalClipboardManager.current
-    var prevLoadState by remember {
-        mutableStateOf(wallpapers.loadState.refresh)
-    }
     val bottomBarState by bottomBarController.state
 
     val searchBarQuery by remember {
@@ -179,28 +175,6 @@ fun HomeScreen(
             }
         searchBarViewModel.setSearch(search)
         searchBarViewModel.setSource(uiState.selectedSource)
-    }
-
-    LaunchedEffect(refreshState.isRefreshing, wallpapers.loadState.refresh) {
-        try {
-            if (!refreshState.isRefreshing) {
-                return@LaunchedEffect
-            }
-            val loadState = wallpapers.loadState.refresh
-            if (prevLoadState !is LoadState.Loading &&
-                loadState is LoadState.NotLoading
-            ) {
-                wallpapers.refresh()
-                viewModel.refresh()
-                return@LaunchedEffect
-            }
-            if (loadState is LoadState.Loading) {
-                return@LaunchedEffect
-            }
-            refreshState.endRefresh()
-        } finally {
-            prevLoadState = wallpapers.loadState.refresh
-        }
     }
 
     val onWallpaperClick: (wallpaper: Wallpaper) -> Unit = remember(systemState.isExpanded) {
@@ -266,7 +240,6 @@ fun HomeScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .nestedScroll(refreshState.nestedScrollConnection)
             .testTag("Home Screen"),
     ) {
         HomeScreenContent(
@@ -281,16 +254,6 @@ fun HomeScreen(
                 bottom = bottomPadding + 8.dp,
             ),
             wallpapers = wallpapers,
-            pullToRefresh = {
-                if (showRefreshingIndicator || refreshState.progress > 0) {
-                    PullToRefreshContainer(
-                        modifier = Modifier
-                            .align(Alignment.TopCenter)
-                            .offset(y = SearchBar.Defaults.height - 8.dp),
-                        state = refreshState,
-                    )
-                }
-            },
             searchBar = {
                 HomeSearch(
                     modifier = Modifier.offset {
@@ -397,6 +360,16 @@ fun HomeScreen(
             } else {
                 null
             },
+            refreshState = refreshState,
+            refreshIndicator = {
+                PullToRefreshDefaults.Indicator(
+                    modifier = Modifier
+                        .align(Alignment.TopCenter)
+                        .offset(y = SearchBar.Defaults.height - 8.dp),
+                    state = refreshState,
+                    isRefreshing = showRefreshingIndicator,
+                )
+            },
             showFAB = !searchBarUiState.active,
             favorites = uiState.favorites,
             viewedList = uiState.viewedList,
@@ -418,6 +391,10 @@ fun HomeScreen(
             onWallpaperFavoriteClick = viewModel::toggleFavorite,
             onTagClick = onTagClick,
             onFABClick = onFilterFABClick,
+            onRefresh = {
+                wallpapers.refresh()
+                viewModel.refresh()
+            },
             onFullWallpaperTransform = viewerViewModel::onWallpaperTransform,
             onFullWallpaperTap = viewerViewModel::onWallpaperTap,
             onFullWallpaperInfoClick = viewerViewModel::showInfo,

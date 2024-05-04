@@ -5,18 +5,23 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.staggeredgrid.LazyStaggeredGridScope
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.pulltorefresh.PullToRefreshBox
+import androidx.compose.material3.pulltorefresh.PullToRefreshState
+import androidx.compose.material3.pulltorefresh.rememberPullToRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -31,6 +36,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.paging.LoadState
 import androidx.paging.PagingData
 import androidx.paging.compose.LazyPagingItems
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -63,6 +69,7 @@ import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.datetime.Clock
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun HomeScreenContent(
     wallpapers: LazyPagingItems<Wallpaper>,
@@ -88,13 +95,15 @@ internal fun HomeScreenContent(
     showFullWallpaperInfo: Boolean = false,
     isFullWallpaperFavorite: Boolean = false,
     fullWallpaperLightDarkTypeFlags: Int = LightDarkType.UNSPECIFIED,
-    pullToRefresh: @Composable () -> Unit = {},
     searchBar: @Composable () -> Unit = {},
     header: (LazyStaggeredGridScope.() -> Unit)? = null,
+    refreshState: PullToRefreshState = rememberPullToRefreshState(),
+    refreshIndicator: @Composable (BoxScope.() -> Unit) = {},
     onWallpaperClick: (wallpaper: Wallpaper) -> Unit = {},
     onWallpaperFavoriteClick: (wallpaper: Wallpaper) -> Unit = {},
     onTagClick: (wallhavenTag: WallhavenTag) -> Unit = {},
     onFABClick: () -> Unit = {},
+    onRefresh: () -> Unit = {},
     onFullWallpaperTransform: () -> Unit = {},
     onFullWallpaperTap: () -> Unit = {},
     onFullWallpaperInfoClick: () -> Unit = {},
@@ -128,12 +137,14 @@ internal fun HomeScreenContent(
                 isHome = isHome,
                 showFAB = showFAB,
                 isMedium = isMedium,
-                pullToRefresh = pullToRefresh,
                 searchBar = searchBar,
                 header = header,
+                refreshState = refreshState,
+                refreshIndicator = refreshIndicator,
                 onWallpaperClick = onWallpaperClick,
                 onWallpaperFavoriteClick = onWallpaperFavoriteClick,
                 onFABClick = onFABClick,
+                onRefresh = onRefresh,
             )
         },
         detailContent = {
@@ -200,6 +211,7 @@ private fun HomeScreenContent(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun Feed(
     wallpapers: LazyPagingItems<Wallpaper>,
@@ -217,12 +229,14 @@ private fun Feed(
     isHome: Boolean = true,
     showFAB: Boolean = true,
     isMedium: Boolean = false,
-    pullToRefresh: @Composable () -> Unit = {},
     searchBar: @Composable () -> Unit = {},
     header: (LazyStaggeredGridScope.() -> Unit)? = null,
+    refreshState: PullToRefreshState = rememberPullToRefreshState(),
+    refreshIndicator: @Composable (BoxScope.() -> Unit) = {},
     onWallpaperClick: (Wallpaper) -> Unit = {},
     onWallpaperFavoriteClick: (Wallpaper) -> Unit = {},
     onFABClick: () -> Unit = {},
+    onRefresh: () -> Unit = {},
 ) {
     val gridState = wallpapers.rememberLazyStaggeredGridState()
     Scaffold(
@@ -275,8 +289,12 @@ private fun Feed(
             }
         },
     ) {
-        Box(
+        PullToRefreshBox(
             modifier = Modifier.fillMaxSize(),
+            state = refreshState,
+            isRefreshing = wallpapers.loadState.refresh == LoadState.Loading,
+            onRefresh = onRefresh,
+            indicator = refreshIndicator,
         ) {
             WallpaperStaggeredGrid(
                 modifier = Modifier
@@ -303,12 +321,12 @@ private fun Feed(
                 onWallpaperClick = onWallpaperClick,
                 onWallpaperFavoriteClick = onWallpaperFavoriteClick,
             )
-            pullToRefresh()
             searchBar()
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Preview
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
