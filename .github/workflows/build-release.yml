@@ -68,20 +68,20 @@ jobs:
       - name: Rename signed apks
         run: |
           cd ${GITHUB_WORKSPACE}/app/build/outputs/apk/base/release
-          mmv '*-unsigned*.apk' '#1#2.apk'
+          mmv '*-release-unsigned-signed.apk' '#1-${{ github.ref_name }}.apk'
           cd ${GITHUB_WORKSPACE}/app/build/outputs/apk/plus/release
-          mmv '*-unsigned*.apk' '#1#2.apk'
+          mmv '*-release-unsigned-signed.apk' '#1-${{ github.ref_name }}.apk'
 
       - uses: actions/upload-artifact@v3
         with:
           name: signed_apks_${{ github.ref_name }}
-          path: app/build/outputs/apk/*/release/*-signed.apk
+          path: app/build/outputs/apk/*/release/*-${{ github.ref_name }}.apk
 
       - name: Create Draft Release
         uses: marvinpinto/action-automatic-releases@latest
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "${{ github.ref_name }}"
-          prerelease: false
+          prerelease: ${{ contains(github.ref_name, '-') }}
           draft: true
-          files: app/build/outputs/apk/*/release/*-signed.apk
+          files: app/build/outputs/apk/*/release/*-${{ github.ref_name }}.apk
