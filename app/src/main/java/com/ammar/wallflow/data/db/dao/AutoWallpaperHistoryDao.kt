@@ -54,4 +54,17 @@ interface AutoWallpaperHistoryDao {
 
     @Upsert
     suspend fun upsert(vararg autoWallpaperHistoryEntity: AutoWallpaperHistoryEntity)
+
+    @Query(
+        """
+        DELETE FROM auto_wallpaper_history
+        WHERE
+            source_choice = :sourceChoice
+            AND source_id in (:sourceIds)
+        """,
+    )
+    suspend fun deleteBySourceIdsAndSourceChoice(
+        sourceIds: Collection<String>,
+        sourceChoice: SourceChoice,
+    )
 }

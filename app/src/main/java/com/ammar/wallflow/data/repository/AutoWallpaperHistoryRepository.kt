@@ -1,5 +1,6 @@
 package com.ammar.wallflow.data.repository
 
+import android.net.Uri
 import com.ammar.wallflow.IoDispatcher
 import com.ammar.wallflow.data.db.dao.AutoWallpaperHistoryDao
 import com.ammar.wallflow.data.db.entity.toModel
@@ -45,5 +46,12 @@ class AutoWallpaperHistoryRepository @Inject constructor(
         autoWallpaperHistory: AutoWallpaperHistory,
     ) = withContext(ioDispatcher) {
         autoWallpaperHistoryDao.upsert(autoWallpaperHistory.toEntity())
+    }
+
+    suspend fun deleteAllByUris(uris: Collection<Uri>) = withContext(ioDispatcher) {
+        autoWallpaperHistoryDao.deleteBySourceIdsAndSourceChoice(
+            sourceIds = uris.map { it.toString() },
+            sourceChoice = SourceChoice.LOCAL,
+        )
     }
 }

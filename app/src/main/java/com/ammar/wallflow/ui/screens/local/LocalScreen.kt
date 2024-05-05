@@ -171,10 +171,15 @@ fun LocalScreen(
             sort = uiState.sort,
             onDismissRequest = { viewModel.showManageFoldersSheet(false) },
             onAddFolderClick = onAddFolderClick,
-            onRemoveClick = {
-                viewModel.removeLocalDir(it.uri)
-            },
+            onRemoveClick = { viewModel.showRemoveConfirmDialog(it.uri) },
             onSortChange = viewModel::updateSort,
+        )
+    }
+
+    if (uiState.showRemoveConfirmDialog) {
+        RemoveDirectoryConfirmDialog(
+            onConfirmClick = { viewModel.removeLocalDirConfirmed() },
+            onDismissRequest = { viewModel.showRemoveConfirmDialog(null) },
         )
     }
 }

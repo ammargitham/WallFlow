@@ -489,25 +489,18 @@ class AppPreferencesRepository @Inject constructor(
             ?: favoritesEnabled
 
         val localDirStrings = get(PreferencesKeys.AUTO_WALLPAPER_LOCAL_DIRS)
+        val accessibleFolderUris = context.accessibleFolders.mapTo(HashSet()) { it.uri }
         val localDirs = localDirStrings
             ?.mapNotNullTo(HashSet()) {
-                try {
-                    Uri.parse(it)
-                } catch (exception: Exception) {
-                    null
-                }
-            } ?: context.accessibleFolders.mapTo(HashSet()) { it.uri }
+                getUriIfAccessible(it, accessibleFolderUris)
+            } ?: accessibleFolderUris
         val localEnabled = (get(PreferencesKeys.AUTO_WALLPAPER_LOCAL_ENABLED) ?: false) &&
             localDirs.isNotEmpty()
 
         val lsLocalDirStrings = get(PreferencesKeys.AUTO_WALLPAPER_LS_LOCAL_DIRS)
             ?: localDirs.map { it.toString() }
         val lsLocalDirs = lsLocalDirStrings.mapNotNullTo(HashSet()) {
-            try {
-                Uri.parse(it)
-            } catch (exception: Exception) {
-                null
-            }
+            getUriIfAccessible(it, accessibleFolderUris)
         }
         val lsLocalEnabled = (
             get(PreferencesKeys.AUTO_WALLPAPER_LS_LOCAL_ENABLED)
@@ -593,6 +586,20 @@ class AppPreferencesRepository @Inject constructor(
                 get(PreferencesKeys.AUTO_WALLPAPER_PREV_LS_SOURCE),
             ),
         )
+    }
+
+    private fun getUriIfAccessible(
+        it: String,
+        accessibleFolderUris: HashSet<Uri>,
+    ) = try {
+        val uri = Uri.parse(it)
+        if (uri in accessibleFolderUris) {
+            uri
+        } else {
+            null
+        }
+    } catch (exception: Exception) {
+        null
     }
 
     private fun getObjectDetectionPreferences(preferences: Preferences) = with(preferences) {

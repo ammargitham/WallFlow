@@ -1,6 +1,7 @@
 package com.ammar.wallflow.data.repository
 
 import android.content.Context
+import android.net.Uri
 import androidx.paging.ExperimentalPagingApi
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
@@ -81,7 +82,7 @@ class FavoritesRepository @Inject constructor(
         )
         if (exists) {
             // delete it
-            favoriteDao.deleteBySourceIdAndType(
+            favoriteDao.deleteBySourceIdAndSource(
                 sourceId = sourceId,
                 source = source,
             )
@@ -170,4 +171,11 @@ class FavoritesRepository @Inject constructor(
     ) = favoriteDao.observeExists(source = source, sourceId = sourceId)
 
     fun observeCount() = favoriteDao.observeCount()
+
+    suspend fun deleteAllByUris(uris: Collection<Uri>) = withContext(ioDispatcher) {
+        favoriteDao.deleteBySourceIdsAndSource(
+            sourceIds = uris.map { it.toString() },
+            source = Source.LOCAL,
+        )
+    }
 }

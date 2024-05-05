@@ -108,6 +108,13 @@ internal open class FakeAutoWallpaperHistoryDao : AutoWallpaperHistoryDao {
     override suspend fun upsert(vararg autoWallpaperHistoryEntity: AutoWallpaperHistoryEntity) {
         throw RuntimeException()
     }
+
+    override suspend fun deleteBySourceIdsAndSourceChoice(
+        sourceIds: Collection<String>,
+        sourceChoice: SourceChoice,
+    ) {
+        throw RuntimeException()
+    }
 }
 
 internal open class FakeObjectDetectionModelDao : ObjectDetectionModelDao {
@@ -211,7 +218,11 @@ internal open class FakeFavoriteDao : FavoriteDao {
         throw RuntimeException()
     }
 
-    override suspend fun deleteBySourceIdAndType(sourceId: String, source: Source) {
+    override suspend fun deleteBySourceIdAndSource(sourceId: String, source: Source) {
+        throw RuntimeException()
+    }
+
+    override suspend fun deleteBySourceIdsAndSource(sourceIds: Collection<String>, source: Source) {
         throw RuntimeException()
     }
 }

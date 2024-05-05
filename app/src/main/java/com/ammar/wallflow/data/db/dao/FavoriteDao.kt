@@ -87,9 +87,29 @@ interface FavoriteDao {
     @Upsert
     suspend fun upsert(favoriteEntity: FavoriteEntity)
 
-    @Query("DELETE FROM favorites WHERE source_id = :sourceId AND source = :source")
-    suspend fun deleteBySourceIdAndType(
+    @Query(
+        """
+        DELETE FROM favorites
+        WHERE
+            source_id = :sourceId
+            AND source = :source
+        """,
+    )
+    suspend fun deleteBySourceIdAndSource(
         sourceId: String,
+        source: Source,
+    )
+
+    @Query(
+        """
+        DELETE FROM favorites
+        WHERE
+            source_id in (:sourceIds)
+            AND source = :source
+        """,
+    )
+    suspend fun deleteBySourceIdsAndSource(
+        sourceIds: Collection<String>,
         source: Source,
     )
 }
