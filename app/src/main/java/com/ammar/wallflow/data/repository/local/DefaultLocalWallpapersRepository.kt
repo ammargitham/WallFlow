@@ -10,7 +10,6 @@ import com.ammar.wallflow.SUPPORTED_MIME_TYPES
 import com.ammar.wallflow.data.repository.AutoWallpaperHistoryRepository
 import com.ammar.wallflow.data.repository.utils.Resource
 import com.ammar.wallflow.extensions.deepListFiles
-import com.ammar.wallflow.extensions.fromUri
 import com.ammar.wallflow.extensions.toLocalWallpaper
 import com.ammar.wallflow.extensions.toUriOrNull
 import com.ammar.wallflow.model.Wallpaper
@@ -122,6 +121,6 @@ class DefaultLocalWallpapersRepository @Inject constructor(
             SourceChoice.LOCAL,
         ) ?: return@withContext null
         val uri = oldestId.toUriOrNull() ?: return@withContext null
-        DocumentFileCompat.fromUri(context, uri)?.toLocalWallpaper(context)
+        DocumentFileCompat.fromSingleUri(context, uri)?.toLocalWallpaper(context)
     }
 }
