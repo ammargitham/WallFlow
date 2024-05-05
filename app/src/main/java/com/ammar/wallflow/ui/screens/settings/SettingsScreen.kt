@@ -227,7 +227,7 @@ fun SettingsScreen(
         extraPane = {
             AnimatedPane(
                 modifier = Modifier.preferredWidth(
-                    (systemState.size.width / 3f).toInt().toDp(),
+                    (systemState.size.width / 3f).toInt().coerceAtLeast(1).toDp(),
                 ),
             ) {
                 LaunchedEffect(transition.targetState) {
