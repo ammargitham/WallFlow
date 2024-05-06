@@ -38,8 +38,8 @@ android {
         applicationId = "com.ammar.wallflow"
         minSdk = 24
         targetSdk = 34
-        versionCode = 21
-        versionName = "2.5.0"
+        versionCode = 22
+        versionName = "2.6.0-alpha01"
 
         val abi = getAbi()
         ndk {
@@ -87,6 +87,10 @@ android {
                 signingConfig = signingConfigs.getByName("release")
             }
         }
+
+        create("alpha") {
+            initWith(getByName("release"))
+        }
     }
 
     flavorDimensions += "feature"
@@ -108,7 +112,9 @@ android {
             isEnable = !hasProperty("fdroid")
                 && !hasProperty("noSplits")
                 && gradle.startParameter.taskNames.isNotEmpty()
-                && gradle.startParameter.taskNames.any { it.contains("Release") }
+                && gradle.startParameter.taskNames.any {
+                it.contains("Release") || it.contains("Alpha")
+            }
 
             // Resets the list of ABIs that Gradle should create APKs for to none.
             reset()

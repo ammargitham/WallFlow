@@ -1,4 +1,4 @@
-name: Tagged Release
+name: Tagged Alpha release
 
 permissions:
   contents: "write"
@@ -8,7 +8,7 @@ permissions:
 on:
   push:
     tags:
-      - "v[0-9]+.[0-9]+.[0-9]+"
+      - "v[0-9]+.[0-9]+.[0-9]+-alpha[0-9]{2,}"
   workflow_dispatch:
 
 jobs:
@@ -29,12 +29,12 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with Gradle
-        run: ./gradlew clean assembleRelease -Pgithub
+        run: ./gradlew clean assembleAlpha -Pgithub
 
       - uses: r0adkll/sign-android-release@v1
         id: sign_base_app
         with:
-          releaseDirectory: app/build/outputs/apk/base/release
+          releaseDirectory: app/build/outputs/apk/base/alpha
           signingKeyBase64: ${{ secrets.SIGNING_KEY }}
           alias: ${{ secrets.ALIAS }}
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
@@ -45,7 +45,7 @@ jobs:
       - uses: r0adkll/sign-android-release@v1
         id: sign_plus_app
         with:
-          releaseDirectory: app/build/outputs/apk/plus/release
+          releaseDirectory: app/build/outputs/apk/plus/alpha
           signingKeyBase64: ${{ secrets.SIGNING_KEY }}
           alias: ${{ secrets.ALIAS }}
           keyStorePassword: ${{ secrets.KEY_STORE_PASSWORD }}
@@ -60,28 +60,28 @@ jobs:
 
       - name: Delete unsigned apks
         run: |
-          cd ${GITHUB_WORKSPACE}/app/build/outputs/apk/base/release
+          cd ${GITHUB_WORKSPACE}/app/build/outputs/apk/base/alpha
           rm *-unsigned-aligned.apk
-          cd ${GITHUB_WORKSPACE}/app/build/outputs/apk/plus/release
+          cd ${GITHUB_WORKSPACE}/app/build/outputs/apk/plus/alpha
           rm *-unsigned-aligned.apk
 
       - name: Rename signed apks
         run: |
-          cd ${GITHUB_WORKSPACE}/app/build/outputs/apk/base/release
-          mmv '*-release-unsigned-signed.apk' '#1-${{ github.ref_name }}.apk'
-          cd ${GITHUB_WORKSPACE}/app/build/outputs/apk/plus/release
-          mmv '*-release-unsigned-signed.apk' '#1-${{ github.ref_name }}.apk'
+          cd ${GITHUB_WORKSPACE}/app/build/outputs/apk/base/alpha
+          mmv '*-alpha-unsigned-signed.apk' '#1-${{ github.ref_name }}.apk'
+          cd ${GITHUB_WORKSPACE}/app/build/outputs/apk/plus/alpha
+          mmv '*-alpha-unsigned-signed.apk' '#1-${{ github.ref_name }}.apk'
 
       - uses: actions/upload-artifact@v3
         with:
           name: signed_apks_${{ github.ref_name }}
-          path: app/build/outputs/apk/*/release/*-${{ github.ref_name }}.apk
+          path: app/build/outputs/apk/*/alpha/*-${{ github.ref_name }}.apk
 
       - name: Create Draft Release
         uses: marvinpinto/action-automatic-releases@latest
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           automatic_release_tag: "${{ github.ref_name }}"
-          prerelease: false
+          prerelease: true
           draft: true
-          files: app/build/outputs/apk/*/release/*-${{ github.ref_name }}.apk
+          files: app/build/outputs/apk/*/alpha/*-${{ github.ref_name }}.apk
