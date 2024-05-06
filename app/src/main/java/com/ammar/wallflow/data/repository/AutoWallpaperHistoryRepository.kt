@@ -36,10 +36,14 @@ class AutoWallpaperHistoryRepository @Inject constructor(
         autoWallpaperHistoryDao.getAllSourceIdsBySourceChoice(sourceChoice)
     }
 
-    suspend fun getOldestSetOnSourceIdBySourceChoice(
+    suspend fun getOldestSetOnSourceIdBySourceChoiceAndSourceIdNotIn(
         sourceChoice: SourceChoice,
+        excludedSourceIds: Collection<String>,
     ) = withContext(ioDispatcher) {
-        autoWallpaperHistoryDao.getOldestSetOnSourceIdBySourceChoice(sourceChoice)
+        autoWallpaperHistoryDao.getOldestSetOnSourceIdBySourceChoiceAndSourceIdNotIn(
+            sourceChoice = sourceChoice,
+            excludedSourceIds = excludedSourceIds,
+        )
     }
 
     suspend fun addHistory(

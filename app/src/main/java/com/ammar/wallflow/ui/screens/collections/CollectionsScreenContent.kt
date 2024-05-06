@@ -64,6 +64,7 @@ internal fun CollectionsScreenContent(
     onFullWallpaperTagClick: (WallhavenTag) -> Unit = {},
     onFullWallpaperUploaderClick: (WallhavenUploader) -> Unit = {},
     onFullWallpaperDownloadPermissionsGranted: () -> Unit = {},
+    onFullWallpaperLightDarkTypeFlagsChange: (Int) -> Unit = {},
 ) {
     CollectionsScreenContent(
         modifier = modifier,
@@ -114,6 +115,7 @@ internal fun CollectionsScreenContent(
                         onWallpaperFavoriteClick(fullWallpaper)
                     }
                 },
+                onLightDarkTypeFlagsChange = onFullWallpaperLightDarkTypeFlagsChange,
             )
         },
     )

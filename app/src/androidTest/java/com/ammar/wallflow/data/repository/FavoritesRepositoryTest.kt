@@ -83,7 +83,10 @@ class FavoritesRepositoryTest {
         var prevWallpaper: Wallpaper? = null
         repeat(11) {
             // we insert 10 light dark wallpapers, so we will get 10 fresh wallpapers
-            val wallpaper = favoriteRepository.getFirstFresh(context = context)
+            val wallpaper = favoriteRepository.getFirstFresh(
+                context = context,
+                excluding = emptyList(),
+            )
             if (it == 10) {
                 // should be null after 10 calls
                 assertNull(wallpaper)
@@ -112,12 +115,18 @@ class FavoritesRepositoryTest {
         initDb()
 
         // oldest set wallpaper should be null
-        var wallpaper = favoriteRepository.getByOldestSetOn(context = context)
+        var wallpaper = favoriteRepository.getByOldestSetOn(
+            context = context,
+            excluding = emptyList(),
+        )
         assertNull(wallpaper)
 
         // exhaust all fresh wallpapers
         repeat(10) {
-            favoriteRepository.getFirstFresh(context = context)?.also {
+            favoriteRepository.getFirstFresh(
+                context = context,
+                excluding = emptyList(),
+            )?.also {
                 autoWallpaperHistoryRepository.addHistory(
                     AutoWallpaperHistory(
                         sourceId = it.id,
@@ -131,13 +140,19 @@ class FavoritesRepositoryTest {
         }
 
         // next fresh should be null
-        wallpaper = favoriteRepository.getFirstFresh(context = context)
+        wallpaper = favoriteRepository.getFirstFresh(
+            context = context,
+            excluding = emptyList(),
+        )
         assertNull(wallpaper)
 
         // oldest should never be null now and should not repeat
         var prevWallpaper: Wallpaper? = null
         repeat(20) {
-            wallpaper = favoriteRepository.getByOldestSetOn(context = context)
+            wallpaper = favoriteRepository.getByOldestSetOn(
+                context = context,
+                excluding = emptyList(),
+            )
             assertNotNull(wallpaper)
             wallpaper?.let {
                 autoWallpaperHistoryRepository.addHistory(

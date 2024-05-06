@@ -128,16 +128,24 @@ class LightDarkRepository @Inject constructor(
     suspend fun getFirstFreshByTypeFlags(
         context: Context,
         typeFlags: Set<Int>,
+        excluding: Collection<Wallpaper>,
     ) = withContext(ioDispatcher) {
-        val entity = lightDarkDao.getFirstFreshByTypeFlag(typeFlags) ?: return@withContext null
+        val entity = lightDarkDao.getFirstFreshByTypeFlagsAndIdNotIn(
+            typeFlags = typeFlags,
+            excludingIds = getIds(excluding),
+        ) ?: return@withContext null
         getWallpaperFromEntity(context, entity)
     }
 
     suspend fun getByOldestSetOnAndTypeFlags(
         context: Context,
         typeFlags: Set<Int>,
+        excluding: Collection<Wallpaper>,
     ) = withContext(ioDispatcher) {
-        val entity = lightDarkDao.getByOldestSetOnAndTypeFlags(typeFlags) ?: return@withContext null
+        val entity = lightDarkDao.getByOldestSetOnAndTypeFlagsAndIdsNotId(
+            typeFlags = typeFlags,
+            excludingIds = getIds(excluding),
+        ) ?: return@withContext null
         getWallpaperFromEntity(context, entity)
     }
 
@@ -171,4 +179,23 @@ class LightDarkRepository @Inject constructor(
         }
         lightDarkDao.insertAll(insert)
     }
+
+    suspend fun getCountForTypeFlagsAndExcludingWallpapers(
+        typeFlags: Set<Int>,
+        excluding: Collection<Wallpaper>,
+    ) = withContext(ioDispatcher) {
+        lightDarkDao.getCountWhereTypeFlagsAndIdsNotIn(
+            typeFlags = typeFlags,
+            ids = getIds(excluding),
+        )
+    }
+
+    private suspend fun getIds(excluding: Collection<Wallpaper>) = excluding
+        .groupBy { it.source }
+        .flatMap { entry ->
+            lightDarkDao.getIdsBySourceIdsAndSource(
+                sourceIds = entry.value.map { it.id },
+                source = entry.key,
+            )
+        }
 }

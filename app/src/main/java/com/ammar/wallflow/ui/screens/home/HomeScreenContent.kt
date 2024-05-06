@@ -114,6 +114,7 @@ internal fun HomeScreenContent(
     onFullWallpaperFullScreenClick: () -> Unit = {},
     onFullWallpaperUploaderClick: (WallhavenUploader) -> Unit = {},
     onFullWallpaperDownloadPermissionsGranted: () -> Unit = {},
+    onFullWallpaperLightDarkTypeFlagsChange: (Int) -> Unit = {},
 ) {
     HomeScreenContent(
         modifier = modifier,
@@ -174,6 +175,7 @@ internal fun HomeScreenContent(
                         onWallpaperFavoriteClick(fullWallpaper)
                     }
                 },
+                onLightDarkTypeFlagsChange = onFullWallpaperLightDarkTypeFlagsChange,
             )
         },
     )

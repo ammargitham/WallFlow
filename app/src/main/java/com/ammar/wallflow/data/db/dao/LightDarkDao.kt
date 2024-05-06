@@ -32,11 +32,15 @@ interface LightDarkDao {
                     ON awh.source = ld.source AND  awh.source_id = ld.source_id
         )
         AND typeFlags IN (:typeFlags)
+        AND id NOT IN (:excludingIds)
         ORDER BY updated_on
         LIMIT 1
         """,
     )
-    suspend fun getFirstFreshByTypeFlag(typeFlags: Set<Int>): LightDarkEntity?
+    suspend fun getFirstFreshByTypeFlagsAndIdNotIn(
+        typeFlags: Set<Int>,
+        excludingIds: Collection<Long>,
+    ): LightDarkEntity?
 
     @Query(
         """
@@ -52,11 +56,43 @@ interface LightDarkDao {
         WHERE awh.source = ld.source
             AND  awh.source_id = ld.source_id
             AND ld.typeFlags IN (:typeFlags)
+            AND ld.id NOT IN (:excludingIds)
         ORDER BY awh.set_on
         LIMIT 1
         """,
     )
-    suspend fun getByOldestSetOnAndTypeFlags(typeFlags: Set<Int>): LightDarkEntity?
+    suspend fun getByOldestSetOnAndTypeFlagsAndIdsNotId(
+        typeFlags: Set<Int>,
+        excludingIds: Collection<Long>,
+    ): LightDarkEntity?
+
+    @Query(
+        """
+            SELECT id
+            FROM light_dark
+            WHERE
+                source_id in (:sourceIds)
+                AND source = :source
+        """,
+    )
+    suspend fun getIdsBySourceIdsAndSource(
+        sourceIds: Collection<String>,
+        source: Source,
+    ): List<Long>
+
+    @Query(
+        """
+            SELECT COUNT(*)
+            FROM light_dark
+            WHERE
+                typeFlags IN (:typeFlags)
+                AND id NOT IN (:ids)
+        """,
+    )
+    suspend fun getCountWhereTypeFlagsAndIdsNotIn(
+        typeFlags: Set<Int>,
+        ids: Collection<Long>,
+    ): Int
 
     // @Query(
     //     """

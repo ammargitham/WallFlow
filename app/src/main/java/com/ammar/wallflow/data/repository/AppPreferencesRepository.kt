@@ -63,6 +63,7 @@ import kotlinx.serialization.encodeToString
 class AppPreferencesRepository @Inject constructor(
     @ApplicationContext private val context: Context,
     private val dataStore: DataStore<Preferences>,
+    private val favoritesRepository: FavoritesRepository,
     @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
 ) {
     val appPreferencesFlow: Flow<AppPreferences> = dataStore.data
@@ -74,7 +75,7 @@ class AppPreferencesRepository @Inject constructor(
                 throw exception
             }
         }
-        .map { mapAppPreferences(it) }
+        .map(::mapAppPreferences)
         .flowOn(ioDispatcher)
 
     suspend fun updateWallhavenApiKey(wallhavenApiKey: String) = withContext(ioDispatcher) {
@@ -343,7 +344,7 @@ class AppPreferencesRepository @Inject constructor(
         set(PreferencesKeys.ENABLE_ACRA, enable)
     }
 
-    private fun mapAppPreferences(preferences: Preferences): AppPreferences {
+    private suspend fun mapAppPreferences(preferences: Preferences): AppPreferences {
         val homeRedditSearch = getHomeRedditSearch(preferences)
         return AppPreferences(
             version = preferences[PreferencesKeys.VERSION] ?: AppPreferences.CURRENT_VERSION,
@@ -464,7 +465,9 @@ class AppPreferencesRepository @Inject constructor(
         roundedCorners = preferences[PreferencesKeys.LAYOUT_ROUNDED_CORNERS] ?: true,
     )
 
-    private fun getAutoWallpaperPreferences(preferences: Preferences) = with(preferences) {
+    private suspend fun getAutoWallpaperPreferences(
+        preferences: Preferences,
+    ) = with(preferences) {
         val savedSearchIdStrings = get(PreferencesKeys.AUTO_WALLPAPER_SAVED_SEARCH_ID)
             ?: emptySet()
         val savedSearchIds = savedSearchIdStrings
@@ -483,10 +486,11 @@ class AppPreferencesRepository @Inject constructor(
             get(PreferencesKeys.AUTO_WALLPAPER_LS_SAVED_SEARCH_ENABLED)
                 ?: savedSearchEnabled
             ) && lsSavedSearchIds.isNotEmpty()
-
-        val favoritesEnabled = get(PreferencesKeys.AUTO_WALLPAPER_FAVORITES_ENABLED) ?: false
-        val lsFavoritesEnabled = get(PreferencesKeys.AUTO_WALLPAPER_LS_FAVORITES_ENABLED)
-            ?: favoritesEnabled
+        val hasFavorites = favoritesRepository.getCount() > 0
+        val favoritesEnabled = hasFavorites &&
+            get(PreferencesKeys.AUTO_WALLPAPER_FAVORITES_ENABLED) ?: false
+        val lsFavoritesEnabled = hasFavorites &&
+            get(PreferencesKeys.AUTO_WALLPAPER_LS_FAVORITES_ENABLED) ?: favoritesEnabled
 
         val localDirStrings = get(PreferencesKeys.AUTO_WALLPAPER_LOCAL_DIRS)
         val accessibleFolderUris = context.accessibleFolders.mapTo(HashSet()) { it.uri }
@@ -589,10 +593,10 @@ class AppPreferencesRepository @Inject constructor(
     }
 
     private fun getUriIfAccessible(
-        it: String,
-        accessibleFolderUris: HashSet<Uri>,
+        uriString: String,
+        accessibleFolderUris: Set<Uri>,
     ) = try {
-        val uri = Uri.parse(it)
+        val uri = Uri.parse(uriString)
         if (uri in accessibleFolderUris) {
             uri
         } else {

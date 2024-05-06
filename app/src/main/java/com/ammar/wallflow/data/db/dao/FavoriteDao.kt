@@ -39,6 +39,9 @@ interface FavoriteDao {
     @Query("SELECT COUNT(*) FROM favorites")
     fun observeCount(): Flow<Int>
 
+    @Query("SELECT COUNT(*) FROM favorites")
+    suspend fun getCount(): Int
+
     @Query("SELECT * FROM favorites WHERE source_id = :sourceId AND source = :source")
     suspend fun getBySourceIdAndType(
         sourceId: String,
@@ -56,11 +59,14 @@ interface FavoriteDao {
             FROM auto_wallpaper_history awh JOIN favorites f
                     ON awh.source = f.source AND  awh.source_id = f.source_id
         )
+        AND id NOT IN (:excludingIds)
         ORDER BY favorited_on
         LIMIT 1
         """,
     )
-    suspend fun getFirstFresh(): FavoriteEntity?
+    suspend fun getFirstFreshExcludingIds(
+        excludingIds: Collection<Long>,
+    ): FavoriteEntity?
 
     @Query(
         """
@@ -74,12 +80,15 @@ interface FavoriteDao {
             ) t on t.id = awh.id
         ) awh
         WHERE awh.source = f.source
-            AND  awh.source_id = f.source_id
+            AND awh.source_id = f.source_id
+            AND f.id NOT IN (:excludingIds)
         ORDER BY awh.set_on
         LIMIT 1
         """,
     )
-    suspend fun getByOldestSetOn(): FavoriteEntity?
+    suspend fun getByOldestSetOnAndIdsNotIn(
+        excludingIds: Collection<Long>,
+    ): FavoriteEntity?
 
     @Insert
     suspend fun insertAll(favoriteEntities: Collection<FavoriteEntity>)
@@ -112,4 +121,27 @@ interface FavoriteDao {
         sourceIds: Collection<String>,
         source: Source,
     )
+
+    @Query(
+        """
+            SELECT id
+            FROM favorites
+            WHERE
+                source_id in (:sourceIds)
+                AND source = :source
+        """,
+    )
+    suspend fun getIdsBySourceIdsAndSource(
+        sourceIds: Collection<String>,
+        source: Source,
+    ): List<Long>
+
+    @Query(
+        """
+            SELECT COUNT(*)
+            FROM favorites
+            WHERE id NOT IN (:ids)
+        """,
+    )
+    suspend fun getCountWhereIdsNotIn(ids: Collection<Long>): Int
 }

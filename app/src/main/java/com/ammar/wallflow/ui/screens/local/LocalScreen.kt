@@ -163,6 +163,7 @@ fun LocalScreen(
         },
         onFABClick = { viewModel.showManageFoldersSheet(true) },
         onAddFolderClick = onAddFolderClick,
+        onFullWallpaperLightDarkTypeFlagsChange = viewerViewModel::updateLightDarkTypeFlags,
     )
 
     if (uiState.showManageFoldersSheet) {

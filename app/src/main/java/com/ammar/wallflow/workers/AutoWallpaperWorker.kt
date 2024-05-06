@@ -134,6 +134,8 @@ class AutoWallpaperWorker @AssistedInject constructor(
     }
     private var prevPageNum: String? = null
     private var cachedWallhavenWallpapers = mutableListOf<Wallpaper>()
+    private var badWallpapers = mutableListOf<Wallpaper>()
+    private var badSourceChoices = mutableListOf<SourceChoice>()
     private val sourceChoices: Set<SourceChoice>
         get() = mutableSetOf<SourceChoice>().apply {
             if (autoWallpaperPreferences.lightDarkEnabled) {
@@ -210,6 +212,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
         if (currentTargets.isEmpty()) {
             currentTargets = WallpaperTarget.ALL
         }
+        Log.d(TAG, "doWorkActual: enabled: ${autoWallpaperPreferences.enabled}")
         if (!autoWallpaperPreferences.enabled && !forced) {
             Log.d(TAG, "doWork: AutoWallpaper failed since it is disabled")
             // worker should not be running, stop it
@@ -373,29 +376,86 @@ class AutoWallpaperWorker @AssistedInject constructor(
         } else {
             targets.first()
         }
-        val (sourceChoice, nextWallpaper) = getNextWallpaper(targetForSource)
-            ?: return SetWallpaperResult.EMPTY
-        return try {
-            val (applied, file) = setWallpaper(
-                nextWallpaper = nextWallpaper,
-                targets = targets,
-            )
-            if (applied) {
-                autoWallpaperHistoryRepository.addHistory(
-                    AutoWallpaperHistory(
-                        sourceId = nextWallpaper.id,
-                        source = nextWallpaper.source,
-                        sourceChoice = sourceChoice,
-                        setOn = Clock.System.now(),
-                        targets = targets,
-                    ),
+        var sourceChoice = getNextSourceChoice(
+            target = targetForSource,
+            sourceChoices = sourceChoices,
+            lsSourceChoices = lsSourceChoices,
+            prevHomeSourceChoice = autoWallpaperPreferences.prevHomeSource,
+            prevLsSourceChoice = autoWallpaperPreferences.prevLockScreenSource,
+        ) ?: return SetWallpaperResult.EMPTY
+
+        var result = SetWallpaperResult.EMPTY
+        var tryNext = true
+        while (tryNext) {
+            val nextWallpaper = getNextWallpaper(
+                sourceChoice = sourceChoice,
+                target = targetForSource,
+            ) ?: return SetWallpaperResult.EMPTY
+            try {
+                result = tryApplyWallpaper(
+                    nextWallpaper = nextWallpaper,
+                    targets = targets,
+                    sourceChoice = sourceChoice,
                 )
-                SetWallpaperResult(nextWallpaper, file, sourceChoice)
-            } else {
-                SetWallpaperResult.EMPTY
+                // successful attempt. Break the loop.
+                tryNext = false
+            } catch (e: BadWallpaperError) {
+                Log.e(TAG, "setNextWallpaper: Bad wallpaper:", e)
+                badWallpapers.add(nextWallpaper)
+                tryNext = hasMoreWallpapers(
+                    sourceChoice = sourceChoice,
+                    target = targetForSource,
+                )
+                if (!tryNext) {
+                    badSourceChoices.add(sourceChoice)
+                    // try the next source choice
+                    sourceChoice = getNextSourceChoice(
+                        target = targetForSource,
+                        sourceChoices = sourceChoices,
+                        lsSourceChoices = lsSourceChoices,
+                        prevHomeSourceChoice = autoWallpaperPreferences.prevHomeSource,
+                        prevLsSourceChoice = autoWallpaperPreferences.prevLockScreenSource,
+                        excluding = badSourceChoices,
+                    ) ?: return SetWallpaperResult.EMPTY
+                    // restart loop with new choice
+                    tryNext = true
+                }
+                Log.d(TAG, "setNextWallpaper: Trying again?: $tryNext")
+            } catch (e: Exception) {
+                Log.e(TAG, "setNextWallpaper: ", e)
+                tryNext = false
             }
-        } catch (e: Exception) {
-            Log.e(TAG, "setNextWallpaper: ", e)
+        }
+        return result
+    }
+
+    private suspend fun tryApplyWallpaper(
+        nextWallpaper: Wallpaper,
+        targets: Set<WallpaperTarget>,
+        sourceChoice: SourceChoice,
+    ): SetWallpaperResult {
+        Log.d(
+            TAG,
+            "tryApplyWallpaper: Trying to apply: " +
+                "${nextWallpaper.source}: ${nextWallpaper.id}",
+        )
+        val (applied, file) = setWallpaper(
+            nextWallpaper = nextWallpaper,
+            targets = targets,
+        )
+        return if (applied) {
+            autoWallpaperHistoryRepository.addHistory(
+                AutoWallpaperHistory(
+                    sourceId = nextWallpaper.id,
+                    source = nextWallpaper.source,
+                    sourceChoice = sourceChoice,
+                    setOn = Clock.System.now(),
+                    targets = targets,
+                ),
+            )
+            SetWallpaperResult(nextWallpaper, file, sourceChoice)
+        } else {
+            Log.e(TAG, "tryApplyWallpaper: Apply failed")
             SetWallpaperResult.EMPTY
         }
     }
@@ -417,22 +477,13 @@ class AutoWallpaperWorker @AssistedInject constructor(
     )
 
     private suspend fun getNextWallpaper(
+        sourceChoice: SourceChoice,
         target: WallpaperTarget,
-    ): Pair<SourceChoice, Wallpaper>? {
-        val sourceChoice = getNextSourceChoice(
-            target = target,
-            sourceChoices = sourceChoices,
-            lsSourceChoices = lsSourceChoices,
-            prevHomeSourceChoice = autoWallpaperPreferences.prevHomeSource,
-            prevLsSourceChoice = autoWallpaperPreferences.prevLockScreenSource,
-        ) ?: return null
-        val nextWallpaper = when (sourceChoice) {
-            SourceChoice.LIGHT_DARK -> getNextLightDarkWallpaper(target)
-            SourceChoice.SAVED_SEARCH -> getNextSavedSearchWallpaper(target)
-            SourceChoice.FAVORITES -> getNextFavoriteWallpaper()
-            SourceChoice.LOCAL -> getNextLocalWallpaper(target)
-        } ?: return null
-        return sourceChoice to nextWallpaper
+    ) = when (sourceChoice) {
+        SourceChoice.LIGHT_DARK -> getNextLightDarkWallpaper(target)
+        SourceChoice.SAVED_SEARCH -> getNextSavedSearchWallpaper(target)
+        SourceChoice.FAVORITES -> getNextFavoriteWallpaper()
+        SourceChoice.LOCAL -> getNextLocalWallpaper(target)
     }
 
     private suspend fun setWallpaper(
@@ -441,7 +492,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
     ): Pair<Boolean, Uri?> {
         val uri: Uri = when (nextWallpaper) {
             is DownloadableWallpaper -> {
-                val wallpaperFile = safeDownloadWallpaper(nextWallpaper) ?: return false to null
+                val wallpaperFile = safeDownloadWallpaper(nextWallpaper)
                 try {
                     val notification = notificationBuilder.apply {
                         setContentText(context.getString(R.string.changing_wallpaper))
@@ -522,12 +573,21 @@ class AutoWallpaperWorker @AssistedInject constructor(
         scale to detectionWithBitmaps.firstOrNull()
     }
 
+    private class BadWallpaperError : Error {
+        constructor(cause: Throwable) : super(cause)
+        constructor(cause: String) : super(cause)
+    }
+
     private suspend fun safeDownloadWallpaper(
         wallpaper: DownloadableWallpaper,
-    ): DocumentFileCompat? {
+    ): DocumentFileCompat {
         var downloadTries = 0
         while (true) {
-            val wallpaperFile = downloadWallpaper(wallpaper)
+            val wallpaperFile = try {
+                downloadWallpaper(wallpaper)
+            } catch (e: Exception) {
+                throw BadWallpaperError(e)
+            }
             if (wallpaper !is WallhavenWallpaper) {
                 return wallpaperFile
             }
@@ -546,8 +606,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
             }
             // delete the file and return
             wallpaperFile.delete()
-            // TODO skip this file next time
-            return null
+            throw BadWallpaperError("Bad url: ${wallpaper.url}")
         }
     }
 
@@ -636,7 +695,12 @@ class AutoWallpaperWorker @AssistedInject constructor(
         excludeHistory: Boolean = true,
     ): Wallpaper? {
         val historyIds = if (excludeHistory) {
-            autoWallpaperHistoryRepository.getAll().map { it.sourceId }
+            autoWallpaperHistoryRepository.getAllBySource(
+                when (search) {
+                    is RedditSearch -> Source.REDDIT
+                    is WallhavenSearch -> Source.WALLHAVEN
+                },
+            ).map { it.sourceId }
         } else {
             emptyList()
         }
@@ -660,10 +724,18 @@ class AutoWallpaperWorker @AssistedInject constructor(
 
             // Loop until we find a wallpaper
             val wallpaper = wallpapers.firstOrNull {
-                if (excludeHistory) {
-                    it.id !in historyIds
+                // exclude bad wallpapers always
+                val isBad = badWallpapers.any { b ->
+                    it.id == b.id && it.source == b.source
+                }
+                if (isBad) {
+                    false
                 } else {
-                    true
+                    if (excludeHistory) {
+                        it.id !in historyIds
+                    } else {
+                        true
+                    }
                 }
             }
             if (wallpaper != null) {
@@ -674,8 +746,21 @@ class AutoWallpaperWorker @AssistedInject constructor(
     }
 
     private suspend fun getNextLightDarkWallpaper(target: WallpaperTarget): Wallpaper? {
-        val systemInDarkTheme = context.isSystemInDarkTheme()
-        val typeFlags = if (!systemInDarkTheme) {
+        val typeFlags = getTypeFlagsForTarget(target)
+        // try to get fresh first else one with oldest 'set_on' in history
+        return lightDarkRepository.getFirstFreshByTypeFlags(
+            context = context,
+            typeFlags = typeFlags,
+            excluding = badWallpapers,
+        ) ?: lightDarkRepository.getByOldestSetOnAndTypeFlags(
+            context = context,
+            typeFlags = typeFlags,
+            excluding = badWallpapers,
+        )
+    }
+
+    private fun getTypeFlagsForTarget(target: WallpaperTarget) =
+        if (!context.isSystemInDarkTheme()) {
             setOf(LightDarkType.LIGHT)
         } else {
             val extraDimActive = context.isExtraDimActive()
@@ -696,20 +781,13 @@ class AutoWallpaperWorker @AssistedInject constructor(
                 setOf(LightDarkType.DARK)
             }
         }
-        // try to get fresh first else one with oldest 'set_on' in history
-        return lightDarkRepository.getFirstFreshByTypeFlags(
-            context = context,
-            typeFlags = typeFlags,
-        ) ?: lightDarkRepository.getByOldestSetOnAndTypeFlags(
-            context = context,
-            typeFlags = typeFlags,
-        )
-    }
 
     private suspend fun getNextFavoriteWallpaper() = favoritesRepository.getFirstFresh(
         context = context,
+        excluding = badWallpapers,
     ) ?: favoritesRepository.getByOldestSetOn(
         context = context,
+        excluding = badWallpapers,
     )
 
     private suspend fun getNextLocalWallpaper(target: WallpaperTarget): Wallpaper? {
@@ -723,8 +801,10 @@ class AutoWallpaperWorker @AssistedInject constructor(
         return localWallpapersRepository.getFirstFresh(
             context = context,
             uris = uris,
+            excluding = badWallpapers,
         ) ?: localWallpapersRepository.getByOldestSetOn(
             context = context,
+            excluding = badWallpapers,
         )
     }
 
@@ -860,6 +940,40 @@ class AutoWallpaperWorker @AssistedInject constructor(
             Log.e(TAG, "saveWallpaperToDownloads: ", e)
         }
     }
+
+    private suspend fun hasMoreWallpapers(
+        sourceChoice: SourceChoice,
+        target: WallpaperTarget,
+    ) = when (sourceChoice) {
+        SourceChoice.LIGHT_DARK -> lightDarkHasMoreWallpapers(target)
+        // saved search manages its own exclude history, see getNextSavedSearchWallpaper
+        SourceChoice.SAVED_SEARCH -> true
+        SourceChoice.FAVORITES -> favoritesHasMoreWallpapers()
+        SourceChoice.LOCAL -> localHasMoreWallpapers(target)
+    }
+
+    private suspend fun lightDarkHasMoreWallpapers(
+        target: WallpaperTarget,
+    ) = lightDarkRepository.getCountForTypeFlagsAndExcludingWallpapers(
+        typeFlags = getTypeFlagsForTarget(target),
+        excluding = badWallpapers,
+    ) > 0
+
+    private suspend fun favoritesHasMoreWallpapers() =
+        favoritesRepository.getCountExcludingWallpapers(
+            excluding = badWallpapers,
+        ) > 0
+
+    private suspend fun localHasMoreWallpapers(
+        target: WallpaperTarget,
+    ) = localWallpapersRepository.getCountExcludingWallpapers(
+        context = context,
+        uris = when (target) {
+            WallpaperTarget.HOME -> autoWallpaperPreferences.localDirs
+            WallpaperTarget.LOCKSCREEN -> autoWallpaperPreferences.lsLocalDirs
+        },
+        excluding = badWallpapers,
+    ) > 0
 
     companion object {
         const val FAILURE_REASON = "failure_reason"

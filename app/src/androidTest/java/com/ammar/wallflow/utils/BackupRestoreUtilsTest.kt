@@ -224,6 +224,13 @@ class BackupRestoreUtilsTest {
         get() = AppPreferencesRepository(
             context = context,
             dataStore = this,
+            favoritesRepository = FavoritesRepository(
+                favoriteDao = favoriteDao,
+                wallhavenWallpapersDao = wallhavenWallpapersDao,
+                redditWallpapersDao = redditWallpapersDao,
+                localWallpapersRepository = FakeLocalWallpapersRepository(),
+                ioDispatcher = testDispatcher,
+            ),
             ioDispatcher = testDispatcher,
         )
 

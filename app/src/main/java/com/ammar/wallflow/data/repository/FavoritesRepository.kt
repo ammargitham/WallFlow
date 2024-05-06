@@ -124,13 +124,23 @@ class FavoritesRepository @Inject constructor(
         getWallpaperFromEntity(context, entity)
     }
 
-    suspend fun getFirstFresh(context: Context) = withContext(ioDispatcher) {
-        val entity = favoriteDao.getFirstFresh() ?: return@withContext null
+    suspend fun getFirstFresh(
+        context: Context,
+        excluding: Collection<Wallpaper>,
+    ) = withContext(ioDispatcher) {
+        val entity = favoriteDao.getFirstFreshExcludingIds(
+            excludingIds = getIds(excluding),
+        ) ?: return@withContext null
         getWallpaperFromEntity(context, entity)
     }
 
-    suspend fun getByOldestSetOn(context: Context) = withContext(ioDispatcher) {
-        val entity = favoriteDao.getByOldestSetOn() ?: return@withContext null
+    suspend fun getByOldestSetOn(
+        context: Context,
+        excluding: Collection<Wallpaper>,
+    ) = withContext(ioDispatcher) {
+        val entity = favoriteDao.getByOldestSetOnAndIdsNotIn(
+            excludingIds = getIds(excluding),
+        ) ?: return@withContext null
         getWallpaperFromEntity(context, entity)
     }
 
@@ -178,4 +188,24 @@ class FavoritesRepository @Inject constructor(
             source = Source.LOCAL,
         )
     }
+
+    suspend fun getCountExcludingWallpapers(
+        excluding: Collection<Wallpaper>,
+    ) = withContext(ioDispatcher) {
+        val ids = getIds(excluding)
+        favoriteDao.getCountWhereIdsNotIn(ids)
+    }
+
+    suspend fun getCount(): Int = withContext(ioDispatcher) {
+        favoriteDao.getCount()
+    }
+
+    private suspend fun getIds(excluding: Collection<Wallpaper>) = excluding
+        .groupBy { it.source }
+        .flatMap { entry ->
+            favoriteDao.getIdsBySourceIdsAndSource(
+                sourceIds = entry.value.map { it.id },
+                source = entry.key,
+            )
+        }
 }

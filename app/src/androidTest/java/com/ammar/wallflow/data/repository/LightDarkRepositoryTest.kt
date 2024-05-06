@@ -88,6 +88,7 @@ class LightDarkRepositoryTest {
             val wallpaper = lightDarkRepository.getFirstFreshByTypeFlags(
                 context = context,
                 typeFlags = typeFlags,
+                excluding = emptyList(),
             )
             if (it == 10) {
                 // should be null after 10 calls
@@ -121,6 +122,7 @@ class LightDarkRepositoryTest {
         var wallpaper = lightDarkRepository.getByOldestSetOnAndTypeFlags(
             context = context,
             typeFlags = typeFlags,
+            excluding = emptyList(),
         )
         assertNull(wallpaper)
 
@@ -129,6 +131,7 @@ class LightDarkRepositoryTest {
             lightDarkRepository.getFirstFreshByTypeFlags(
                 context = context,
                 typeFlags = typeFlags,
+                excluding = emptyList(),
             )?.also {
                 autoWallpaperHistoryRepository.addHistory(
                     AutoWallpaperHistory(
@@ -146,6 +149,7 @@ class LightDarkRepositoryTest {
         wallpaper = lightDarkRepository.getFirstFreshByTypeFlags(
             context = context,
             typeFlags = typeFlags,
+            excluding = emptyList(),
         )
         assertNull(wallpaper)
 
@@ -155,6 +159,7 @@ class LightDarkRepositoryTest {
             wallpaper = lightDarkRepository.getByOldestSetOnAndTypeFlags(
                 context = context,
                 typeFlags = typeFlags,
+                excluding = emptyList(),
             )
             assertNotNull(wallpaper)
             wallpaper?.let {

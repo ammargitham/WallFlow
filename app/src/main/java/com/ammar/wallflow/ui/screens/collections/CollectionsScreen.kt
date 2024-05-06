@@ -221,6 +221,7 @@ fun CollectionsScreen(
             onFullWallpaperTagClick = onTagClick,
             onFullWallpaperUploaderClick = onUploaderClick,
             onFullWallpaperDownloadPermissionsGranted = viewerViewModel::download,
+            onFullWallpaperLightDarkTypeFlagsChange = viewerViewModel::updateLightDarkTypeFlags,
         )
     }
 }

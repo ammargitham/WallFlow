@@ -1,7 +1,10 @@
 package com.ammar.wallflow.workers
 
 import android.content.Context
+import android.content.Intent
+import android.content.UriPermission
 import android.net.Uri
+import android.os.Parcel
 import android.util.Log
 import androidx.compose.ui.unit.IntSize
 import androidx.core.net.toUri
@@ -47,9 +50,11 @@ import com.ammar.wallflow.data.repository.ObjectDetectionModelRepository
 import com.ammar.wallflow.data.repository.SavedSearchRepository
 import com.ammar.wallflow.data.repository.local.LocalWallpapersRepository
 import com.ammar.wallflow.extensions.TAG
+import com.ammar.wallflow.extensions.accessibleFolders
 import com.ammar.wallflow.extensions.getTempFile
 import com.ammar.wallflow.model.Purity
 import com.ammar.wallflow.model.Source
+import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.model.local.LocalWallpaper
 import com.ammar.wallflow.model.search.SavedSearch
@@ -63,6 +68,8 @@ import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.SUCCESS_NEXT_HOM
 import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.SUCCESS_NEXT_LOCK_WALLPAPER_ID
 import com.ammar.wallflow.workers.AutoWallpaperWorker.Companion.SourceChoice
 import io.mockk.every
+import io.mockk.mockkObject
+import io.mockk.mockkStatic
 import io.mockk.spyk
 import io.mockk.unmockkAll
 import io.mockk.verify
@@ -120,7 +127,7 @@ class AutoWallpaperTest {
     fun testAutoWallpaperWorkerNoSavedSearchId() = runTest(testDispatcher) {
         val testDataStore = dataStore()
         try {
-            val appPreferencesRepository = testDataStore.appPreferencesRepository
+            val appPreferencesRepository = testDataStore.getAppPreferencesRepository()
             appPreferencesRepository.updateAutoWallpaperPrefs(
                 AutoWallpaperPreferences(
                     enabled = true,
@@ -148,7 +155,7 @@ class AutoWallpaperTest {
     fun testAutoWallpaperWorkerSavedSearchNull() = runTest(testDispatcher) {
         val testDataStore = dataStore()
         try {
-            val appPreferencesRepository = testDataStore.appPreferencesRepository
+            val appPreferencesRepository = testDataStore.getAppPreferencesRepository()
             appPreferencesRepository.updateAutoWallpaperPrefs(
                 AutoWallpaperPreferences(
                     enabled = true,
@@ -182,7 +189,7 @@ class AutoWallpaperTest {
         val testDataStore = dataStore()
         val tempFile = createTempFile(context, "tmp")
         try {
-            val appPreferencesRepository = testDataStore.appPreferencesRepository
+            val appPreferencesRepository = testDataStore.getAppPreferencesRepository()
             appPreferencesRepository.updateAutoWallpaperPrefs(
                 AutoWallpaperPreferences(
                     enabled = true,
@@ -284,7 +291,7 @@ class AutoWallpaperTest {
         val testDataStore = dataStore()
         val tempFile = createTempFile(context, "tmp")
         try {
-            val appPreferencesRepository = testDataStore.appPreferencesRepository
+            val appPreferencesRepository = testDataStore.getAppPreferencesRepository()
             appPreferencesRepository.updateAutoWallpaperPrefs(
                 AutoWallpaperPreferences(
                     enabled = true,
@@ -395,7 +402,7 @@ class AutoWallpaperTest {
         val testDataStore = dataStore()
         val tempFile = createTempFile(context, "tmp")
         try {
-            val appPreferencesRepository = testDataStore.appPreferencesRepository
+            val appPreferencesRepository = testDataStore.getAppPreferencesRepository()
             appPreferencesRepository.updateAutoWallpaperPrefs(
                 AutoWallpaperPreferences(
                     enabled = true,
@@ -510,7 +517,20 @@ class AutoWallpaperTest {
     fun testAutoWallpaperWorkerNoFavoriteWallpaper() = runTest(testDispatcher) {
         val testDataStore = dataStore()
         try {
-            val appPreferencesRepository = testDataStore.appPreferencesRepository
+            val favoriteDao = object : FakeFavoriteDao() {
+                override suspend fun getFirstFreshExcludingIds(
+                    excludingIds: Collection<Long>,
+                ) = null
+
+                override suspend fun getByOldestSetOnAndIdsNotIn(
+                    excludingIds: Collection<Long>,
+                ) = null
+
+                override suspend fun getCount() = 0
+            }
+            val appPreferencesRepository = testDataStore.getAppPreferencesRepository(
+                favoriteDao = favoriteDao,
+            )
             appPreferencesRepository.updateAutoWallpaperPrefs(
                 AutoWallpaperPreferences(
                     enabled = true,
@@ -523,10 +543,7 @@ class AutoWallpaperTest {
             val worker = getWorker(
                 dataStore = testDataStore,
                 appPreferencesRepository = appPreferencesRepository,
-                favoriteDao = object : FakeFavoriteDao() {
-                    override suspend fun getFirstFresh() = null
-                    override suspend fun getByOldestSetOn() = null
-                },
+                favoriteDao = favoriteDao,
             )
 
             val result = worker.doWork()
@@ -535,7 +552,7 @@ class AutoWallpaperTest {
                 `is`(
                     Result.failure(
                         workDataOf(
-                            FAILURE_REASON to FailureReason.NO_WALLPAPER_FOUND.name,
+                            FAILURE_REASON to FailureReason.DISABLED.name,
                         ),
                     ),
                 ),
@@ -550,7 +567,26 @@ class AutoWallpaperTest {
         val testDataStore = dataStore()
         val tempFile = createTempFile(context, "tmp")
         try {
-            val appPreferencesRepository = testDataStore.appPreferencesRepository
+            val favoriteDao = object : FakeFavoriteDao() {
+                override suspend fun getFirstFreshExcludingIds(
+                    excludingIds: Collection<Long>,
+                ) = FavoriteEntity(
+                    id = 1,
+                    sourceId = "1",
+                    source = Source.WALLHAVEN,
+                    favoritedOn = Clock.System.now(),
+                )
+
+                override suspend fun getCount() = 1
+            }
+            val wallpaperEntity = testNetworkWallhavenWallpaper.toWallpaperEntity()
+            val wallhavenWallpapersDao = object : FakeWallhavenWallpapersDao() {
+                override suspend fun getByWallhavenId(wallhavenId: String) = wallpaperEntity
+            }
+            val appPreferencesRepository = testDataStore.getAppPreferencesRepository(
+                favoriteDao = favoriteDao,
+                wallhavenWallpapersDao = wallhavenWallpapersDao,
+            )
             appPreferencesRepository.updateAutoWallpaperPrefs(
                 AutoWallpaperPreferences(
                     enabled = true,
@@ -560,7 +596,6 @@ class AutoWallpaperTest {
                     useObjectDetection = false,
                 ),
             )
-            val wallpaperEntity = testNetworkWallhavenWallpaper.toWallpaperEntity()
             val autoWallpaperHistoryDao = object : FakeAutoWallpaperHistoryDao() {
                 private var history = emptyList<AutoWallpaperHistoryEntity>()
 
@@ -583,17 +618,8 @@ class AutoWallpaperTest {
                 dataStore = testDataStore,
                 appPreferencesRepository = appPreferencesRepository,
                 autoWallpaperHistoryDao = autoWallpaperHistoryDao,
-                favoriteDao = object : FakeFavoriteDao() {
-                    override suspend fun getFirstFresh() = FavoriteEntity(
-                        id = 1,
-                        sourceId = "1",
-                        source = Source.WALLHAVEN,
-                        favoritedOn = Clock.System.now(),
-                    )
-                },
-                wallhavenWallpapersDao = object : FakeWallhavenWallpapersDao() {
-                    override suspend fun getByWallhavenId(wallhavenId: String) = wallpaperEntity
-                },
+                favoriteDao = favoriteDao,
+                wallhavenWallpapersDao = wallhavenWallpapersDao,
             )
 
             every {
@@ -633,7 +659,7 @@ class AutoWallpaperTest {
     fun testAutoWallpaperWorkerNoLocalWallpaper() = runTest(testDispatcher) {
         val testDataStore = dataStore()
         try {
-            val appPreferencesRepository = testDataStore.appPreferencesRepository
+            val appPreferencesRepository = testDataStore.getAppPreferencesRepository()
             appPreferencesRepository.updateAutoWallpaperPrefs(
                 AutoWallpaperPreferences(
                     enabled = true,
@@ -678,7 +704,26 @@ class AutoWallpaperTest {
     fun testAutoWallpaperWorkerSetsLocalWallpaper() = runTest(testDispatcher) {
         val testDataStore = dataStore()
         try {
-            val appPreferencesRepository = testDataStore.appPreferencesRepository
+            val uri = Uri.parse("http://example.com")
+            val localWallpaper = LocalWallpaper(
+                id = uri.toString(),
+                data = uri,
+                fileSize = 1L,
+                resolution = IntSize(1, 1),
+                mimeType = MIME_TYPE_JPEG,
+                name = "test",
+            )
+            val localWallpapersRepository = object : FakeLocalWallpapersRepository() {
+                override suspend fun getFirstFresh(
+                    context: Context,
+                    uris: Collection<Uri>,
+                    excluding: Collection<Wallpaper>,
+                ) = localWallpaper
+            }
+            val appPreferencesRepository = testDataStore.getAppPreferencesRepository(
+                localWallpapersRepository = localWallpapersRepository,
+            )
+            mockkObject(appPreferencesRepository, recordPrivateCalls = true)
             appPreferencesRepository.updateAutoWallpaperPrefs(
                 AutoWallpaperPreferences(
                     enabled = true,
@@ -708,27 +753,31 @@ class AutoWallpaperTest {
                     history = autoWallpaperHistoryEntity.toList()
                 }
             }
-            val uri = Uri.EMPTY
-            val localWallpaper = LocalWallpaper(
-                id = uri.toString(),
-                data = uri,
-                fileSize = 1L,
-                resolution = IntSize(1, 1),
-                mimeType = MIME_TYPE_JPEG,
-                name = "test",
-            )
             val worker = getWorker(
                 dataStore = testDataStore,
                 appPreferencesRepository = appPreferencesRepository,
                 autoWallpaperHistoryDao = autoWallpaperHistoryDao,
-                localWallpapersRepository = object : FakeLocalWallpapersRepository() {
-                    override suspend fun getFirstFresh(
-                        context: Context,
-                        uris: Collection<Uri>,
-                    ) = localWallpaper
+                localWallpapersRepository = localWallpapersRepository,
+            )
+            mockkStatic("com.ammar.wallflow.extensions.Context_extKt")
+            val parcel = Parcel.obtain()
+            val uriPermission = UriPermission.CREATOR.createFromParcel(
+                parcel.apply {
+                    writeString(uri.toString())
+                    writeInt(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                    writeLong(Clock.System.now().epochSeconds)
                 },
             )
-
+            parcel.recycle()
+            every {
+                context.accessibleFolders
+            } returns listOf(uriPermission)
+            every {
+                appPreferencesRepository["getUriIfAccessible"](
+                    any<String>(),
+                    any<Set<Uri>>(),
+                )
+            } returns uri
             every {
                 worker["setWallpaper"](
                     localWallpaper,
@@ -766,7 +815,7 @@ class AutoWallpaperTest {
         val testDataStore = dataStore()
         val tempFile = createTempFile(context, "tmp")
         try {
-            val appPreferencesRepository = testDataStore.appPreferencesRepository
+            val appPreferencesRepository = testDataStore.getAppPreferencesRepository()
             appPreferencesRepository.updateAutoWallpaperPrefs(
                 AutoWallpaperPreferences(
                     enabled = true,
@@ -880,17 +929,25 @@ class AutoWallpaperTest {
 
     private fun getWorker(
         dataStore: DataStore<Preferences>,
-        appPreferencesRepository: AppPreferencesRepository = dataStore.appPreferencesRepository,
         savedSearchDao: SavedSearchDao = FakeSavedSearchDao(),
         autoWallpaperHistoryDao: AutoWallpaperHistoryDao = FakeAutoWallpaperHistoryDao(),
         objectDetectionModelDao: ObjectDetectionModelDao = FakeObjectDetectionModelDao(),
         wallHavenNetwork: WallhavenNetworkDataSource = FakeWallhavenNetworkDataSource(),
         redditNetwork: RedditNetworkDataSource = FakeRedditNetworkDataSource(),
-        favoriteDao: FavoriteDao = FakeFavoriteDao(),
+        favoriteDao: FavoriteDao = object : FakeFavoriteDao() {
+            override suspend fun getCount() = 0
+        },
         wallhavenWallpapersDao: WallhavenWallpapersDao = FakeWallhavenWallpapersDao(),
         redditWallpapersDao: RedditWallpapersDao = FakeRedditWallpapersDao(),
         localWallpapersRepository: LocalWallpapersRepository = FakeLocalWallpapersRepository(),
         lightDarkDao: LightDarkDao = FakeLightDarkDao(),
+        appPreferencesRepository: AppPreferencesRepository =
+            dataStore.getAppPreferencesRepository(
+                favoriteDao = favoriteDao,
+                wallhavenWallpapersDao = wallhavenWallpapersDao,
+                redditWallpapersDao = redditWallpapersDao,
+                localWallpapersRepository = localWallpapersRepository,
+            ),
     ): AutoWallpaperWorker {
         val workTaskExecutor = InstantWorkTaskExecutor()
         return AutoWallpaperWorker(
@@ -951,12 +1008,25 @@ class AutoWallpaperTest {
 
     private suspend fun DataStore<Preferences>.clear() = this.edit { it.clear() }
 
-    private val DataStore<Preferences>.appPreferencesRepository
-        get() = AppPreferencesRepository(
-            context = context,
-            dataStore = this,
+    private fun DataStore<Preferences>.getAppPreferencesRepository(
+        favoriteDao: FavoriteDao = object : FakeFavoriteDao() {
+            override suspend fun getCount() = 0
+        },
+        wallhavenWallpapersDao: WallhavenWallpapersDao = FakeWallhavenWallpapersDao(),
+        redditWallpapersDao: RedditWallpapersDao = FakeRedditWallpapersDao(),
+        localWallpapersRepository: LocalWallpapersRepository = FakeLocalWallpapersRepository(),
+    ) = AppPreferencesRepository(
+        context = context,
+        dataStore = this,
+        favoritesRepository = FavoritesRepository(
+            favoriteDao = favoriteDao,
+            wallhavenWallpapersDao = wallhavenWallpapersDao,
+            redditWallpapersDao = redditWallpapersDao,
+            localWallpapersRepository = localWallpapersRepository,
             ioDispatcher = testDispatcher,
-        )
+        ),
+        ioDispatcher = testDispatcher,
+    )
 
     private fun createTempFile(
         context: Context,

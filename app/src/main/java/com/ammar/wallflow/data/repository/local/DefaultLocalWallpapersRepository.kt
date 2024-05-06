@@ -12,6 +12,7 @@ import com.ammar.wallflow.data.repository.utils.Resource
 import com.ammar.wallflow.extensions.deepListFiles
 import com.ammar.wallflow.extensions.toLocalWallpaper
 import com.ammar.wallflow.extensions.toUriOrNull
+import com.ammar.wallflow.model.Source
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.model.local.LocalWallpaper
 import com.ammar.wallflow.ui.screens.local.LocalSort
@@ -102,6 +103,7 @@ class DefaultLocalWallpapersRepository @Inject constructor(
     override suspend fun getFirstFresh(
         context: Context,
         uris: Collection<Uri>,
+        excluding: Collection<Wallpaper>,
     ) = withContext(ioDispatcher) {
         val wallpapersInUri = getAllLocalWallpapers(
             context = context,
@@ -111,16 +113,41 @@ class DefaultLocalWallpapersRepository @Inject constructor(
         val historyIds = autoWallpaperHistoryRepository.getAllSourceIdsBySourceChoice(
             SourceChoice.LOCAL,
         )
-        wallpapersInUri.firstOrNull { it.id !in historyIds }
+        val excludedUris = getUris(excluding)
+        wallpapersInUri.firstOrNull {
+            it.id !in historyIds && it.data !in excludedUris
+        }
     }
 
     override suspend fun getByOldestSetOn(
         context: Context,
+        excluding: Collection<Wallpaper>,
     ) = withContext(ioDispatcher) {
-        val oldestId = autoWallpaperHistoryRepository.getOldestSetOnSourceIdBySourceChoice(
-            SourceChoice.LOCAL,
-        ) ?: return@withContext null
+        val excludedUriStrings = getUris(excluding).map { it.toString() }
+        val oldestId =
+            autoWallpaperHistoryRepository.getOldestSetOnSourceIdBySourceChoiceAndSourceIdNotIn(
+                sourceChoice = SourceChoice.LOCAL,
+                excludedSourceIds = excludedUriStrings,
+            ) ?: return@withContext null
         val uri = oldestId.toUriOrNull() ?: return@withContext null
         DocumentFileCompat.fromSingleUri(context, uri)?.toLocalWallpaper(context)
     }
+
+    override suspend fun getCountExcludingWallpapers(
+        context: Context,
+        uris: Collection<Uri>,
+        excluding: Collection<Wallpaper>,
+    ) = withContext(ioDispatcher) {
+        val excludedUris = getUris(excluding)
+        getAllLocalWallpapers(
+            context = context,
+            uris = uris,
+        ).filterNot {
+            it.data in excludedUris
+        }.size
+    }
+
+    private fun getUris(excluding: Collection<Wallpaper>) = excluding
+        .filter { it.source == Source.LOCAL }
+        .map { it.data }
 }

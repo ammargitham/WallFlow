@@ -39,12 +39,17 @@ interface AutoWallpaperHistoryDao {
         """
         SELECT source_id
         FROM auto_wallpaper_history
-        WHERE source_choice = :sourceChoice
+        WHERE
+            source_choice = :sourceChoice
+            AND source_id NOT IN (:excludedSourceIds)
         ORDER BY set_on
         LIMIT 1
         """,
     )
-    suspend fun getOldestSetOnSourceIdBySourceChoice(sourceChoice: SourceChoice): String?
+    suspend fun getOldestSetOnSourceIdBySourceChoiceAndSourceIdNotIn(
+        sourceChoice: SourceChoice,
+        excludedSourceIds: Collection<String>,
+    ): String?
 
     @Query("SELECT * FROM auto_wallpaper_history WHERE source_id = :sourceId AND source = :source")
     suspend fun getBySourceId(

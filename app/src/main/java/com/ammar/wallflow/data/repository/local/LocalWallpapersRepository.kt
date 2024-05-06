@@ -29,9 +29,17 @@ interface LocalWallpapersRepository {
     suspend fun getFirstFresh(
         context: Context,
         uris: Collection<Uri>,
+        excluding: Collection<Wallpaper>,
     ): Wallpaper?
 
     suspend fun getByOldestSetOn(
         context: Context,
+        excluding: Collection<Wallpaper>,
     ): Wallpaper?
+
+    suspend fun getCountExcludingWallpapers(
+        context: Context,
+        uris: Collection<Uri>,
+        excluding: Collection<Wallpaper>,
+    ): Int
 }
