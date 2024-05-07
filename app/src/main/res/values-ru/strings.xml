@@ -373,4 +373,20 @@
     <string name="target_activity_not_found">Целевая активность не найдена</string>
     <string name="current_target_disabled">Текущая цель обоев отключена в настройках</string>
     <string name="next_run_approximate">Следующий запуск (приблизительно)</string>
+    <string name="downloads">Загрузки</string>
+    <string name="close">Закрыть</string>
+    <string name="crash_report_line_2">"Если вы решили создать задачу на Github, скопируйте отчёт ниже и создайте задачу здесь: "</string>
+    <string name="report_data">Отчёт</string>
+    <string name="send_email">Отправить по почте</string>
+    <string name="oops">Ой!</string>
+    <string name="crash_reports">Отчёты о сбоях</string>
+    <string name="show_crash_report_dialog">Показать отчёт о сбое</string>
+    <string name="restart">Перезапустить</string>
+    <string name="acra_enabled_reason">Чтобы обнаружить сбои, перезапустите приложение</string>
+    <string name="no_email_app_found">Приложение эл. почты не найдено</string>
+    <string name="never_show_again">Больше не показывать</string>
+    <string name="remove_local_dir_confirm_text">Это удалит все содержащиеся в этом каталоге обои из истории автоматической смены обоев и избранного</string>
+    <string name="restart_required">Требуется перезапуск</string>
+    <string name="are_you_sure">Продолжить?</string>
+    <string name="crash_report_line_1">Что-то пошло не так! Вы можете сообщить о сбое разработчику по эл. почте или создав задачу на Github. Если возможно, распишите шаги для повтора этого сбоя.</string>
 </resources>
