@@ -212,7 +212,6 @@ class AutoWallpaperWorker @AssistedInject constructor(
         if (currentTargets.isEmpty()) {
             currentTargets = WallpaperTarget.ALL
         }
-        Log.d(TAG, "doWorkActual: enabled: ${autoWallpaperPreferences.enabled}")
         if (!autoWallpaperPreferences.enabled && !forced) {
             Log.d(TAG, "doWork: AutoWallpaper failed since it is disabled")
             // worker should not be running, stop it
@@ -420,7 +419,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
                     // restart loop with new choice
                     tryNext = true
                 }
-                Log.d(TAG, "setNextWallpaper: Trying again?: $tryNext")
+                Log.d(TAG, "setNextWallpaper: Trying next...")
             } catch (e: Exception) {
                 Log.e(TAG, "setNextWallpaper: ", e)
                 tryNext = false
