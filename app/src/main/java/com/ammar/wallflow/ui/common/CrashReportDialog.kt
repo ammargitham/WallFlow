@@ -2,7 +2,6 @@ package com.ammar.wallflow.ui.common
 
 import android.content.res.Configuration
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.updateTransition
 import androidx.compose.animation.expandVertically
@@ -57,7 +56,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ammar.wallflow.ISSUE_TRACKER_URL
 import com.ammar.wallflow.R
-import com.ammar.wallflow.extensions.getScreenResolution
+import com.ammar.wallflow.extensions.getCurrentScreenResolution
 import com.ammar.wallflow.extensions.toAnnotatedString
 import com.ammar.wallflow.extensions.toDp
 import com.ammar.wallflow.ui.theme.WallFlowTheme
@@ -65,10 +64,7 @@ import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentMapOf
 import org.acra.ReportField
 
-@OptIn(
-    ExperimentalAnimationApi::class,
-    ExperimentalMaterial3Api::class,
-)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CrashReportDialog(
     modifier: Modifier = Modifier,
@@ -159,7 +155,7 @@ fun CrashReportDialog(
                                 SelectionContainer {
                                     val verticalScrollState = rememberScrollState()
                                     val horizontalScrollState = rememberScrollState()
-                                    val screenHeight = context.getScreenResolution().height
+                                    val screenHeight = context.getCurrentScreenResolution().height
 
                                     Text(
                                         modifier = Modifier

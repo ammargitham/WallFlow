@@ -101,6 +101,7 @@ internal fun getFailureReasonString(
         FailureReason.CURRENT_TARGETS_DISABLED -> context.getString(
             R.string.current_target_disabled,
         )
+        FailureReason.BAD_ORIENTATION -> context.getString(R.string.not_in_default_orientation)
     }
     return context.getString(R.string.wallpaper_not_changed_with_reason, reasonStr)
 }

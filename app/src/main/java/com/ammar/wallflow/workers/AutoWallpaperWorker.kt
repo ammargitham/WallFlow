@@ -46,10 +46,11 @@ import com.ammar.wallflow.data.repository.SavedSearchRepository
 import com.ammar.wallflow.data.repository.local.LocalWallpapersRepository
 import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.extensions.displayManager
+import com.ammar.wallflow.extensions.getCurrentScreenResolution
+import com.ammar.wallflow.extensions.getDefaultScreenResolution
 import com.ammar.wallflow.extensions.getFileNameFromUrl
 import com.ammar.wallflow.extensions.getMLModelsDir
 import com.ammar.wallflow.extensions.getMLModelsFileIfExists
-import com.ammar.wallflow.extensions.getScreenResolution
 import com.ammar.wallflow.extensions.getTempDir
 import com.ammar.wallflow.extensions.getTempFileIfExists
 import com.ammar.wallflow.extensions.isExtraDimActive
@@ -252,8 +253,17 @@ class AutoWallpaperWorker @AssistedInject constructor(
             )
         }
         // check if device is not in its default orientation
-        if (!forced && !context.isInDefaultOrientation()) {
+        if (!forced && !context.isInDefaultOrientation(appPreferences.devicePreferences)) {
             Log.d(TAG, "doWork: AutoWallpaper failed since not in default orientation")
+            val workName = inputData.getString(INPUT_NAME)
+            if (workName == IMMEDIATE_WORK_NAME) {
+                // fail with reason if triggered using 'Change Now' button
+                return Result.failure(
+                    workDataOf(
+                        FAILURE_REASON to FailureReason.BAD_ORIENTATION.name,
+                    ),
+                )
+            }
             Log.i(TAG, "Device is rotated. Auto wallpaper will retry in 15 minutes")
             return Result.retry()
         }
@@ -521,7 +531,13 @@ class AutoWallpaperWorker @AssistedInject constructor(
         }
         val rect = getCropRect(nextWallpaper, uri)
         val display = context.displayManager.getDisplay(Display.DEFAULT_DISPLAY)
-        val applied = context.setWallpaper(display, uri, rect, targets)
+        val applied = context.setWallpaper(
+            display = display,
+            uri = uri,
+            cropRect = rect,
+            devicePreferences = appPreferences.devicePreferences,
+            targets = targets,
+        )
         if (!applied) {
             return false to null
         }
@@ -536,7 +552,9 @@ class AutoWallpaperWorker @AssistedInject constructor(
         if (!autoWallpaperPreferences.crop) {
             return imageSize.toRect()
         }
-        val screenResolution = context.getScreenResolution(true)
+        val screenResolution = context.getDefaultScreenResolution(
+            devicePreferences = appPreferences.devicePreferences,
+        )
         val maxCropSize = getMaxCropSize(
             screenResolution = screenResolution,
             imageSize = imageSize,
@@ -565,6 +583,9 @@ class AutoWallpaperWorker @AssistedInject constructor(
         val modelFile = getObjectDetectionModel().uri.toFile()
         val (scale, detectionWithBitmaps) = detectObjects(
             context = context,
+            resolution = context.getDefaultScreenResolution(
+                devicePreferences = appPreferences.devicePreferences,
+            ),
             uri = uri,
             model = modelFile,
             objectDetectionPreferences = appPreferences.objectDetectionPreferences,
@@ -840,7 +861,11 @@ class AutoWallpaperWorker @AssistedInject constructor(
         targets: Set<WallpaperTarget>,
     ) {
         if (!context.checkNotificationPermission() || targets.isEmpty()) return
-        val (bitmap, _) = decodeSampledBitmapFromUri(context, uri) ?: return
+        val (bitmap, _) = decodeSampledBitmapFromUri(
+            context = context,
+            resolution = context.getCurrentScreenResolution(),
+            uri = uri,
+        ) ?: return
         val title = context.getString(
             when {
                 targets.size == 2 -> R.string.new_wallpaper
@@ -983,6 +1008,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
         internal const val PERIODIC_LS_WORK_NAME = "auto_wallpaper_ls_periodic"
         internal const val INPUT_FORCE = "auto_wallpaper_force"
         internal const val INPUT_TARGETS = "auto_wallpaper_targets"
+        internal const val INPUT_NAME = "auto_wallpaper_name"
 
         enum class FailureReason {
             APP_PREFS_NULL,
@@ -992,6 +1018,7 @@ class AutoWallpaperWorker @AssistedInject constructor(
             SAVED_SEARCH_NOT_SET,
             NO_WALLPAPER_FOUND,
             CANCELLED,
+            BAD_ORIENTATION,
         }
 
         suspend fun schedule(
@@ -1082,7 +1109,12 @@ class AutoWallpaperWorker @AssistedInject constructor(
                 val wallpaperTargets = targets
                     .map { it.name }
                     .toTypedArray()
-                setInputData(workDataOf(INPUT_TARGETS to wallpaperTargets))
+                setInputData(
+                    workDataOf(
+                        INPUT_TARGETS to wallpaperTargets,
+                        INPUT_NAME to workName,
+                    ),
+                )
             }.build()
             context.workManager.enqueueUniquePeriodicWork(
                 workName,
@@ -1129,27 +1161,23 @@ class AutoWallpaperWorker @AssistedInject constructor(
             Log.i(TAG, "Auto wallpaper lock screen worker cancelled!")
         }
 
-        suspend fun triggerImmediate(
+        fun triggerImmediate(
             context: Context,
             force: Boolean = false,
         ): UUID {
-            val workInfosFlow = context.workManager.getWorkInfosForUniqueWorkFlow(
-                IMMEDIATE_WORK_NAME,
-            )
-            val workInfos = workInfosFlow.firstOrNull()
-            val workInfo = workInfos?.firstOrNull {
-                it.state == WorkInfo.State.RUNNING || it.state == WorkInfo.State.ENQUEUED
-            }
-            if (workInfo != null) {
-                return workInfo.id
-            }
+            val workName = IMMEDIATE_WORK_NAME
             val request = OneTimeWorkRequestBuilder<AutoWallpaperWorker>().apply {
                 setExpedited(OutOfQuotaPolicy.RUN_AS_NON_EXPEDITED_WORK_REQUEST)
-                setInputData(workDataOf(INPUT_FORCE to force))
+                setInputData(
+                    workDataOf(
+                        INPUT_FORCE to force,
+                        INPUT_NAME to workName,
+                    ),
+                )
             }.build()
             context.workManager.enqueueUniqueWork(
-                IMMEDIATE_WORK_NAME,
-                ExistingWorkPolicy.KEEP,
+                workName,
+                ExistingWorkPolicy.REPLACE,
                 request,
             )
             return request.id

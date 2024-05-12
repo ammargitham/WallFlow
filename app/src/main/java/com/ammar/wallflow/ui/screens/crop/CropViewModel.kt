@@ -19,6 +19,7 @@ import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.db.entity.toModel
+import com.ammar.wallflow.data.preferences.DevicePreferences
 import com.ammar.wallflow.data.preferences.ObjectDetectionPreferences
 import com.ammar.wallflow.data.preferences.Theme
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
@@ -26,8 +27,9 @@ import com.ammar.wallflow.data.repository.ObjectDetectionModelRepository
 import com.ammar.wallflow.data.repository.utils.Resource
 import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.extensions.displayManager
+import com.ammar.wallflow.extensions.getCurrentScreenResolution
+import com.ammar.wallflow.extensions.getDefaultScreenResolution
 import com.ammar.wallflow.extensions.getMLModelsFileIfExists
-import com.ammar.wallflow.extensions.getScreenResolution
 import com.ammar.wallflow.extensions.setWallpaper
 import com.ammar.wallflow.extensions.toast
 import com.ammar.wallflow.model.DetectionWithBitmap
@@ -113,6 +115,7 @@ class CropViewModel(
                 theme = appPreferences.lookAndFeelPreferences.theme,
                 displays = displays,
                 selectedDisplay = displays.firstOrNull(),
+                devicePreferences = appPreferences.devicePreferences,
             ),
         )
     }.stateIn(
@@ -226,16 +229,16 @@ class CropViewModel(
     }
 
     private suspend fun setUri(uri: Uri) {
+        val state = uiState.value
         val result = imageCropper.crop(
             uri = uri,
             context = application,
-            maxResultSize = application.getScreenResolution(
-                true,
-                uiState.value.selectedDisplay?.displayId ?: Display.DEFAULT_DISPLAY,
+            maxResultSize = application.getDefaultScreenResolution(
+                devicePreferences = state.devicePreferences,
+                displayId = state.selectedDisplay?.displayId ?: Display.DEFAULT_DISPLAY,
             ),
             cacheBeforeUse = false,
         )
-        val state = uiState.value
         val cropRect = if (!state.crop) {
             if (state.imageSize == Size.Unspecified) {
                 return
@@ -255,6 +258,7 @@ class CropViewModel(
             it.displayId == state.selectedDisplay?.displayId
         } ?: application.displayManager.getDisplay(Display.DEFAULT_DISPLAY)
         val applied = application.setWallpaper(
+            devicePreferences = state.devicePreferences,
             display = display,
             uri = uri,
             cropRect = cropRect,
@@ -286,6 +290,7 @@ class CropViewModel(
             }
             val (scale, detectionWithBitmaps) = actualDetectObjects(
                 context = application,
+                resolution = application.getCurrentScreenResolution(),
                 uri = uri,
                 model = model,
                 objectDetectionPreferences = objectDetectionPreferences,
@@ -397,6 +402,7 @@ data class CropUiState(
     val selectedDisplay: Display? = null,
     val crop: Boolean = true,
     val imageSize: Size = Size.Unspecified,
+    val devicePreferences: DevicePreferences = DevicePreferences(),
 )
 
 data class DetectionState(

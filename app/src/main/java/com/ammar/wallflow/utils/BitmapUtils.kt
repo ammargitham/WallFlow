@@ -4,7 +4,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import com.ammar.wallflow.extensions.getScreenResolution
+import androidx.compose.ui.unit.IntSize
 
 private fun calculateInSampleSize(
     options: BitmapFactory.Options,
@@ -42,22 +42,19 @@ fun decodeSampledBitmapFromFile(
 }
 
 fun decodeSampledBitmapFromFile(
-    context: Context,
     filePath: String,
-): Bitmap {
-    val resolution = context.getScreenResolution()
-    return decodeSampledBitmapFromFile(
-        filePath = filePath,
-        reqWidth = resolution.width / 2,
-        reqHeight = resolution.height / 2,
-    )
-}
+    resolution: IntSize,
+) = decodeSampledBitmapFromFile(
+    filePath = filePath,
+    reqWidth = resolution.width / 2,
+    reqHeight = resolution.height / 2,
+)
 
 fun decodeSampledBitmapFromUri(
     context: Context,
+    resolution: IntSize,
     uri: Uri,
 ): Pair<Bitmap, Int>? {
-    val resolution = context.getScreenResolution()
     val reqWidth = resolution.width / 2
     val reqHeight = resolution.height / 2
     return decodeSampledBitmapFromUri(

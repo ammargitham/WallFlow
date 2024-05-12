@@ -11,6 +11,7 @@ import android.net.Uri
 import androidx.annotation.IntRange
 import androidx.work.Constraints
 import androidx.work.NetworkType
+import com.ammar.wallflow.model.DeviceOrientation
 import com.ammar.wallflow.model.OnlineSource
 import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.model.search.RedditSearch
@@ -56,6 +57,7 @@ data class AppPreferences(
     val viewedWallpapersPreferences: ViewedWallpapersPreferences = ViewedWallpapersPreferences(),
     val downloadLocation: Uri? = null,
     val acraEnabled: Boolean = true,
+    val devicePreferences: DevicePreferences = DevicePreferences(),
 ) {
     companion object {
         const val CURRENT_VERSION = 2
@@ -187,4 +189,9 @@ data class LayoutPreferences(
 data class LocalWallpapersPreferences(
     val sort: LocalSort = LocalSort.NO_SORT,
     val directories: Set<Uri>? = null,
+)
+
+@Serializable
+data class DevicePreferences(
+    val defaultOrientation: DeviceOrientation = DeviceOrientation.Vertical,
 )

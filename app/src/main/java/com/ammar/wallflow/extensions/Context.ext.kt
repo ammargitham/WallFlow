@@ -35,6 +35,8 @@ import com.ammar.wallflow.FILE_PROVIDER_AUTHORITY
 import com.ammar.wallflow.MIME_TYPE_JPEG
 import com.ammar.wallflow.R
 import com.ammar.wallflow.WEB_URL_REGEX
+import com.ammar.wallflow.data.preferences.DevicePreferences
+import com.ammar.wallflow.model.DeviceOrientation
 import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.model.toWhichInt
 import com.ammar.wallflow.ui.common.permissions.checkSetWallpaperPermission
@@ -83,9 +85,13 @@ fun Context.setWallpaper(
     display: Display,
     uri: Uri,
     cropRect: Rect,
+    devicePreferences: DevicePreferences,
     targets: Set<WallpaperTarget> = setOf(WallpaperTarget.HOME, WallpaperTarget.LOCKSCREEN),
 ) = this.contentResolver.openInputStream(uri).use {
-    val screenResolution = getScreenResolution(true, display.displayId)
+    val screenResolution = getDefaultScreenResolution(
+        devicePreferences = devicePreferences,
+        displayId = display.displayId,
+    )
     if (it == null) return@use false
     val decoder = getBitmapRegionDecoder(it) ?: return@use false
     val (opts, _) = getDecodeSampledBitmapOptions(
@@ -231,16 +237,32 @@ fun Context.getMLModelsFileIfExists(fileName: String): File? {
 val Context.displayManager
     get() = getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
 
-fun Context.getScreenResolution(
-    inDefaultOrientation: Boolean = false,
+fun Context.getCurrentScreenResolution(
+    displayId: Int = Display.DEFAULT_DISPLAY,
+) = getScreenResolution(
+    devicePreferences = DevicePreferences(),
+    inDefaultOrientation = false,
+    displayId = displayId,
+)
+
+fun Context.getDefaultScreenResolution(
+    devicePreferences: DevicePreferences,
+    displayId: Int = Display.DEFAULT_DISPLAY,
+) = getScreenResolution(
+    devicePreferences = devicePreferences,
+    inDefaultOrientation = true,
+    displayId = displayId,
+)
+
+private fun Context.getScreenResolution(
+    devicePreferences: DevicePreferences,
+    inDefaultOrientation: Boolean,
     displayId: Int = Display.DEFAULT_DISPLAY,
 ): IntSize {
     val display = displayManager.getDisplay(displayId) ?: return IntSize.Zero
     var changeOrientation = false
     if (inDefaultOrientation) {
-        val rotation = display.rotation
-        // if current rotation is 90 or 270, device is rotated, so we will swap width and height
-        changeOrientation = rotation == Surface.ROTATION_90 || rotation == Surface.ROTATION_270
+        changeOrientation = !isInDefaultOrientation(devicePreferences)
     }
     val metrics = DisplayMetrics()
     @Suppress("DEPRECATION")
@@ -253,10 +275,43 @@ fun Context.getScreenResolution(
     )
 }
 
-fun Context.isInDefaultOrientation(): Boolean {
-    val display = displayManager.getDisplay(Display.DEFAULT_DISPLAY) ?: return true
-    val rotation = display.rotation
-    return rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180
+fun Context.isInDefaultOrientation(
+    devicePreferences: DevicePreferences,
+) = devicePreferences.defaultOrientation == currentDeviceOrientation
+
+val Context.currentDisplayRotation: Int
+    get() = displayManager.getDisplay(Display.DEFAULT_DISPLAY)
+        ?.rotation
+        ?: Surface.ROTATION_0
+
+val Context.currentDeviceOrientation: DeviceOrientation
+    get() {
+        val resolution = getCurrentScreenResolution()
+        return if (resolution.height >= resolution.width) {
+            DeviceOrientation.Vertical
+        } else {
+            DeviceOrientation.Horizontal
+        }
+    }
+
+fun Context.guessDefaultOrientation(): DeviceOrientation {
+    val resolution = getCurrentScreenResolution()
+    val orientation = if (resolution.height >= resolution.width) {
+        DeviceOrientation.Vertical
+    } else {
+        DeviceOrientation.Horizontal
+    }
+    val rotation = currentDisplayRotation
+    return if (rotation == Surface.ROTATION_0 || rotation == Surface.ROTATION_180) {
+        orientation
+    } else {
+        // return rotated orientation
+        if (orientation == DeviceOrientation.Vertical) {
+            DeviceOrientation.Horizontal
+        } else {
+            DeviceOrientation.Vertical
+        }
+    }
 }
 
 fun Context.getUriForFile(file: File): Uri = FileProvider.getUriForFile(

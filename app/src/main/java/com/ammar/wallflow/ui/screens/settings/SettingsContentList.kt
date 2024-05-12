@@ -41,6 +41,14 @@ fun SettingsContentList(
             onItemClick = onItemClick,
         )
         mainSettingsListItem(
+            type = SettingsType.DEVICE,
+            labelRes = R.string.device,
+            iconRes = R.drawable.baseline_devices_24,
+            isExpanded = isExpanded,
+            selectedType = selectedType,
+            onItemClick = onItemClick,
+        )
+        mainSettingsListItem(
             type = SettingsType.LOOK_AND_FEEL,
             labelRes = R.string.look_and_feel,
             iconRes = R.drawable.baseline_format_paint_24,

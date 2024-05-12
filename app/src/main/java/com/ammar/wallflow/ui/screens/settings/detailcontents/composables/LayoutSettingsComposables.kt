@@ -73,7 +73,6 @@ import com.ammar.wallflow.data.preferences.MAX_GRID_COL_WIDTH_PCT
 import com.ammar.wallflow.data.preferences.MIN_GRID_COLS
 import com.ammar.wallflow.data.preferences.MIN_GRID_COL_WIDTH_PCT
 import com.ammar.wallflow.extensions.aspectRatio
-import com.ammar.wallflow.extensions.getScreenResolution
 import com.ammar.wallflow.extensions.toDp
 import com.ammar.wallflow.extensions.toPxF
 import com.ammar.wallflow.ui.screens.settings.composables.SettingsExtraListItem
@@ -91,13 +90,10 @@ private val resolutions = COMMON_RESOLUTIONS.values
 internal fun LayoutPreview(
     modifier: Modifier = Modifier,
     supportsTwoPane: Boolean = false,
+    screenResolution: IntSize = IntSize(1, 1),
     layoutPreferences: LayoutPreferences = LayoutPreferences(),
 ) {
-    val context = LocalContext.current
     var gridSize by remember { mutableStateOf(IntSize.Zero) }
-    val screenResolution = remember(context) {
-        context.getScreenResolution(true)
-    }
     val deviceAspectRatio = screenResolution.let {
         if (it == IntSize.Zero) {
             9f / 16
@@ -251,6 +247,7 @@ private fun PreviewLayoutPreview(
         Surface {
             LayoutPreview(
                 modifier = Modifier.fillMaxWidth(),
+                screenResolution = IntSize.Zero,
                 supportsTwoPane = twoPaneLayoutPreferences.first,
                 layoutPreferences = twoPaneLayoutPreferences.second,
             )

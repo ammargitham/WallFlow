@@ -43,7 +43,7 @@ import com.ammar.wallflow.data.preferences.ObjectDetectionPreferences
 import com.ammar.wallflow.data.repository.utils.Resource
 import com.ammar.wallflow.data.repository.utils.successOr
 import com.ammar.wallflow.extensions.aspectRatio
-import com.ammar.wallflow.extensions.getScreenResolution
+import com.ammar.wallflow.extensions.getDefaultScreenResolution
 import com.ammar.wallflow.extensions.toDp
 import com.ammar.wallflow.extensions.toast
 import com.ammar.wallflow.model.Detection
@@ -80,8 +80,8 @@ fun CropScreen(
         key1 = context,
         key2 = uiState.selectedDisplay,
         producer = {
-            value = context.getScreenResolution(
-                inDefaultOrientation = true,
+            value = context.getDefaultScreenResolution(
+                devicePreferences = uiState.devicePreferences,
                 displayId = uiState.selectedDisplay?.displayId ?: Display.DEFAULT_DISPLAY,
             )
         },

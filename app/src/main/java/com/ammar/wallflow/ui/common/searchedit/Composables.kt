@@ -80,7 +80,6 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.COMMON_RESOLUTIONS
 import com.ammar.wallflow.R
-import com.ammar.wallflow.extensions.getScreenResolution
 import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.model.Order
 import com.ammar.wallflow.model.Purity
@@ -463,6 +462,7 @@ internal fun OrderFilter(
 internal fun MinResolutionFilter(
     modifier: Modifier = Modifier,
     resolution: IntSize? = null,
+    localResolution: IntSize = IntSize(1, 1),
     onChange: (IntSize?) -> Unit = {},
     onAddCustomResolutionClick: () -> Unit = {},
 ) {
@@ -478,6 +478,7 @@ internal fun MinResolutionFilter(
             )
         } else {
             AddResolutionButton(
+                localResolution = localResolution,
                 addedResolutions = emptySet(),
                 onAdd = { onChange(it) },
                 onCustomClick = onAddCustomResolutionClick,
@@ -490,6 +491,7 @@ internal fun MinResolutionFilter(
 @Composable
 internal fun ResolutionsFilter(
     modifier: Modifier = Modifier,
+    localResolution: IntSize = IntSize(1, 1),
     resolutions: Set<IntSize> = emptySet(),
     onChange: (resolutions: Set<IntSize>) -> Unit = {},
     onAddCustomResolutionClick: () -> Unit = {},
@@ -518,6 +520,7 @@ internal fun ResolutionsFilter(
             }
         }
         AddResolutionButton(
+            localResolution = localResolution,
             addedResolutions = resolutions,
             onAdd = { onChange(resolutions + it) },
             onCustomClick = onAddCustomResolutionClick,
@@ -528,13 +531,12 @@ internal fun ResolutionsFilter(
 @Composable
 private fun AddResolutionButton(
     modifier: Modifier = Modifier,
+    localResolution: IntSize = IntSize(1, 1),
     addedResolutions: Set<IntSize> = emptySet(),
     onAdd: (resolution: IntSize) -> Unit = {},
     onCustomClick: () -> Unit = {},
 ) {
     var expanded by remember { mutableStateOf(false) }
-    val context = LocalContext.current
-    val localResolution = context.getScreenResolution(true)
     val localInCommon = remember(localResolution) { localResolution in COMMON_RESOLUTIONS.values }
     val scrollState = rememberScrollState()
 

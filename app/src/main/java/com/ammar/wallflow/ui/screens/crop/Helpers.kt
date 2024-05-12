@@ -12,7 +12,7 @@ import com.ammar.wallflow.extensions.aspectRatio
 import com.ammar.wallflow.extensions.constrainOffset
 
 fun getMaxCropSize(
-    screenResolution: IntSize,
+    screenResolution: IntSize = IntSize(1, 1),
     imageSize: Size,
 ): Size {
     val imageAspectRatio = imageSize.width / imageSize.height

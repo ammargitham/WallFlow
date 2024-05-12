@@ -37,6 +37,7 @@ private fun DetailTopBarTitle(selectedType: SettingsType) {
         text = stringResource(
             when (selectedType) {
                 SettingsType.ACCOUNT -> R.string.account
+                SettingsType.DEVICE -> R.string.device
                 SettingsType.LOOK_AND_FEEL -> R.string.look_and_feel
                 SettingsType.DOWNLOADS -> R.string.downloads
                 SettingsType.SAVED_SEARCHES -> R.string.saved_searches

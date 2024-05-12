@@ -352,6 +352,11 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="never_show_again">Never show again</string>
     <string name="remove_local_dir_confirm_text">This will remove any wallpaper contained in this directory from auto wallpaper history and favorites</string>
     <string name="are_you_sure">Are you sure?</string>
+    <string name="device">Device</string>
+    <string name="default_orientation">Default orientation</string>
+    <string name="horizontal">Horizontal</string>
+    <string name="vertical">Vertical</string>
+    <string name="not_in_default_orientation">Device is not in its default orientation</string>
     <plurals name="every_x_hrs">
         <item quantity="one">Every %d hour</item>
         <item quantity="other">Every %d hours</item>

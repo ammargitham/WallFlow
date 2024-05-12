@@ -47,6 +47,7 @@ import androidx.paging.LoadState
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.ammar.wallflow.R
 import com.ammar.wallflow.destinations.WallpaperScreenDestination
+import com.ammar.wallflow.extensions.getDefaultScreenResolution
 import com.ammar.wallflow.extensions.search
 import com.ammar.wallflow.extensions.toPxF
 import com.ammar.wallflow.extensions.toast
@@ -508,6 +509,9 @@ fun HomeScreen(
             },
             showQueryField = uiState.isHome,
             showNSFW = uiState.showNSFW,
+            localResolution = context.getDefaultScreenResolution(
+                devicePreferences = uiState.devicePreferences,
+            ),
             onChange = { localSearch = it },
             onErrorStateChange = { hasError = it },
             onDismissRequest = { viewModel.showFilters(false) },

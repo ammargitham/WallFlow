@@ -21,6 +21,7 @@ import coil.imageLoader
 import com.ammar.wallflow.IoDispatcher
 import com.ammar.wallflow.R
 import com.ammar.wallflow.extensions.TAG
+import com.ammar.wallflow.extensions.getCurrentScreenResolution
 import com.ammar.wallflow.extensions.getFileNameFromUrl
 import com.ammar.wallflow.extensions.getShareChooserIntent
 import com.ammar.wallflow.extensions.notificationManager
@@ -277,7 +278,11 @@ class DownloadWorker @AssistedInject constructor(
         source: Source,
     ) {
         if (!shouldShowSuccessNotification()) return
-        val (bitmap, _) = decodeSampledBitmapFromUri(context, file.uri) ?: return
+        val (bitmap, _) = decodeSampledBitmapFromUri(
+            context = context,
+            resolution = context.getCurrentScreenResolution(),
+            uri = file.uri,
+        ) ?: return
         val notification = successNotificationBuilder.apply {
             setContentTitle(file.name)
             setLargeIcon(bitmap)

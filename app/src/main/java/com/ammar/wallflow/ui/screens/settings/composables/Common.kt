@@ -7,6 +7,7 @@ import androidx.compose.ui.res.stringResource
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.preferences.ObjectDetectionDelegate
 import com.ammar.wallflow.data.preferences.ViewedWallpapersLook
+import com.ammar.wallflow.model.DeviceOrientation
 import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.ui.screens.settings.NextRun
 import com.ammar.wallflow.utils.ExifWriteType
@@ -154,3 +155,22 @@ fun getRestartReasonText(reason: RestartReason) = stringResource(
         RestartReason.ACRA_ENABLED -> R.string.acra_enabled_reason
     },
 )
+
+@Composable
+fun getOrientationString(
+    orientation: DeviceOrientation,
+    current: DeviceOrientation,
+): String {
+    val defaultOrientationString = stringResource(
+        when (orientation) {
+            DeviceOrientation.Horizontal -> R.string.horizontal
+            else -> R.string.vertical
+        },
+    )
+    val currentStr = if (orientation == current) {
+        " (${stringResource(R.string.current)})"
+    } else {
+        ""
+    }
+    return "$defaultOrientationString$currentStr"
+}

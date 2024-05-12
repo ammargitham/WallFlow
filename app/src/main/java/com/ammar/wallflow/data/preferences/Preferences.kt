@@ -115,4 +115,5 @@ object PreferencesKeys {
     val VIEWED_WALLPAPERS_ENABLED = booleanPreferencesKey("viewed_wallpapers_enabled")
     val VIEWED_WALLPAPERS_LOOK = stringPreferencesKey("viewed_wallpapers_look")
     val ENABLE_ACRA = booleanPreferencesKey("enable_acra")
+    val DEFAULT_ORIENTATION = intPreferencesKey("default_orientation")
 }

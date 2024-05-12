@@ -11,6 +11,7 @@ import androidx.datastore.preferences.core.emptyPreferences
 import com.ammar.wallflow.IoDispatcher
 import com.ammar.wallflow.data.preferences.AppPreferences
 import com.ammar.wallflow.data.preferences.AutoWallpaperPreferences
+import com.ammar.wallflow.data.preferences.DevicePreferences
 import com.ammar.wallflow.data.preferences.GridColType
 import com.ammar.wallflow.data.preferences.GridType
 import com.ammar.wallflow.data.preferences.LayoutPreferences
@@ -26,10 +27,12 @@ import com.ammar.wallflow.data.preferences.defaultAutoWallpaperConstraints
 import com.ammar.wallflow.data.preferences.defaultAutoWallpaperFreq
 import com.ammar.wallflow.extensions.TAG
 import com.ammar.wallflow.extensions.accessibleFolders
+import com.ammar.wallflow.extensions.guessDefaultOrientation
 import com.ammar.wallflow.extensions.toConstraintTypeMap
 import com.ammar.wallflow.extensions.toConstraints
 import com.ammar.wallflow.extensions.toUriOrNull
 import com.ammar.wallflow.json
+import com.ammar.wallflow.model.DeviceOrientation
 import com.ammar.wallflow.model.OnlineSource
 import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.model.search.RedditSearch
@@ -344,6 +347,18 @@ class AppPreferencesRepository @Inject constructor(
         set(PreferencesKeys.ENABLE_ACRA, enable)
     }
 
+    suspend fun updateDevicePreferences(
+        devicePreferences: DevicePreferences,
+    ) = withContext(ioDispatcher) {
+        dataStore.edit { it.updateDevicePreferences(devicePreferences) }
+    }
+
+    private fun MutablePreferences.updateDevicePreferences(
+        devicePreferences: DevicePreferences,
+    ) {
+        set(PreferencesKeys.DEFAULT_ORIENTATION, devicePreferences.defaultOrientation.value)
+    }
+
     private suspend fun mapAppPreferences(preferences: Preferences): AppPreferences {
         val homeRedditSearch = getHomeRedditSearch(preferences)
         return AppPreferences(
@@ -367,8 +382,15 @@ class AppPreferencesRepository @Inject constructor(
             mainRedditSearch = getMainRedditSearch(preferences),
             viewedWallpapersPreferences = getViewedWallpapersPreferences(preferences),
             acraEnabled = preferences[PreferencesKeys.ENABLE_ACRA] ?: true,
+            devicePreferences = getDevicePreferences(preferences),
         )
     }
+
+    private fun getDevicePreferences(preferences: Preferences) = DevicePreferences(
+        defaultOrientation = preferences[PreferencesKeys.DEFAULT_ORIENTATION]?.let {
+            DeviceOrientation.valueOf(it)
+        } ?: context.guessDefaultOrientation(),
+    )
 
     private fun getViewedWallpapersPreferences(preferences: Preferences) =
         ViewedWallpapersPreferences(
@@ -732,6 +754,7 @@ class AppPreferencesRepository @Inject constructor(
                 }
                 updateViewedWallpapersPreferences(appPreferences.viewedWallpapersPreferences)
                 updateAcraEnabled(appPreferences.acraEnabled)
+                updateDevicePreferences(appPreferences.devicePreferences)
             }
         }
     }

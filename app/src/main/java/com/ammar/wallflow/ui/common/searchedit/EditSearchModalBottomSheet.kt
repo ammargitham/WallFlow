@@ -15,6 +15,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.extensions.toDp
 import com.ammar.wallflow.model.search.RedditSearch
@@ -36,6 +37,7 @@ fun EditSearchModalBottomSheet(
     header: @Composable (ColumnScope.() -> Unit)? = null,
     showNSFW: Boolean = false,
     showQueryField: Boolean = true,
+    localResolution: IntSize = IntSize(1, 1),
     onChange: (Search) -> Unit = {},
     onErrorStateChange: (Boolean) -> Unit = {},
     onDismissRequest: () -> Unit = {},
@@ -73,6 +75,7 @@ fun EditSearchModalBottomSheet(
             search = search,
             showQueryField = showQueryField,
             showNSFW = showNSFW,
+            localResolution = localResolution,
             onChange = onChange,
             onErrorStateChange = onErrorStateChange,
             onMinResAddCustomResClick = { showMinResAddCustomResDialog = true },
@@ -127,6 +130,7 @@ fun EditSearchContent(
     search: Search = WallhavenSearch(),
     showQueryField: Boolean = true,
     showNSFW: Boolean = false,
+    localResolution: IntSize = IntSize(1, 1),
     onChange: (Search) -> Unit = {},
     onErrorStateChange: (Boolean) -> Unit = {},
     onMinResAddCustomResClick: () -> Unit = {},
@@ -138,6 +142,7 @@ fun EditSearchContent(
             showQueryField = showQueryField,
             search = search,
             showNSFW = showNSFW,
+            localResolution = localResolution,
             onChange = onChange,
             onMinResAddCustomResClick = onMinResAddCustomResClick,
             onResolutionsAddCustomResClick = onResolutionsAddCustomResClick,

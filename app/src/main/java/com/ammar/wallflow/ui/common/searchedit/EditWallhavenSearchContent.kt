@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.R
 import com.ammar.wallflow.model.search.WallhavenFilters
@@ -27,6 +28,7 @@ internal fun EditWallhavenSearchContent(
     search: WallhavenSearch = WallhavenSearch(),
     showQueryField: Boolean = true,
     showNSFW: Boolean = false,
+    localResolution: IntSize = IntSize(1, 1),
     onChange: (WallhavenSearch) -> Unit = {},
     onMinResAddCustomResClick: () -> Unit = {},
     onResolutionsAddCustomResClick: () -> Unit = {},
@@ -76,12 +78,14 @@ internal fun EditWallhavenSearchContent(
         )
         MinResolutionFilter(
             modifier = Modifier.wrapContentHeight(),
+            localResolution = localResolution,
             resolution = search.filters.atleast,
             onChange = { onChange(search.copy(filters = search.filters.copy(atleast = it))) },
             onAddCustomResolutionClick = onMinResAddCustomResClick,
         )
         ResolutionsFilter(
             modifier = Modifier.wrapContentHeight(),
+            localResolution = localResolution,
             resolutions = search.filters.resolutions,
             onChange = { onChange(search.copy(filters = search.filters.copy(resolutions = it))) },
             onAddCustomResolutionClick = onResolutionsAddCustomResClick,
@@ -104,6 +108,7 @@ private fun PreviewEditWallhavenSearchContent() {
         Surface {
             EditSearchContent(
                 modifier = Modifier.padding(16.dp),
+                localResolution = IntSize(0, 0),
                 search = WallhavenSearch(
                     filters = WallhavenFilters(
                         sorting = WallhavenSorting.TOPLIST,

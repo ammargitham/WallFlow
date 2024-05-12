@@ -13,6 +13,7 @@ import com.ammar.wallflow.data.db.entity.search.toSavedSearch
 import com.ammar.wallflow.data.db.entity.toFavorite
 import com.ammar.wallflow.data.db.entity.toLightDark
 import com.ammar.wallflow.data.db.entity.toViewed
+import com.ammar.wallflow.data.preferences.DevicePreferences
 import com.ammar.wallflow.data.preferences.LayoutPreferences
 import com.ammar.wallflow.data.preferences.ViewedWallpapersLook
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
@@ -206,6 +207,7 @@ class HomeViewModel @Inject constructor(
                 sources = appPreferences.homeSources.toImmutableMap(),
                 prevMainWallhavenSearch = appPreferences.mainWallhavenSearch,
                 prevMainRedditSearch = appPreferences.mainRedditSearch,
+                devicePreferences = appPreferences.devicePreferences,
             ),
         )
     }.stateIn(
@@ -413,6 +415,7 @@ data class HomeUiState(
     val manageSourcesState: ManageSourcesState = ManageSourcesState(),
     val prevMainWallhavenSearch: WallhavenSearch? = null,
     val prevMainRedditSearch: RedditSearch? = null,
+    val devicePreferences: DevicePreferences = DevicePreferences(),
 ) {
     val isHome = mainSearch == null
     val showSaveAsDialog = saveSearchAsSearch != null

@@ -33,6 +33,7 @@ import com.ammar.wallflow.extensions.getMLModelsFileIfExists
 import com.ammar.wallflow.extensions.rootCause
 import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.extensions.workManager
+import com.ammar.wallflow.model.DeviceOrientation
 import com.ammar.wallflow.model.ObjectDetectionModel
 import com.ammar.wallflow.model.WallpaperTarget
 import com.ammar.wallflow.model.local.LocalDirectory
@@ -782,6 +783,21 @@ class SettingsViewModel @Inject constructor(
             it.copy(showRestartDialog = partial(enabled))
         }
     }
+
+    fun showDefaultOrientationDialog(show: Boolean = true) = localUiStateFlow.update {
+        it.copy(showDefaultOrientationDialog = partial(show))
+    }
+
+    fun updateDefaultOrientation(defaultOrientation: DeviceOrientation) = viewModelScope.launch {
+        appPreferencesRepository.updateDevicePreferences(
+            uiState.value.appPreferences.devicePreferences.copy(
+                defaultOrientation = defaultOrientation,
+            ),
+        )
+        localUiStateFlow.update {
+            it.copy(showDefaultOrientationDialog = partial(false))
+        }
+    }
 }
 
 @Stable
@@ -820,6 +836,7 @@ data class SettingsUiState(
     val homeScreenAutoWallpaperSources: AutoWallpaperSources = AutoWallpaperSources(),
     val lockScreenAutoWallpaperSources: AutoWallpaperSources = AutoWallpaperSources(),
     val showRestartDialog: Boolean = false,
+    val showDefaultOrientationDialog: Boolean = false,
 )
 
 sealed class NextRun {

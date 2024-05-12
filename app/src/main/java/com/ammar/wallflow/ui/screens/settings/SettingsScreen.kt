@@ -8,7 +8,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.EnterExitState
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -49,6 +48,8 @@ import androidx.navigation.NavController
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.preferences.AutoWallpaperPreferences
 import com.ammar.wallflow.destinations.WallhavenApiKeyDialogDestination
+import com.ammar.wallflow.extensions.currentDeviceOrientation
+import com.ammar.wallflow.extensions.getDefaultScreenResolution
 import com.ammar.wallflow.extensions.restartApp
 import com.ammar.wallflow.extensions.safeLaunch
 import com.ammar.wallflow.extensions.toDp
@@ -70,6 +71,7 @@ import com.ammar.wallflow.ui.screens.settings.composables.AutoWallpaperSetToDial
 import com.ammar.wallflow.ui.screens.settings.composables.ChangeDownloadLocationDialog
 import com.ammar.wallflow.ui.screens.settings.composables.ClearViewedWallpapersConfirmDialog
 import com.ammar.wallflow.ui.screens.settings.composables.ConstraintOptionsDialog
+import com.ammar.wallflow.ui.screens.settings.composables.DefaultOrientationDialog
 import com.ammar.wallflow.ui.screens.settings.composables.DeleteSavedSearchConfirmDialog
 import com.ammar.wallflow.ui.screens.settings.composables.DetailContentTopBar
 import com.ammar.wallflow.ui.screens.settings.composables.EditSavedSearchBottomSheetHeader
@@ -88,6 +90,7 @@ import com.ammar.wallflow.ui.screens.settings.composables.ThemeOptionsDialog
 import com.ammar.wallflow.ui.screens.settings.detailcontents.AccountContent
 import com.ammar.wallflow.ui.screens.settings.detailcontents.AutoWallpaperContent
 import com.ammar.wallflow.ui.screens.settings.detailcontents.CrashReportsContent
+import com.ammar.wallflow.ui.screens.settings.detailcontents.DeviceSettingsContent
 import com.ammar.wallflow.ui.screens.settings.detailcontents.DownloadsContent
 import com.ammar.wallflow.ui.screens.settings.detailcontents.LayoutSettingsScreenContent
 import com.ammar.wallflow.ui.screens.settings.detailcontents.LookAndFeelContent
@@ -107,7 +110,6 @@ import kotlinx.coroutines.launch
 @OptIn(
     ExperimentalMaterial3Api::class,
     ExperimentalMaterial3AdaptiveApi::class,
-    ExperimentalAnimationApi::class,
 )
 @Destination<SettingsNavGraph>(
     start = true,
@@ -353,6 +355,9 @@ fun SettingsScreen(
                 )
             },
             showNSFW = uiState.appPreferences.wallhavenApiKey.isNotBlank(),
+            localResolution = context.getDefaultScreenResolution(
+                devicePreferences = uiState.appPreferences.devicePreferences,
+            ),
             onChange = { localSavedSearch = localSavedSearch.copy(search = it) },
             onDismissRequest = { viewModel.editSavedSearch(null) },
         )
@@ -489,6 +494,15 @@ fun SettingsScreen(
             onCancelClick = { viewModel.updateAcraEnabled(false) },
         )
     }
+
+    if (uiState.showDefaultOrientationDialog) {
+        DefaultOrientationDialog(
+            defaultOrientation = uiState.appPreferences.devicePreferences.defaultOrientation,
+            currentOrientation = context.currentDeviceOrientation,
+            onSaveClick = viewModel::updateDefaultOrientation,
+            onDismissRequest = { viewModel.showDefaultOrientationDialog(false) },
+        )
+    }
 }
 
 @Composable
@@ -581,6 +595,10 @@ private fun DetailContentScaffold(
                     SettingsType.ACCOUNT -> AccountContent(
                         isExpanded = isExpanded,
                         onWallhavenApiKeyItemClick = onWallhavenApiKeyItemClick,
+                    )
+                    SettingsType.DEVICE -> DeviceContentScreen(
+                        viewModel = viewModel,
+                        isExpanded = isExpanded,
                     )
                     SettingsType.LOOK_AND_FEEL -> LookAndFeelSettingsScreen(
                         selectedExtraType = selectedExtraType,
@@ -699,6 +717,24 @@ private fun ExtraContentScaffold(
             }
         }
     }
+}
+
+@Composable
+private fun DeviceContentScreen(
+    viewModel: SettingsViewModel,
+    isExpanded: Boolean,
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val appPreferences = uiState.appPreferences
+    val devicePreferences = appPreferences.devicePreferences
+    val context = LocalContext.current
+
+    DeviceSettingsContent(
+        isExpanded = isExpanded,
+        defaultOrientation = devicePreferences.defaultOrientation,
+        currentOrientation = context.currentDeviceOrientation,
+        onDefaultOrientationClick = viewModel::showDefaultOrientationDialog,
+    )
 }
 
 @Composable
@@ -929,9 +965,13 @@ private fun LayoutSettings(
     viewModel: SettingsViewModel,
     isExpanded: Boolean,
 ) {
+    val context = LocalContext.current
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     LayoutSettingsScreenContent(
         supportsTwoPane = isExpanded,
+        screenResolution = context.getDefaultScreenResolution(
+            devicePreferences = uiState.appPreferences.devicePreferences,
+        ),
         layoutPreferences = uiState
             .appPreferences
             .lookAndFeelPreferences

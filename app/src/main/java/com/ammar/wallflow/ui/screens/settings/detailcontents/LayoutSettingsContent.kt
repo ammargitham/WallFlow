@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import com.ammar.wallflow.data.preferences.GridColType
 import com.ammar.wallflow.data.preferences.LayoutPreferences
@@ -35,6 +36,7 @@ import com.ammar.wallflow.ui.theme.WallFlowTheme
 fun LayoutSettingsScreenContent(
     modifier: Modifier = Modifier,
     supportsTwoPane: Boolean = false,
+    screenResolution: IntSize = IntSize(1, 1),
     layoutPreferences: LayoutPreferences = LayoutPreferences(),
     onLayoutPreferencesChange: (LayoutPreferences) -> Unit = {},
 ) {
@@ -52,6 +54,7 @@ fun LayoutSettingsScreenContent(
     Column(modifier = modifier.fillMaxSize()) {
         LayoutPreview(
             modifier = Modifier.fillMaxWidth(),
+            screenResolution = screenResolution,
             supportsTwoPane = supportsTwoPane,
             layoutPreferences = layoutPreferences,
         )
@@ -126,6 +129,7 @@ private fun PreviewLayoutSettingsScreenContent(
     WallFlowTheme {
         Surface {
             LayoutSettingsScreenContent(
+                screenResolution = IntSize.Zero,
                 supportsTwoPane = twoPaneLayoutPreferences.first,
                 layoutPreferences = tempLayoutPreferences,
                 onLayoutPreferencesChange = { tempLayoutPreferences = it },

@@ -2,6 +2,7 @@ package com.ammar.wallflow.ui.screens.settings
 
 enum class SettingsType {
     ACCOUNT,
+    DEVICE,
     LOOK_AND_FEEL,
     DOWNLOADS,
     SAVED_SEARCHES,
