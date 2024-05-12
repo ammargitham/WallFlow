@@ -29,7 +29,7 @@ data class SerializableLibrary(
      * defines the [uniqueId]:[artifactVersion] combined
      */
     val artifactId: String
-        get() = "${uniqueId}:${artifactVersion ?: ""}"
+        get() = "$uniqueId:${artifactVersion ?: ""}"
 
     /**
      * Returns `true` in cases this artifact is assumed to be open source (e..g. [scm].url is provided)
