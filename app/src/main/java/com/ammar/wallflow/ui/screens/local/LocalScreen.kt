@@ -2,11 +2,7 @@ package com.ammar.wallflow.ui.screens.local
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -14,8 +10,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.paging.compose.collectAsLazyPagingItems
@@ -25,13 +19,11 @@ import com.ammar.wallflow.extensions.safeLaunch
 import com.ammar.wallflow.model.Wallpaper
 import com.ammar.wallflow.navigation.AppNavGraphs.LocalNavGraph
 import com.ammar.wallflow.ui.common.LocalSystemController
-import com.ammar.wallflow.ui.common.bottomWindowInsets
+import com.ammar.wallflow.ui.common.MainDestinationBox
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
-import com.ammar.wallflow.ui.common.topWindowInsets
 import com.ammar.wallflow.ui.screens.main.RootNavControllerWrapper
 import com.ammar.wallflow.ui.wallpaperviewer.WallpaperViewerViewModel
 import com.ammar.wallflow.utils.applyWallpaper
-import com.ammar.wallflow.utils.getStartBottomPadding
 import com.ammar.wallflow.utils.shareWallpaper
 import com.ramcosta.composedestinations.annotation.Destination
 
@@ -50,23 +42,7 @@ fun LocalScreen(
     val wallpapers = viewModel.wallpapers.collectAsLazyPagingItems()
     val systemController = LocalSystemController.current
     val bottomBarController = LocalBottomBarController.current
-    val bottomWindowInsets = bottomWindowInsets
     val gridState = wallpapers.rememberLazyStaggeredGridState()
-    val navigationBarsInsets = WindowInsets.navigationBars
-    val density = LocalDensity.current
-    val bottomPadding = remember(
-        bottomBarController.state.value,
-        density,
-        bottomWindowInsets.getBottom(density),
-        navigationBarsInsets.getBottom(density),
-    ) {
-        getStartBottomPadding(
-            density,
-            bottomBarController,
-            bottomWindowInsets,
-            navigationBarsInsets,
-        )
-    }
     val systemState by systemController.state
     val context = LocalContext.current
     val openDocumentTreeLauncher = rememberLauncherForActivityResult(
@@ -111,60 +87,57 @@ fun LocalScreen(
         }
     }
 
-    LocalScreenContent(
-        modifier = Modifier
-            .fillMaxSize()
-            .windowInsetsPadding(topWindowInsets),
-        wallpapers = wallpapers,
-        folders = uiState.folders,
+    MainDestinationBox(
         isExpanded = systemState.isExpanded,
-        contentPadding = PaddingValues(
-            start = if (systemState.isExpanded) 0.dp else 8.dp,
-            end = if (systemState.isExpanded) 0.dp else 8.dp,
-            top = 8.dp,
-            bottom = bottomPadding + 8.dp,
-        ),
-        gridState = gridState,
-        favorites = uiState.favorites,
-        viewedList = uiState.viewedList,
-        viewedWallpapersLook = uiState.viewedWallpapersLook,
-        lightDarkList = uiState.lightDarkList,
-        selectedWallpaper = uiState.selectedWallpaper,
-        layoutPreferences = uiState.layoutPreferences,
-        fullWallpaper = viewerUiState.wallpaper,
-        fullWallpaperActionsVisible = viewerUiState.actionsVisible,
-        fullWallpaperLoading = viewerUiState.loading,
-        showFullWallpaperInfo = viewerUiState.showInfo,
-        isFullWallpaperFavorite = viewerUiState.isFavorite,
-        onWallpaperClick = onWallpaperClick,
-        onWallpaperFavoriteClick = viewModel::toggleFavorite,
-        onFullWallpaperTransform = viewerViewModel::onWallpaperTransform,
-        onFullWallpaperTap = viewerViewModel::onWallpaperTap,
-        onFullWallpaperInfoClick = viewerViewModel::showInfo,
-        onFullWallpaperInfoDismiss = { viewerViewModel.showInfo(false) },
-        onFullWallpaperShareImageClick = {
-            val wallpaper = viewerUiState.wallpaper ?: return@LocalScreenContent
-            shareWallpaper(context, viewerViewModel, wallpaper)
-        },
-        onFullWallpaperApplyWallpaperClick = {
-            val wallpaper = viewerUiState.wallpaper ?: return@LocalScreenContent
-            applyWallpaper(context, viewerViewModel, wallpaper)
-        },
-        onFullWallpaperFullScreenClick = {
-            viewerUiState.wallpaper?.run {
-                rootNavController.navigate(
-                    WallpaperScreenDestination(
-                        source = source,
-                        thumbData = thumbData,
-                        wallpaperId = id,
-                    ).route,
-                )
-            }
-        },
-        onFABClick = { viewModel.showManageFoldersSheet(true) },
-        onAddFolderClick = onAddFolderClick,
-        onFullWallpaperLightDarkTypeFlagsChange = viewerViewModel::updateLightDarkTypeFlags,
-    )
+    ) { contentPadding ->
+        LocalScreenContent(
+            modifier = Modifier.fillMaxSize(),
+            wallpapers = wallpapers,
+            folders = uiState.folders,
+            isExpanded = systemState.isExpanded,
+            contentPadding = contentPadding,
+            gridState = gridState,
+            favorites = uiState.favorites,
+            viewedList = uiState.viewedList,
+            viewedWallpapersLook = uiState.viewedWallpapersLook,
+            lightDarkList = uiState.lightDarkList,
+            selectedWallpaper = uiState.selectedWallpaper,
+            layoutPreferences = uiState.layoutPreferences,
+            fullWallpaper = viewerUiState.wallpaper,
+            fullWallpaperActionsVisible = viewerUiState.actionsVisible,
+            fullWallpaperLoading = viewerUiState.loading,
+            showFullWallpaperInfo = viewerUiState.showInfo,
+            isFullWallpaperFavorite = viewerUiState.isFavorite,
+            onWallpaperClick = onWallpaperClick,
+            onWallpaperFavoriteClick = viewModel::toggleFavorite,
+            onFullWallpaperTransform = viewerViewModel::onWallpaperTransform,
+            onFullWallpaperTap = viewerViewModel::onWallpaperTap,
+            onFullWallpaperInfoClick = viewerViewModel::showInfo,
+            onFullWallpaperInfoDismiss = { viewerViewModel.showInfo(false) },
+            onFullWallpaperShareImageClick = {
+                val wallpaper = viewerUiState.wallpaper ?: return@LocalScreenContent
+                shareWallpaper(context, viewerViewModel, wallpaper)
+            },
+            onFullWallpaperApplyWallpaperClick = {
+                val wallpaper = viewerUiState.wallpaper ?: return@LocalScreenContent
+                applyWallpaper(context, viewerViewModel, wallpaper)
+            },
+            onFullWallpaperFullScreenClick = {
+                viewerUiState.wallpaper?.run {
+                    rootNavController.navigate(
+                        WallpaperScreenDestination(
+                            source = source,
+                            thumbData = thumbData,
+                            wallpaperId = id,
+                        ).route,
+                    )
+                }
+            },
+            onFABClick = { viewModel.showManageFoldersSheet(true) },
+            onAddFolderClick = onAddFolderClick,
+            onFullWallpaperLightDarkTypeFlagsChange = viewerViewModel::updateLightDarkTypeFlags,
+        )
+    }
 
     if (uiState.showManageFoldersSheet) {
         ManageFoldersBottomSheet(

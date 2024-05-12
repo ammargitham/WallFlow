@@ -1,29 +1,34 @@
 package com.ammar.wallflow.ui.screens.main
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.adaptive.currentWindowAdaptiveInfo
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteDefaults
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldDefaults
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteScaffoldLayout
+import androidx.compose.material3.adaptive.navigationsuite.NavigationSuiteType
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.onSizeChanged
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.ammar.wallflow.NavGraphs
 import com.ammar.wallflow.destinations.WallhavenApiKeyDialogDestination
-import com.ammar.wallflow.extensions.toDp
 import com.ammar.wallflow.navigation.AppNavGraphs.RootNavGraph
-import com.ammar.wallflow.ui.common.bottombar.BottomBar
+import com.ammar.wallflow.ui.common.WallflowNavigationSuite
+import com.ammar.wallflow.ui.common.bottombar.BottomBarDestination
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
-import com.ammar.wallflow.ui.common.bottombar.NavRail
 import com.ammar.wallflow.ui.common.globalerrors.GlobalErrorsColumn
 import com.ammar.wallflow.ui.common.topWindowInsets
 import com.ramcosta.composedestinations.DestinationsNavHost
@@ -42,77 +47,86 @@ fun MainScreen(
     val viewModel: MainViewModel = hiltViewModel()
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val bottomBarController = LocalBottomBarController.current
-    val bottomBarState by bottomBarController.state
-
     val engine = rememberNavHostEngine()
     val navController = engine.rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = currentBackStackEntry?.destination
-
-    Box {
-        DestinationsNavHost(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(
-                    start = if (bottomBarState.isRail && bottomBarState.visible) {
-                        bottomBarState.size.width.toDp()
-                    } else {
-                        0.dp
-                    },
-                ),
-            engine = engine,
-            navController = navController,
-            navGraph = NavGraphs.main,
-            dependenciesContainerBuilder = {
-                dependency(RootNavControllerWrapper(rootNavController))
-            },
-        )
-        if (uiState.globalErrors.isNotEmpty()) {
-            GlobalErrorsColumn(
-                modifier = Modifier
-                    .windowInsetsPadding(topWindowInsets)
-                    .padding(
-                        start = if (bottomBarState.isRail) {
-                            bottomBarState.size.width.toDp()
-                        } else {
-                            0.dp
-                        },
-                    ),
-                globalErrors = uiState.globalErrors,
-                onFixWallHavenApiKeyClick = {
-                    navController.navigate(WallhavenApiKeyDialogDestination.route)
-                },
-                onDismiss = viewModel::dismissGlobalError,
-            )
-        }
-        if (bottomBarState.isRail) {
-            NavRail(
-                modifier = Modifier
-                    .fillMaxHeight()
-                    .align(Alignment.TopStart)
-                    .onSizeChanged {
-                        bottomBarController.update { state ->
-                            state.copy(size = it)
-                        }
-                    },
-                currentDestination = currentDestination,
-                showLocalTab = uiState.showLocalTab,
-                onItemClick = { onBottomBarItemClick(navController, it) },
-            )
+    val layoutType = NavigationSuiteScaffoldDefaults.calculateFromAdaptiveInfo(
+        currentWindowAdaptiveInfo(),
+    )
+    val currentLayoutType = remember(bottomBarController.state.value.visible) {
+        if (bottomBarController.state.value.visible) {
+            layoutType
         } else {
-            BottomBar(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .align(Alignment.BottomCenter)
-                    .onSizeChanged {
-                        bottomBarController.update { state ->
-                            state.copy(size = it)
+            NavigationSuiteType.None
+        }
+    }
+
+    NavigationSuiteScaffoldLayout(
+        navigationSuite = {
+            WallflowNavigationSuite(
+                modifier = Modifier.onSizeChanged {
+                    bottomBarController.update { state ->
+                        state.copy(size = it)
+                    }
+                },
+                layoutType = currentLayoutType,
+                colors = NavigationSuiteDefaults.colors(
+                    navigationRailContainerColor = MaterialTheme.colorScheme.surfaceContainer,
+                ),
+                content = {
+                    BottomBarDestination.entries
+                        .filter {
+                            if (it != BottomBarDestination.Local) {
+                                true
+                            } else {
+                                uiState.showLocalTab
+                            }
                         }
-                    },
-                currentDestination = currentDestination,
-                showLocalTab = uiState.showLocalTab,
-                onItemClick = { onBottomBarItemClick(navController, it) },
+                        .forEach { destination ->
+                            item(
+                                selected = currentDestination?.hierarchy?.any {
+                                    it.route == destination.graph.route
+                                } == true,
+                                onClick = {
+                                    onBottomBarItemClick(
+                                        navController = navController,
+                                        route = destination.graph,
+                                    )
+                                },
+                                icon = {
+                                    Icon(
+                                        painter = painterResource(destination.icon),
+                                        contentDescription = stringResource(destination.label),
+                                    )
+                                },
+                                label = { Text(stringResource(destination.label)) },
+                            )
+                        }
+                },
             )
+        },
+        layoutType = currentLayoutType,
+    ) {
+        Box {
+            DestinationsNavHost(
+                engine = engine,
+                navController = navController,
+                navGraph = NavGraphs.main,
+                dependenciesContainerBuilder = {
+                    dependency(RootNavControllerWrapper(rootNavController))
+                },
+            )
+            if (uiState.globalErrors.isNotEmpty()) {
+                GlobalErrorsColumn(
+                    modifier = Modifier.windowInsetsPadding(topWindowInsets),
+                    globalErrors = uiState.globalErrors,
+                    onFixWallHavenApiKeyClick = {
+                        navController.navigate(WallhavenApiKeyDialogDestination.route)
+                    },
+                    onDismiss = viewModel::dismissGlobalError,
+                )
+            }
         }
     }
 }

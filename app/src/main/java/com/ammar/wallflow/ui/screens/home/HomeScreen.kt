@@ -1,10 +1,6 @@
 package com.ammar.wallflow.ui.screens.home
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
@@ -32,7 +28,6 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
@@ -63,8 +58,8 @@ import com.ammar.wallflow.model.wallhaven.WallhavenTag
 import com.ammar.wallflow.model.wallhaven.WallhavenUploader
 import com.ammar.wallflow.navigation.AppNavGraphs
 import com.ammar.wallflow.ui.common.LocalSystemController
+import com.ammar.wallflow.ui.common.MainDestinationBox
 import com.ammar.wallflow.ui.common.SearchBar
-import com.ammar.wallflow.ui.common.bottomWindowInsets
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
 import com.ammar.wallflow.ui.common.mainsearch.MainSearchBar
 import com.ammar.wallflow.ui.common.rememberAdaptiveBottomSheetState
@@ -79,7 +74,6 @@ import com.ammar.wallflow.ui.screens.home.composables.wallhavenHeader
 import com.ammar.wallflow.ui.screens.main.RootNavControllerWrapper
 import com.ammar.wallflow.ui.wallpaperviewer.WallpaperViewerViewModel
 import com.ammar.wallflow.utils.applyWallpaper
-import com.ammar.wallflow.utils.getStartBottomPadding
 import com.ammar.wallflow.utils.shareWallpaper
 import com.ammar.wallflow.utils.shareWallpaperUrl
 import com.ramcosta.composedestinations.annotation.Destination
@@ -110,16 +104,7 @@ fun HomeScreen(
         wallpapers.itemCount > 0
     val bottomBarController = LocalBottomBarController.current
     val systemController = LocalSystemController.current
-    val density = LocalDensity.current
     val context = LocalContext.current
-    val bottomWindowInsets = bottomWindowInsets
-    val navigationBarsInsets = WindowInsets.navigationBars
-    val bottomPadding = getStartBottomPadding(
-        density,
-        bottomBarController,
-        bottomWindowInsets,
-        navigationBarsInsets,
-    )
     val systemState by systemController.state
     val clipboardManager = LocalClipboardManager.current
     val bottomBarState by bottomBarController.state
@@ -238,22 +223,17 @@ fun HomeScreen(
 
     val onFilterFABClick = remember { { viewModel.showFilters(true) } }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .testTag("Home Screen"),
-    ) {
+    MainDestinationBox(
+        modifier = Modifier.testTag("Home Screen"),
+        isExpanded = systemState.isExpanded,
+        hasSearchBar = true,
+    ) { contentPadding ->
         HomeScreenContent(
             modifier = Modifier.fillMaxSize(),
             nestedScrollConnectionGetter = { nestedScrollConnection },
             isExpanded = systemState.isExpanded,
             isMedium = systemState.isMedium,
-            contentPadding = PaddingValues(
-                start = if (systemState.isExpanded) 0.dp else 8.dp,
-                end = if (systemState.isExpanded) 0.dp else 8.dp,
-                top = SearchBar.Defaults.height,
-                bottom = bottomPadding + 8.dp,
-            ),
+            contentPadding = contentPadding,
             wallpapers = wallpapers,
             searchBar = {
                 HomeSearch(

@@ -1,7 +1,6 @@
 package com.ammar.wallflow.ui.screens.more
 
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -9,15 +8,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import com.ammar.wallflow.NavGraphs
-import com.ammar.wallflow.navigation.AppNavGraphs
+import com.ammar.wallflow.navigation.AppNavGraphs.MoreNavGraph
 import com.ammar.wallflow.ui.common.LocalSystemController
+import com.ammar.wallflow.ui.common.MainDestinationBox
 import com.ammar.wallflow.ui.common.bottombar.LocalBottomBarController
-import com.ammar.wallflow.ui.common.topWindowInsets
 import com.ammar.wallflow.ui.screens.main.RootNavControllerWrapper
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.spec.NavGraphSpec
 
-@Destination<AppNavGraphs.MoreNavGraph>(
+@Destination<MoreNavGraph>(
     start = true,
 )
 @Composable
@@ -41,15 +40,18 @@ fun MoreScreen(
         bottomBarController.update { it.copy(visible = true) }
     }
 
-    MoreScreenContent(
-        modifier = Modifier
-            .fillMaxSize()
-            .windowInsetsPadding(topWindowInsets),
+    MainDestinationBox(
         isExpanded = systemState.isExpanded,
-        isMedium = systemState.isMedium,
-        onSettingsClick = { moreNavigate(ActiveOption.SETTINGS) },
-        onBackupRestoreClick = { moreNavigate(ActiveOption.BACKUP_RESTORE) },
-    ) { moreNavigate(ActiveOption.OSL) }
+    ) {
+        MoreScreenContent(
+            modifier = Modifier.fillMaxSize(),
+            isExpanded = systemState.isExpanded,
+            isMedium = systemState.isMedium,
+            onSettingsClick = { moreNavigate(ActiveOption.SETTINGS) },
+            onBackupRestoreClick = { moreNavigate(ActiveOption.BACKUP_RESTORE) },
+            onOpenSourceLicensesClick = { moreNavigate(ActiveOption.OSL) },
+        )
+    }
 }
 
 private fun getRoute(
