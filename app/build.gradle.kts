@@ -375,7 +375,6 @@ aboutLibraries {
         "description",
         "scm",
         "funding",
-        "website",
         "organization",
         "organisationUrl",
     )
