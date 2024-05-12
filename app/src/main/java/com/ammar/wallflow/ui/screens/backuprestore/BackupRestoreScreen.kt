@@ -5,6 +5,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -23,6 +24,7 @@ import com.ammar.wallflow.MIME_TYPE_JSON
 import com.ammar.wallflow.R
 import com.ammar.wallflow.extensions.safeLaunch
 import com.ammar.wallflow.navigation.AppNavGraphs.BackupRestoreNavGraph
+import com.ammar.wallflow.ui.common.LocalSystemController
 import com.ammar.wallflow.ui.common.TopBar
 import com.ammar.wallflow.utils.backupFileName
 import com.ramcosta.composedestinations.annotation.Destination
@@ -55,6 +57,8 @@ fun BackupRestoreScreen(
             it ?: return@rememberLauncherForActivityResult,
         )
     }
+    val systemController = LocalSystemController.current
+    val systemState by systemController.state
 
     LaunchedEffect(context, uiState.showSnackbar) {
         val snackbarType = uiState.showSnackbar ?: return@LaunchedEffect
@@ -83,10 +87,16 @@ fun BackupRestoreScreen(
                 showBackButton = true,
             )
         },
+        containerColor = if (systemState.isExpanded) {
+            MaterialTheme.colorScheme.surfaceContainer
+        } else {
+            MaterialTheme.colorScheme.surface
+        },
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) {
         BackupRestoreScreenContent(
             modifier = Modifier.padding(it),
+            isExpanded = systemState.isExpanded,
             onBackupClicked = { viewModel.showBackupDialog(true) },
             onRestoreClicked = { viewModel.showRestoreDialog(true) },
         )
