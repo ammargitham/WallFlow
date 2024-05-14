@@ -383,4 +383,9 @@
     <string name="close">Închide</string>
     <string name="crash_report_line_1">Ceva n-a mers bine! Poți raporta blocarea către dezvoltator prin e-mail sau creând o problemă pe Github. Dacă este posibil, adaugă pașii pentru a reproduce problema.</string>
     <string name="remove_local_dir_confirm_text">Acest lucru va elimina orice imagine de fundal conținută în acest director din istoric și din favorite</string>
+    <string name="device">Dispozitiv</string>
+    <string name="default_orientation">Orientare implicită</string>
+    <string name="horizontal">Orizontal</string>
+    <string name="vertical">Vertical</string>
+    <string name="not_in_default_orientation">Dispozitivul nu este în orientarea implicită</string>
 </resources>
