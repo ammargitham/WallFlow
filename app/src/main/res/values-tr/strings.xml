@@ -377,4 +377,9 @@
     <string name="crash_report_line_1">Bir şeyler yanlış gitti! Çökmeyi geliştiriciye e-posta yoluyla veya Github\'da bir sorun oluşturarak bildirebilirsiniz. Mümkünse, çökmeyi yeniden oluşturmak için adımları ekleyin.</string>
     <string name="restart">Yeniden başlat</string>
     <string name="remove_local_dir_confirm_text">Bu, bu dizinde bulunan tüm duvar kağıtlarını otomatik duvar kağıdı geçmişinden ve favorilerden kaldıracak</string>
+    <string name="device">Aygıt</string>
+    <string name="default_orientation">Öntanımlı yön</string>
+    <string name="horizontal">Yatay</string>
+    <string name="vertical">Dikey</string>
+    <string name="not_in_default_orientation">Aygıt öntanımlı yönünde değil</string>
 </resources>
