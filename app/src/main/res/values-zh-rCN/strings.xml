@@ -1,2 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="home">主页</string>
+    <string name="popular_tags">热门标签</string>
+    <string name="info">详细信息</string>
+    <string name="more">更多</string>
+    <string name="settings">设置</string>
+    <string name="wallhaven_api_key">Wallhaven API Key</string>
+    <string name="wallhaven_api_key_desc">需要授权码才能访问限制内容。</string>
+    <string name="confirm">确认</string>
+    <string name="date_added">添加日期</string>
+    <string name="relevance">相关排序</string>
+    <string name="random">随机</string>
+    <string name="views">观看次数</string>
+    <string name="top">热门排行</string>
+    <string name="one_day">今日</string>
+    <string name="three_days">过去三天内</string>
+    <string name="three_months">过去三个月内</string>
+    <string name="one_year">过去一年内</string>
+    <string name="general">一般</string>
+    <string name="anime">动漫</string>
+    <string name="sketchy">存疑</string>
+    <string name="nsfw">限制级</string>
+    <string name="descending">降序</string>
+    <string name="ascending">升序</string>
+    <string name="add">新增</string>
+    <string name="downloads_channel_description">用于显示下载通知</string>
+    <string name="downloading">下载中</string>
+    <string name="wallpaper">壁纸</string>
+    <string name="cancel">取消</string>
+    <string name="downloaded">已下载</string>
+    <string name="delete">删除</string>
+    <string name="included_tags_supp">包括：%1$s</string>
+    <string name="excluded_tags_supp">排除：%1$s</string>
+    <string name="username_supp">使用者：%1$s</string>
+    <string name="tag_id_supp">标签：%1$s</string>
+    <string name="wallpaper_id_supp">壁纸：%1$s</string>
+    <string name="categories_supp">类别：%1$s</string>
+    <string name="app_name">WallFlow</string>
+    <string name="download">下载</string>
+    <string name="apply_wallpaper">设置为壁纸</string>
+    <string name="back">返回</string>
+    <string name="dismiss">取消</string>
+    <string name="favorites">加入喜爱</string>
+    <string name="one_week">过去一周内</string>
+    <string name="one_month">过去一个月内</string>
+    <string name="six_months">过去六个月内</string>
+    <string name="people">人物</string>
+    <string name="sfw">适合工作场合</string>
+    <string name="share">分享</string>
+    <string name="downloads_channel_name">下载</string>
+</resources>
