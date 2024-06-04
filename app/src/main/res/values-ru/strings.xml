@@ -389,4 +389,9 @@
     <string name="restart_required">Требуется перезапуск</string>
     <string name="are_you_sure">Продолжить?</string>
     <string name="crash_report_line_1">Что-то пошло не так! Вы можете сообщить о сбое разработчику по эл. почте или создав задачу на Github. Если возможно, распишите шаги для повтора этого сбоя.</string>
+    <string name="device">Устройство</string>
+    <string name="default_orientation">Ориентация по умолчанию</string>
+    <string name="horizontal">Горизонтальная</string>
+    <string name="vertical">Вертикальная</string>
+    <string name="not_in_default_orientation">Устройство не в ориентации по умолчанию</string>
 </resources>
