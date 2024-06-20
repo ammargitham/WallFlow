@@ -1,2 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources></resources>
+<resources>
+    <string name="info">Thông tin</string>
+    <string name="download">Tải xuống</string>
+    <string name="apply_wallpaper">Áp dụng hình nền</string>
+    <string name="settings">Thiết đặt</string>
+    <string name="back">Quay lại</string>
+    <string name="wallhaven_api_key">Khóa API Wallhaven</string>
+    <string name="wallhaven_api_key_desc">Cần thiết để xem nội dung NSFW.</string>
+    <string name="confirm">Xác nhận</string>
+    <string name="relevance">Mức độ liên quan</string>
+    <string name="random">Ngẫu nhiên</string>
+    <string name="favorites">Yêu thích</string>
+    <string name="one_day">1 ngày</string>
+    <string name="three_days">3 ngày</string>
+    <string name="one_week">1 tuần</string>
+    <string name="one_month">1 tháng</string>
+    <string name="three_months">3 tháng</string>
+    <string name="one_year">1 năm</string>
+    <string name="general">Tổng quan</string>
+    <string name="ascending">Tăng dần</string>
+    <string name="downloading">Đang tải xuống</string>
+    <string name="wallpaper">Hình nền</string>
+    <string name="cancel">Hủy</string>
+    <string name="downloaded">Đã tải xuống</string>
+    <string name="delete">Xóa</string>
+    <string name="included_tags_supp">bao gồm: %1$s</string>
+    <string name="excluded_tags_supp">loại trừ: %1$s</string>
+    <string name="username_supp">người dùng: %1$s</string>
+    <string name="tag_id_supp">thẻ: %1$s</string>
+    <string name="wallpaper_id_supp">hình nền: %1$s</string>
+    <string name="categories_supp">thể loại: %1$s</string>
+    <string name="account">Tài khoản</string>
+    <string name="set">Đặt</string>
+    <string name="more">Nhiều hơn</string>
+    <string name="home">Trang chủ</string>
+    <string name="popular_tags">Thẻ phổ biến</string>
+    <string name="dismiss">Gạt bỏ</string>
+    <string name="people">Mọi người</string>
+    <string name="descending">Giảm dần</string>
+    <string name="add">Thêm</string>
+    <string name="share">Chia sẻ</string>
+    <string name="downloads_channel_description">Kênh hiển thị thông báo tải xuống</string>
+    <string name="date_added">Ngày thêm</string>
+    <string name="downloads_channel_name">Tải xuống</string>
+    <string name="views">Lượt xem</string>
+    <string name="six_months">6 tháng</string>
+</resources>
