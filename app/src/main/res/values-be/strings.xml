@@ -339,4 +339,21 @@
         <item quantity="many">Кожныя %d гадзін</item>
         <item quantity="other">Кожныя %d гадзін</item>
     </plurals>
+    <string name="send_email">Адправіць па пошце</string>
+    <string name="crash_reports">Справаздачы аб збоях</string>
+    <string name="no_email_app_found">Праграма эл. пошты не знойдзена</string>
+    <string name="never_show_again">Больш не паказваць</string>
+    <string name="restart">Перазапусціць</string>
+    <string name="downloads">Загрузкі</string>
+    <string name="close">Закрыць</string>
+    <string name="crash_report_line_1">Нешта пайшло не так! Вы можаце паведаміць аб збоі распрацоўніку па эл. пошце ці стварыўшы задачу на Github. Калі магчыма, распішыце крокі для паўтору гэтага збою.</string>
+    <string name="crash_report_line_2">"Калі вы вырашылі стварыць задачу на Github, скапіруйце справаздачу ніжэй і стварыце задачу тут: "</string>
+    <string name="report_data">Справаздача</string>
+    <string name="show_crash_report_dialog">Паказаць справаздачу аб збоі</string>
+    <string name="acra_enabled_reason">Каб выявіць збоі, перазапусціце праграму</string>
+    <string name="restart_required">Патрабуецца перазапуск</string>
+    <string name="current_target_disabled">Бягучая мэта шпалер адключана ў наладах</string>
+    <string name="use_same_freq_homescreen_lockscreen">Выкарыстоўваць адну і тую ж частату для галоўнага экрана і экрана блакавання</string>
+    <string name="next_run_approximate">Наступны запуск (прыблізна)</string>
+    <string name="target_activity_not_found">Мэтавая актыўнасць не знойдзена</string>
 </resources>

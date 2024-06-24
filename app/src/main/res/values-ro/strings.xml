@@ -363,4 +363,29 @@
 \nDupă marcare, activează „Utilizează imagine de fundal luminoasă/întunecată” în setările sursei pentru a schimba imaginea de fundal.</string>
     <string name="download_location">Locație de descărcare</string>
     <string name="no_light_dark_found">Nu s-au găsit imagini de fundal deschise/întunecate</string>
+    <string name="current_target_disabled">Ținta actuală a imaginii de fundal este dezactivată în preferințe</string>
+    <string name="use_same_freq_homescreen_lockscreen">Utilizează aceeași frecvență pentru ecranul de pornire și pentru ecranul de blocare</string>
+    <string name="next_run_approximate">Următoarea rulare (aproximativ)</string>
+    <string name="target_activity_not_found">Activitate țintă nu a fost găsită</string>
+    <string name="crash_report_line_2">"Dacă creezi o problemă Github, copiază datele raportului de mai jos și creează problema la: "</string>
+    <string name="report_data">Raport</string>
+    <string name="send_email">Trimite email</string>
+    <string name="oops">Hopa!</string>
+    <string name="crash_reports">Rapoarte de avarie</string>
+    <string name="show_crash_report_dialog">Afișează caseta de dialog pentru raportul de avarie</string>
+    <string name="acra_enabled_reason">Aplicația trebuie repornită pentru a detecta blocările</string>
+    <string name="restart_required">Este necesară repornirea</string>
+    <string name="restart">Repornește</string>
+    <string name="no_email_app_found">Nu a fost găsită nicio aplicație de e-mail</string>
+    <string name="never_show_again">Nu mai arăta niciodată</string>
+    <string name="are_you_sure">Ești sigur?</string>
+    <string name="downloads">Descărcări</string>
+    <string name="close">Închide</string>
+    <string name="crash_report_line_1">Ceva n-a mers bine! Poți raporta blocarea către dezvoltator prin e-mail sau creând o problemă pe Github. Dacă este posibil, adaugă pașii pentru a reproduce problema.</string>
+    <string name="remove_local_dir_confirm_text">Acest lucru va elimina orice imagine de fundal conținută în acest director din istoric și din favorite</string>
+    <string name="device">Dispozitiv</string>
+    <string name="default_orientation">Orientare implicită</string>
+    <string name="horizontal">Orizontal</string>
+    <string name="vertical">Vertical</string>
+    <string name="not_in_default_orientation">Dispozitivul nu este în orientarea implicită</string>
 </resources>
