@@ -163,7 +163,7 @@
     <string name="delete_saved_search_dialog_title">確定要移除已儲存的搜尋條件「%1s」嗎？</string>
     <string name="permission_is_required">需要 %1s 權限</string>
     <string name="invalid_api_key_provided">所提供的 API 金鑰無效。</string>
-    <string name="rate_limited_please_try_again_after_some_time">請求次數過多，請稍後重試。</string>
+    <string name="rate_limited_please_try_again_after_some_time">%s：請求次數過多，請稍後重試。</string>
     <string name="error">錯誤</string>
     <string name="fix">修復</string>
     <string name="delete_suggestion_dialog_text">確定要從瀏覽歷史中刪除嗎？</string>

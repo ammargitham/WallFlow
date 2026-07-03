@@ -361,4 +361,25 @@
     <string name="current_target_disabled">Geçerli duvar kağıdı hedefi tercihlerde devre dışı bırakıldı</string>
     <string name="target_activity_not_found">Hedef etkinlik bulunamadı</string>
     <string name="next_run_approximate">Sonraki çalışma (yaklaşık)</string>
+    <string name="crash_report_line_2">"Bir Github sorunu oluşturuyorsanız, aşağıdaki verileri kopyalayın ve sorunu şurada oluşturun: "</string>
+    <string name="report_data">Rapor verileri</string>
+    <string name="send_email">E-posta gönder</string>
+    <string name="oops">Tüh!</string>
+    <string name="crash_reports">Çökme raporları</string>
+    <string name="show_crash_report_dialog">Çökme raporu iletişim kutusunu göster</string>
+    <string name="acra_enabled_reason">Çökmeleri tespit etmek için uygulamanın yeniden başlatılması gerekiyor</string>
+    <string name="restart_required">Yeniden başlatma gerekli</string>
+    <string name="no_email_app_found">E-posta uygulaması bulunamadı</string>
+    <string name="never_show_again">Tekrar gösterilmesin</string>
+    <string name="are_you_sure">Emin misiniz?</string>
+    <string name="downloads">İndirmeler</string>
+    <string name="close">Kapat</string>
+    <string name="crash_report_line_1">Bir şeyler yanlış gitti! Çökmeyi geliştiriciye e-posta yoluyla veya Github\'da bir sorun oluşturarak bildirebilirsiniz. Mümkünse, çökmeyi yeniden oluşturmak için adımları ekleyin.</string>
+    <string name="restart">Yeniden başlat</string>
+    <string name="remove_local_dir_confirm_text">Bu, bu dizinde bulunan tüm duvar kağıtlarını otomatik duvar kağıdı geçmişinden ve favorilerden kaldıracak</string>
+    <string name="device">Aygıt</string>
+    <string name="default_orientation">Öntanımlı yön</string>
+    <string name="horizontal">Yatay</string>
+    <string name="vertical">Dikey</string>
+    <string name="not_in_default_orientation">Aygıt öntanımlı yönünde değil</string>
 </resources>
