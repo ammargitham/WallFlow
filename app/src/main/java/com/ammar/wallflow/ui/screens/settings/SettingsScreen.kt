@@ -48,6 +48,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.preferences.AutoWallpaperPreferences
+import com.ammar.wallflow.destinations.RedditAuthScreenDestination
 import com.ammar.wallflow.destinations.WallhavenApiKeyDialogDestination
 import com.ammar.wallflow.extensions.restartApp
 import com.ammar.wallflow.extensions.safeLaunch
@@ -209,6 +210,10 @@ fun SettingsScreen(
                     onWallhavenApiKeyItemClick = {
                         navController.navigate(WallhavenApiKeyDialogDestination.route)
                     },
+                    onRedditLoginItemClick = {
+                        navController.navigate(RedditAuthScreenDestination.route)
+                    },
+                    redditCookie = uiState.appPreferences.redditCookie,
                     onLayoutClick = {
                         selectedExtraType = SettingsExtraType.LAYOUT
                         scaffoldNavigator.navigateTo(ListDetailPaneScaffoldRole.Extra)
@@ -533,6 +538,8 @@ private fun DetailContentScaffold(
     autoWallpaperPermissionsState: MultiplePermissionsState,
     onBackClick: () -> Unit,
     onWallhavenApiKeyItemClick: () -> Unit,
+    onRedditLoginItemClick: () -> Unit,
+    redditCookie: String,
     onLayoutClick: () -> Unit,
     onViewedWallpapersLookClick: () -> Unit,
     onSourcesClick: () -> Unit,
@@ -581,6 +588,8 @@ private fun DetailContentScaffold(
                     SettingsType.ACCOUNT -> AccountContent(
                         isExpanded = isExpanded,
                         onWallhavenApiKeyItemClick = onWallhavenApiKeyItemClick,
+                        onRedditLoginItemClick = onRedditLoginItemClick,
+                        redditCookie = redditCookie,
                     )
                     SettingsType.LOOK_AND_FEEL -> LookAndFeelSettingsScreen(
                         selectedExtraType = selectedExtraType,

@@ -295,6 +295,9 @@ dependencies {
     // DataStore
     implementation(libs.androidx.datastore.preferences)
 
+    // WebView
+    implementation(libs.androidx.webkit)
+
     // Work
     implementation(libs.androidx.work.ktx)
     implementation(libs.androidx.hilt.work)

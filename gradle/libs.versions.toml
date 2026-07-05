@@ -28,6 +28,7 @@ androidxTestExt = "1.1.5"
 androidxTestRunner = "1.5.2"
 androidxTestServices = "1.4.2"
 androidxTestUiautomator = "2.3.0"
+androidxWebkit = "1.12.0"
 androidxWork = "2.9.0"
 autoService = "1.1.1"
 autoServiceKsp = "1.1.0"
@@ -98,6 +99,7 @@ androidx-room-ktx = { module = "androidx.room:room-ktx", version.ref = "androidx
 androidx-room-paging = { module = "androidx.room:room-paging", version.ref = "androidxRoom" }
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidxRoom" }
 androidx-room-testing = { module = "androidx.room:room-testing", version.ref = "androidxRoom" }
+androidx-webkit = { module = "androidx.webkit:webkit", version.ref = "androidxWebkit" }
 androidx-test-core = { module = "androidx.test:core", version.ref = "androidxTestCore" }
 androidx-test-espresso-core = { module = "androidx.test.espresso:espresso-core", version.ref = "androidxTestEspresso" }
 androidx-test-ext-junit = { module = "androidx.test.ext:junit", version.ref = "androidxTestExt" }

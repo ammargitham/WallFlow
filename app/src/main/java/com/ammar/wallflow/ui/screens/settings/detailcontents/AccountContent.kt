@@ -19,25 +19,39 @@ internal fun AccountContent(
     modifier: Modifier = Modifier,
     isExpanded: Boolean = false,
     onWallhavenApiKeyItemClick: () -> Unit = {},
+    onRedditLoginItemClick: () -> Unit = {},
+    redditCookie: String = "",
 ) {
-    WallhavenApiKeyItem(
-        modifier = modifier.clickable(
-            onClick = onWallhavenApiKeyItemClick,
-        ),
-        isExpanded = isExpanded,
-    )
+    Column(modifier = modifier) {
+        WallhavenApiKeyItem(
+            modifier = Modifier.clickable(
+                onClick = onWallhavenApiKeyItemClick,
+            ),
+            isExpanded = isExpanded,
+            isFirst = true,
+        )
+        RedditLoginItem(
+            modifier = Modifier.clickable(
+                onClick = onRedditLoginItemClick,
+            ),
+            isExpanded = isExpanded,
+            isLast = true,
+            isLoggedIn = redditCookie.isNotBlank(),
+        )
+    }
 }
 
 @Composable
 private fun WallhavenApiKeyItem(
     modifier: Modifier = Modifier,
     isExpanded: Boolean = false,
+    isFirst: Boolean = false,
 ) {
     SettingsDetailListItem(
         modifier = modifier,
         isExpanded = isExpanded,
-        isFirst = true,
-        isLast = true,
+        isFirst = isFirst,
+        isLast = false,
         headlineContent = {
             Text(text = stringResource(R.string.wallhaven_api_key))
         },
@@ -46,6 +60,38 @@ private fun WallhavenApiKeyItem(
                 Text(text = stringResource(R.string.wallhaven_api_key_desc))
                 Text(
                     text = stringResource(R.string.wallhaven_api_key_desc_2),
+                    style = MaterialTheme.typography.bodySmall,
+                )
+            }
+        },
+    )
+}
+
+@Composable
+private fun RedditLoginItem(
+    modifier: Modifier = Modifier,
+    isExpanded: Boolean = false,
+    isFirst: Boolean = false,
+    isLast: Boolean = false,
+    isLoggedIn: Boolean = false,
+) {
+    SettingsDetailListItem(
+        modifier = modifier,
+        isExpanded = isExpanded,
+        isFirst = isFirst,
+        isLast = isLast,
+        headlineContent = {
+            Text(text = stringResource(R.string.reddit_login))
+        },
+        supportingContent = {
+            Column {
+                Text(text = stringResource(R.string.reddit_login_desc))
+                Text(
+                    text = if (isLoggedIn) {
+                        stringResource(R.string.reddit_logged_in)
+                    } else {
+                        stringResource(R.string.reddit_not_logged_in)
+                    },
                     style = MaterialTheme.typography.bodySmall,
                 )
             }

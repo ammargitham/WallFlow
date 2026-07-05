@@ -18,6 +18,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.ammar.wallflow.NavGraphs
+import com.ammar.wallflow.destinations.RedditAuthScreenDestination
 import com.ammar.wallflow.destinations.WallhavenApiKeyDialogDestination
 import com.ammar.wallflow.extensions.toDp
 import com.ammar.wallflow.navigation.AppNavGraphs.RootNavGraph
@@ -81,6 +82,9 @@ fun MainScreen(
                 globalErrors = uiState.globalErrors,
                 onFixWallHavenApiKeyClick = {
                     navController.navigate(WallhavenApiKeyDialogDestination.route)
+                },
+                onRedditLoginClick = {
+                    navController.navigate(RedditAuthScreenDestination.route)
                 },
                 onDismiss = viewModel::dismissGlobalError,
             )
