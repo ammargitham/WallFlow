@@ -13,6 +13,10 @@
     <string name="reddit_login_desc">Login to Reddit to enable search functionality.</string>
     <string name="reddit_logged_in">Logged in</string>
     <string name="reddit_not_logged_in">Not logged in</string>
+    <string name="reddit_logged_in_long_press">Logged in (long press to delete cookie)</string>
+    <string name="reddit_delete_cookie_title">Delete Reddit cookie?</string>
+    <string name="reddit_delete_cookie_text">This will remove the stored Reddit session cookie.</string>
+    <string name="reddit_cookie_deleted">Reddit cookie deleted.</string>
     <string name="wallhaven_api_key_desc">Required to view NSFW content.</string>
     <string name="confirm">Confirm</string>
     <string name="dismiss">Dismiss</string>

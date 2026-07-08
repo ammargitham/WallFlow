@@ -23,7 +23,6 @@ fun SettingsDetailListItem(
     trailingContent: @Composable (() -> Unit)? = null,
 ) {
     ListItem(
-        // clip first then apply root Modifier
         modifier = Modifier.then(
             if (isExpanded) {
                 Modifier.clip(
