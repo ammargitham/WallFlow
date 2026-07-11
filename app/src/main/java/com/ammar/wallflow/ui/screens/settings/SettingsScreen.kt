@@ -273,7 +273,6 @@ fun SettingsScreen(
             dismissButton = {
                 TextButton(onClick = {
                     showDeleteRedditCookieDialog = false
-                    toastMessage = context.getString(R.string.cancelled)
                 }) {
                     Text(text = stringResource(R.string.cancel))
                 }
