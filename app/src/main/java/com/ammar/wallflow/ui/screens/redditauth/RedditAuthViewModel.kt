@@ -1,5 +1,6 @@
 package com.ammar.wallflow.ui.screens.redditauth
 
+import android.webkit.CookieManager
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ammar.wallflow.data.repository.AppPreferencesRepository
@@ -31,6 +32,7 @@ class RedditAuthViewModel @Inject constructor(
 
     fun saveCookie(cookie: String) {
         viewModelScope.launch {
+            CookieManager.getInstance().removeAllCookies { }
             appPreferencesRepository.updateRedditCookie(cookie)
             globalErrorsRepository.removeErrorByType(GlobalErrorType.REDDIT_UNAUTHORISED)
         }
