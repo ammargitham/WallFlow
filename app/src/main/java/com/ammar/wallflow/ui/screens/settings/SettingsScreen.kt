@@ -218,10 +218,11 @@ fun SettingsScreen(
                         navController.navigate(WallhavenApiKeyDialogDestination.route)
                     },
                     onRedditLoginItemClick = {
-                        navController.navigate(RedditAuthScreenDestination.route)
-                    },
-                    onRedditLoginItemLongPressClick = {
-                        showDeleteRedditCookieDialog = true
+                        if (uiState.appPreferences.redditCookie.isNotBlank()) {
+                            showDeleteRedditCookieDialog = true
+                        } else {
+                            navController.navigate(RedditAuthScreenDestination.route)
+                        }
                     },
                     redditCookie = uiState.appPreferences.redditCookie,
                     onLayoutClick = {
@@ -586,7 +587,6 @@ private fun DetailContentScaffold(
     onBackClick: () -> Unit,
     onWallhavenApiKeyItemClick: () -> Unit,
     onRedditLoginItemClick: () -> Unit,
-    onRedditLoginItemLongPressClick: () -> Unit = {},
     redditCookie: String,
     onLayoutClick: () -> Unit,
     onViewedWallpapersLookClick: () -> Unit,
@@ -636,9 +636,8 @@ private fun DetailContentScaffold(
                     SettingsType.ACCOUNT -> AccountContent(
                         isExpanded = isExpanded,
                         onWallhavenApiKeyItemClick = onWallhavenApiKeyItemClick,
-                        onRedditLoginItemClick = onRedditLoginItemClick,
-                        onRedditLoginItemLongPressClick = onRedditLoginItemLongPressClick,
-                        redditCookie = redditCookie,
+                    onRedditLoginItemClick = onRedditLoginItemClick,
+                    redditCookie = redditCookie,
                     )
                     SettingsType.LOOK_AND_FEEL -> LookAndFeelSettingsScreen(
                         selectedExtraType = selectedExtraType,
