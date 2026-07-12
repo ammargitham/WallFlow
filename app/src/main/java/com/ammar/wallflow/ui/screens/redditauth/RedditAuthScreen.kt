@@ -21,7 +21,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,7 +31,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.webkit.WebViewClientCompat
 import com.ammar.wallflow.R
 import com.ammar.wallflow.navigation.AppNavGraphs.RootNavGraph
@@ -51,8 +49,6 @@ fun RedditAuthScreen(
     viewModel: RedditAuthViewModel = hiltViewModel(),
     navigator: DestinationsNavigator,
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-
     RedditAuthDialogContent(
         initialUrl = REDDIT_LOGIN_URL,
         onDone = { cookie ->

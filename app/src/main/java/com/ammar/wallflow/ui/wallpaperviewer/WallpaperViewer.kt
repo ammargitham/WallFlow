@@ -89,7 +89,6 @@ fun WallpaperViewer(
     wallpaper: Wallpaper? = null,
     actionsVisible: Boolean = true,
     downloadStatus: DownloadStatus? = null,
-    loading: Boolean = false,
     thumbData: String? = null,
     showInfo: Boolean = false,
     isExpanded: Boolean = false,

@@ -128,7 +128,6 @@ class WallpaperViewerViewModel @Inject constructor(
             WallpaperViewerUiState(
                 wallpaper = wallpaper.successOr(null),
                 thumbData = args.thumbData,
-                loading = wallpaper is Resource.Loading,
                 isFavorite = isFavorite,
                 writeTagsToExif = appPreferences.writeTagsToExif,
                 tagsExifWriteType = appPreferences.tagsExifWriteType,
@@ -234,9 +233,6 @@ class WallpaperViewerViewModel @Inject constructor(
                 downloadManager.downloadWallpaperAsync(
                     context = application,
                     wallpaper = this@run,
-                    onLoadingChange = { loading ->
-                        localUiState.update { it.copy(loading = partial(loading)) }
-                    },
                     onResult = {
                         onResult(it)
                         job?.cancel()
@@ -271,7 +267,6 @@ data class WallpaperViewerUiState(
     val actionsVisible: Boolean = true,
     val showInfo: Boolean = false,
     val downloadStatus: DownloadStatus? = null,
-    val loading: Boolean = true,
     val isFavorite: Boolean = false,
     val writeTagsToExif: Boolean = false,
     val tagsExifWriteType: ExifWriteType = ExifWriteType.APPEND,

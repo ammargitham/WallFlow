@@ -186,7 +186,6 @@ fun CollectionsScreen(
             fullWallpaper = viewerUiState.wallpaper,
             fullWallpaperActionsVisible = viewerUiState.actionsVisible,
             fullWallpaperDownloadStatus = viewerUiState.downloadStatus,
-            fullWallpaperLoading = viewerUiState.loading,
             showFullWallpaperInfo = viewerUiState.showInfo,
             isFullWallpaperFavorite = viewerUiState.isFavorite,
             onWallpaperClick = onWallpaperClick,
