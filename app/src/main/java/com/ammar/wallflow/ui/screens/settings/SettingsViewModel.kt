@@ -151,6 +151,10 @@ class SettingsViewModel @Inject constructor(
         initialValue = SettingsUiState(),
     )
 
+    fun deleteRedditCookie() = viewModelScope.launch {
+        appPreferencesRepository.updateRedditCookie("")
+    }
+
     fun setBlurSketchy(blur: Boolean) = viewModelScope.launch {
         appPreferencesRepository.updateBlurSketchy(blur)
     }

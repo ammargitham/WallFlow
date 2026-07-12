@@ -166,7 +166,6 @@
     <string name="invalid_api_key_provided">"Предоставлен неверный ключ API."</string>
     <string name="rate_limited_please_try_again_after_some_time">%s: Частота ограничена. Пожалуйста, повторите попытку через некоторое время.</string>
     <string name="error">"Ошибка"</string>
-    <string name="fix">"Исправление"</string>
     <string name="delete_suggestion_dialog_text">"Удалить из истории?"</string>
     <string name="url_cannot_be_empty">"URL не может быть пустым"</string>
     <string name="invalid_url">"Неверный URL"</string>

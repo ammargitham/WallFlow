@@ -38,8 +38,8 @@ android {
         applicationId = "com.ammar.wallflow"
         minSdk = 24
         targetSdk = 34
-        versionCode = 22
-        versionName = "2.6.0-alpha01"
+        versionCode = 23
+        versionName = "2.6.0-alpha02"
 
         val abi = getAbi()
         ndk {
@@ -294,6 +294,9 @@ dependencies {
 
     // DataStore
     implementation(libs.androidx.datastore.preferences)
+
+    // WebView
+    implementation(libs.androidx.webkit)
 
     // Work
     implementation(libs.androidx.work.ktx)

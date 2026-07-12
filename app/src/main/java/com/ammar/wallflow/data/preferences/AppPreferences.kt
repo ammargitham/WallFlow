@@ -34,6 +34,7 @@ import kotlinx.serialization.UseSerializers
 data class AppPreferences(
     val version: Int? = CURRENT_VERSION,
     val wallhavenApiKey: String = "",
+    val redditCookie: String = "",
     val homeWallhavenSearch: WallhavenSearch = WallhavenSearch(
         filters = WallhavenFilters(
             sorting = WallhavenSorting.TOPLIST,

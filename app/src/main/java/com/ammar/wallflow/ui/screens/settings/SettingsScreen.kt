@@ -4,6 +4,7 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Build
+import android.webkit.CookieManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.Crossfade
@@ -16,10 +17,13 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.adaptive.ExperimentalMaterial3AdaptiveApi
@@ -48,9 +52,11 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.ammar.wallflow.R
 import com.ammar.wallflow.data.preferences.AutoWallpaperPreferences
+import com.ammar.wallflow.destinations.RedditAuthScreenDestination
 import com.ammar.wallflow.destinations.WallhavenApiKeyDialogDestination
 import com.ammar.wallflow.extensions.restartApp
 import com.ammar.wallflow.extensions.safeLaunch
+import com.ammar.wallflow.extensions.toast
 import com.ammar.wallflow.extensions.toDp
 import com.ammar.wallflow.extensions.trimAll
 import com.ammar.wallflow.model.search.SavedSearchSaver
@@ -124,6 +130,8 @@ fun SettingsScreen(
 
     var selectedType by rememberSaveable { mutableStateOf(SettingsType.ACCOUNT) }
     var selectedExtraType: SettingsExtraType? by rememberSaveable { mutableStateOf(null) }
+    var showDeleteRedditCookieDialog by remember { mutableStateOf(false) }
+    var toastMessage by remember { mutableStateOf<String?>(null) }
     val scaffoldNavigator = rememberListDetailPaneScaffoldNavigator<Any>(
         calculatePaneScaffoldDirective(currentWindowAdaptiveInfo()).copy(
             horizontalPartitionSpacerSize = 8.dp,
@@ -209,6 +217,14 @@ fun SettingsScreen(
                     onWallhavenApiKeyItemClick = {
                         navController.navigate(WallhavenApiKeyDialogDestination.route)
                     },
+                    onRedditLoginItemClick = {
+                        if (uiState.appPreferences.redditCookie.isNotBlank()) {
+                            showDeleteRedditCookieDialog = true
+                        } else {
+                            navController.navigate(RedditAuthScreenDestination.route)
+                        }
+                    },
+                    redditCookie = uiState.appPreferences.redditCookie,
                     onLayoutClick = {
                         selectedExtraType = SettingsExtraType.LAYOUT
                         scaffoldNavigator.navigateTo(ListDetailPaneScaffoldRole.Extra)
@@ -244,6 +260,42 @@ fun SettingsScreen(
             }
         },
     )
+
+    if (showDeleteRedditCookieDialog) {
+        AlertDialog(
+            onDismissRequest = { showDeleteRedditCookieDialog = false },
+            title = {
+                Text(text = stringResource(R.string.reddit_delete_cookie_title))
+            },
+            text = {
+                Text(text = stringResource(R.string.reddit_delete_cookie_text))
+            },
+            dismissButton = {
+                TextButton(onClick = {
+                    showDeleteRedditCookieDialog = false
+                }) {
+                    Text(text = stringResource(R.string.cancel))
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    showDeleteRedditCookieDialog = false
+                    viewModel.deleteRedditCookie()
+                    CookieManager.getInstance().removeAllCookies { }
+                    toastMessage = context.getString(R.string.reddit_cookie_deleted)
+                }) {
+                    Text(text = stringResource(R.string.confirm))
+                }
+            },
+        )
+    }
+
+    toastMessage?.let { msg ->
+        LaunchedEffect(msg) {
+            context.toast(msg)
+        }
+        toastMessage = null
+    }
 
     if (uiState.showObjectDetectionModelOptions) {
         ObjectDetectionModelOptionsDialog(
@@ -533,6 +585,8 @@ private fun DetailContentScaffold(
     autoWallpaperPermissionsState: MultiplePermissionsState,
     onBackClick: () -> Unit,
     onWallhavenApiKeyItemClick: () -> Unit,
+    onRedditLoginItemClick: () -> Unit,
+    redditCookie: String,
     onLayoutClick: () -> Unit,
     onViewedWallpapersLookClick: () -> Unit,
     onSourcesClick: () -> Unit,
@@ -581,6 +635,8 @@ private fun DetailContentScaffold(
                     SettingsType.ACCOUNT -> AccountContent(
                         isExpanded = isExpanded,
                         onWallhavenApiKeyItemClick = onWallhavenApiKeyItemClick,
+                    onRedditLoginItemClick = onRedditLoginItemClick,
+                    redditCookie = redditCookie,
                     )
                     SettingsType.LOOK_AND_FEEL -> LookAndFeelSettingsScreen(
                         selectedExtraType = selectedExtraType,

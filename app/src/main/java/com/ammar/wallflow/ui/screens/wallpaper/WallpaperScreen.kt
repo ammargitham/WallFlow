@@ -127,7 +127,6 @@ fun WallpaperScreen(
             wallpaper = viewerUiState.wallpaper,
             actionsVisible = viewerUiState.actionsVisible,
             downloadStatus = viewerUiState.downloadStatus,
-            loading = viewerUiState.loading,
             thumbData = viewerUiState.thumbData,
             showInfo = viewerUiState.showInfo,
             isFavorite = viewerUiState.isFavorite,

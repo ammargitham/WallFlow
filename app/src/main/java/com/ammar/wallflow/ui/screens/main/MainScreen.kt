@@ -18,7 +18,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import com.ammar.wallflow.NavGraphs
-import com.ammar.wallflow.destinations.WallhavenApiKeyDialogDestination
+
 import com.ammar.wallflow.extensions.toDp
 import com.ammar.wallflow.navigation.AppNavGraphs.RootNavGraph
 import com.ammar.wallflow.ui.common.bottombar.BottomBar
@@ -79,9 +79,6 @@ fun MainScreen(
                         },
                     ),
                 globalErrors = uiState.globalErrors,
-                onFixWallHavenApiKeyClick = {
-                    navController.navigate(WallhavenApiKeyDialogDestination.route)
-                },
                 onDismiss = viewModel::dismissGlobalError,
             )
         }

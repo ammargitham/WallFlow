@@ -133,7 +133,6 @@ fun LocalScreen(
         layoutPreferences = uiState.layoutPreferences,
         fullWallpaper = viewerUiState.wallpaper,
         fullWallpaperActionsVisible = viewerUiState.actionsVisible,
-        fullWallpaperLoading = viewerUiState.loading,
         showFullWallpaperInfo = viewerUiState.showInfo,
         isFullWallpaperFavorite = viewerUiState.isFavorite,
         onWallpaperClick = onWallpaperClick,

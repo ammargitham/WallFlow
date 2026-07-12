@@ -9,6 +9,13 @@
     <string name="settings">Settings</string>
     <string name="back">Back</string>
     <string name="wallhaven_api_key">Wallhaven API Key</string>
+    <string name="reddit_login">Reddit Login</string>
+    <string name="reddit_login_desc">Login to Reddit to enable search functionality.</string>
+    <string name="reddit_not_logged_in">Not logged in</string>
+    <string name="reddit_logged_in_status">Logged in (tap to delete cookie)</string>
+    <string name="reddit_delete_cookie_title">Delete Reddit cookie?</string>
+    <string name="reddit_delete_cookie_text">This will remove the stored Reddit session cookie.</string>
+    <string name="reddit_cookie_deleted">Reddit cookie deleted.</string>
     <string name="wallhaven_api_key_desc">Required to view NSFW content.</string>
     <string name="confirm">Confirm</string>
     <string name="dismiss">Dismiss</string>
@@ -166,9 +173,9 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="delete_saved_search_dialog_title">Delete saved search \'%1s\'?</string>
     <string name="permission_is_required">%1s is required</string>
     <string name="invalid_api_key_provided">Invalid wallhaven.cc API key provided.</string>
+    <string name="reddit_unauthorised">Reddit session expired or invalid. Login again.</string>
     <string name="rate_limited_please_try_again_after_some_time">%s: Rate limited. Please try again after some time.</string>
     <string name="error">Error</string>
-    <string name="fix">Fix</string>
     <string name="delete_suggestion_dialog_text">Remove from history?</string>
     <string name="url_cannot_be_empty">URL cannot be empty</string>
     <string name="invalid_url">Invalid URL</string>

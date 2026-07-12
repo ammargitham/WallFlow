@@ -24,9 +24,7 @@ import com.ammar.wallflow.ui.theme.WallFlowTheme
 fun SingleLineError(
     modifier: Modifier = Modifier,
     errorMsg: String,
-    actionText: String? = null,
     dismissText: String = stringResource(R.string.dismiss),
-    onActionClick: () -> Unit = {},
     onDismissClick: () -> Unit = {},
 ) {
     Row(
@@ -42,16 +40,6 @@ fun SingleLineError(
             text = errorMsg,
             color = MaterialTheme.colorScheme.onErrorContainer,
         )
-        if (actionText != null) {
-            TextButton(
-                onClick = onActionClick,
-                colors = ButtonDefaults.textButtonColors(
-                    contentColor = MaterialTheme.colorScheme.error,
-                ),
-            ) {
-                Text(text = actionText)
-            }
-        }
         TextButton(
             onClick = onDismissClick,
             colors = ButtonDefaults.textButtonColors(
@@ -71,7 +59,6 @@ private fun PreviewSingleLineError() {
         Surface {
             SingleLineError(
                 errorMsg = "This is an error message. A very long error message.",
-                actionText = "Fix",
             )
         }
     }

@@ -382,7 +382,6 @@ fun HomeScreen(
             fullWallpaper = viewerUiState.wallpaper,
             fullWallpaperActionsVisible = viewerUiState.actionsVisible,
             fullWallpaperDownloadStatus = viewerUiState.downloadStatus,
-            fullWallpaperLoading = viewerUiState.loading,
             showFullWallpaperInfo = viewerUiState.showInfo,
             isFullWallpaperFavorite = viewerUiState.isFavorite,
             isHome = uiState.isHome,

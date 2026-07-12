@@ -8,6 +8,7 @@ import com.ammar.wallflow.data.network.RedditNetworkDataSource
 import com.ammar.wallflow.data.network.WallhavenNetworkDataSource
 import com.ammar.wallflow.data.network.retrofit.DocumentConverterFactory
 import com.ammar.wallflow.data.network.retrofit.RetrofitWallhavenNetwork
+import com.ammar.wallflow.data.network.retrofit.RedditInterceptor
 import com.ammar.wallflow.data.network.retrofit.WallhavenInterceptor
 import com.ammar.wallflow.data.network.retrofit.api.WallhavenNetworkApi
 import com.ammar.wallflow.data.network.retrofit.reddit.RedditNetworkApi
@@ -38,9 +39,11 @@ object NetworkModule {
     @Singleton
     fun providesOkHttpClient(
         wallHavenInterceptor: WallhavenInterceptor,
+        redditInterceptor: RedditInterceptor,
     ) = OkHttpClient.Builder().apply {
         readTimeout(30, TimeUnit.SECONDS)
         addInterceptor(wallHavenInterceptor)
+        addInterceptor(redditInterceptor)
         if (BuildConfig.DEBUG) {
             addInterceptor(
                 HttpLoggingInterceptor().apply {
