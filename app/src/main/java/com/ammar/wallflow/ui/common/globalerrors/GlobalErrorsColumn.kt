@@ -18,8 +18,6 @@ import com.ammar.wallflow.model.Source
 fun GlobalErrorsColumn(
     modifier: Modifier = Modifier,
     globalErrors: List<GlobalError> = emptyList(),
-    onFixWallHavenApiKeyClick: () -> Unit = {},
-    onRedditLoginClick: () -> Unit = {},
     onDismiss: (error: GlobalError) -> Unit = {},
 ) {
     LazyColumn(modifier = modifier) {
@@ -32,25 +30,13 @@ fun GlobalErrorsColumn(
                     when (it.source) {
                         Source.WALLHAVEN -> stringResource(R.string.wallhaven_cc)
                         Source.REDDIT -> stringResource(R.string.reddit)
-                        Source.LOCAL -> "" // will never be local
+                        Source.LOCAL -> ""
                     },
                 )
-            }
-            val actionText = when (it) {
-                is WallHavenUnauthorisedError -> stringResource(R.string.fix)
-                is RedditUnauthorisedError -> stringResource(R.string.fix)
-                else -> null
-            }
-            val onActionClick = when (it) {
-                is WallHavenUnauthorisedError -> onFixWallHavenApiKeyClick
-                is RedditUnauthorisedError -> onRedditLoginClick
-                else -> ({})
             }
             SingleLineError(
                 modifier = Modifier.animateItem(),
                 errorMsg = errorMsg,
-                actionText = actionText,
-                onActionClick = onActionClick,
                 onDismissClick = { onDismiss(it) },
             )
         }

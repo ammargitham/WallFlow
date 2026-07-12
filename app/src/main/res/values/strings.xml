@@ -176,7 +176,6 @@ Auto wallpaper will almost never run at this time. It is dependent on many facto
     <string name="reddit_unauthorised">Reddit session expired or invalid. Login again.</string>
     <string name="rate_limited_please_try_again_after_some_time">%s: Rate limited. Please try again after some time.</string>
     <string name="error">Error</string>
-    <string name="fix">Fix</string>
     <string name="delete_suggestion_dialog_text">Remove from history?</string>
     <string name="url_cannot_be_empty">URL cannot be empty</string>
     <string name="invalid_url">Invalid URL</string>
